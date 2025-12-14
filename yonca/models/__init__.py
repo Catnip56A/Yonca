@@ -77,3 +77,20 @@ class TaviTest(db.Model):
 
     def __repr__(self):
         return f'<TaviTest {self.id}>'
+
+class PDFDocument(db.Model):
+    """PDF document model for secure document management"""
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    filename = db.Column(db.String(300), nullable=False)
+    original_filename = db.Column(db.String(300), nullable=False)
+    file_path = db.Column(db.String(500), nullable=False)
+    file_size = db.Column(db.Integer)
+    access_pin = db.Column(db.String(10), nullable=False)
+    uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    upload_date = db.Column(db.DateTime, server_default=db.func.now())
+    is_active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f'<PDFDocument {self.title}>'

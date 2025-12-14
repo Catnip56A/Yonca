@@ -11,10 +11,15 @@ from yonca.admin import init_admin
 from yonca.routes.auth import auth_bp
 from yonca.routes.api import api_bp
 from yonca.routes import main_bp
+import os
 
 def create_app(config_name='development'):
     """Create and configure Flask application"""
-    app = Flask(__name__, static_folder='static', static_url_path='/static')
+    # Get the parent directory (project root) and then the static folder
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    static_dir = os.path.join(project_root, 'static')
+    
+    app = Flask(__name__, static_folder=static_dir, static_url_path='/static')
     
     # Load configuration
     app.config.from_object(config[config_name])

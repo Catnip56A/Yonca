@@ -16,13 +16,14 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
+            background-color: #ffffff;
         }
 
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
             padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
@@ -35,6 +36,14 @@
         .logo {
             font-size: 1.8rem;
             font-weight: bold;
+            color: #abc32f;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
         }
 
         nav {
@@ -42,19 +51,21 @@
         }
 
         nav a {
-            color: white;
+            color: #333;
             text-decoration: none;
             margin-right: 2rem;
             padding: 0.5rem 0;
-            transition: opacity 0.3s ease;
+            transition: color 0.3s ease;
+            font-weight: 500;
         }
 
         nav a:hover {
-            opacity: 0.8;
+            color: #abc32f;
         }
 
         nav a.active {
-            border-bottom: 2px solid white;
+            color: #abc32f;
+            border-bottom: 2px solid #abc32f;
         }
 
         main {
@@ -72,26 +83,33 @@
 
         .hero {
             text-align: center;
-            padding: 3rem 0;
+            padding: 4rem 0;
+            background: #f8fafc;
+            margin: -2rem -20px 2rem -20px;
         }
 
         .hero h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 1rem;
-            color: #667eea;
+            color: #1f2937;
+            font-weight: 700;
         }
 
         .hero p {
-            font-size: 1.1rem;
-            color: #666;
+            font-size: 1.2rem;
+            color: #6b7280;
             margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .section-title {
-            font-size: 2rem;
-            color: #667eea;
+            font-size: 2.2rem;
+            color: #1f2937;
             margin-bottom: 2rem;
-            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+            border-bottom: 3px solid #abc32f;
             padding-bottom: 0.5rem;
         }
 
@@ -111,68 +129,88 @@
             transform: translate(-50%, -50%);
             z-index: 1;
             text-align: center;
-            color: #999;
+            color: #9ca3af;
             font-size: 1.1rem;
         }
 
         .forum-container {
-            background: #f9f9f9;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 2rem;
+            margin-top: 2rem;
         }
 
         .forum-message {
-            background: white;
-            padding: 1rem;
+            background: #ffffff;
+            padding: 1.5rem;
             margin-bottom: 1rem;
-            border-left: 4px solid #667eea;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid #abc32f;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .forum-message .user {
-            font-weight: bold;
-            color: #667eea;
+            font-weight: 600;
+            color: #abc32f;
             margin-bottom: 0.5rem;
+            font-size: 1.1rem;
         }
 
         .forum-message .timestamp {
             font-size: 0.9rem;
-            color: #999;
+            color: #9ca3af;
         }
 
         .forum-message.current-user {
-            border-left-color: #28a745;
-            background: #f8fff9;
+            border-left-color: #16a34a;
+            background: #f0fdf4;
         }
 
         .message-form {
-            background: white;
-            padding: 1.5rem;
+            background: #ffffff;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             margin-bottom: 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-form h3 {
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 600;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #333;
+            color: #374151;
         }
 
         input[type="text"],
         textarea {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-family: inherit;
             font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #abc32f;
+            box-shadow: 0 0 0 3px rgba(171, 195, 47, 0.1);
         }
 
         textarea {
@@ -181,139 +219,403 @@
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #abc32f;
             color: white;
             padding: 0.75rem 2rem;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
-            transition: transform 0.2s ease;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            transform: translateY(-2px);
+            background: #809c13;
         }
 
         .resources-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
 
         .resource-card {
-            background: white;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .resource-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .resource-icon {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 1rem;
         }
 
         .resource-card h3 {
-            color: #667eea;
+            color: #1f2937;
             margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .resource-card p {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
 
         .download-btn {
-            background: #667eea;
+            background: #abc32f;
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.5rem;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
             display: inline-block;
-            transition: background 0.3s ease;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
         }
 
         .download-btn:hover {
-            background: #764ba2;
+            background: #809c13;
         }
 
         .empty-section {
-            background: #f5f5f5;
-            padding: 3rem;
+            background: #f9fafb;
+            padding: 4rem 2rem;
             border-radius: 8px;
             text-align: center;
-            color: #999;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
         }
 
         .contact-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
 
         .contact-item {
-            background: white;
-            padding: 2rem;
+            background: #ffffff;
+            padding: 2.5rem;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .contact-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .contact-item h3 {
-            color: #667eea;
+            color: #1f2937;
             margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: 600;
         }
 
         .contact-item p {
-            color: #666;
+            color: #6b7280;
             line-height: 1.8;
         }
 
         .about-content {
-            background: white;
-            padding: 2rem;
+            background: #ffffff;
+            padding: 3rem;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
             margin-top: 2rem;
         }
 
         .about-content h2 {
-            color: #667eea;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.6rem;
+            font-weight: 600;
         }
 
         .about-content p {
-            color: #666;
-            margin-bottom: 1rem;
+            color: #6b7280;
+            margin-bottom: 1.2rem;
             line-height: 1.8;
         }
 
+        .about-content ul {
+            margin-left: 2rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content li {
+            margin-bottom: 0.5rem;
+        }
+
         footer {
-            background: #333;
-            color: white;
+            background: #1f2937;
+            color: #9ca3af;
             text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid #374151;
         }
 
         footer p {
             margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        footer a {
+            color: #abc32f;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Auth buttons styling */
+        #auth-buttons button {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #auth-buttons button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        #user-info {
+            color: #374151;
+            font-weight: 500;
+        }
+
+        #user-info button {
+            background: #dc2626;
+            color: white;
+            border: 1px solid #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #user-info button:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
+        #user-info a {
+            color: #abc32f;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        #user-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Course cards styling */
+        .course-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .course-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-emoji {
+            width: 80px;
+            height: 80px;
+            margin-right: 1.5rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #abc32f 0%, #809c13 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .course-info h4 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .course-info p {
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .course-info .time-slot {
+            color: #374151;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* PDFs styling */
+        .pdfs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pdf-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .pdf-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .pdf-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #abc32f;
+        }
+
+        .pdf-card h3 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .pdf-card p {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .pdf-access-btn {
+            background: #abc32f;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .pdf-access-btn:hover {
+            background: #809c13;
+        }
+
+        .pin-input {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pin-input input {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 0.2rem;
+        }
+
+        .pin-error {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            nav a {
+                margin-right: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+
+            .course-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .course-emoji {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <div class="logo">🎓 Yonca</div>
+            <div class="logo">
+                <img src="/static/images/Logo.jpeg" alt="Yonca Logo">
+            </div>
             <nav>
                 <a href="#" onclick="showPage('home')" class="nav-link active">Home</a>
                 <a href="#" onclick="showPage('courses')" class="nav-link">Courses</a>
@@ -323,11 +625,12 @@
                 <a href="#" onclick="showPage('contacts')" class="nav-link">Contacts</a>
                 <a href="#" onclick="showPage('about')" class="nav-link">About Company</a>
             </nav>
-            <div id="auth-buttons" style="position: absolute; top: 1rem; right: 20px;">
+            <div id="auth-buttons" style="position: absolute; top: 1rem; right: 20px; display: block;">
                 <button id="login-btn" onclick="window.location.href='/login'" style="background: white; color: #667eea; border: 1px solid #667eea; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Login</button>
             </div>
-            <div id="user-info" style="position: absolute; top: 1rem; right: 20px; color: white; display: none;">
-                Welcome, <span id="user-name"></span>! <a href="/logout" style="color: white; text-decoration: underline;">Logout</a>
+            <div id="user-info" style="position: absolute; top: 1rem; right: 20px; display: none;">
+                <span style="color: #374151; margin-right: 1rem;">Welcome, <span id="user-name"></span>!</span>
+                <button onclick="window.location.href='/logout'" style="background: #dc2626; color: white; border: 1px solid #dc2626; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">Logout</button>
             </div>
         </div>
     </header>
@@ -392,8 +695,10 @@
         <!-- Resources Page -->
         <section id="resources" class="page">
             <h2 class="section-title">Resources Library</h2>
-            <p>Download educational materials and reference documents.</p>
+            <p>Download educational materials, reference documents, and access secure PDF files.</p>
             
+            <!-- Regular Resources -->
+            <h3 style="color: #1f2937; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 Learning Materials</h3>
             <div class="resources-grid">
                 <div class="resource-card">
                     <div class="resource-icon">📄</div>
@@ -423,6 +728,49 @@
                     <a href="#" class="download-btn">Download PDF</a>
                 </div>
             </div>
+
+            <!-- PDF Upload Section (Admin Only) -->
+            <div id="pdf-upload-section" style="display: none;">
+                <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 Upload PDF Document</h3>
+                <p style="color: #6b7280; margin-bottom: 2rem;">Upload a PDF document to share securely with PIN protection.</p>
+                
+                <div class="upload-form" style="background: #f8fafc; padding: 2rem; border-radius: 8px; margin-bottom: 3rem;">
+                    <form id="pdf-upload-form" enctype="multipart/form-data">
+                    <div style="margin-bottom: 1rem;">
+                        <label for="pdf-title" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151;">Document Title</label>
+                        <input type="text" id="pdf-title" name="title" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label for="pdf-description" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151;">Description</label>
+                        <textarea id="pdf-description" name="description" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label for="pdf-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151;">PDF File</label>
+                        <input type="file" id="pdf-file" name="file" accept=".pdf" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <label for="pdf-pin" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151;">Access PIN (Optional - auto-generated if empty)</label>
+                        <input type="text" id="pdf-pin" name="pin" maxlength="10" placeholder="Leave empty for auto-generated PIN" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                    
+                    <button type="submit" class="upload-btn" style="background: #abc32f; color: white; padding: 0.75rem 2rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.3s ease;">
+                        📤 Upload PDF
+                    </button>
+                    
+                    <div id="upload-status" style="margin-top: 1rem; display: none;"></div>
+                </form>
+            </div>
+            </div>
+
+            <!-- Secure PDFs -->
+            <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">🔒 Secure PDF Documents</h3>
+            <p style="color: #6b7280; margin-bottom: 2rem;">Access protected PDF documents with PIN code authentication.</p>
+            <div class="pdfs-grid">
+                <!-- PDFs will be loaded here -->
+            </div>
         </section>
 
         <!-- TAVI Test Page -->
@@ -439,52 +787,47 @@
             
             <div class="contact-info">
                 <div class="contact-item">
-                    <h3>📞 Phone</h3>
+                    <h3>� WhatsApp</h3>
                     <p>
-                        +1 (555) 123-4567<br>
-                        Available: Mon-Fri, 9AM-5PM EST
+                        <a href="https://wa.me/994516237394" target="_blank" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                            +994 51 623 73 94
+                        </a><br>
+                        Available: Mon-Fri, 9AM-6PM
                     </p>
                 </div>
 
                 <div class="contact-item">
                     <h3>📧 Email</h3>
                     <p>
-                        support@yonca.com<br>
-                        info@yonca.com
+                        <a href="mailto:info@yonca-sdc.com" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                            info@yonca-sdc.com
+                        </a>
                     </p>
                 </div>
 
                 <div class="contact-item">
                     <h3>📍 Address</h3>
                     <p>
-                        123 Learning Street<br>
-                        Education City, EC 12345<br>
-                        Country
+                        Məsud Əlizadə 52<br>
+                        Baku, Azerbaijan
                     </p>
                 </div>
 
                 <div class="contact-item">
                     <h3>🕐 Business Hours</h3>
                     <p>
-                        Monday - Friday: 9:00 AM - 5:00 PM<br>
-                        Saturday: 10:00 AM - 3:00 PM<br>
-                        Sunday: Closed
-                    </p>
-                </div>
-
-                <div class="contact-item">
-                    <h3>💬 Live Chat</h3>
-                    <p>
-                        Available during business hours<br>
-                        Click the chat icon in the bottom right corner
+                        Monday - Friday: 9:00 AM - 6:00 PM<br>
+                        Saturday - Sunday: Closed
                     </p>
                 </div>
 
                 <div class="contact-item">
                     <h3>📱 Social Media</h3>
                     <p>
-                        Follow us on social media for updates and announcements<br>
-                        @yonca_learning
+                        Follow us on Instagram for updates and announcements<br>
+                        <a href="https://www.instagram.com/yonca_ababaku/?hl=en" target="_blank" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                            @yonca_ababaku
+                        </a>
                     </p>
                 </div>
             </div>
@@ -565,7 +908,10 @@
                 // Load data for specific pages
                 if (pageId === 'courses') loadCourses();
                 if (pageId === 'forum') loadForumMessages();
-                if (pageId === 'resources') loadResources();
+                if (pageId === 'resources') {
+                    loadResources();
+                    loadPDFs();
+                }
             }
 
             // Add active class to clicked nav link
@@ -587,23 +933,23 @@
                     coursesContainer.innerHTML = '<h3>Your Courses:</h3>';
                     courses.forEach(course => {
                         const courseDiv = document.createElement('div');
-                        courseDiv.style.cssText = 'background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center;';
+                        courseDiv.className = 'course-card';
                         
                         let profilePic = '';
                         if (course.profile_emoji) {
                             // Show configured emoji
-                            profilePic = `<div class="image-container" style="width: 80px; height: 80px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 36px;">${course.profile_emoji}</div>`;
+                            profilePic = `<div class="course-emoji">${course.profile_emoji}</div>`;
                         } else {
                             // Show default emoji
-                            profilePic = '<div class="image-container" style="width: 80px; height: 80px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 36px;">📚</div>';
+                            profilePic = '<div class="course-emoji">📚</div>';
                         }
                         
                         courseDiv.innerHTML = `
                             ${profilePic}
-                            <div style="flex: 1;">
-                                <h4 style="color: #667eea; margin-bottom: 0.5rem;">${course.title}</h4>
-                                <p style="margin-bottom: 0.5rem;">${course.description}</p>
-                                ${course.time_slot ? `<p style="color: #666; font-size: 0.9rem;"><strong>Time:</strong> ${course.time_slot}</p>` : ''}
+                            <div class="course-info">
+                                <h4>${course.title}</h4>
+                                <p>${course.description}</p>
+                                ${course.time_slot ? `<p class="time-slot"><strong>Time:</strong> ${course.time_slot}</p>` : ''}
                             </div>
                         `;
                         coursesContainer.appendChild(courseDiv);
@@ -663,6 +1009,132 @@
             }
         }
 
+        async function loadPDFs() {
+            try {
+                const response = await fetch(`${API_BASE}/api/pdfs`);
+                const pdfs = await response.json();
+                const pdfsGrid = document.querySelector('.pdfs-grid');
+                pdfsGrid.innerHTML = '';
+                if (pdfs.length > 0) {
+                    pdfs.forEach(pdf => {
+                        const pdfCard = document.createElement('div');
+                        pdfCard.className = 'pdf-card';
+                        pdfCard.innerHTML = `
+                            <div class="pdf-icon">📕</div>
+                            <h3>${pdf.title}</h3>
+                            <p>${pdf.description || 'Secure PDF document'}</p>
+                            <div class="pin-input">
+                                <input type="password" id="pin-${pdf.id}" placeholder="Enter PIN" maxlength="10">
+                                <button class="pdf-access-btn" onclick="accessPDF(${pdf.id})">Access PDF</button>
+                                <div id="error-${pdf.id}" class="pin-error" style="display: none;"></div>
+                            </div>
+                        `;
+                        pdfsGrid.appendChild(pdfCard);
+                    });
+                } else {
+                    pdfsGrid.innerHTML = '<p>No PDF documents available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading PDFs:', error);
+            }
+        }
+
+        async function accessPDF(pdfId) {
+            const pinInput = document.getElementById(`pin-${pdfId}`);
+            const errorDiv = document.getElementById(`error-${pdfId}`);
+            const pin = pinInput.value.trim();
+            
+            if (!pin) {
+                errorDiv.textContent = 'Please enter a PIN';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/pdfs/${pdfId}/access`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pin: pin }),
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Success - open download link
+                    window.open(`${API_BASE}/api/pdfs/${pdfId}/download/${pin}`, '_blank');
+                    errorDiv.style.display = 'none';
+                    pinInput.value = '';
+                    alert('PDF downloaded successfully!');
+                } else {
+                    errorDiv.textContent = result.error || 'Access denied';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error accessing PDF:', error);
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function uploadPDF(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('pdf-upload-form');
+            const statusDiv = document.getElementById('upload-status');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('pdf-title').value);
+            formData.append('description', document.getElementById('pdf-description').value);
+            formData.append('file', document.getElementById('pdf-file').files[0]);
+            
+            const pinValue = document.getElementById('pdf-pin').value.trim();
+            if (pinValue) {
+                formData.append('pin', pinValue);
+            }
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<span style="color: #6b7280;">Uploading PDF...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/pdfs/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span style="color: #059669;">✅ PDF uploaded successfully! Access PIN: <strong>${result.pin}</strong></span>`;
+                    
+                    // Clear form
+                    form.reset();
+                    
+                    // Reload PDFs
+                    loadPDFs();
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        alert(`PDF "${result.title}" uploaded successfully!\n\nAccess PIN: ${result.pin}\n\nKeep this PIN safe to share the document.`);
+                    }, 500);
+                } else {
+                    statusDiv.innerHTML = `<span style="color: #dc2626;">❌ Error: ${result.error || 'Upload failed'}</span>`;
+                }
+            } catch (error) {
+                console.error('Error uploading PDF:', error);
+                statusDiv.innerHTML = '<span style="color: #dc2626;">❌ Network error. Please try again.</span>';
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📤 Upload PDF';
+            }
+        }
+
         async function postMessage(event) {
             event.preventDefault();
 
@@ -715,23 +1187,23 @@
                 contentDiv.innerHTML = '';
                 courses.forEach(course => {
                     const courseDiv = document.createElement('div');
-                    courseDiv.style.cssText = 'background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center;';
+                    courseDiv.className = 'course-card';
                     
                     let profilePic = '';
                     if (course.profile_emoji) {
                         // Show configured emoji
-                        profilePic = `<div class="image-container" style="width: 60px; height: 60px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 28px;">${course.profile_emoji}</div>`;
+                        profilePic = `<div class="course-emoji">${course.profile_emoji}</div>`;
                     } else {
                         // Show default emoji
-                        profilePic = '<div class="image-container" style="width: 60px; height: 60px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 28px;">📚</div>';
+                        profilePic = '<div class="course-emoji">📚</div>';
                     }
                     
                     courseDiv.innerHTML = `
                         ${profilePic}
-                        <div style="flex: 1;">
-                            <h4 style="color: #667eea; margin-bottom: 0.5rem;">${course.title}</h4>
-                            <p style="margin-bottom: 0.5rem;">${course.description}</p>
-                            ${course.time_slot ? `<p style="color: #666; font-size: 0.9rem;"><strong>Time:</strong> ${course.time_slot}</p>` : ''}
+                        <div class="course-info">
+                            <h4>${course.title}</h4>
+                            <p>${course.description}</p>
+                            ${course.time_slot ? `<p class="time-slot"><strong>Time:</strong> ${course.time_slot}</p>` : ''}
                         </div>
                     `;
                     contentDiv.appendChild(courseDiv);
@@ -761,6 +1233,11 @@
                     window.currentUser = user;
                     updateForumForm(true);
                     showHomeCourses(user.courses);
+                    
+                    // Show PDF upload section for admins
+                    if (user.is_admin) {
+                        document.getElementById('pdf-upload-section').style.display = 'block';
+                    }
                 } else {
                     console.log('User not logged in');
                     document.getElementById('auth-buttons').style.display = 'block';
@@ -768,6 +1245,9 @@
                     window.currentUser = null;
                     updateForumForm(false);
                     hideHomeCourses();
+                    
+                    // Hide PDF upload section for non-admin users
+                    document.getElementById('pdf-upload-section').style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error checking user:', error);
@@ -776,6 +1256,9 @@
                 window.currentUser = null;
                 updateForumForm(false);
                 hideHomeCourses();
+                
+                // Hide PDF upload section for non-admin users
+                document.getElementById('pdf-upload-section').style.display = 'none';
             }
         }
 
@@ -792,6 +1275,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkUser();
             loadForumMessages();
+            
+            // Add PDF upload form listener
+            const pdfUploadForm = document.getElementById('pdf-upload-form');
+            if (pdfUploadForm) {
+                pdfUploadForm.addEventListener('submit', uploadPDF);
+            }
         });
     </script>
 </body>

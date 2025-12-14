@@ -1,11 +1,12 @@
 """
 Admin interface views and configuration
 """
+from flask import flash
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from wtforms import StringField
-from wtforms.validators import Optional
-from yonca.models import User, Course, ForumMessage, Resource, TaviTest, db
+from wtforms.validators import Optional, DataRequired
+from yonca.models import User, Course, ForumMessage, TaviTest, db
 
 class UserView(ModelView):
     """Admin view for User model with password management"""
@@ -42,6 +43,5 @@ def init_admin(app):
     admin.add_view(UserView(User, db.session))
     admin.add_view(CourseView(Course, db.session))
     admin.add_view(ModelView(ForumMessage, db.session))
-    admin.add_view(ModelView(Resource, db.session))
     admin.add_view(ModelView(TaviTest, db.session))
     return admin
