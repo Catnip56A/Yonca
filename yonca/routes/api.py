@@ -36,18 +36,67 @@ def get_forum_messages():
     } for m in messages])
 
 @api_bp.route('/forum/messages', methods=['POST'])
+@login_required
 def post_forum_message():
     """Post a new forum message"""
     data = request.get_json()
     
-    if not data or 'username' not in data or 'message' not in data:
-        return jsonify({'error': 'Username and message required'}), 400
+    if not data or 'message' not in data:
+        return jsonify({'error': 'Message required'}), 400
     
-    new_message = ForumMessage(username=data['username'], message=data['message'])
+    # Use the logged-in user's information
+    new_message = ForumMessage(
+        user_id=current_user.id,
+        username=current_user.username,
+        message=data['message']
+    )
     db.session.add(new_message)
     db.session.commit()
     
-    return jsonify({'success': True, 'id': new_message.id}), 201
+    # Refresh to get the server-generated timestamp
+    db.session.refresh(new_message)
+    
+    return jsonify({
+        'success': True,
+        'message_id': new_message.id,
+        'message': new_message.message,
+        'username': new_message.username,
+        'timestamp': new_message.timestamp.isoformat() if new_message.timestamp else None
+    }), 201
+    
+@api_bp.route('/forum/messages/<int:message_id>', methods=['PUT'])
+@login_required
+def edit_forum_message(message_id):
+    """Edit a forum message (only by owner or admin)"""
+    message = ForumMessage.query.get_or_404(message_id)
+    
+    # Check if user owns the message or is admin
+    if message.user_id != current_user.id and not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    if not data or 'message' not in data:
+        return jsonify({'error': 'Message required'}), 400
+    
+    message.message = data['message']
+    db.session.commit()
+    
+    return jsonify({'success': True}), 200
+
+@api_bp.route('/forum/messages/<int:message_id>', methods=['DELETE'])
+@login_required
+def delete_forum_message(message_id):
+    """Delete a forum message (only by owner or admin)"""
+    message = ForumMessage.query.get_or_404(message_id)
+    
+    # Check if user owns the message or is admin
+    if message.user_id != current_user.id and not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    db.session.delete(message)
+    db.session.commit()
+    
+    return jsonify({'success': True}), 200
 
 @api_bp.route('/resources')
 def get_resources():

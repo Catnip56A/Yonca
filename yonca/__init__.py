@@ -15,11 +15,13 @@ import os
 
 def create_app(config_name='development'):
     """Create and configure Flask application"""
-    # Get the parent directory (project root) and then the static folder
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Get the package directory
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(package_dir)
     static_dir = os.path.join(project_root, 'static')
+    template_dir = os.path.join(package_dir, 'templates')
     
-    app = Flask(__name__, static_folder=static_dir, static_url_path='/static')
+    app = Flask(__name__, static_folder=static_dir, static_url_path='/static', template_folder=template_dir)
     
     # Load configuration
     app.config.from_object(config[config_name])

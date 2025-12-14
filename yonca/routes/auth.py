@@ -1,7 +1,7 @@
 """
 Authentication routes
 """
-from flask import Blueprint, request, redirect, url_for, flash, jsonify, current_app
+from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from yonca.models import User, db
 
@@ -21,7 +21,7 @@ def login():
         
         flash('Invalid username or password')
     
-    return current_app.send_static_file('login.html')
+    return render_template('login.html')
 
 @auth_bp.route('/logout')
 @login_required
