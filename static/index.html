@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://via.placeholder.com">
+    <title>Yonca - Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav {
+            margin-top: 1rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 0;
+            transition: opacity 0.3s ease;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        nav a.active {
+            border-bottom: 2px solid white;
+        }
+
+        main {
+            min-height: calc(100vh - 150px);
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .image-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            text-align: center;
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .forum-container {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .forum-message {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .forum-message .user {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .forum-message .timestamp {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .forum-message.current-user {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .message-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .resource-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .resource-card h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .download-btn {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #764ba2;
+        }
+
+        .empty-section {
+            background: #f5f5f5;
+            padding: 3rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #999;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-item h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .contact-item p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .about-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .about-content h2 {
+            color: #667eea;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-content p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">🎓 Yonca</div>
+            <nav>
+                <a href="#" onclick="showPage('home')" class="nav-link active">Home</a>
+                <a href="#" onclick="showPage('courses')" class="nav-link">Courses</a>
+                <a href="#" onclick="showPage('forum')" class="nav-link">Forum</a>
+                <a href="#" onclick="showPage('resources')" class="nav-link">Resources</a>
+                <a href="#" onclick="showPage('tavi')" class="nav-link">TAVI Test</a>
+                <a href="#" onclick="showPage('contacts')" class="nav-link">Contacts</a>
+                <a href="#" onclick="showPage('about')" class="nav-link">About Company</a>
+            </nav>
+            <div id="auth-buttons" style="position: absolute; top: 1rem; right: 20px;">
+                <button id="login-btn" onclick="window.location.href='/login'" style="background: white; color: #667eea; border: 1px solid #667eea; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Login</button>
+            </div>
+            <div id="user-info" style="position: absolute; top: 1rem; right: 20px; color: white; display: none;">
+                Welcome, <span id="user-name"></span>! <a href="/logout" style="color: white; text-decoration: underline;">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1>Welcome to Yonca</h1>
+                <p>Your comprehensive learning platform for courses, resources, and community engagement</p>
+                <p>Navigate using the menu above to explore our courses, connect with others in our forum, access resources, and learn more about us.</p>
+            </div>
+            <div id="home-courses" style="display: none; margin-top: 2rem;">
+                <h2 class="section-title">Your Enrolled Courses</h2>
+                <div id="home-courses-content">
+                    <p>Loading your courses...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses Page -->
+        <section id="courses" class="page">
+            <h2 class="section-title">Courses</h2>
+            <p>Explore your enrolled courses with videos and recorded sessions.</p>
+            <div class="courses-placeholder">
+                <p>No courses available yet. Check back soon!</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">This section will display your courses with videos and recordings of sessions.</p>
+            </div>
+        </section>
+
+        <!-- Forum Page -->
+        <section id="forum" class="page">
+            <h2 class="section-title">Community Forum</h2>
+            
+            <div class="message-form">
+                <h3>Post a New Message</h3>
+                <form onsubmit="postMessage(event)">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    <button type="submit">Post Message</button>
+                </form>
+            </div>
+
+            <div class="forum-container">
+                <h3>Recent Messages</h3>
+                <div id="messages-container">
+                    <div class="forum-message">
+                        <div class="user">Welcome to Yonca Forum!</div>
+                        <p>This is where community members can connect, ask questions, and share knowledge.</p>
+                        <div class="timestamp">Posted on December 8, 2025</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Page -->
+        <section id="resources" class="page">
+            <h2 class="section-title">Resources Library</h2>
+            <p>Download educational materials and reference documents.</p>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">📄</div>
+                    <h3>Getting Started Guide</h3>
+                    <p>A comprehensive guide to help you get started with Yonca platform.</p>
+                    <a href="#" class="download-btn">Download PDF</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">📚</div>
+                    <h3>Course Materials</h3>
+                    <p>Essential course materials and study notes for all courses.</p>
+                    <a href="#" class="download-btn">Download PDF</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">📋</div>
+                    <h3>Best Practices</h3>
+                    <p>Industry best practices and tips for success.</p>
+                    <a href="#" class="download-btn">Download PDF</a>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-icon">🎯</div>
+                    <h3>FAQ Document</h3>
+                    <p>Frequently asked questions and answers about our platform.</p>
+                    <a href="#" class="download-btn">Download PDF</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAVI Test Page -->
+        <section id="tavi" class="page">
+            <h2 class="section-title">TAVI Test</h2>
+            <div class="empty-section">
+                <p>TAVI Test section is coming soon.</p>
+            </div>
+        </section>
+
+        <!-- Contacts Page -->
+        <section id="contacts" class="page">
+            <h2 class="section-title">Contact Us</h2>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <h3>📞 Phone</h3>
+                    <p>
+                        +1 (555) 123-4567<br>
+                        Available: Mon-Fri, 9AM-5PM EST
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>📧 Email</h3>
+                    <p>
+                        support@yonca.com<br>
+                        info@yonca.com
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>📍 Address</h3>
+                    <p>
+                        123 Learning Street<br>
+                        Education City, EC 12345<br>
+                        Country
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>🕐 Business Hours</h3>
+                    <p>
+                        Monday - Friday: 9:00 AM - 5:00 PM<br>
+                        Saturday: 10:00 AM - 3:00 PM<br>
+                        Sunday: Closed
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>💬 Live Chat</h3>
+                    <p>
+                        Available during business hours<br>
+                        Click the chat icon in the bottom right corner
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>📱 Social Media</h3>
+                    <p>
+                        Follow us on social media for updates and announcements<br>
+                        @yonca_learning
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Company Page -->
+        <section id="about" class="page">
+            <h2 class="section-title">About Yonca</h2>
+            
+            <div class="about-content">
+                <h2>Our Mission</h2>
+                <p>
+                    At Yonca, we are committed to providing accessible, high-quality educational content and fostering a supportive learning community. 
+                    Our mission is to empower learners worldwide to achieve their goals through innovative online education.
+                </p>
+
+                <h2>Our Vision</h2>
+                <p>
+                    We envision a world where quality education is accessible to everyone, regardless of their background or location. 
+                    We strive to create an inclusive platform that bridges the gap between learners and expert educators.
+                </p>
+
+                <h2>Our Values</h2>
+                <ul style="margin-left: 2rem; color: #666;">
+                    <li><strong>Excellence:</strong> We maintain the highest standards in our courses and services.</li>
+                    <li><strong>Community:</strong> We believe in the power of collaborative learning and peer support.</li>
+                    <li><strong>Accessibility:</strong> We ensure our platform is accessible to all learners.</li>
+                    <li><strong>Innovation:</strong> We continuously evolve to provide the best learning experience.</li>
+                    <li><strong>Integrity:</strong> We operate with transparency and honesty in all our dealings.</li>
+                </ul>
+
+                <h2>Why Choose Yonca?</h2>
+                <ul style="margin-left: 2rem; color: #666;">
+                    <li>Expert instructors with real-world experience</li>
+                    <li>Comprehensive course library with varied topics</li>
+                    <li>Flexible learning at your own pace</li>
+                    <li>Active community forum for peer support</li>
+                    <li>Rich library of downloadable resources</li>
+                    <li>Certificate of completion for each course</li>
+                </ul>
+
+                <h2>Contact Information</h2>
+                <p>
+                    Have questions about our company? Feel free to reach out to us through the <a href="#contacts" onclick="showPage('contacts')">Contacts</a> page.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Yonca Learning Platform. All rights reserved.</p>
+        <p>Privacy Policy | Terms of Service | Contact Us</p>
+    </footer>
+
+    <script>
+        const API_BASE = ''; // Relative to same origin
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // Remove active class from all nav links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // Show selected page
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+                // Load data for specific pages
+                if (pageId === 'courses') loadCourses();
+                if (pageId === 'forum') loadForumMessages();
+                if (pageId === 'resources') loadResources();
+            }
+
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        async function loadCourses() {
+            try {
+                console.log('Loading courses...');
+                const response = await fetch(`${API_BASE}/api/courses`);
+                console.log('Response status:', response.status);
+                const courses = await response.json();
+                console.log('Courses received:', courses);
+                const coursesContainer = document.querySelector('.courses-placeholder');
+                if (courses.length > 0) {
+                    coursesContainer.innerHTML = '<h3>Your Courses:</h3>';
+                    courses.forEach(course => {
+                        const courseDiv = document.createElement('div');
+                        courseDiv.style.cssText = 'background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center;';
+                        
+                        let profilePic = '';
+                        if (course.profile_emoji) {
+                            // Show configured emoji
+                            profilePic = `<div class="image-container" style="width: 80px; height: 80px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 36px;">${course.profile_emoji}</div>`;
+                        } else {
+                            // Show default emoji
+                            profilePic = '<div class="image-container" style="width: 80px; height: 80px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 36px;">📚</div>';
+                        }
+                        
+                        courseDiv.innerHTML = `
+                            ${profilePic}
+                            <div style="flex: 1;">
+                                <h4 style="color: #667eea; margin-bottom: 0.5rem;">${course.title}</h4>
+                                <p style="margin-bottom: 0.5rem;">${course.description}</p>
+                                ${course.time_slot ? `<p style="color: #666; font-size: 0.9rem;"><strong>Time:</strong> ${course.time_slot}</p>` : ''}
+                            </div>
+                        `;
+                        coursesContainer.appendChild(courseDiv);
+                    });
+                } else {
+                    coursesContainer.innerHTML = '<p>No courses available yet. Check back soon!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading courses:', error);
+            }
+        }
+
+        async function loadForumMessages() {
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages`);
+                const messages = await response.json();
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.innerHTML = '';
+                messages.forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'forum-message' + (message.is_current_user ? ' current-user' : '');
+                    messageDiv.innerHTML = `
+                        <div class="user">${escapeHtml(message.username)}${message.is_current_user ? ' (You)' : ''}</div>
+                        <p>${escapeHtml(message.message)}</p>
+                        <div class="timestamp">Posted on ${new Date(message.timestamp).toLocaleDateString()}</div>
+                    `;
+                    messagesContainer.appendChild(messageDiv);
+                });
+            } catch (error) {
+                console.error('Error loading forum messages:', error);
+            }
+        }
+
+        async function loadResources() {
+            try {
+                const response = await fetch(`${API_BASE}/api/resources`);
+                const resources = await response.json();
+                const resourcesGrid = document.querySelector('.resources-grid');
+                resourcesGrid.innerHTML = '';
+                if (resources.length > 0) {
+                    resources.forEach(resource => {
+                        const resourceCard = document.createElement('div');
+                        resourceCard.className = 'resource-card';
+                        resourceCard.innerHTML = `
+                            <div class="resource-icon">📄</div>
+                            <h3>${resource.title}</h3>
+                            <p>${resource.description}</p>
+                            <a href="${resource.file_url}" class="download-btn" target="_blank">Download PDF</a>
+                        `;
+                        resourcesGrid.appendChild(resourceCard);
+                    });
+                } else {
+                    resourcesGrid.innerHTML = '<p>No resources available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading resources:', error);
+            }
+        }
+
+        async function postMessage(event) {
+            event.preventDefault();
+
+            let username;
+            if (window.currentUser) {
+                username = window.currentUser.username;
+            } else {
+                username = document.getElementById('username').value;
+            }
+
+            const message = document.getElementById('message').value;
+
+            if (!username || username.trim() === '' || message.trim() === '') {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, message }),
+                });
+
+                if (response.ok) {
+                    // Reload messages
+                    loadForumMessages();
+                    // Clear form
+                    if (!window.currentUser) {
+                        document.getElementById('username').value = '';
+                    }
+                    document.getElementById('message').value = '';
+                    alert('Message posted successfully!');
+                } else {
+                    alert('Error posting message');
+                }
+            } catch (error) {
+                console.error('Error posting message:', error);
+                alert('Error posting message');
+            }
+        }
+
+        function showHomeCourses(courses) {
+            const homeCoursesDiv = document.getElementById('home-courses');
+            const contentDiv = document.getElementById('home-courses-content');
+            
+            if (courses && courses.length > 0) {
+                contentDiv.innerHTML = '';
+                courses.forEach(course => {
+                    const courseDiv = document.createElement('div');
+                    courseDiv.style.cssText = 'background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center;';
+                    
+                    let profilePic = '';
+                    if (course.profile_emoji) {
+                        // Show configured emoji
+                        profilePic = `<div class="image-container" style="width: 60px; height: 60px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 28px;">${course.profile_emoji}</div>`;
+                    } else {
+                        // Show default emoji
+                        profilePic = '<div class="image-container" style="width: 60px; height: 60px; margin-right: 1rem; border-radius: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 28px;">📚</div>';
+                    }
+                    
+                    courseDiv.innerHTML = `
+                        ${profilePic}
+                        <div style="flex: 1;">
+                            <h4 style="color: #667eea; margin-bottom: 0.5rem;">${course.title}</h4>
+                            <p style="margin-bottom: 0.5rem;">${course.description}</p>
+                            ${course.time_slot ? `<p style="color: #666; font-size: 0.9rem;"><strong>Time:</strong> ${course.time_slot}</p>` : ''}
+                        </div>
+                    `;
+                    contentDiv.appendChild(courseDiv);
+                });
+                homeCoursesDiv.style.display = 'block';
+            } else {
+                contentDiv.innerHTML = '<p>You are not enrolled in any courses yet. Visit the <a href="#" onclick="showPage(\'courses\')">Courses</a> page to browse available courses.</p>';
+                homeCoursesDiv.style.display = 'block';
+            }
+        }
+
+        function hideHomeCourses() {
+            document.getElementById('home-courses').style.display = 'none';
+        }
+
+        async function checkUser() {
+            try {
+                console.log('Checking user login status...');
+                const response = await fetch(`${API_BASE}/api/user`);
+                console.log('User check response status:', response.status);
+                if (response.ok) {
+                    const user = await response.json();
+                    console.log('User logged in:', user);
+                    document.getElementById('auth-buttons').style.display = 'none';
+                    document.getElementById('user-info').style.display = 'block';
+                    document.getElementById('user-name').textContent = user.username;
+                    window.currentUser = user;
+                    updateForumForm(true);
+                    showHomeCourses(user.courses);
+                } else {
+                    console.log('User not logged in');
+                    document.getElementById('auth-buttons').style.display = 'block';
+                    document.getElementById('user-info').style.display = 'none';
+                    window.currentUser = null;
+                    updateForumForm(false);
+                    hideHomeCourses();
+                }
+            } catch (error) {
+                console.error('Error checking user:', error);
+                document.getElementById('auth-buttons').style.display = 'block';
+                document.getElementById('user-info').style.display = 'none';
+                window.currentUser = null;
+                updateForumForm(false);
+                hideHomeCourses();
+            }
+        }
+
+        function updateForumForm(isLoggedIn) {
+            const usernameGroup = document.querySelector('.form-group');
+            if (isLoggedIn) {
+                usernameGroup.style.display = 'none';
+            } else {
+                usernameGroup.style.display = 'block';
+            }
+        }
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUser();
+            loadForumMessages();
+        });
+    </script>
+</body>
+</html>
