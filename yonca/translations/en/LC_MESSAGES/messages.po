@@ -1,0 +1,161 @@
+# English translations for Yonca
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Yonca - Learning Platform"
+msgstr "Yonca - Learning Platform"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "Courses"
+msgstr "Courses"
+
+msgid "Forum"
+msgstr "Forum"
+
+msgid "Resources"
+msgstr "Resources"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Welcome to Yonca"
+msgstr "Welcome to Yonca"
+
+msgid "Your gateway to knowledge and community learning."
+msgstr "Your gateway to knowledge and community learning."
+
+msgid "Get Started"
+msgstr "Get Started"
+
+msgid "Community Forum"
+msgstr "Community Forum"
+
+msgid "Connect with fellow learners, ask questions, and share knowledge."
+msgstr "Connect with fellow learners, ask questions, and share knowledge."
+
+msgid "Learning Materials"
+msgstr "Learning Materials"
+
+msgid "Access educational resources and study materials."
+msgstr "Access educational resources and study materials."
+
+msgid "Secure PDF Library"
+msgstr "Secure PDF Library"
+
+msgid "Upload and access protected PDF documents."
+msgstr "Upload and access protected PDF documents."
+
+msgid "Post a New Message"
+msgstr "Post a New Message"
+
+msgid "Recent Messages"
+msgstr "Recent Messages"
+
+msgid "Please enter a message"
+msgstr "Please enter a message"
+
+msgid "Posting..."
+msgstr "Posting..."
+
+msgid "Message posted successfully!"
+msgstr "Message posted successfully!"
+
+msgid "Error posting message. Please try again."
+msgstr "Error posting message. Please try again."
+
+msgid "Please log in to post messages"
+msgstr "Please log in to post messages"
+
+msgid "Please log in to reply to messages"
+msgstr "Please log in to reply to messages"
+
+msgid "Reply posted successfully!"
+msgstr "Reply posted successfully!"
+
+msgid "Error posting reply. Please try again."
+msgstr "Error posting reply. Please try again."
+
+msgid "Edit your message:"
+msgstr "Edit your message:"
+
+msgid "Reply to"
+msgstr "Reply to"
+
+msgid "Authentication Required"
+msgstr "Authentication Required"
+
+msgid "Please log in to participate in the community forum."
+msgstr "Please log in to participate in the community forum."
+
+msgid "You can still view messages without logging in."
+msgstr "You can still view messages without logging in."
+
+msgid "Upload PDF Document"
+msgstr "Upload PDF Document"
+
+msgid "Upload a PDF document to share securely with PIN protection."
+msgstr "Upload a PDF document to share securely with PIN protection."
+
+msgid "Choose PDF file..."
+msgstr "Choose PDF file..."
+
+msgid "Title:"
+msgstr "Title:"
+
+msgid "Description:"
+msgstr "Description:"
+
+msgid "Access PIN (leave empty for auto-generated):"
+msgstr "Access PIN (leave empty for auto-generated):"
+
+msgid "Uploading PDF..."
+msgstr "Uploading PDF..."
+
+msgid "PDF uploaded successfully! Access PIN:"
+msgstr "PDF uploaded successfully! Access PIN:"
+
+msgid "Error uploading PDF. Please try again."
+msgstr "Error uploading PDF. Please try again."
+
+msgid "Access PDF Document"
+msgstr "Access PDF Document"
+
+msgid "Enter the access PIN to view this document:"
+msgstr "Enter the access PIN to view this document:"
+
+msgid "Access PDF"
+msgstr "Access PDF"
+
+msgid "Invalid PIN"
+msgstr "Invalid PIN"
+
+msgid "PDF not found"
+msgstr "PDF not found"
+
+msgid "Download PDF"
+msgstr "Download PDF"
+
+msgid "Login to Your Account"
+msgstr "Login to Your Account"
+
+msgid "Username:"
+msgstr "Username:"
+
+msgid "Password:"
+msgstr "Password:"
+
+msgid "Invalid username or password"
+msgstr "Invalid username or password"
+
+msgid "Back to Yonca"
+msgstr "Back to Yonca"

@@ -5,6 +5,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_cors import CORS
 from flask_session import Session
+from flask_babel import Babel
 from yonca.config import config
 from yonca.models import db, User
 from yonca.admin import init_admin
@@ -36,6 +37,35 @@ def create_app(config_name='development'):
     def load_user(user_id):
         return db.session.get(User, int(user_id))
     
+    # Initialize Babel for internationalization
+    babel = Babel()
+    babel.init_app(app)
+    
+    def get_locale():
+        """Select the language for the current request"""
+        from flask import request
+        
+        # Check URL parameter first
+        lang = request.args.get('lang')
+        if lang and lang in ['en', 'ru']:
+            print(f"DEBUG: Detected language from URL: {lang}")
+            return lang
+        
+        # Check if language is set in session
+        from flask import session
+        lang = session.get('language')
+        if lang and lang in ['en', 'ru']:
+            print(f"DEBUG: Using session language: {lang}")
+            return lang
+        
+        # Default to English
+        print("DEBUG: Defaulting to English")
+        return 'en'
+    
+    babel.locale_selector_func = get_locale
+    app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'ru']
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(package_dir, 'translations')
+    
     # Enable CORS
     CORS(app)
     
@@ -55,3 +85,4 @@ def create_app(config_name='development'):
         db.create_all()
     
     return app
+

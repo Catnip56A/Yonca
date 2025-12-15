@@ -23,14 +23,24 @@ def login():
     
     return render_template('login.html')
 
-@auth_bp.route('/logout')
-@login_required
-def logout():
-    """Handle user logout"""
-    logout_user()
-    return redirect(url_for('main.index'))
-
-@auth_bp.route('/api/user')
+@auth_bp.route('/set_language/<lang>')
+def set_language(lang):
+    """Set the user's language preference"""
+    from flask import session, redirect, request, url_for
+    
+    if lang in ['en', 'ru']:
+        session['language'] = lang
+        session.modified = True  # Force session to be saved
+    
+    # Redirect back to the referring page with lang parameter
+    referrer = request.referrer or url_for('main.index')
+    url = referrer
+    if '?' in referrer:
+        url += f'&lang={lang}'
+    else:
+        url += f'?lang={lang}'
+    
+    return redirect(url)
 @login_required
 def get_user():
     """Get current user information"""

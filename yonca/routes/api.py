@@ -25,30 +25,52 @@ def get_courses():
 
 @api_bp.route('/forum/messages')
 def get_forum_messages():
-    """Get all forum messages"""
-    messages = ForumMessage.query.order_by(ForumMessage.timestamp.desc()).all()
-    return jsonify([{
-        'id': m.id,
-        'username': m.username,
-        'message': m.message,
-        'timestamp': m.timestamp.isoformat(),
-        'is_current_user': current_user.is_authenticated and m.username == current_user.username
-    } for m in messages])
+    """Get all forum messages in threaded structure"""
+    def build_thread(message, depth=0):
+        """Recursively build message thread"""
+        result = {
+            'id': message.id,
+            'username': message.username,
+            'message': message.message,
+            'timestamp': message.timestamp.isoformat(),
+            'is_current_user': current_user.is_authenticated and message.username == current_user.username,
+            'depth': depth,
+            'replies': []
+        }
+        
+        # Get replies sorted by timestamp
+        for reply in message.replies.order_by(ForumMessage.timestamp.asc()).all():
+            result['replies'].append(build_thread(reply, depth + 1))
+        
+        return result
+    
+    # Get only top-level messages (no parent)
+    top_level_messages = ForumMessage.query.filter_by(parent_id=None).order_by(ForumMessage.timestamp.desc()).all()
+    
+    return jsonify([build_thread(msg) for msg in top_level_messages])
 
 @api_bp.route('/forum/messages', methods=['POST'])
 @login_required
 def post_forum_message():
-    """Post a new forum message"""
+    """Post a new forum message or reply"""
     data = request.get_json()
     
     if not data or 'message' not in data:
         return jsonify({'error': 'Message required'}), 400
     
+    parent_id = data.get('parent_id')
+    if parent_id:
+        # Verify parent message exists
+        parent = ForumMessage.query.get(parent_id)
+        if not parent:
+            return jsonify({'error': 'Parent message not found'}), 404
+    
     # Use the logged-in user's information
     new_message = ForumMessage(
         user_id=current_user.id,
         username=current_user.username,
-        message=data['message']
+        message=data['message'],
+        parent_id=parent_id
     )
     db.session.add(new_message)
     db.session.commit()
@@ -61,7 +83,8 @@ def post_forum_message():
         'message_id': new_message.id,
         'message': new_message.message,
         'username': new_message.username,
-        'timestamp': new_message.timestamp.isoformat() if new_message.timestamp else None
+        'timestamp': new_message.timestamp.isoformat() if new_message.timestamp else None,
+        'parent_id': new_message.parent_id
     }), 201
     
 @api_bp.route('/forum/messages/<int:message_id>', methods=['PUT'])

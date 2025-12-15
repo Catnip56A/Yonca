@@ -176,7 +176,8 @@
         }
 
         .forum-message .edit-btn,
-        .forum-message .delete-btn {
+        .forum-message .delete-btn,
+        .forum-message .reply-btn {
             background: none;
             border: none;
             cursor: pointer;
@@ -200,6 +201,14 @@
 
         .forum-message .delete-btn:hover {
             background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .forum-message .reply-btn {
+            color: #6b7280;
+        }
+
+        .forum-message .reply-btn:hover {
+            background-color: rgba(107, 114, 128, 0.1);
         }
 
         .auth-message {
@@ -688,6 +697,12 @@
                 <span style="color: #374151; margin-right: 1rem;">Welcome, <span id="user-name"></span>!</span>
                 <button onclick="window.location.href='/logout'" style="background: #dc2626; color: white; border: 1px solid #dc2626; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">Logout</button>
             </div>
+            <div id="language-switcher" style="position: absolute; top: 3.5rem; right: 20px;">
+                <select id="language-select" onchange="changeLanguage(this.value)" style="background: white; color: #374151; border: 1px solid #d1d5db; padding: 0.5rem; border-radius: 4px; cursor: pointer;">
+                    <option value="en">English</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
         </div>
     </header>
 
@@ -1074,19 +1089,25 @@
                     return;
                 }
                 
-                messages.forEach(message => {
+                function renderMessage(message, container, depth = 0) {
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'forum-message' + (message.is_current_user ? ' current-user' : '');
                     messageDiv.setAttribute('data-message-id', message.id);
+                    messageDiv.style.marginLeft = `${depth * 20}px`;
                     
                     let actionsHtml = '';
-                    if (message.is_current_user || (window.currentUser && window.currentUser.is_admin)) {
+                    if (window.currentUser) {
                         actionsHtml = `
                             <div class="message-actions">
+                                <button onclick="replyToMessage(${message.id}, '${escapeHtml(message.username)}')" class="reply-btn">💬 Reply</button>
+                        `;
+                        if (message.is_current_user || window.currentUser.is_admin) {
+                            actionsHtml += `
                                 <button onclick="editMessage(${message.id}, '${escapeHtml(message.message)}')" class="edit-btn">✏️ Edit</button>
                                 <button onclick="deleteMessage(${message.id})" class="delete-btn">🗑️ Delete</button>
-                            </div>
-                        `;
+                            `;
+                        }
+                        actionsHtml += '</div>';
                     }
                     
                     messageDiv.innerHTML = `
@@ -1095,8 +1116,15 @@
                         <div class="timestamp">Posted on ${new Date(message.timestamp).toLocaleDateString()} at ${new Date(message.timestamp).toLocaleTimeString()}</div>
                         ${actionsHtml}
                     `;
-                    messagesContainer.appendChild(messageDiv);
-                });
+                    container.appendChild(messageDiv);
+                    
+                    // Render replies
+                    if (message.replies && message.replies.length > 0) {
+                        message.replies.forEach(reply => renderMessage(reply, container, depth + 1));
+                    }
+                }
+                
+                messages.forEach(message => renderMessage(message, messagesContainer));
             } catch (error) {
                 console.error('Error loading forum messages:', error);
                 const messagesContainer = document.getElementById('messages-container');
@@ -1344,6 +1372,42 @@
             }
         }
 
+        async function replyToMessage(parentId, parentUsername) {
+            const replyMessage = prompt(`Reply to ${parentUsername}:`, '');
+            if (replyMessage === null || replyMessage.trim() === '') {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ 
+                        message: replyMessage.trim(),
+                        parent_id: parentId
+                    }),
+                });
+
+                if (response.ok) {
+                    // Reload messages to show the new reply
+                    loadForumMessages();
+                    alert('Reply posted successfully!');
+                } else if (response.status === 401) {
+                    alert('Please log in to reply to messages');
+                    showPage('login');
+                } else {
+                    const error = await response.json();
+                    alert('Error posting reply: ' + (error.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error posting reply:', error);
+                alert('Error posting reply. Please try again.');
+            }
+        }
+
         async function editMessage(messageId, currentMessage) {
             const newMessage = prompt('Edit your message:', currentMessage);
             if (newMessage === null || newMessage.trim() === '' || newMessage.trim() === currentMessage) {
@@ -1502,10 +1566,25 @@
             updateForumAuth();
         }
 
+        function changeLanguage(lang) {
+            window.location.href = `/set_language/${lang}`;
+        }
+
+        function initLanguageSelector() {
+            // Get current language from URL or default to 'en'
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentLang = urlParams.get('lang') || 'en';
+            const select = document.getElementById('language-select');
+            if (select) {
+                select.value = currentLang;
+            }
+        }
+
         // Load initial data
         document.addEventListener('DOMContentLoaded', () => {
             checkUser();
             loadForumMessages();
+            initLanguageSelector();
             
             // Add PDF upload form listener
             const pdfUploadForm = document.getElementById('pdf-upload-form');

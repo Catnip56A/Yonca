@@ -54,6 +54,10 @@ class ForumMessage(db.Model):
     username = db.Column(db.String(80))
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, server_default=db.func.now())
+    parent_id = db.Column(db.Integer, db.ForeignKey('forum_message.id'), nullable=True)
+    
+    # Relationship for replies
+    replies = db.relationship('ForumMessage', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
 
     def __repr__(self):
         return f'<ForumMessage {self.id}>'

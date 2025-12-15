@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale.language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://via.placeholder.com">
+    <title>{{ _('Yonca - Learning Platform') }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #ffffff;
+        }
+
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #abc32f;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        nav {
+            margin-top: 1rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: #374151;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: #f3f4f6;
+            color: #abc32f;
+        }
+
+        .nav-link.active {
+            background-color: #abc32f;
+            color: white;
+        }
+
+        #auth-buttons button {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #auth-buttons button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        #user-info button {
+            background: #dc2626;
+            color: white;
+            border: 1px solid #dc2626;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #user-info button:hover {
+            background: #b91c1c;
+        }
+
+        #language-switcher select {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #abc32f;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            color: #1f2937;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .forum-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .message-form {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .message-form h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: #abc32f;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background: #809c13;
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .forum-message {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .forum-message.current-user {
+            border-color: #abc32f;
+            background: #f0fdf4;
+        }
+
+        .forum-message .user {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .forum-message .message-text {
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .forum-message .timestamp {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .forum-message .edit-btn,
+        .forum-message .delete-btn,
+        .forum-message .reply-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .forum-message .edit-btn {
+            color: #abc32f;
+        }
+
+        .forum-message .edit-btn:hover {
+            background-color: rgba(171, 195, 47, 0.1);
+        }
+
+        .forum-message .delete-btn {
+            color: #dc3545;
+        }
+
+        .forum-message .delete-btn:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .forum-message .reply-btn {
+            color: #6b7280;
+        }
+
+        .forum-message .reply-btn:hover {
+            background-color: rgba(107, 114, 128, 0.1);
+        }
+
+        .auth-message {
+            text-align: center;
+            padding: 2rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .auth-message h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .resource-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .resource-card h4 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-card p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .pdf-access-form {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            max-width: 500px;
+        }
+
+        .pdf-upload-section {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .pdf-upload-section h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .message-actions {
+                position: static;
+                margin-top: 1rem;
+                justify-content: flex-end;
+            }
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .contact-item {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-item h3 {
+            color: #abc32f;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .contact-item p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="/static/images/Logo.jpeg" alt="Yonca Logo">
+            </div>
+            <nav>
+                <a href="#" onclick="showPage('home', event); return false;" class="nav-link active" id="home-link">{{ _('Home') }}</a>
+                <a href="#" onclick="showPage('courses', event); return false;" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
+                <a href="#" onclick="showPage('forum', event); return false;" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
+                <a href="#" onclick="showPage('resources', event); return false;" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
+                <a href="#" onclick="showPage('tavi', event); return false;" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
+                <a href="#" onclick="showPage('contacts', event); return false;" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
+                <a href="#" onclick="showPage('about', event); return false;" class="nav-link" id="about-link">{{ _('About Company') }}</a>
+            </nav>
+            <div id="auth-buttons" style="position: absolute; top: 1rem; right: 20px; display: block;">
+                <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
+            </div>
+            <div id="user-info" style="position: absolute; top: 1rem; right: 20px; display: none;">
+                <span style="color: #374151; margin-right: 1rem;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
+                <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
+            </div>
+            <div id="language-switcher" style="position: absolute; top: 3.5rem; right: 20px;">
+                <select id="language-select" onchange="changeLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="ru">Русский</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1>{{ _('Welcome to Yonca') }}</h1>
+                <p>{{ _('Your gateway to knowledge and community learning.') }}</p>
+                <p>{{ _('Get Started') }}</p>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <h3>{{ _('Courses') }}</h3>
+                    <p>{{ _('Access educational courses and learning materials.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Community Forum') }}</h3>
+                    <p>{{ _('Connect with fellow learners, ask questions, and share knowledge.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Learning Materials') }}</h3>
+                    <p>{{ _('Access educational resources and study materials.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Secure PDF Library') }}</h3>
+                    <p>{{ _('Upload and access protected PDF documents.') }}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses Page -->
+        <section id="courses" class="page">
+            <h2 class="section-title">{{ _('Courses') }}</h2>
+            <p>{{ _('Explore our available courses and start your learning journey.') }}</p>
+            <div class="courses-grid">
+                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading courses...') }}</p>
+            </div>
+        </section>
+
+        <!-- Forum Page -->
+        <section id="forum" class="page">
+            <h2 class="section-title">{{ _('Community Forum') }}</h2>
+
+            <div id="forum-auth-required" style="display: none;">
+                <div class="auth-message">
+                    <h3>🔒 {{ _('Authentication Required') }}</h3>
+                    <p>{{ _('Please log in to participate in the community forum.') }}</p>
+                    <p>{{ _('You can still view messages without logging in.') }}</p>
+                </div>
+            </div>
+
+            <div id="forum-content">
+                <div class="message-form">
+                    <h3>{{ _('Post a New Message') }}</h3>
+                    <form onsubmit="postMessage(event)">
+                        <div class="form-group" id="username-group" style="display: none;">
+                            <label for="username">{{ _('Username:') }}</label>
+                            <input type="text" id="username" name="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">{{ _('Message:') }}</label>
+                            <textarea id="message" name="message" placeholder="{{ _('Share your thoughts, ask questions, or help others...') }}" required></textarea>
+                        </div>
+                        <button type="submit" id="post-btn">{{ _('Post Message') }}</button>
+                    </form>
+                </div>
+
+                <div class="forum-container">
+                    <h3>{{ _('Recent Messages') }}</h3>
+                    <div id="messages-container">
+                        <div class="forum-message">
+                            <div class="user">{{ _('Welcome to Yonca Forum!') }}</div>
+                            <p>{{ _('This is where community members can connect, ask questions, and share knowledge.') }}</p>
+                            <div class="timestamp">{{ _('Posted on December 8, 2025') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Page -->
+        <section id="resources" class="page">
+            <h2 class="section-title">{{ _('Resources') }}</h2>
+            <p>{{ _('Download educational materials, reference documents, and access secure PDF files.') }}</p>
+
+            <!-- Regular Resources -->
+            <h3 style="color: #1f2937; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 {{ _('Learning Materials') }}</h3>
+            <div class="resources-grid">
+                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading resources...') }}</p>
+            </div>
+
+            <!-- PDF Access -->
+            <div class="pdf-access-form">
+                <h3>{{ _('Access PDF Document') }}</h3>
+                <p>{{ _('Enter the access PIN to view this document:') }}</p>
+                <form onsubmit="accessPDF(event)">
+                    <div class="form-group">
+                        <input type="text" id="pdf-pin" name="pin" placeholder="{{ _('Enter PIN') }}" required>
+                    </div>
+                    <button type="submit">{{ _('Access PDF') }}</button>
+                </form>
+            </div>
+
+            <!-- PDF Upload Section (Admin Only) -->
+            <div id="pdf-upload-section" style="display: none;">
+                <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload PDF Document') }}</h3>
+                <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload a PDF document to share securely with PIN protection.') }}</p>
+                <form id="pdf-upload-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="pdf-title">{{ _('Title:') }}</label>
+                        <input type="text" id="pdf-title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdf-description">{{ _('Description:') }}</label>
+                        <textarea id="pdf-description" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdf-file">{{ _('Choose PDF file...') }}</label>
+                        <input type="file" id="pdf-file" name="file" accept=".pdf" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pdf-pin-input">{{ _('Access PIN (leave empty for auto-generated):') }}</label>
+                        <input type="text" id="pdf-pin-input" name="pin">
+                    </div>
+                    <button type="submit" id="pdf-upload-btn">{{ _('Upload PDF') }}</button>
+                </form>
+                <div id="pdf-upload-status"></div>
+            </div>
+        </section>
+
+        <!-- TAVI Test Page -->
+        <section id="tavi" class="page">
+            <h2 class="section-title">{{ _('TAVI Test') }}</h2>
+            <div class="empty-section">
+                <p>{{ _('TAVI Test section is coming soon.') }}</p>
+            </div>
+        </section>
+
+        <!-- Contacts Page -->
+        <section id="contacts" class="page">
+            <h2 class="section-title">{{ _('Contact Us') }}</h2>
+
+            <div class="contact-info">
+                <div class="contact-item">
+                    <h3>📱 {{ _('WhatsApp') }}</h3>
+                    <p>
+                        <a href="https://wa.me/994516237394" target="_blank" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                            +994 51 623 73 94
+                        </a><br>
+                        {{ _('Available: Mon-Fri, 9AM-6PM') }}
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>📧 {{ _('Email') }}</h3>
+                    <p>
+                        <a href="mailto:info@yonca.az" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                            info@yonca.az
+                        </a><br>
+                        {{ _('We respond within 24 hours') }}
+                    </p>
+                </div>
+
+                <div class="contact-item">
+                    <h3>📍 {{ _('Location') }}</h3>
+                    <p>
+                        {{ _('Baku, Azerbaijan') }}<br>
+                        {{ _('Serving clients worldwide') }}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Company Page -->
+        <section id="about" class="page">
+            <h2 class="section-title">{{ _('About Yonca') }}</h2>
+
+            <div class="about-content">
+                <p>
+                    {{ _('Today, Yonca Support & Development Center is one of the leading centers in Baku in the field of psychological support and correction. Our mission is to provide professional, evidence-based psychological assistance to children, adolescents and adults with developmental features (and without), as well as support for their families. The center has been operating for more than four years and during this time has become a brand of quality and reliability, associated with effectiveness, ethics and a modern approach to correction.') }}
+                </p>
+
+                <p>
+                    {{ _('In our work, we rely on international standards (DSM-5-TR, ICD-11, ABA, ICF) and actively cooperate with leading specialists from different countries, primarily from Israel. Our format: "correctly, effectively and with soul". We work both offline in Baku and online worldwide, ensuring accessibility and a high level of support for each family.') }}
+                </p>
+
+                <h3>{{ _('International Team of Experts') }}</h3>
+                <p>
+                    {{ _('The international team of experts collaborating with Yonca includes six specialists from Israel:') }}
+                </p>
+                <ul style="margin-left: 2rem; color: #666;">
+                    <li><strong>{{ _('Ronni Edelstein') }}</strong> - {{ _('physician-therapist, physician for diagnosis and correction of ADHD') }}</li>
+                    <li><strong>{{ _('Olesia Frolova') }}</strong> - {{ _('pediatrician, nutritionist, physician for diagnosis and correction of ADHD') }}</li>
+                    <li><strong>{{ _('Albert Feigelson') }}</strong> - {{ _('psychologist, behavioral analyst. Author of books and courses on working with ADHD for parents and specialists. Specialist in PCT (parent competence training). Founder of the company "ADHD_Israel"') }}</li>
+                    <li><strong>{{ _('Elena Pinski-Volcman') }}</strong> - {{ _('behavioral analyst, instructor on sex education for people with developmental features') }}</li>
+                    <li><strong>{{ _('Svetlana Revich') }}</strong> - {{ _('occupational therapist, BOT, M.A. specialist in child development and nutrition. Founder and director of the "Visut" center in Israel. Co-author of the SEB-method. Author of the book - "Sensory perception or Sensory glasses in child upbringing"') }}</li>
+                    <li><strong>{{ _('Dan Mirdzharov') }}</strong> - {{ _('coach, specialist in working with adults with ADHD') }}</li>
+                </ul>
+
+                <p>
+                    {{ _('As well as specialists from different countries:') }}
+                </p>
+                <ul style="margin-left: 2rem; color: #666;">
+                    <li><strong>{{ _('Dr. Aysel Mammadova') }}</strong> - {{ _('clinical psychologist, ABA specialist') }}</li>
+                    <li><strong>{{ _('Dr. Nigar Hajiyeva') }}</strong> - {{ _('psychiatrist, specialist in child and adolescent psychiatry') }}</li>
+                    <li><strong>{{ _('Dr. Aytan Mammadova') }}</strong> - {{ _('speech therapist, specialist in speech development correction') }}</li>
+                    <li><strong>{{ _('Dr. Gunel Mammadova') }}</strong> - {{ _('occupational therapist, sensory integration specialist') }}</li>
+                    <li><strong>{{ _('Dr. Leyla Aliyeva') }}</strong> - {{ _('clinical psychologist, CBT specialist') }}</li>
+                    <li><strong>{{ _('Dr. Samira Hasanova') }}</strong> - {{ _('child psychologist, play therapy specialist') }}</li>
+                </ul>
+
+                <h3>{{ _('Our Services') }}</h3>
+                <ul style="margin-left: 2rem; color: #666;">
+                    <li>{{ _('Psychological diagnostics and correction') }}</li>
+                    <li>{{ _('Speech therapy services') }}</li>
+                    <li>{{ _('Occupational therapy') }}</li>
+                    <li>{{ _('Behavioral analysis and correction (ABA)') }}</li>
+                    <li>{{ _('Parent training and support') }}</li>
+                    <li>{{ _('Online consultations worldwide') }}</li>
+                    <li>{{ _('School readiness programs') }}</li>
+                    <li>{{ _('Social skills development') }}</li>
+                </ul>
+
+                <h3>{{ _('Contact Us') }}</h3>
+                <p>
+                    {{ _('For more information about our services or to schedule a consultation, please contact us:') }}
+                </p>
+                <p>
+                    📱 <strong>{{ _('WhatsApp') }}</strong>: <a href="https://wa.me/994516237394" target="_blank" style="color: #abc32f;">+994 51 623 73 94</a><br>
+                    📧 <strong>{{ _('Email') }}</strong>: <a href="mailto:info@yonca.az" style="color: #abc32f;">info@yonca.az</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // API base URL
+        const API_BASE = '';
+
+        // Current page management
+        function showPage(pageId, event) {
+            if (event) event.preventDefault();
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById(pageId + '-link').classList.add('active');
+
+            // Load data for specific pages
+            if (pageId === 'courses') {
+                loadCourses();
+            } else if (pageId === 'forum') {
+                loadForumMessages();
+            } else if (pageId === 'resources') {
+                loadResources();
+                loadPDFs();
+            }
+        }
+
+        // Load courses
+        async function loadCourses() {
+            try {
+                const response = await fetch(`${API_BASE}/api/courses`);
+                const courses = await response.json();
+                const coursesGrid = document.querySelector('.courses-grid');
+                coursesGrid.innerHTML = '';
+
+                if (courses.length === 0) {
+                    coursesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No courses available at the moment.") }}</p>';
+                    return;
+                }
+
+                courses.forEach(course => {
+                    const courseCard = document.createElement('div');
+                    courseCard.className = 'resource-card';
+                    courseCard.innerHTML = `
+                        <h4>${course.title}</h4>
+                        <p>${course.description}</p>
+                        <p><strong>{{ _('Time Slot:') }}</strong> ${course.time_slot || 'TBD'}</p>
+                        <div style="margin-top: 1rem;">${course.profile_emoji || '📚'}</div>
+                    `;
+                    coursesGrid.appendChild(courseCard);
+                });
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                document.querySelector('.courses-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading courses. Please try again.") }}</p>';
+            }
+        }
+
+        // Load resources
+        async function loadResources() {
+            try {
+                const response = await fetch(`${API_BASE}/api/resources`);
+                const resources = await response.json();
+                const resourcesGrid = document.querySelector('.resources-grid');
+                resourcesGrid.innerHTML = '';
+
+                if (resources.length === 0) {
+                    resourcesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No resources available at the moment.") }}</p>';
+                    return;
+                }
+
+                resources.forEach(resource => {
+                    const resourceCard = document.createElement('div');
+                    resourceCard.className = 'resource-card';
+                    resourceCard.innerHTML = `
+                        <h4>${resource.title}</h4>
+                        <p>${resource.description}</p>
+                        <a href="${resource.file_url}" target="_blank" style="color: #abc32f; text-decoration: none; font-weight: 500;">{{ _('Download') }}</a>
+                    `;
+                    resourcesGrid.appendChild(resourceCard);
+                });
+            } catch (error) {
+                console.error('Error loading resources:', error);
+                document.querySelector('.resources-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading resources. Please try again.") }}</p>';
+            }
+        }
+
+        // Load PDFs
+        async function loadPDFs() {
+            try {
+                const response = await fetch(`${API_BASE}/api/pdfs`);
+                const pdfs = await response.json();
+                // For now, just log the PDFs - we can display them later
+                console.log('Available PDFs:', pdfs);
+            } catch (error) {
+                console.error('Error loading PDFs:', error);
+            }
+        }
+
+        // Access PDF
+        async function accessPDF(event) {
+            event.preventDefault();
+            const pin = document.getElementById('pdf-pin').value.trim();
+
+            if (!pin) {
+                alert('{{ _("Please enter a PIN") }}');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/pdfs/${pin}/access`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pin }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    window.open(data.file_url, '_blank');
+                } else {
+                    const error = await response.json();
+                    alert('{{ _("Invalid PIN") }}');
+                }
+            } catch (error) {
+                console.error('Error accessing PDF:', error);
+                alert('{{ _("Error accessing PDF. Please try again.") }}');
+            }
+        }
+
+        // Upload PDF
+        async function uploadPDF(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const submitBtn = document.getElementById('pdf-upload-btn');
+            const statusDiv = document.getElementById('pdf-upload-status');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '{{ _("Uploading PDF...") }}';
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<span style="color: #6b7280;">{{ _("Uploading PDF...") }}</span>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/pdfs/upload`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span style="color: #059669;">✅ {{ _("PDF uploaded successfully! Access PIN:") }} <strong>${result.pin}</strong></span>`;
+
+                    // Clear form
+                    form.reset();
+
+                    // Reload PDFs
+                    loadPDFs();
+                } else {
+                    statusDiv.innerHTML = `<span style="color: #dc2626;">❌ {{ _("Error uploading PDF. Please try again.") }}</span>`;
+                }
+            } catch (error) {
+                console.error('Error uploading PDF:', error);
+                statusDiv.innerHTML = `<span style="color: #dc2626;">❌ {{ _("Error uploading PDF. Please try again.") }}</span>`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '{{ _("Upload PDF") }}';
+            }
+        }
+
+        // Forum functionality
+        async function loadForumMessages() {
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages`);
+                const messages = await response.json();
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.innerHTML = '';
+
+                if (messages.length === 0) {
+                    messagesContainer.innerHTML = '<div class="forum-message"><div class="user">{{ _("No messages yet") }}</div><p>{{ _("Be the first to start a conversation!") }}</p></div>';
+                    return;
+                }
+
+                function renderMessage(message, container, depth = 0) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'forum-message' + (message.is_current_user ? ' current-user' : '');
+                    messageDiv.setAttribute('data-message-id', message.id);
+                    messageDiv.style.marginLeft = `${depth * 20}px`;
+
+                    let actionsHtml = '';
+                    if (window.currentUser) {
+                        actionsHtml = `
+                            <div class="message-actions">
+                                <button onclick="replyToMessage(${message.id}, '${message.username}')" class="reply-btn">💬 {{ _("Reply") }}</button>
+                        `;
+                        if (message.is_current_user || window.currentUser.is_admin) {
+                            actionsHtml += `
+                                <button onclick="editMessage(${message.id}, '${message.message.replace(/'/g, "\\'")}')" class="edit-btn">✏️ {{ _("Edit") }}</button>
+                                <button onclick="deleteMessage(${message.id})" class="delete-btn">🗑️ {{ _("Delete") }}</button>
+                            `;
+                        }
+                        actionsHtml += '</div>';
+                    }
+
+                    messageDiv.innerHTML = `
+                        <div class="user">${message.username}${message.is_current_user ? ' ({{ _("You") }})' : ''}</div>
+                        <p class="message-text">${message.message}</p>
+                        <div class="timestamp">{{ _("Posted on") }} ${new Date(message.timestamp).toLocaleDateString()} {{ _("at") }} ${new Date(message.timestamp).toLocaleTimeString()}</div>
+                        ${actionsHtml}
+                    `;
+                    container.appendChild(messageDiv);
+
+                    // Render replies
+                    if (message.replies && message.replies.length > 0) {
+                        message.replies.forEach(reply => renderMessage(reply, container, depth + 1));
+                    }
+                }
+
+                messages.forEach(message => renderMessage(message, messagesContainer));
+            } catch (error) {
+                console.error('Error loading forum messages:', error);
+            }
+        }
+
+        async function postMessage(event) {
+            event.preventDefault();
+
+            if (!window.currentUser) {
+                alert('{{ _("Please log in to post messages") }}');
+                showPage('login');
+                return;
+            }
+
+            const message = document.getElementById('message').value.trim();
+
+            if (message === '') {
+                alert('{{ _("Please enter a message") }}');
+                return;
+            }
+
+            const postBtn = document.getElementById('post-btn');
+            const originalText = postBtn.textContent;
+            postBtn.textContent = '{{ _("Posting...") }}';
+            postBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ message }),
+                });
+
+                if (response.ok) {
+                    // Reload messages
+                    loadForumMessages();
+                    // Clear form
+                    document.getElementById('message').value = '';
+                    alert('{{ _("Message posted successfully!") }}');
+                } else if (response.status === 401) {
+                    alert('{{ _("Please log in to post messages") }}');
+                    showPage('login');
+                } else {
+                    const error = await response.json();
+                    alert('{{ _("Error posting message:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                }
+            } catch (error) {
+                console.error('Error posting message:', error);
+                alert('{{ _("Error posting message. Please try again.") }}');
+            } finally {
+                postBtn.textContent = originalText;
+                postBtn.disabled = false;
+            }
+        }
+
+        async function replyToMessage(parentId, parentUsername) {
+            const replyMessage = prompt('{{ _("Reply to") }} ${parentUsername}:', '');
+            if (replyMessage === null || replyMessage.trim() === '') {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        message: replyMessage.trim(),
+                        parent_id: parentId
+                    }),
+                });
+
+                if (response.ok) {
+                    // Reload messages to show the new reply
+                    loadForumMessages();
+                    alert('{{ _("Reply posted successfully!") }}');
+                } else if (response.status === 401) {
+                    alert('{{ _("Please log in to reply to messages") }}');
+                    showPage('login');
+                } else {
+                    const error = await response.json();
+                    alert('{{ _("Error posting reply:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                }
+            } catch (error) {
+                console.error('Error posting reply:', error);
+                alert('{{ _("Error posting reply. Please try again.") }}');
+            }
+        }
+
+        async function editMessage(messageId, currentMessage) {
+            const newMessage = prompt('{{ _("Edit your message:") }}', currentMessage);
+            if (newMessage === null || newMessage.trim() === '' || newMessage.trim() === currentMessage) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages/${messageId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ message: newMessage.trim() }),
+                });
+
+                if (response.ok) {
+                    loadForumMessages();
+                    alert('{{ _("Message updated successfully!") }}');
+                } else {
+                    const error = await response.json();
+                    alert('{{ _("Error updating message:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                }
+            } catch (error) {
+                console.error('Error editing message:', error);
+                alert('{{ _("Error updating message. Please try again.") }}');
+            }
+        }
+
+        async function deleteMessage(messageId) {
+            if (!confirm('{{ _("Are you sure you want to delete this message?") }}')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages/${messageId}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                });
+
+                if (response.ok) {
+                    loadForumMessages();
+                    alert('{{ _("Message deleted successfully!") }}');
+                } else {
+                    const error = await response.json();
+                    alert('{{ _("Error deleting message:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                }
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                alert('{{ _("Error deleting message. Please try again.") }}');
+            }
+        }
+
+        // User authentication
+        async function checkUser() {
+            try {
+                console.log('Checking user login status...');
+                const response = await fetch(`${API_BASE}/api/user`, {
+                    credentials: 'same-origin'
+                });
+                console.log('User check response status:', response.status);
+                if (response.ok) {
+                    const user = await response.json();
+                    console.log('User logged in:', user);
+                    document.getElementById('auth-buttons').style.display = 'none';
+                    document.getElementById('user-info').style.display = 'block';
+                    document.getElementById('user-name').textContent = user.username;
+                    window.currentUser = user;
+                    updateForumForm(true);
+                    showHomeCourses(user.courses);
+
+                    // Show PDF upload section for admins
+                    if (user.is_admin) {
+                        document.getElementById('pdf-upload-section').style.display = 'block';
+                    }
+                } else {
+                    console.log('User not logged in');
+                    document.getElementById('auth-buttons').style.display = 'block';
+                    document.getElementById('user-info').style.display = 'none';
+                    window.currentUser = null;
+                    updateForumForm(false);
+                    hideHomeCourses();
+
+                    // Hide PDF upload section for non-admin users
+                    document.getElementById('pdf-upload-section').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking user:', error);
+                document.getElementById('auth-buttons').style.display = 'block';
+                document.getElementById('user-info').style.display = 'none';
+                window.currentUser = null;
+                updateForumForm(false);
+                hideHomeCourses();
+            }
+        }
+
+        function updateForumForm(isLoggedIn) {
+            const usernameGroup = document.querySelector('.form-group');
+            if (isLoggedIn) {
+                usernameGroup.style.display = 'none';
+            } else {
+                usernameGroup.style.display = 'block';
+            }
+            updateForumAuth();
+        }
+
+        function updateForumAuth() {
+            const authRequired = document.getElementById('forum-auth-required');
+            const forumContent = document.getElementById('forum-content');
+            const messageForm = document.querySelector('.message-form');
+            const usernameGroup = document.getElementById('username-group');
+
+            if (window.currentUser) {
+                // User is logged in - show full forum
+                authRequired.style.display = 'none';
+                forumContent.style.display = 'block';
+                if (messageForm) messageForm.style.display = 'block';
+                usernameGroup.style.display = 'none';
+            } else {
+                // User is not logged in - show auth message and hide form
+                authRequired.style.display = 'block';
+                forumContent.style.display = 'block'; // Still show messages
+                if (messageForm) messageForm.style.display = 'none'; // Hide form
+                usernameGroup.style.display = 'none';
+            }
+        }
+
+        function showHomeCourses(courses) {
+            // Implementation for showing user courses on home page
+            console.log('User courses:', courses);
+        }
+
+        function hideHomeCourses() {
+            // Implementation for hiding courses when not logged in
+            console.log('Hiding courses');
+        }
+
+        function changeLanguage(lang) {
+            // Add language as URL parameter and force reload
+            const url = new URL(window.location);
+            url.searchParams.set('lang', lang);
+            const newUrl = url.toString();
+
+            // Force a full page reload to get new translations from server
+            window.location.replace(newUrl);
+        }
+
+        function initLanguageSelector() {
+            // Get current language from URL parameter or default to 'en'
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentLang = urlParams.get('lang') || 'en';
+            const select = document.getElementById('language-select');
+            if (select) {
+                select.value = currentLang;
+            }
+        }
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUser();
+            loadForumMessages();
+            initLanguageSelector();
+
+            // Add PDF upload form listener
+            const pdfUploadForm = document.getElementById('pdf-upload-form');
+            if (pdfUploadForm) {
+                pdfUploadForm.addEventListener('submit', uploadPDF);
+            }
+        });
+    </script>
+</body>
+</html>
