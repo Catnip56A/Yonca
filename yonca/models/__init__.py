@@ -68,6 +68,10 @@ class Resource(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     file_url = db.Column(db.String(300))
+    access_pin = db.Column(db.String(10))
+    uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    upload_date = db.Column(db.DateTime, server_default=db.func.now())
+    is_active = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<Resource {self.title}>'

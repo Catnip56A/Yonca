@@ -104,6 +104,15 @@
             background: #b91c1c;
         }
 
+        #admin-btn {
+            background: #abc32f !important;
+            border-color: #abc32f !important;
+        }
+
+        #admin-btn:hover {
+            background: #9bb92a !important;
+        }
+
         #language-switcher select {
             background: white;
             color: #374151;
@@ -463,19 +472,20 @@
                 <img src="/static/images/Logo.jpeg" alt="Yonca Logo">
             </div>
             <nav>
-                <a href="#" onclick="showPage('home', event); return false;" class="nav-link active" id="home-link">{{ _('Home') }}</a>
-                <a href="#" onclick="showPage('courses', event); return false;" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
-                <a href="#" onclick="showPage('forum', event); return false;" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
-                <a href="#" onclick="showPage('resources', event); return false;" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
-                <a href="#" onclick="showPage('tavi', event); return false;" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
-                <a href="#" onclick="showPage('contacts', event); return false;" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
-                <a href="#" onclick="showPage('about', event); return false;" class="nav-link" id="about-link">{{ _('About Company') }}</a>
+                <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
+                <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
+                <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
+                <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
+                <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
+                <a href="javascript:void(0)" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
+                <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
             </nav>
             <div id="auth-buttons" style="position: absolute; top: 1rem; right: 20px; display: block;">
                 <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
             </div>
             <div id="user-info" style="position: absolute; top: 1rem; right: 20px; display: none;">
                 <span style="color: #374151; margin-right: 1rem;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
+                <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.5rem; display: none;">{{ _('Admin') }}</button>
                 <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
             </div>
             <div id="language-switcher" style="position: absolute; top: 3.5rem; right: 20px;">
@@ -569,50 +579,38 @@
         <!-- Resources Page -->
         <section id="resources" class="page">
             <h2 class="section-title">{{ _('Resources') }}</h2>
-            <p>{{ _('Download educational materials, reference documents, and access secure PDF files.') }}</p>
+            <p>{{ _('Download educational materials, documents, and access protected files.') }}</p>
 
-            <!-- Regular Resources -->
+            <!-- Learning Materials -->
             <h3 style="color: #1f2937; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 {{ _('Learning Materials') }}</h3>
             <div class="resources-grid">
-                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading resources...') }}</p>
+                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading materials...') }}</p>
             </div>
 
-            <!-- PDF Access -->
-            <div class="pdf-access-form">
-                <h3>{{ _('Access PDF Document') }}</h3>
-                <p>{{ _('Enter the access PIN to view this document:') }}</p>
-                <form onsubmit="accessPDF(event)">
+            <!-- Resource Upload Section (Admin Only) -->
+            <div id="resource-upload-section" style="display: none;">
+                <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload Learning Material') }}</h3>
+                <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload documents, presentations, PDFs, or other materials. PIN protection will be automatically applied for security.') }}</p>
+                <form id="resource-upload-form" enctype="multipart/form-data">
                     <div class="form-group">
-                        <input type="text" id="pdf-pin" name="pin" placeholder="{{ _('Enter PIN') }}" required>
+                        <label for="resource-title">{{ _('Title:') }}</label>
+                        <input type="text" id="resource-title" name="title" required>
                     </div>
-                    <button type="submit">{{ _('Access PDF') }}</button>
+                    <div class="form-group">
+                        <label for="resource-description">{{ _('Description:') }}</label>
+                        <textarea id="resource-description" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="resource-file">{{ _('Choose file...') }}</label>
+                        <input type="file" id="resource-file" name="file" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="resource-pin">{{ _('Access PIN (leave empty for auto-generated):') }}</label>
+                        <input type="text" id="resource-pin" name="pin" placeholder="{{ _('Auto-generated if empty') }}">
+                    </div>
+                    <button type="submit" id="resource-upload-btn">{{ _('Upload Material') }}</button>
                 </form>
-            </div>
-
-            <!-- PDF Upload Section (Admin Only) -->
-            <div id="pdf-upload-section" style="display: none;">
-                <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload PDF Document') }}</h3>
-                <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload a PDF document to share securely with PIN protection.') }}</p>
-                <form id="pdf-upload-form" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="pdf-title">{{ _('Title:') }}</label>
-                        <input type="text" id="pdf-title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="pdf-description">{{ _('Description:') }}</label>
-                        <textarea id="pdf-description" name="description"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="pdf-file">{{ _('Choose PDF file...') }}</label>
-                        <input type="file" id="pdf-file" name="file" accept=".pdf" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="pdf-pin-input">{{ _('Access PIN (leave empty for auto-generated):') }}</label>
-                        <input type="text" id="pdf-pin-input" name="pin">
-                    </div>
-                    <button type="submit" id="pdf-upload-btn">{{ _('Upload PDF') }}</button>
-                </form>
-                <div id="pdf-upload-status"></div>
+                <div id="resource-upload-status"></div>
             </div>
         </section>
 
@@ -727,31 +725,64 @@
 
         // Current page management
         function showPage(pageId, event) {
-            if (event) event.preventDefault();
+            console.log('showPage called with pageId:', pageId, 'event:', event);
+            
+            // Prevent default if event is provided
+            if (event && typeof event.preventDefault === 'function') {
+                event.preventDefault();
+                console.log('Prevented default event');
+            }
 
+            console.log('Hiding all pages...');
             // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
+            const pages = document.querySelectorAll('.page');
+            console.log('Found', pages.length, 'pages');
+            pages.forEach(page => {
                 page.classList.remove('active');
+                console.log('Removed active from page:', page.id);
             });
 
+            console.log('Removing active from all nav links...');
             // Remove active class from all nav links
-            document.querySelectorAll('.nav-link').forEach(link => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            console.log('Found', navLinks.length, 'nav links');
+            navLinks.forEach(link => {
                 link.classList.remove('active');
+                console.log('Removed active from link:', link.id);
             });
 
             // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            document.getElementById(pageId + '-link').classList.add('active');
+            const pageElement = document.getElementById(pageId);
+            const linkElement = document.getElementById(pageId + '-link');
+            
+            if (pageElement) {
+                pageElement.classList.add('active');
+                console.log('Activated page:', pageId);
+            } else {
+                console.error('Page element not found:', pageId);
+                return;
+            }
+            
+            if (linkElement) {
+                linkElement.classList.add('active');
+                console.log('Activated link:', pageId + '-link');
+            } else {
+                console.error('Link element not found:', pageId + '-link');
+            }
 
             // Load data for specific pages
             if (pageId === 'courses') {
+                console.log('Loading courses...');
                 loadCourses();
             } else if (pageId === 'forum') {
+                console.log('Loading forum...');
                 loadForumMessages();
             } else if (pageId === 'resources') {
+                console.log('Loading resources...');
                 loadResources();
-                loadPDFs();
             }
+            
+            console.log('showPage completed for:', pageId);
         }
 
         // Load courses
@@ -793,23 +824,58 @@
                 resourcesGrid.innerHTML = '';
 
                 if (resources.length === 0) {
-                    resourcesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No resources available at the moment.") }}</p>';
+                    resourcesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No materials available at the moment.") }}</p>';
                     return;
                 }
 
                 resources.forEach(resource => {
                     const resourceCard = document.createElement('div');
                     resourceCard.className = 'resource-card';
-                    resourceCard.innerHTML = `
-                        <h4>${resource.title}</h4>
-                        <p>${resource.description}</p>
-                        <a href="${resource.file_url}" target="_blank" style="color: #abc32f; text-decoration: none; font-weight: 500;">{{ _('Download') }}</a>
-                    `;
+                    
+                    // Check if current user uploaded this resource
+                    const isUploader = window.currentUser && resource.uploaded_by === window.currentUser.id;
+                    
+                    if (resource.has_pin) {
+                        // PIN-protected resource
+                        let accessButton = '';
+                        if (isUploader && resource.access_pin) {
+                            // Show PIN to uploader
+                            accessButton = `<div style="background: #f0f9ff; border: 1px solid #0ea5e9; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
+                                <strong style="color: #0ea5e9;">{{ _('Your Access PIN:') }}</strong> 
+                                <span style="font-family: monospace; font-size: 1.1em; color: #1e40af; background: #e0f2fe; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${resource.access_pin}</span>
+                                <br><small style="color: #64748b;">{{ _('Share this PIN with others to grant access') }}</small>
+                            </div>
+                            <a href="${resource.file_url}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('Download') }}</a>`;
+                        } else {
+                            // Show request access button to others
+                            accessButton = `<button onclick="requestResourceAccess(${resource.id}, '${resource.title}')" style="background: #abc32f; color: white; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
+                        }
+                        
+                        resourceCard.innerHTML = `
+                            <h4>${resource.title} 🔒</h4>
+                            <p>${resource.description || '{{ _("No description available") }}'}</p>
+                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
+                                {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
+                            </p>
+                            ${accessButton}
+                        `;
+                    } else {
+                        // Public resource
+                        resourceCard.innerHTML = `
+                            <h4>${resource.title}</h4>
+                            <p>${resource.description || '{{ _("No description available") }}'}</p>
+                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
+                                {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
+                            </p>
+                            <a href="${resource.file_url}" target="_blank" style="background: #abc32f; color: white; text-decoration: none; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('Download') }}</a>
+                        `;
+                    }
+                    
                     resourcesGrid.appendChild(resourceCard);
                 });
             } catch (error) {
                 console.error('Error loading resources:', error);
-                document.querySelector('.resources-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading resources. Please try again.") }}</p>';
+                document.querySelector('.resources-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading materials. Please try again.") }}</p>';
             }
         }
 
@@ -818,42 +884,69 @@
             try {
                 const response = await fetch(`${API_BASE}/api/pdfs`);
                 const pdfs = await response.json();
-                // For now, just log the PDFs - we can display them later
-                console.log('Available PDFs:', pdfs);
+                
+                const pdfsList = document.getElementById('pdfs-list');
+                pdfsList.innerHTML = '';
+
+                if (pdfs.length === 0) {
+                    pdfsList.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No PDF documents available at the moment.") }}</p>';
+                    return;
+                }
+
+                pdfs.forEach(pdf => {
+                    const pdfCard = document.createElement('div');
+                    pdfCard.className = 'resource-card';
+                    
+                    // Check if current user uploaded this PDF
+                    const isUploader = window.currentUser && pdf.uploaded_by === window.currentUser.id;
+                    
+                    let accessButton = '';
+                    if (isUploader && pdf.access_pin) {
+                        // Show PIN to uploader
+                        accessButton = `<div style="background: #f0f9ff; border: 1px solid #0ea5e9; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
+                            <strong style="color: #0ea5e9;">{{ _('Your Access PIN:') }}</strong> 
+                            <span style="font-family: monospace; font-size: 1.1em; color: #1e40af; background: #e0f2fe; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${pdf.access_pin}</span>
+                            <br><small style="color: #64748b;">{{ _('Share this PIN with others to grant access') }}</small>
+                        </div>
+                        <button onclick="requestPDFAccess(${pdf.id}, '${pdf.title}')" style="background: #059669; color: white; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; margin-top: 0.5rem;">{{ _('Access PDF') }}</button>`;
+                    } else {
+                        // Show request access button to others
+                        accessButton = `<button onclick="requestPDFAccess(${pdf.id}, '${pdf.title}')" style="background: #abc32f; color: white; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
+                    }
+                    
+                    pdfCard.innerHTML = `
+                        <h4>${pdf.title}</h4>
+                        <p>${pdf.description || '{{ _("No description available") }}'}</p>
+                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
+                            {{ _('Uploaded:') }} ${new Date(pdf.upload_date).toLocaleDateString()}
+                        </p>
+                        ${accessButton}
+                    `;
+                    pdfsList.appendChild(pdfCard);
+                });
             } catch (error) {
                 console.error('Error loading PDFs:', error);
+                document.getElementById('pdfs-list').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading PDFs. Please try again.") }}</p>';
             }
         }
 
-        // Access PDF
-        async function accessPDF(event) {
-            event.preventDefault();
-            const pin = document.getElementById('pdf-pin').value.trim();
-
-            if (!pin) {
-                alert('{{ _("Please enter a PIN") }}');
-                return;
+        // Request resource access
+        function requestResourceAccess(resourceId, title) {
+            const pin = prompt(`{{ _('Enter access PIN for:') }} ${title}`);
+            if (pin && pin.trim()) {
+                accessResourceById(resourceId, pin.trim());
             }
+        }
 
+        // Access resource by ID and PIN
+        async function accessResourceById(resourceId, pin) {
             try {
-                const response = await fetch(`${API_BASE}/api/pdfs/${pin}/access`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ pin }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    window.open(data.file_url, '_blank');
-                } else {
-                    const error = await response.json();
-                    alert('{{ _("Invalid PIN") }}');
-                }
+                // Use the download URL with PIN embedded for direct access
+                const downloadUrl = `${API_BASE}/api/resources/${resourceId}/download/${pin}`;
+                window.open(downloadUrl, '_blank');
             } catch (error) {
-                console.error('Error accessing PDF:', error);
-                alert('{{ _("Error accessing PDF. Please try again.") }}');
+                console.error('Error accessing resource:', error);
+                alert('{{ _("Error accessing resource. Please try again.") }}');
             }
         }
 
@@ -897,6 +990,49 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '{{ _("Upload PDF") }}';
+            }
+        }
+
+        // Upload resource
+        async function uploadResource(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const submitBtn = document.getElementById('resource-upload-btn');
+            const statusDiv = document.getElementById('resource-upload-status');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '{{ _("Uploading...") }}';
+            statusDiv.style.display = 'block';
+            statusDiv.innerHTML = '<span style="color: #6b7280;">{{ _("Uploading resource...") }}</span>';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/resources`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span style="color: #059669;">✅ {{ _("Material uploaded successfully! Access PIN:") }} <strong>${result.pin}</strong></span>`;
+
+                    // Clear form
+                    form.reset();
+
+                    // Reload resources
+                    loadResources();
+                } else {
+                    statusDiv.innerHTML = `<span style="color: #dc2626;">❌ ${result.error || '{{ _("Error uploading material. Please try again.") }}'}</span>`;
+                }
+            } catch (error) {
+                console.error('Error uploading resource:', error);
+                statusDiv.innerHTML = `<span style="color: #dc2626;">❌ {{ _("Error uploading resource. Please try again.") }}</span>`;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '{{ _("Upload Material") }}';
             }
         }
 
@@ -1101,7 +1237,7 @@
             try {
                 console.log('Checking user login status...');
                 const response = await fetch(`${API_BASE}/api/user`, {
-                    credentials: 'same-origin'
+                    credentials: 'include'
                 });
                 console.log('User check response status:', response.status);
                 if (response.ok) {
@@ -1114,25 +1250,31 @@
                     updateForumForm(true);
                     showHomeCourses(user.courses);
 
-                    // Show PDF upload section for admins
+                    // Show admin button for admin users
                     if (user.is_admin) {
-                        document.getElementById('pdf-upload-section').style.display = 'block';
+                        document.getElementById('admin-btn').style.display = 'inline-block';
+                        document.getElementById('resource-upload-section').style.display = 'block';
+                    } else {
+                        document.getElementById('admin-btn').style.display = 'none';
+                        document.getElementById('resource-upload-section').style.display = 'none';
                     }
                 } else {
-                    console.log('User not logged in');
+                    console.log('User not logged in or API error');
                     document.getElementById('auth-buttons').style.display = 'block';
                     document.getElementById('user-info').style.display = 'none';
+                    document.getElementById('admin-btn').style.display = 'none';
                     window.currentUser = null;
                     updateForumForm(false);
                     hideHomeCourses();
 
-                    // Hide PDF upload section for non-admin users
-                    document.getElementById('pdf-upload-section').style.display = 'none';
+                    // Hide resource upload section for non-admin users
+                    document.getElementById('resource-upload-section').style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error checking user:', error);
                 document.getElementById('auth-buttons').style.display = 'block';
                 document.getElementById('user-info').style.display = 'none';
+                document.getElementById('admin-btn').style.display = 'none';
                 window.currentUser = null;
                 updateForumForm(false);
                 hideHomeCourses();
@@ -1206,10 +1348,26 @@
             loadForumMessages();
             initLanguageSelector();
 
+            // Add navigation event listeners
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const pageId = link.id.replace('-link', '');
+                    showPage(pageId, event);
+                });
+            });
+
             // Add PDF upload form listener
             const pdfUploadForm = document.getElementById('pdf-upload-form');
             if (pdfUploadForm) {
                 pdfUploadForm.addEventListener('submit', uploadPDF);
+            }
+
+            // Add resource upload form listener
+            const resourceUploadForm = document.getElementById('resource-upload-form');
+            if (resourceUploadForm) {
+                resourceUploadForm.addEventListener('submit', uploadResource);
             }
         });
     </script>

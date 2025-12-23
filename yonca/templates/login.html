@@ -155,6 +155,10 @@
                 <label for="password">{{ _('Password:') }}</label>
                 <input type="password" id="password" name="password" required>
             </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="admin_login" name="admin_login" style="width: auto; margin: 0;">
+                <label for="admin_login" style="margin: 0; font-weight: normal;">{{ _('Login as Administrator') }}</label>
+            </div>
             <button type="submit">{{ _('Login') }}</button>
         </form>
         <div class="back-link">

@@ -121,68 +121,158 @@ def delete_forum_message(message_id):
     
     return jsonify({'success': True}), 200
 
+@api_bp.route('/resources', methods=['POST'])
+@login_required
+def upload_resource():
+    """Upload a new learning resource"""
+    from flask import request
+    from werkzeug.utils import secure_filename
+    import os
+    import random
+    import string
+    from flask_login import current_user
+    
+    # Check if user is authenticated and is admin
+    if not current_user.is_authenticated or not current_user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    
+    # Check if file is present
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    if not file or file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    # Get form data
+    title = request.form.get('title', '').strip()
+    description = request.form.get('description', '').strip()
+    pin = request.form.get('pin', '').strip()
+    
+    if not title:
+        return jsonify({'error': 'Title is required'}), 400
+    
+    # Generate PIN if requested but not provided
+    if pin and len(pin) < 4:
+        return jsonify({'error': 'PIN must be at least 4 characters'}), 400
+    elif not pin:
+        # Generate a PIN for security
+        pin = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    
+    try:
+        # Create uploads directory if it doesn't exist
+        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'resources')
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate secure filename
+        filename = secure_filename(file.filename)
+        unique_filename = f"{random.randint(1000, 9999)}_{filename}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        
+        # Save file
+        file.save(file_path)
+        
+        # Create database record
+        new_resource = Resource(
+            title=title,
+            description=description,
+            file_url=f'/static/uploads/resources/{unique_filename}',
+            access_pin=pin,
+            uploaded_by=current_user.id
+        )
+        db.session.add(new_resource)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'id': new_resource.id,
+            'title': new_resource.title,
+            'file_url': new_resource.file_url,
+            'pin': pin,
+            'message': 'Resource uploaded successfully'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        # Clean up file if it was saved
+        if 'file_path' in locals() and os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except:
+                pass
+        return jsonify({'error': f'Upload failed: {str(e)}'}), 500
+
 @api_bp.route('/resources')
 def get_resources():
     """Get all learning resources"""
-    resources = Resource.query.all()
+    from flask_login import current_user
+    resources = Resource.query.filter_by(is_active=True).all()
     return jsonify([{
         'id': r.id,
         'title': r.title,
         'description': r.description,
-        'file_url': r.file_url
+        'file_url': r.file_url,
+        'access_pin': r.access_pin if (current_user.is_authenticated and r.uploaded_by == current_user.id) else None,
+        'upload_date': r.upload_date.isoformat() if r.upload_date else None,
+        'has_pin': bool(r.access_pin),
+        'uploaded_by': r.uploaded_by
     } for r in resources])
 
 @api_bp.route('/pdfs')
 def get_pdfs():
     """Get all active PDF documents (without sensitive info)"""
+    from flask_login import current_user
     pdfs = PDFDocument.query.filter_by(is_active=True).all()
     return jsonify([{
         'id': p.id,
         'title': p.title,
         'description': p.description,
         'file_size': p.file_size,
-        'upload_date': p.upload_date.isoformat() if p.upload_date else None
+        'upload_date': p.upload_date.isoformat() if p.upload_date else None,
+        'uploaded_by': p.uploaded_by,
+        # Only show PIN to the uploader
+        'access_pin': p.access_pin if (current_user.is_authenticated and p.uploaded_by == current_user.id) else None
     } for p in pdfs])
 
-@api_bp.route('/pdfs/<int:pdf_id>/access', methods=['POST'])
-def access_pdf(pdf_id):
-    """Verify PIN and provide access to PDF"""
+@api_bp.route('/resources/<int:resource_id>/access', methods=['POST'])
+@login_required
+def access_resource(resource_id):
+    """Verify PIN and provide access to resource"""
     data = request.get_json()
     
     if not data or 'pin' not in data:
         return jsonify({'error': 'PIN required'}), 400
     
-    pdf = PDFDocument.query.filter_by(id=pdf_id, is_active=True).first()
-    if not pdf:
-        return jsonify({'error': 'PDF not found'}), 404
+    resource = Resource.query.filter_by(id=resource_id, is_active=True).first()
+    if not resource:
+        return jsonify({'error': 'Resource not found'}), 404
     
-    if pdf.access_pin != data['pin']:
+    if not resource.access_pin or resource.access_pin != data['pin']:
         return jsonify({'error': 'Invalid PIN'}), 403
     
     return jsonify({
         'success': True,
-        'title': pdf.title,
-        'file_url': pdf.file_path,
-        'file_size': pdf.file_size,
-        'original_filename': pdf.original_filename
+        'title': resource.title,
+        'file_url': resource.file_url
     })
 
-@api_bp.route('/pdfs/<int:pdf_id>/download/<pin>')
-def download_pdf(pdf_id, pin):
-    """Download PDF with PIN verification"""
-    pdf = PDFDocument.query.filter_by(id=pdf_id, is_active=True).first()
-    if not pdf or pdf.access_pin != pin:
+@api_bp.route('/resources/<int:resource_id>/download/<pin>')
+@login_required
+def download_resource(resource_id, pin):
+    """Download resource with PIN verification"""
+    resource = Resource.query.filter_by(id=resource_id, is_active=True).first()
+    if not resource or (resource.access_pin and resource.access_pin != pin):
         return jsonify({'error': 'Invalid access'}), 403
     
     # Return the file directly
     import os
     from flask import send_file
-    file_path = os.path.join(current_app.root_path, pdf.file_path[1:])
+    file_path = os.path.join(current_app.static_folder, resource.file_url[1:])
     
     if not os.path.exists(file_path):
         return jsonify({'error': 'File not found on server'}), 404
     
-    return send_file(file_path, as_attachment=True, download_name=pdf.original_filename)
+    return send_file(file_path, as_attachment=True, download_name=resource.title)
 
 @api_bp.route('/pdfs/upload', methods=['POST'])
 def upload_pdf():
@@ -228,7 +318,7 @@ def upload_pdf():
     
     try:
         # Create uploads directory if it doesn't exist
-        upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'pdfs')
+        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'pdfs')
         os.makedirs(upload_dir, exist_ok=True)
         
         # Generate secure filename
@@ -271,3 +361,15 @@ def upload_pdf():
             except:
                 pass
         return jsonify({'error': f'Upload failed: {str(e)}'}), 500
+
+@api_bp.route('/user')
+@login_required
+def get_user():
+    """Get current user information"""
+    return jsonify({
+        'id': current_user.id,
+        'username': current_user.username,
+        'email': current_user.email,
+        'is_admin': current_user.is_admin,
+        'courses': [{'id': c.id, 'title': c.title, 'description': c.description} for c in current_user.courses]
+    })

@@ -13,41 +13,45 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        admin_login = request.form.get('admin_login') == 'on'
+        
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('main.index'))
+            
+            # Check if admin login is requested and user is admin
+            if admin_login and user.is_admin:
+                return redirect('/admin')
+            else:
+                return redirect(url_for('main.index'))
         
         flash('Invalid username or password')
     
     return render_template('login.html')
 
-@auth_bp.route('/set_language/<lang>')
-def set_language(lang):
-    """Set the user's language preference"""
-    from flask import session, redirect, request, url_for
-    
-    if lang in ['en', 'ru']:
-        session['language'] = lang
-        session.modified = True  # Force session to be saved
-    
-    # Redirect back to the referring page with lang parameter
-    referrer = request.referrer or url_for('main.index')
-    url = referrer
-    if '?' in referrer:
-        url += f'&lang={lang}'
-    else:
-        url += f'?lang={lang}'
-    
-    return redirect(url)
+@auth_bp.route('/logout')
 @login_required
+def logout():
+    """Handle user logout"""
+    logout_user()
+    return redirect(url_for('main.index'))
+
+@auth_bp.route('/api/user')
 def get_user():
     """Get current user information"""
-    return jsonify({
-        'id': current_user.id,
-        'username': current_user.username,
-        'email': current_user.email,
-        'is_admin': current_user.is_admin,
-        'courses': [{'id': c.id, 'title': c.title, 'description': c.description} for c in current_user.courses]
-    })
+    if current_user.is_authenticated:
+        return jsonify({
+            'id': current_user.id,
+            'username': current_user.username,
+            'is_admin': current_user.is_admin,
+            'courses': [{
+                'id': c.id,
+                'title': c.title,
+                'description': c.description,
+                'time_slot': c.time_slot,
+                'profile_emoji': c.profile_emoji
+            } for c in current_user.courses]
+        })
+    else:
+        return jsonify({'error': 'Not authenticated'}), 401
