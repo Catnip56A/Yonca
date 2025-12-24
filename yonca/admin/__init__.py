@@ -1,15 +1,17 @@
 """
 Admin interface views and configuration
 """
-from flask import flash, redirect, url_for, request
+from flask import flash, redirect, url_for, request, current_app
 from flask_admin import Admin, AdminIndexView, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.form import JSONField
+from flask_admin.form.upload import FileUploadField
+from wtforms import Form, FileField, StringField, TextAreaField, BooleanField
+from wtforms.validators import DataRequired
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField
 from wtforms.validators import Optional, DataRequired
-from yonca.models import User, Course, ForumMessage, TaviTest, Resource, db, HomeContent
+from yonca.models import User, Course, ForumMessage, ForumChannel, TaviTest, Resource, db, HomeContent
 
 class AdminIndexView(AdminIndexView):
     """Custom admin index view with authentication and home content management"""
@@ -124,9 +126,76 @@ class AdminIndexView(AdminIndexView):
                 home_content.features = features
                 home_content.logged_out_features = logged_out_features
                 
+                # Process gallery images
+                gallery_images = []
+                
+                # Get all gallery indices from form data (alt and caption fields)
+                gallery_indices = set()
+                for key in form_data.keys():
+                    if key.startswith('gallery_alt_'):
+                        index = key.replace('gallery_alt_', '')
+                        gallery_indices.add(index)
+                    elif key.startswith('gallery_caption_'):
+                        index = key.replace('gallery_caption_', '')
+                        gallery_indices.add(index)
+                
+                # Also include existing gallery images that might not have form data
+                existing_images = home_content.gallery_images or []
+                
+                # Process each gallery index
+                for index in sorted(gallery_indices):
+                    file_key = f'gallery_file_{index}'
+                    alt_key = f'gallery_alt_{index}'
+                    caption_key = f'gallery_caption_{index}'
+                    
+                    alt = form_data.get(alt_key, '').strip()
+                    caption = form_data.get(caption_key, '').strip()
+                    
+                    # Check if a file was uploaded for this index
+                    if file_key in request.files and request.files[file_key].filename:
+                        file = request.files[file_key]
+                        if file and file.filename:
+                            # Handle file upload
+                            from werkzeug.utils import secure_filename
+                            import os
+                            import random
+                            
+                            # Create uploads directory if it doesn't exist
+                            upload_dir = os.path.join(current_app.static_folder, 'uploads', 'gallery')
+                            os.makedirs(upload_dir, exist_ok=True)
+                            
+                            # Generate secure filename
+                            filename = secure_filename(file.filename)
+                            unique_filename = f"{random.randint(1000, 9999)}_{filename}"
+                            file_path = os.path.join(upload_dir, unique_filename)
+                            
+                            # Save file
+                            file.save(file_path)
+                            url = f'/static/uploads/gallery/{unique_filename}'
+                            
+                            gallery_images.append({'url': url, 'alt': alt, 'caption': caption})
+                    else:
+                        # No new file uploaded - check if this corresponds to an existing image
+                        # by checking if the index is within the range of existing images
+                        try:
+                            index_num = int(index)
+                            if index_num < len(existing_images):
+                                # Update existing image with new alt/caption
+                                existing_image = existing_images[index_num].copy()
+                                if alt:
+                                    existing_image['alt'] = alt
+                                if caption:
+                                    existing_image['caption'] = caption
+                                gallery_images.append(existing_image)
+                        except (ValueError, IndexError):
+                            pass  # Skip invalid indices
+                
+                home_content.gallery_images = gallery_images
+                
                 print(f"DEBUG: About to commit changes to database")
                 print(f"DEBUG: home_content.features: {home_content.features}")
                 print(f"DEBUG: home_content.logged_out_features: {home_content.logged_out_features}")
+                print(f"DEBUG: home_content.gallery_images: {home_content.gallery_images}")
                 
                 db.session.commit()
                 print(f"DEBUG: Database commit successful")
@@ -224,12 +293,71 @@ class CourseView(SecureModelView):
         'users': lambda v, c, m, p: ', '.join([user.username for user in m.users]) if m.users else 'None'
     }
 
+class ResourceForm(Form):
+    """Custom form for resource creation with file upload"""
+    title = StringField('Title', [DataRequired()])
+    description = TextAreaField('Description')
+    file = FileField('File', [DataRequired()])
+    is_active = BooleanField('Active', default=True)
+
 class ResourceView(SecureModelView):
-    """Admin view for Resource model"""
+    """Admin view for Resource model with file upload"""
     column_list = ('id', 'title', 'description', 'file_url', 'access_pin', 'uploaded_by', 'upload_date', 'is_active')
     column_searchable_list = ['title', 'description']
-    form_columns = ('title', 'description', 'file_url', 'access_pin', 'is_active')
-    form_excluded_columns = ('uploaded_by', 'upload_date')
+    form = ResourceForm
+    form_excluded_columns = ('uploaded_by', 'upload_date', 'file_url', 'access_pin')
+    
+    def create_model(self, form):
+        """Override create_model to handle file upload"""
+        from werkzeug.utils import secure_filename
+        import os
+        import random
+        from flask_login import current_user
+        
+        # Handle file upload
+        file = form.file.data
+        if file:
+            # Create uploads directory if it doesn't exist
+            upload_dir = os.path.join(current_app.static_folder, 'uploads', 'resources')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Generate secure filename
+            filename = secure_filename(file.filename)
+            unique_filename = f"{random.randint(1000, 9999)}_{filename}"
+            file_path = os.path.join(upload_dir, unique_filename)
+            
+            # Save file
+            file.save(file_path)
+            file_url = f'/static/uploads/resources/{unique_filename}'
+        else:
+            file_url = None
+        
+        # Create model
+        model = self.model(
+            title=form.title.data,
+            description=form.description.data,
+            file_url=file_url,
+            access_pin=None,  # No PIN for admin uploads
+            uploaded_by=current_user.id,
+            is_active=form.is_active.data
+        )
+        
+        self.session.add(model)
+        self.session.commit()
+        return model
+    
+    def create_form(self):
+        """Override form creation to ensure no extra fields"""
+        form = super(ResourceView, self).create_form()
+        return form
+    
+    def edit_form(self, obj):
+        """Override edit form - no file upload for editing"""
+        form = super(ResourceView, self).edit_form(obj)
+        # Remove file field from edit form since we don't support re-uploading
+        if hasattr(form, 'file'):
+            delattr(form, 'file')
+        return form
 
 class TaviTestView(SecureModelView):
     """Admin view for TaviTest model"""
@@ -237,13 +365,44 @@ class TaviTestView(SecureModelView):
     column_searchable_list = ['result']
     form_excluded_columns = ('timestamp',)
 
+class ForumChannelView(SecureModelView):
+    """Admin view for ForumChannel model"""
+    column_list = ('name', 'slug', 'description', 'requires_login', 'admin_only', 'is_active', 'sort_order', 'created_at')
+    column_searchable_list = ['name', 'slug', 'description']
+    column_filters = ['requires_login', 'admin_only', 'is_active']
+    form_columns = ('name', 'slug', 'description', 'requires_login', 'admin_only', 'is_active', 'sort_order')
+    form_excluded_columns = ('created_at', 'updated_at')
+
+    def on_model_change(self, form, model, is_created):
+        """Ensure slug is URL-friendly"""
+        if hasattr(model, 'slug') and model.slug:
+            # Make slug URL-friendly
+            model.slug = model.slug.lower().replace(' ', '-').replace('_', '-')
+        return super().on_model_change(form, model, is_created)
+
+    def delete_model(self, model):
+        """Override delete to prevent deletion of 'general' channel and move messages"""
+        if model.slug == 'general':
+            flash('Cannot delete the General Discussion channel.', 'error')
+            return False
+        
+        # Move all messages from this channel to 'general'
+        messages_to_move = ForumMessage.query.filter_by(channel=model.slug).all()
+        for message in messages_to_move:
+            message.channel = 'general'
+        db.session.commit()
+        
+        # Proceed with deletion
+        return super().delete_model(model)
+
 def init_admin(app):
     """Initialize admin interface with all views"""
     admin = Admin(app, name='Yonca Admin', index_view=AdminIndexView())
     admin.add_view(UserView(User, db.session))
     admin.add_view(CourseView(Course, db.session))
-    admin.add_view(ResourceView(Resource, db.session))
+    admin.add_view(ForumChannelView(ForumChannel, db.session))
     admin.add_view(SecureModelView(ForumMessage, db.session))
+    admin.add_view(ResourceView(Resource, db.session))
     admin.add_view(TaviTestView(TaviTest, db.session))
     admin.add_view(LogoutView(name='Logout', endpoint='logout'))
     return admin

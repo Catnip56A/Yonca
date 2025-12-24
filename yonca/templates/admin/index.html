@@ -220,7 +220,7 @@
         <div class="editor-panel">
             <h3><i class="fa fa-edit"></i> Content Editor</h3>
 
-            <form method="post" id="content-form">
+            <form method="post" id="content-form" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
 
                 <!-- Logged In Content -->
@@ -296,6 +296,20 @@
 
                     <div id="logged-out-features-container">
                         <!-- Logged out features will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Gallery Images Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-images"></i> Gallery Images</h4>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-gallery-image">
+                            <i class="fa fa-plus"></i> Add Image
+                        </button>
+                    </div>
+
+                    <div id="gallery-container">
+                        <!-- Gallery images will be dynamically added here -->
                     </div>
                 </div>
 
@@ -517,9 +531,15 @@ document.addEventListener('DOMContentLoaded', function() {
         addFeature('logged-out-features-container', 'logged_out_feature');
     });
 
+    // Add gallery image button
+    document.getElementById('add-gallery-image').addEventListener('click', function() {
+        addGalleryImage('gallery-container', 'gallery');
+    });
+
     // Make features sortable
     makeSortable('features-container');
     makeSortable('logged-out-features-container');
+    makeSortable('gallery-container');
 });
 
 function initializeFeatures() {
@@ -534,6 +554,13 @@ function initializeFeatures() {
     {% if home_content.logged_out_features %}
     {% for feature in home_content.logged_out_features %}
     addFeatureFromData('logged-out-features-container', 'logged_out_feature', {{ feature.title|tojson }}, {{ feature.description|tojson }});
+    {% endfor %}
+    {% endif %}
+
+    // Initialize gallery images
+    {% if home_content.gallery_images %}
+    {% for image in home_content.gallery_images %}
+    addGalleryImageFromData('gallery-container', 'gallery', {{ image.url|tojson }}, {{ image.alt|tojson }}, {{ image.caption|tojson }});
     {% endfor %}
     {% endif %}
 }
@@ -769,6 +796,87 @@ function makeSortable(containerId) {
         placeholder = null;
         isDragging = false;
         updatePreviewFeatures();
+    });
+}
+
+// Gallery Image Functions
+function addGalleryImage(containerId, prefix) {
+    const container = document.getElementById(containerId);
+    const imageIndex = container.children.length;
+
+    const imageDiv = document.createElement('div');
+    imageDiv.className = 'feature-item gallery-item';
+    imageDiv.draggable = true;
+    imageDiv.innerHTML = `
+        <div class="feature-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span class="drag-handle" style="cursor: move; color: #6c757d;"><i class="fa fa-grip-vertical"></i></span>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-feature">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+        <div class="form-group-inline">
+            <label>Image File:</label>
+            <input type="file" name="${prefix}_file_${imageIndex}" class="form-control gallery-file"
+                   accept="image/*" required>
+        </div>
+        <div class="form-group-inline">
+            <label>Alt Text:</label>
+            <input type="text" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
+                   placeholder="Image description" value="">
+        </div>
+        <div class="form-group-inline">
+            <label>Caption:</label>
+            <input type="text" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
+                   placeholder="Image caption" value="">
+        </div>
+    `;
+
+    container.appendChild(imageDiv);
+
+    // Add event listeners
+    imageDiv.querySelector('.remove-feature').addEventListener('click', function() {
+        imageDiv.remove();
+    });
+}
+
+function addGalleryImageFromData(containerId, prefix, url, alt, caption) {
+    const container = document.getElementById(containerId);
+    const imageIndex = container.children.length;
+
+    // Escape quotes for HTML attributes
+    const escapedAlt = alt.replace(/"/g, '&quot;');
+    const escapedCaption = caption.replace(/"/g, '&quot;');
+
+    const imageDiv = document.createElement('div');
+    imageDiv.className = 'feature-item gallery-item';
+    imageDiv.draggable = true;
+    imageDiv.innerHTML = `
+        <div class="feature-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span class="drag-handle" style="cursor: move; color: #6c757d;"><i class="fa fa-grip-vertical"></i></span>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-feature">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+        <div class="form-group-inline" style="background: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 10px;">
+            <small style="color: #6c757d;"><i class="fa fa-info-circle"></i> Image already uploaded: <code>${url}</code></small>
+        </div>
+        <div class="form-group-inline">
+            <label>Alt Text:</label>
+            <input type="text" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
+                   placeholder="Image description" value="${escapedAlt}">
+        </div>
+        <div class="form-group-inline">
+            <label>Caption:</label>
+            <input type="text" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
+                   placeholder="Image caption" value="${escapedCaption}">
+        </div>
+    `;
+
+    container.appendChild(imageDiv);
+
+    // Add event listeners
+    imageDiv.querySelector('.remove-feature').addEventListener('click', function() {
+        imageDiv.remove();
     });
 }
 

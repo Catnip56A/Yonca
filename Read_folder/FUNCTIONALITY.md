@@ -67,11 +67,20 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
 - **Message Hierarchy**: Support for main posts and threaded replies
 - **Real-time Updates**: Dynamic forum content loading
 - **User Attribution**: Messages are attributed to specific users
+- **Channel-Based Organization**: Forum is organized into multiple channels with different access levels
+
+#### Forum Channels
+- **Public Channels**: Accessible to all users without login
+- **Login-Required Channels**: Require user authentication to access
+- **Admin-Only Channels**: Restricted to administrators only for private staff discussions
+- **Channel Management**: Administrators can create, edit, and manage forum channels
+- **Customizable Display Order**: Channels can be ordered using sort_order field
 
 #### Forum Management
 - **Content Moderation**: Administrators can moderate forum content
 - **Message Editing**: Users can edit their own messages
 - **Message Deletion**: Appropriate deletion permissions for users and admins
+- **Channel Administration**: Full CRUD operations for forum channels
 - **Spam Prevention**: Built-in measures to prevent forum abuse
 
 ### 6. Administrative Dashboard
@@ -81,6 +90,7 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
 - **Course Administration**: Full course lifecycle management
 - **Resource Oversight**: Manage all learning resources and PDFs
 - **Forum Moderation**: Moderate community discussions
+- **Channel Management**: Create and manage forum channels with different permission levels
 - **System Analytics**: View platform usage statistics
 
 #### Security Features
@@ -178,12 +188,14 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
 - **Course Model**: Course information and enrollment relationships
 - **Resource Model**: Learning resources with PIN protection
 - **PDFDocument Model**: PDF files with secure access controls
+- **ForumChannel Model**: Forum channels with tiered access control (public/login-required/admin-only)
 - **ForumMessage Model**: Discussion forum with threaded replies
 - **TaviTest Model**: Assessment and testing functionality (planned)
 
 ### Data Relationships
 - **Many-to-Many**: Users can enroll in multiple courses
 - **One-to-Many**: Users can upload multiple resources and PDFs
+- **Channel-Based**: Forum messages are organized by channels with different access levels
 - **Hierarchical**: Forum messages support threaded discussions
 - **Ownership**: Clear ownership relationships for uploaded content
 

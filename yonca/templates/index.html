@@ -180,6 +180,49 @@
             font-size: 1.5rem;
         }
 
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .gallery-item {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-caption {
+            padding: 1rem;
+            background: #f9fafb;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .gallery-section {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
         .section-title {
             color: #1f2937;
             font-size: 2.5rem;
@@ -459,9 +502,46 @@
             font-size: 1.5rem;
         }
 
-        .contact-item p {
-            color: #6b7280;
-            line-height: 1.6;
+        .channel-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .channel-tab {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .channel-tab:hover {
+            background: #e5e7eb;
+        }
+
+        .channel-tab.active {
+            background: #abc32f;
+            color: white;
+            border-color: #abc32f;
+        }
+
+        .channel-tab.locked {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+            cursor: not-allowed;
+        }
+
+        .channel-tab.locked:hover {
+            background: #fecaca;
         }
     </style>
 </head>
@@ -535,6 +615,38 @@
                 {% endif %}
             </div>
             {% endif %}
+
+            <!-- Gallery Section -->
+            <div class="gallery-section">
+                <h2 class="section-title">{{ _('Gallery') }}</h2>
+                <p>{{ _('Explore our community and learning environment through these images.') }}</p>
+
+                <div class="gallery-grid">
+                    {% if home_content.gallery_images %}
+                    {% for image in home_content.gallery_images %}
+                    <div class="gallery-item">
+                        <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
+                        {% if image.caption %}
+                        <div class="gallery-caption">{{ image.caption }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/400x250/abc32f/ffffff?text=Learning+Community" alt="Learning Community" loading="lazy">
+                        <div class="gallery-caption">Our vibrant learning community</div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/400x250/4a90e2/ffffff?text=Interactive+Courses" alt="Interactive Courses" loading="lazy">
+                        <div class="gallery-caption">Engage with interactive course content</div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/400x250/7ed321/ffffff?text=Study+Groups" alt="Study Groups" loading="lazy">
+                        <div class="gallery-caption">Collaborate in study groups</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </section>
 
         <!-- Courses Page -->
@@ -559,6 +671,11 @@
             </div>
 
             <div id="forum-content">
+                <!-- Channel Tabs -->
+                <div class="channel-tabs" style="margin-bottom: 2rem;">
+                    <!-- Tabs will be loaded dynamically -->
+                </div>
+
                 <div class="message-form">
                     <h3>{{ _('Post a New Message') }}</h3>
                     <form onsubmit="postMessage(event)">
@@ -575,7 +692,7 @@
                 </div>
 
                 <div class="forum-container">
-                    <h3>{{ _('Recent Messages') }}</h3>
+                    <h3 id="channel-title">{{ _('General Discussion') }}</h3>
                     <div id="messages-container">
                         <div class="forum-message">
                             <div class="user">{{ _('Welcome to Yonca Forum!') }}</div>
@@ -732,7 +849,7 @@
 
     <script>
         // API base URL
-        const API_BASE = '';
+        const API_BASE = window.location.origin;
 
         // Current page management
         function showPage(pageId, event) {
@@ -787,7 +904,7 @@
                 loadCourses();
             } else if (pageId === 'forum') {
                 console.log('Loading forum...');
-                loadForumMessages();
+                loadForumChannels();
             } else if (pageId === 'resources') {
                 console.log('Loading resources...');
                 loadResources();
@@ -1048,15 +1165,107 @@
         }
 
         // Forum functionality
-        async function loadForumMessages() {
+        let currentChannel = 'general';
+        let availableChannels = [];
+
+        async function loadForumChannels() {
             try {
-                const response = await fetch(`${API_BASE}/api/forum/messages`);
-                const messages = await response.json();
+                const response = await fetch(`${API_BASE}/api/forum/channels`);
+                const channels = await response.json();
+                availableChannels = channels;
+                
+                // Build channel tabs dynamically
+                const channelTabsContainer = document.querySelector('.channel-tabs');
+                channelTabsContainer.innerHTML = '';
+                
+                channels.forEach((channel, index) => {
+                    const tabButton = document.createElement('button');
+                    tabButton.className = 'channel-tab' + (index === 0 ? ' active' : '');
+                    tabButton.setAttribute('data-channel', channel.slug);
+                    tabButton.textContent = channel.name;
+                    
+                    // Handle channel visibility and access
+                    if (channel.admin_only) {
+                        // Admin-only channels
+                        if (!window.currentUser || !window.currentUser.is_admin) {
+                            return; // Don't show this tab to non-admins
+                        }
+                    } else if (channel.requires_login) {
+                        // Login-required channels
+                        if (!window.currentUser) {
+                            tabButton.classList.add('locked');
+                            tabButton.disabled = true;
+                        }
+                    }
+                    // Public channels are always shown and enabled
+                    
+                    channelTabsContainer.appendChild(tabButton);
+                });
+                
+                // Add event listeners to new tabs
+                document.querySelectorAll('.channel-tab').forEach(tab => {
+                    tab.addEventListener('click', (event) => {
+                        const channel = event.target.getAttribute('data-channel');
+                        switchChannel(channel);
+                    });
+                });
+                
+                // Load messages for the first channel
+                if (channels.length > 0) {
+                    currentChannel = channels[0].slug;
+                    updateForumAuth(); // Update form visibility for the initial channel
+                    loadForumMessages(currentChannel);
+                }
+            } catch (error) {
+                console.error('Error loading forum channels:', error);
+                // Fallback to default behavior
+                loadForumMessages(currentChannel);
+            }
+        }
+
+        function switchChannel(channel) {
+            // Check permissions
+            const channelObj = availableChannels.find(c => c.slug === channel);
+            if (channelObj) {
+                if (channelObj.admin_only && (!window.currentUser || !window.currentUser.is_admin)) {
+                    alert('Admin access required for this channel');
+                    return;
+                } else if (channelObj.requires_login && !window.currentUser) {
+                    alert('Authentication required for this channel');
+                    return;
+                }
+            }
+            
+            currentChannel = channel;
+            
+            // Update active tab
+            document.querySelectorAll('.channel-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-channel="${channel}"]`).classList.add('active');
+            
+            // Update channel title
+            document.getElementById('channel-title').textContent = channelObj ? channelObj.name : channel;
+            
+            // Update form visibility based on channel permissions
+            updateForumAuth();
+            
+            // Load messages for this channel
+            loadForumMessages(channel);
+        }
+
+        async function loadForumMessages(channel = 'general') {
+            try {
+                const response = await fetch(`${API_BASE}/api/forum/messages?channel=${channel}`);
+                const data = await response.json();
                 const messagesContainer = document.getElementById('messages-container');
                 messagesContainer.innerHTML = '';
 
+                // Extract messages from the response object
+                const messages = data.messages || [];
+
                 if (messages.length === 0) {
-                    messagesContainer.innerHTML = '<div class="forum-message"><div class="user">{{ _("No messages yet") }}</div><p>{{ _("Be the first to start a conversation!") }}</p></div>';
+                    messagesContainer.innerHTML = '<div class="forum-message"><div class="user">No messages yet</div><p>Be the first to start a conversation!</p></div>';
                     return;
                 }
 
@@ -1067,24 +1276,26 @@
                     messageDiv.style.marginLeft = `${depth * 20}px`;
 
                     let actionsHtml = '';
-                    if (window.currentUser) {
-                        actionsHtml = `
-                            <div class="message-actions">
-                                <button onclick="replyToMessage(${message.id}, '${message.username}')" class="reply-btn">💬 {{ _("Reply") }}</button>
+                    // Show reply button for all users (logged in and anonymous)
+                    actionsHtml = `
+                        <div class="message-actions">
+                            <button onclick="replyToMessage(${message.id}, '${message.username}', '${message.channel}')" class="reply-btn">💬 Reply</button>
+                    `;
+                    
+                    // Show edit/delete buttons only for message owner or admin
+                    if (window.currentUser && (message.is_current_user || window.currentUser.is_admin)) {
+                        actionsHtml += `
+                            <button onclick="editMessage(${message.id}, '${message.message.replace(/'/g, "\\'")}')" class="edit-btn">✏️ Edit</button>
+                            <button onclick="deleteMessage(${message.id})" class="delete-btn">🗑️ Delete</button>
                         `;
-                        if (message.is_current_user || window.currentUser.is_admin) {
-                            actionsHtml += `
-                                <button onclick="editMessage(${message.id}, '${message.message.replace(/'/g, "\\'")}')" class="edit-btn">✏️ {{ _("Edit") }}</button>
-                                <button onclick="deleteMessage(${message.id})" class="delete-btn">🗑️ {{ _("Delete") }}</button>
-                            `;
-                        }
-                        actionsHtml += '</div>';
                     }
+                    
+                    actionsHtml += '</div>';
 
                     messageDiv.innerHTML = `
-                        <div class="user">${message.username}${message.is_current_user ? ' ({{ _("You") }})' : ''}</div>
+                        <div class="user">${message.username}${message.is_current_user ? ' (You)' : ''}</div>
                         <p class="message-text">${message.message}</p>
-                        <div class="timestamp">{{ _("Posted on") }} ${new Date(message.timestamp).toLocaleDateString()} {{ _("at") }} ${new Date(message.timestamp).toLocaleTimeString()}</div>
+                        <div class="timestamp">Posted on ${new Date(message.timestamp).toLocaleDateString()} at ${new Date(message.timestamp).toLocaleTimeString()}</div>
                         ${actionsHtml}
                     `;
                     container.appendChild(messageDiv);
@@ -1104,94 +1315,129 @@
         async function postMessage(event) {
             event.preventDefault();
 
-            if (!window.currentUser) {
-                alert('{{ _("Please log in to post messages") }}');
-                showPage('login');
+            const message = document.getElementById('message').value.trim();
+            const username = document.getElementById('username').value.trim();
+
+            if (message === '') {
+                alert('Please enter a message');
                 return;
             }
 
-            const message = document.getElementById('message').value.trim();
+            // Check if user can post to this channel
+            const channelObj = availableChannels.find(c => c.slug === currentChannel);
+            if (channelObj && channelObj.requires_login && !window.currentUser) {
+                alert('Please log in to post to this channel');
+                return;
+            }
 
-            if (message === '') {
-                alert('{{ _("Please enter a message") }}');
+            if (!window.currentUser && !username) {
+                alert('Please enter a username');
                 return;
             }
 
             const postBtn = document.getElementById('post-btn');
             const originalText = postBtn.textContent;
-            postBtn.textContent = '{{ _("Posting...") }}';
+            postBtn.textContent = 'Posting...';
             postBtn.disabled = true;
 
             try {
+                const requestData = { 
+                    message,
+                    channel: currentChannel
+                };
+                
+                if (!window.currentUser) {
+                    requestData.username = username;
+                }
+
                 const response = await fetch(`${API_BASE}/api/forum/messages`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ message }),
+                    body: JSON.stringify(requestData),
                 });
 
                 if (response.ok) {
                     // Reload messages
-                    loadForumMessages();
+                    loadForumMessages(currentChannel);
                     // Clear form
                     document.getElementById('message').value = '';
-                    alert('{{ _("Message posted successfully!") }}');
-                } else if (response.status === 401) {
-                    alert('{{ _("Please log in to post messages") }}');
-                    showPage('login');
+                    if (!window.currentUser) {
+                        document.getElementById('username').value = '';
+                    }
+                    alert('Message posted successfully!');
+                } else if (response.status === 401 || response.status === 403) {
+                    alert('You do not have permission to post to this channel');
                 } else {
                     const error = await response.json();
-                    alert('{{ _("Error posting message:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                    alert('Error posting message: ' + (error.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error posting message:', error);
-                alert('{{ _("Error posting message. Please try again.") }}');
+                alert('Error posting message. Please try again.');
             } finally {
                 postBtn.textContent = originalText;
                 postBtn.disabled = false;
             }
         }
 
-        async function replyToMessage(parentId, parentUsername) {
-            const replyMessage = prompt('{{ _("Reply to") }} ${parentUsername}:', '');
+        async function replyToMessage(parentId, parentUsername, channel) {
+            let replyMessage = prompt(`Reply to ${parentUsername}:`, '');
             if (replyMessage === null || replyMessage.trim() === '') {
                 return;
             }
 
+            let username = null;
+            if (!window.currentUser) {
+                // Anonymous user - ask for username
+                username = prompt('Enter your username:', '');
+                if (username === null || username.trim() === '') {
+                    alert('Username is required for anonymous posting');
+                    return;
+                }
+                username = username.trim();
+            }
+
             try {
+                const requestData = {
+                    message: replyMessage.trim(),
+                    parent_id: parentId,
+                    channel: channel
+                };
+                
+                if (!window.currentUser) {
+                    requestData.username = username;
+                }
+
                 const response = await fetch(`${API_BASE}/api/forum/messages`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'same-origin',
-                    body: JSON.stringify({
-                        message: replyMessage.trim(),
-                        parent_id: parentId
-                    }),
+                    body: JSON.stringify(requestData),
                 });
 
                 if (response.ok) {
                     // Reload messages to show the new reply
-                    loadForumMessages();
-                    alert('{{ _("Reply posted successfully!") }}');
-                } else if (response.status === 401) {
-                    alert('{{ _("Please log in to reply to messages") }}');
-                    showPage('login');
+                    loadForumMessages(currentChannel);
+                    alert('Reply posted successfully!');
+                } else if (response.status === 401 || response.status === 403) {
+                    alert('You do not have permission to reply to messages in this channel');
                 } else {
                     const error = await response.json();
-                    alert('{{ _("Error posting reply:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                    alert('Error posting reply: ' + (error.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error posting reply:', error);
-                alert('{{ _("Error posting reply. Please try again.") }}');
+                alert('Error posting reply. Please try again.');
             }
         }
 
         async function editMessage(messageId, currentMessage) {
-            const newMessage = prompt('{{ _("Edit your message:") }}', currentMessage);
+            const newMessage = prompt('Edit your message:', currentMessage);
             if (newMessage === null || newMessage.trim() === '' || newMessage.trim() === currentMessage) {
                 return;
             }
@@ -1207,20 +1453,20 @@
                 });
 
                 if (response.ok) {
-                    loadForumMessages();
-                    alert('{{ _("Message updated successfully!") }}');
+                    loadForumMessages(currentChannel);
+                    alert('Message updated successfully!');
                 } else {
                     const error = await response.json();
-                    alert('{{ _("Error updating message:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                    alert('Error updating message: ' + (error.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error editing message:', error);
-                alert('{{ _("Error updating message. Please try again.") }}');
+                alert('Error updating message. Please try again.');
             }
         }
 
         async function deleteMessage(messageId) {
-            if (!confirm('{{ _("Are you sure you want to delete this message?") }}')) {
+            if (!confirm('Are you sure you want to delete this message?')) {
                 return;
             }
 
@@ -1231,15 +1477,15 @@
                 });
 
                 if (response.ok) {
-                    loadForumMessages();
-                    alert('{{ _("Message deleted successfully!") }}');
+                    loadForumMessages(currentChannel);
+                    alert('Message deleted successfully!');
                 } else {
                     const error = await response.json();
-                    alert('{{ _("Error deleting message:") }} ' + (error.error || '{{ _("Unknown error") }}'));
+                    alert('Error deleting message: ' + (error.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error deleting message:', error);
-                alert('{{ _("Error deleting message. Please try again.") }}');
+                alert('Error deleting message. Please try again.');
             }
         }
 
@@ -1253,35 +1499,45 @@
                 console.log('User check response status:', response.status);
                 if (response.ok) {
                     const user = await response.json();
-                    console.log('User logged in:', user);
-                    document.getElementById('auth-buttons').style.display = 'none';
-                    document.getElementById('user-info').style.display = 'block';
-                    document.getElementById('user-name').textContent = user.username;
-                    window.currentUser = user;
-                    updateForumForm(true);
-                    showHomeCourses(user.courses);
+                    console.log('User data received:', user);
+                    if (user) {
+                        // User is logged in
+                        console.log('User logged in:', user);
+                        document.getElementById('auth-buttons').style.display = 'none';
+                        document.getElementById('user-info').style.display = 'block';
+                        document.getElementById('user-name').textContent = user.username;
+                        window.currentUser = user;
+                        updateForumForm(true);
+                        showHomeCourses(user.courses);
 
-                    // Show admin button for admin users
-                    if (user.is_admin) {
-                        document.getElementById('admin-btn').style.display = 'inline-block';
-                        document.getElementById('resource-upload-section').style.display = 'block';
+                        // Show admin button for admin users
+                        if (user.is_admin) {
+                            document.getElementById('admin-btn').style.display = 'inline-block';
+                            document.getElementById('resource-upload-section').style.display = 'block';
+                        } else {
+                            document.getElementById('admin-btn').style.display = 'none';
+                            document.getElementById('resource-upload-section').style.display = 'none';
+                        }
+                        
+                        // Load forum messages for authenticated user
+                        loadForumMessages(currentChannel);
                     } else {
+                        // User is not logged in - anonymous visitor
+                        console.log('User is not logged in (anonymous visitor)');
+                        document.getElementById('auth-buttons').style.display = 'block';
+                        document.getElementById('user-info').style.display = 'none';
                         document.getElementById('admin-btn').style.display = 'none';
+                        window.currentUser = null;
+                        updateForumForm(false);
+                        hideHomeCourses();
+                        // Hide resource upload section for anonymous users
                         document.getElementById('resource-upload-section').style.display = 'none';
+                        
+                        // Load forum messages for anonymous user
+                        loadForumMessages(currentChannel);
                     }
-                } else if (response.status === 401) {
-                    // User is not logged in - this is normal for anonymous visitors
-                    console.log('User is not logged in (anonymous visitor)');
-                    document.getElementById('auth-buttons').style.display = 'block';
-                    document.getElementById('user-info').style.display = 'none';
-                    document.getElementById('admin-btn').style.display = 'none';
-                    window.currentUser = null;
-                    updateForumForm(false);
-                    hideHomeCourses();
-                    // Hide resource upload section for anonymous users
-                    document.getElementById('resource-upload-section').style.display = 'none';
                 } else {
-                    // Other API errors
+                    // API error
                     console.warn('API error checking user status:', response.status);
                     document.getElementById('auth-buttons').style.display = 'block';
                     document.getElementById('user-info').style.display = 'none';
@@ -1290,6 +1546,9 @@
                     updateForumForm(false);
                     hideHomeCourses();
                     document.getElementById('resource-upload-section').style.display = 'none';
+                    
+                    // Load forum messages for anonymous user (API error)
+                    loadForumMessages(currentChannel);
                 }
             } catch (error) {
                 console.error('Network error checking user:', error);
@@ -1301,11 +1560,14 @@
                 updateForumForm(false);
                 hideHomeCourses();
                 document.getElementById('resource-upload-section').style.display = 'none';
+                
+                // Load forum messages for anonymous user (network error)
+                loadForumMessages(currentChannel);
             }
         }
 
         function updateForumForm(isLoggedIn) {
-            const usernameGroup = document.querySelector('.form-group');
+            const usernameGroup = document.getElementById('username-group');
             if (isLoggedIn) {
                 usernameGroup.style.display = 'none';
             } else {
@@ -1319,19 +1581,50 @@
             const forumContent = document.getElementById('forum-content');
             const messageForm = document.querySelector('.message-form');
             const usernameGroup = document.getElementById('username-group');
+            const membersTab = document.getElementById('members-tab');
+            const staffTab = document.getElementById('staff-tab');
 
             if (window.currentUser) {
                 // User is logged in - show full forum
                 authRequired.style.display = 'none';
                 forumContent.style.display = 'block';
-                if (messageForm) messageForm.style.display = 'block';
+                
+                // Show form based on channel permissions
+                const currentChannelObj = availableChannels.find(c => c.slug === currentChannel);
+                if (currentChannelObj) {
+                    if (currentChannelObj.admin_only && !window.currentUser.is_admin) {
+                        // Admin-only channels require admin access
+                        if (messageForm) messageForm.style.display = 'none';
+                    } else {
+                        // User can post in this channel
+                        if (messageForm) messageForm.style.display = 'block';
+                    }
+                } else {
+                    if (messageForm) messageForm.style.display = 'block';
+                }
+                
                 usernameGroup.style.display = 'none';
             } else {
-                // User is not logged in - show auth message and hide form
-                authRequired.style.display = 'block';
-                forumContent.style.display = 'block'; // Still show messages
-                if (messageForm) messageForm.style.display = 'none'; // Hide form
-                usernameGroup.style.display = 'none';
+                // User is not logged in
+                authRequired.style.display = 'none';
+                forumContent.style.display = 'block';
+                
+                // Check if current channel allows anonymous posting
+                const currentChannelObj = availableChannels.find(c => c.slug === currentChannel);
+                if (currentChannelObj && !currentChannelObj.requires_login && !currentChannelObj.admin_only) {
+                    // Public channel - show form for anonymous posting
+                    if (messageForm) messageForm.style.display = 'block';
+                    usernameGroup.style.display = 'block';
+                } else {
+                    // Private channel - hide form
+                    if (messageForm) messageForm.style.display = 'none';
+                    usernameGroup.style.display = 'none';
+                }
+                
+                // If current channel is private, switch to general
+                if (currentChannel === 'members' || currentChannel === 'staff') {
+                    switchChannel('general');
+                }
             }
         }
 
@@ -1368,7 +1661,7 @@
         // Load initial data
         document.addEventListener('DOMContentLoaded', () => {
             checkUser();
-            loadForumMessages();
+            // Don't load forum messages here - let checkUser handle it after determining auth status
             initLanguageSelector();
 
             // Add navigation event listeners
@@ -1392,6 +1685,15 @@
             if (resourceUploadForm) {
                 resourceUploadForm.addEventListener('submit', uploadResource);
             }
+
+            // Add channel tab event listeners
+            const channelTabs = document.querySelectorAll('.channel-tab');
+            channelTabs.forEach(tab => {
+                tab.addEventListener('click', (event) => {
+                    const channel = event.target.getAttribute('data-channel');
+                    switchChannel(channel);
+                });
+            });
         });
     </script>
 </body>

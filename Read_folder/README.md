@@ -9,7 +9,7 @@ A comprehensive learning management platform built with Python Flask, featuring 
 - **Course Management**: Enroll in and manage learning courses
 - **Resource Library**: Upload and access protected learning materials
 - **PDF Document Management**: Secure PDF upload and access with PIN protection
-- **Community Forum**: Interactive discussion forum with threaded replies
+- **Community Forum**: Interactive discussion forum with threaded replies and channel-based organization
 - **Admin Dashboard**: Comprehensive administrative interface for system management
 
 ### Technical Features
@@ -18,7 +18,8 @@ A comprehensive learning management platform built with Python Flask, featuring 
 - **RESTful API**: JSON-based API for frontend integration
 - **Secure File Uploads**: Protected resource and PDF management
 - **Session Management**: Secure user sessions with Flask-Login
-- **Database**: SQLite with SQLAlchemy ORM
+- **Database**: SQLite with SQLAlchemy ORM and migration support
+- **Forum Channels**: Multi-channel forum with tiered access control (public/login-required/admin-only)
 
 ## 🛠️ Technology Stack
 
@@ -56,15 +57,21 @@ A comprehensive learning management platform built with Python Flask, featuring 
 
 4. **Initialize the database**:
    ```bash
-   python init_db.py
+   python Helping Scripts/init_db.py
    ```
 
-5. **Create admin user** (optional):
+5. **Run database migrations** (if needed):
    ```bash
-   python create_user.py
+   # Run any migration scripts in Helping Scripts/ directory
+   python Helping Scripts/migrate_*.py
    ```
 
-6. **Run the application**:
+6. **Create admin user** (optional):
+   ```bash
+   python Helping Scripts/create_user.py
+   ```
+
+7. **Run the application**:
    ```bash
    python app.py
    ```
@@ -115,6 +122,11 @@ yonca/
 └── translations/        # Internationalization files
     ├── en/
     └── ru/
+Helping Scripts/         # Database management and utility scripts
+├── init_db.py          # Database initialization
+├── create_user.py      # User creation utilities
+├── migrate_*.py        # Database migration scripts
+└── update_*.py         # Data update scripts
 ```
 
 ## 🔧 Configuration
@@ -146,6 +158,7 @@ Key configuration options in `yonca/config.py`:
 - `POST /api/pdfs/upload` - Upload PDF document
 
 ### Forum
+- `GET /api/forum/channels` - Get all forum channels
 - `GET /api/forum/messages` - Get forum messages
 - `POST /api/forum/messages` - Create new message
 - `PUT /api/forum/messages/{id}` - Update message

@@ -55,12 +55,29 @@ class ForumMessage(db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, server_default=db.func.now())
     parent_id = db.Column(db.Integer, db.ForeignKey('forum_message.id'), nullable=True)
+    channel = db.Column(db.String(50), default='general', nullable=False)  # Channel/category for the message
     
     # Relationship for replies
     replies = db.relationship('ForumMessage', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
 
     def __repr__(self):
         return f'<ForumMessage {self.id}>'
+
+class ForumChannel(db.Model):
+    """Forum channel model for organizing discussions"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)  # Display name
+    slug = db.Column(db.String(50), unique=True, nullable=False)  # URL-friendly identifier
+    description = db.Column(db.Text)
+    requires_login = db.Column(db.Boolean, default=False)  # Whether login is required
+    admin_only = db.Column(db.Boolean, default=False)  # Whether admin access is required
+    is_active = db.Column(db.Boolean, default=True)  # Whether channel is visible
+    sort_order = db.Column(db.Integer, default=0)  # Display order
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+
+    def __repr__(self):
+        return f'<ForumChannel {self.name} ({self.slug})>'
 
 class Resource(db.Model):
     """Resource model for learning materials"""
@@ -125,6 +142,12 @@ class HomeContent(db.Model):
         {"title": "Community", "description": "Join discussions with fellow learners."},
         {"title": "Resources", "description": "Browse our learning materials."},
         {"title": "Sign Up", "description": "Create your account to get started."}
+    ])
+    # Gallery images
+    gallery_images = db.Column(db.JSON, default=[
+        {"url": "https://via.placeholder.com/400x250/abc32f/ffffff?text=Learning+Community", "alt": "Learning Community", "caption": "Our vibrant learning community"},
+        {"url": "https://via.placeholder.com/400x250/4a90e2/ffffff?text=Interactive+Courses", "alt": "Interactive Courses", "caption": "Engage with interactive course content"},
+        {"url": "https://via.placeholder.com/400x250/7ed321/ffffff?text=Study+Groups", "alt": "Study Groups", "caption": "Collaborate in study groups"}
     ])
     is_active = db.Column(db.Boolean, default=True)
 

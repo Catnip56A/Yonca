@@ -3,7 +3,7 @@ API routes for courses, forum, and resources
 """
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import current_user, login_required
-from yonca.models import Course, ForumMessage, Resource, PDFDocument, db
+from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -30,9 +30,53 @@ def get_courses():
         'profile_emoji': c.profile_emoji
     } for c in courses])
 
+@api_bp.route('/user')
+def get_current_user():
+    """Get current user information"""
+    if current_user.is_authenticated:
+        return jsonify({
+            'id': current_user.id,
+            'username': current_user.username,
+            'is_admin': current_user.is_admin,
+            'courses': [{
+                'id': c.id,
+                'title': c.title,
+                'description': c.description,
+                'time_slot': c.time_slot,
+                'profile_emoji': c.profile_emoji
+            } for c in current_user.courses]
+        })
+    else:
+        return jsonify(None)
+
+@api_bp.route('/forum/channels')
+def get_forum_channels():
+    """Get all active forum channels"""
+    channels = ForumChannel.query.filter_by(is_active=True).order_by(ForumChannel.sort_order).all()
+    
+    return jsonify([{
+        'id': c.id,
+        'name': c.name,
+        'slug': c.slug,
+        'description': c.description,
+        'requires_login': c.requires_login,
+        'admin_only': c.admin_only
+    } for c in channels])
+
 @api_bp.route('/forum/messages')
 def get_forum_messages():
-    """Get all forum messages in threaded structure"""
+    """Get forum messages, optionally filtered by channel"""
+    channel_slug = request.args.get('channel', 'general')
+    
+    # Get channel from database
+    channel = ForumChannel.query.filter_by(slug=channel_slug, is_active=True).first()
+    if not channel:
+        return jsonify({'error': 'Channel not found'}), 404
+    
+    # Check access permissions
+    if channel.requires_login and not current_user.is_authenticated:
+        return jsonify({'error': 'Authentication required for this channel'}), 403
+    
     def build_thread(message, depth=0):
         """Recursively build message thread"""
         result = {
@@ -40,6 +84,7 @@ def get_forum_messages():
             'username': message.username,
             'message': message.message,
             'timestamp': message.timestamp.isoformat(),
+            'channel': message.channel,
             'is_current_user': current_user.is_authenticated and message.username == current_user.username,
             'depth': depth,
             'replies': []
@@ -51,13 +96,17 @@ def get_forum_messages():
         
         return result
     
-    # Get only top-level messages (no parent)
-    top_level_messages = ForumMessage.query.filter_by(parent_id=None).order_by(ForumMessage.timestamp.desc()).all()
+    # Get messages for the specified channel
+    top_level_messages = ForumMessage.query.filter_by(channel=channel_slug, parent_id=None).order_by(ForumMessage.timestamp.desc()).all()
     
-    return jsonify([build_thread(msg) for msg in top_level_messages])
+    return jsonify({
+        'channel': channel_slug,
+        'channel_name': channel.name,
+        'requires_login': channel.requires_login,
+        'messages': [build_thread(msg) for msg in top_level_messages]
+    })
 
 @api_bp.route('/forum/messages', methods=['POST'])
-@login_required
 def post_forum_message():
     """Post a new forum message or reply"""
     data = request.get_json()
@@ -65,20 +114,51 @@ def post_forum_message():
     if not data or 'message' not in data:
         return jsonify({'error': 'Message required'}), 400
     
+    channel = data.get('channel', 'general')
+    
+    # Validate channel exists and is active
+    channel_obj = ForumChannel.query.filter_by(slug=channel, is_active=True).first()
+    if not channel_obj:
+        return jsonify({'error': 'Channel not found'}), 404
+    
+    # Check access permissions
+    if channel_obj.admin_only:
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return jsonify({'error': 'Admin access required for this channel'}), 403
+    elif channel_obj.requires_login:
+        if not current_user.is_authenticated:
+            return jsonify({'error': 'Authentication required for this channel'}), 403
+    
     parent_id = data.get('parent_id')
     if parent_id:
-        # Verify parent message exists
-        parent = ForumMessage.query.get(parent_id)
+        # Verify parent message exists and is in the same channel
+        parent = ForumMessage.query.filter_by(id=parent_id, channel=channel).first()
         if not parent:
-            return jsonify({'error': 'Parent message not found'}), 404
+            return jsonify({'error': 'Parent message not found in this channel'}), 404
     
-    # Use the logged-in user's information
-    new_message = ForumMessage(
-        user_id=current_user.id,
-        username=current_user.username,
-        message=data['message'],
-        parent_id=parent_id
-    )
+    # Handle anonymous posting for public channels
+    if not current_user.is_authenticated:
+        # For anonymous users, require username
+        username = data.get('username', '').strip()
+        if not username:
+            return jsonify({'error': 'Username required for anonymous posting'}), 400
+        
+        new_message = ForumMessage(
+            username=username,
+            message=data['message'],
+            parent_id=parent_id,
+            channel=channel
+        )
+    else:
+        # Use the logged-in user's information
+        new_message = ForumMessage(
+            user_id=current_user.id,
+            username=current_user.username,
+            message=data['message'],
+            parent_id=parent_id,
+            channel=channel
+        )
+    
     db.session.add(new_message)
     db.session.commit()
     
@@ -90,6 +170,7 @@ def post_forum_message():
         'message_id': new_message.id,
         'message': new_message.message,
         'username': new_message.username,
+        'channel': new_message.channel,
         'timestamp': new_message.timestamp.isoformat() if new_message.timestamp else None,
         'parent_id': new_message.parent_id
     }), 201
@@ -370,13 +451,15 @@ def upload_pdf():
         return jsonify({'error': f'Upload failed: {str(e)}'}), 500
 
 @api_bp.route('/user')
-@login_required
 def get_user():
-    """Get current user information"""
-    return jsonify({
-        'id': current_user.id,
-        'username': current_user.username,
-        'email': current_user.email,
-        'is_admin': current_user.is_admin,
-        'courses': [{'id': c.id, 'title': c.title, 'description': c.description} for c in current_user.courses]
-    })
+    """Get current user information (or null if not authenticated)"""
+    if current_user.is_authenticated:
+        return jsonify({
+            'id': current_user.id,
+            'username': current_user.username,
+            'email': current_user.email,
+            'is_admin': current_user.is_admin,
+            'courses': [{'id': c.id, 'title': c.title, 'description': c.description} for c in current_user.courses]
+        })
+    else:
+        return jsonify(None)
