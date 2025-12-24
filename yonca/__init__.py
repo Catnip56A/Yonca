@@ -54,14 +54,14 @@ def create_app(config_name='development'):
         
         # Check URL parameter first
         lang = request.args.get('lang')
-        if lang and lang in ['en', 'ru']:
+        if lang and lang in ['en']:
             print(f"DEBUG: Detected language from URL: {lang}")
             return lang
         
         # Check if language is set in session
         from flask import session
         lang = session.get('language')
-        if lang and lang in ['en', 'ru']:
+        if lang and lang in ['en']:
             print(f"DEBUG: Using session language: {lang}")
             return lang
         
@@ -70,7 +70,7 @@ def create_app(config_name='development'):
         return 'en'
     
     babel.locale_selector_func = get_locale
-    app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'ru']
+    app.config['BABEL_SUPPORTED_LOCALES'] = ['en']
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(package_dir, 'translations')
     
     # Enable CORS with credentials support

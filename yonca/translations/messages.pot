@@ -1,4 +1,9 @@
-# English translations for Yonca
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
@@ -6,9 +11,7 @@ msgstr ""
 "POT-Creation-Date: 2025-12-24 13:48+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
-"Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,23 +19,23 @@ msgstr ""
 
 #: templates/index.html:7
 msgid "Yonca - Learning Platform"
-msgstr "Yonca - Learning Platform"
+msgstr ""
 
 #: templates/index.html:581
 msgid "Home"
-msgstr "Home"
+msgstr ""
 
 #: templates/index.html:582 templates/index.html:681
 msgid "Courses"
-msgstr "Courses"
+msgstr ""
 
 #: templates/index.html:583
 msgid "Forum"
-msgstr "Forum"
+msgstr ""
 
 #: templates/index.html:584 templates/index.html:736
 msgid "Resources"
-msgstr "Resources"
+msgstr ""
 
 #: templates/index.html:585 templates/index.html:774
 msgid "TAVI Test"
@@ -48,12 +51,11 @@ msgstr ""
 
 #: templates/index.html:590 templates/login.html:162
 msgid "Login"
-msgstr "Login"
+msgstr ""
 
 #: templates/index.html:593
-#, fuzzy
 msgid "Welcome"
-msgstr "Welcome to Yonca"
+msgstr ""
 
 #: templates/index.html:594
 msgid "Admin"
@@ -61,19 +63,19 @@ msgstr ""
 
 #: templates/index.html:595
 msgid "Logout"
-msgstr "Logout"
+msgstr ""
 
 #: templates/index.html:612 templates/index.html:629
 msgid "Welcome to Yonca"
-msgstr "Welcome to Yonca"
+msgstr ""
 
 #: templates/index.html:613
 msgid "Your gateway to knowledge and community learning."
-msgstr "Your gateway to knowledge and community learning."
+msgstr ""
 
 #: templates/index.html:614
 msgid "Get Started"
-msgstr "Get Started"
+msgstr ""
 
 #: templates/index.html:630
 msgid "Join our learning community today!"
@@ -96,63 +98,58 @@ msgid "Explore our available courses and start your learning journey."
 msgstr ""
 
 #: templates/index.html:684
-#, fuzzy
 msgid "Loading courses..."
-msgstr "Uploading PDF..."
+msgstr ""
 
 #: templates/index.html:690
 msgid "Community Forum"
-msgstr "Community Forum"
+msgstr ""
 
 #: templates/index.html:694
 msgid "Authentication Required"
-msgstr "Authentication Required"
+msgstr ""
 
 #: templates/index.html:695
 msgid "Please log in to participate in the community forum."
-msgstr "Please log in to participate in the community forum."
+msgstr ""
 
 #: templates/index.html:696
 msgid "You can still view messages without logging in."
-msgstr "You can still view messages without logging in."
+msgstr ""
 
 #: templates/index.html:707
 msgid "Post a New Message"
-msgstr "Post a New Message"
+msgstr ""
 
 #: templates/index.html:710 templates/login.html:151
 msgid "Username:"
-msgstr "Username:"
+msgstr ""
 
 #: templates/index.html:714
-#, fuzzy
 msgid "Message:"
-msgstr "Edit your message:"
+msgstr ""
 
 #: templates/index.html:715
 msgid "Share your thoughts, ask questions, or help others..."
 msgstr ""
 
 #: templates/index.html:717
-#, fuzzy
 msgid "Post Message"
-msgstr "Post a New Message"
+msgstr ""
 
 #: templates/index.html:722
 msgid "General Discussion"
 msgstr ""
 
 #: templates/index.html:725
-#, fuzzy
 msgid "Welcome to Yonca Forum!"
-msgstr "Welcome to Yonca"
+msgstr ""
 
 #: templates/index.html:726
-#, fuzzy
 msgid ""
 "This is where community members can connect, ask questions, and share "
 "knowledge."
-msgstr "Connect with fellow learners, ask questions, and share knowledge."
+msgstr ""
 
 #: templates/index.html:727
 msgid "Posted on December 8, 2025"
@@ -164,17 +161,15 @@ msgstr ""
 
 #: templates/index.html:740
 msgid "Learning Materials"
-msgstr "Learning Materials"
+msgstr ""
 
 #: templates/index.html:742
-#, fuzzy
 msgid "Loading materials..."
-msgstr "Learning Materials"
+msgstr ""
 
 #: templates/index.html:747
-#, fuzzy
 msgid "Upload Learning Material"
-msgstr "Learning Materials"
+msgstr ""
 
 #: templates/index.html:748
 msgid ""
@@ -184,29 +179,27 @@ msgstr ""
 
 #: templates/index.html:751
 msgid "Title:"
-msgstr "Title:"
+msgstr ""
 
 #: templates/index.html:755
 msgid "Description:"
-msgstr "Description:"
+msgstr ""
 
 #: templates/index.html:759
-#, fuzzy
 msgid "Choose file..."
-msgstr "Choose PDF file..."
+msgstr ""
 
 #: templates/index.html:763
 msgid "Access PIN (leave empty for auto-generated):"
-msgstr "Access PIN (leave empty for auto-generated):"
+msgstr ""
 
 #: templates/index.html:764
 msgid "Auto-generated if empty"
 msgstr ""
 
 #: templates/index.html:766 templates/index.html:1191
-#, fuzzy
 msgid "Upload Material"
-msgstr "Learning Materials"
+msgstr ""
 
 #: templates/index.html:776
 msgid "TAVI Test section is coming soon."
@@ -233,9 +226,8 @@ msgid "We respond within 24 hours"
 msgstr ""
 
 #: templates/index.html:806
-#, fuzzy
 msgid "Location"
-msgstr "Login"
+msgstr ""
 
 #: templates/index.html:808
 msgid "Baku, Azerbaijan"
@@ -246,9 +238,8 @@ msgid "Serving clients worldwide"
 msgstr ""
 
 #: templates/index.html:817
-#, fuzzy
 msgid "About Yonca"
-msgstr "Back to Yonca"
+msgstr ""
 
 #: templates/index.html:821
 msgid ""
@@ -391,9 +382,8 @@ msgid "child psychologist, play therapy specialist"
 msgstr ""
 
 #: templates/index.html:853
-#, fuzzy
 msgid "Our Services"
-msgstr "Courses"
+msgstr ""
 
 #: templates/index.html:855
 msgid "Psychological diagnostics and correction"
@@ -442,27 +432,24 @@ msgid "Time Slot:"
 msgstr ""
 
 #: templates/index.html:970
-#, fuzzy
 msgid "Error loading courses. Please try again."
-msgstr "Error uploading PDF. Please try again."
+msgstr ""
 
 #: templates/index.html:983
 msgid "No materials available at the moment."
 msgstr ""
 
 #: templates/index.html:1000 templates/index.html:1063
-#, fuzzy
 msgid "Your Access PIN:"
-msgstr "Access PDF"
+msgstr ""
 
 #: templates/index.html:1002 templates/index.html:1065
 msgid "Share this PIN with others to grant access"
 msgstr ""
 
 #: templates/index.html:1004 templates/index.html:1026
-#, fuzzy
 msgid "Download"
-msgstr "Download PDF"
+msgstr ""
 
 #: templates/index.html:1007 templates/index.html:1070
 msgid "Request Access"
@@ -470,9 +457,8 @@ msgstr ""
 
 #: templates/index.html:1012 templates/index.html:1022
 #: templates/index.html:1075
-#, fuzzy
 msgid "No description available"
-msgstr "Description:"
+msgstr ""
 
 #: templates/index.html:1014 templates/index.html:1024
 #: templates/index.html:1077
@@ -480,9 +466,8 @@ msgid "Uploaded:"
 msgstr ""
 
 #: templates/index.html:1034
-#, fuzzy
 msgid "Error loading materials. Please try again."
-msgstr "Error uploading PDF. Please try again."
+msgstr ""
 
 #: templates/index.html:1048
 msgid "No PDF documents available at the moment."
@@ -490,71 +475,63 @@ msgstr ""
 
 #: templates/index.html:1067
 msgid "Access PDF"
-msgstr "Access PDF"
+msgstr ""
 
 #: templates/index.html:1085
-#, fuzzy
 msgid "Error loading PDFs. Please try again."
-msgstr "Error uploading PDF. Please try again."
+msgstr ""
 
 #: templates/index.html:1091
 msgid "Enter access PIN for:"
 msgstr ""
 
 #: templates/index.html:1105
-#, fuzzy
 msgid "Error accessing resource. Please try again."
-msgstr "Error posting message. Please try again."
+msgstr ""
 
 #: templates/index.html:1119 templates/index.html:1121
 msgid "Uploading PDF..."
-msgstr "Uploading PDF..."
+msgstr ""
 
 #: templates/index.html:1133
 msgid "PDF uploaded successfully! Access PIN:"
-msgstr "PDF uploaded successfully! Access PIN:"
+msgstr ""
 
 #: templates/index.html:1141 templates/index.html:1145
 msgid "Error uploading PDF. Please try again."
-msgstr "Error uploading PDF. Please try again."
+msgstr ""
 
 #: templates/index.html:1148
-#, fuzzy
 msgid "Upload PDF"
-msgstr "Uploading PDF..."
+msgstr ""
 
 #: templates/index.html:1162
-#, fuzzy
 msgid "Uploading..."
-msgstr "Uploading PDF..."
+msgstr ""
 
 #: templates/index.html:1164
-#, fuzzy
 msgid "Uploading resource..."
-msgstr "Uploading PDF..."
+msgstr ""
 
 #: templates/index.html:1176
-#, fuzzy
 msgid "Material uploaded successfully! Access PIN:"
-msgstr "PDF uploaded successfully! Access PIN:"
+msgstr ""
 
 #: templates/index.html:1184
-#, fuzzy
 msgid "Error uploading material. Please try again."
-msgstr "Error uploading PDF. Please try again."
+msgstr ""
 
 #: templates/index.html:1188
-#, fuzzy
 msgid "Error uploading resource. Please try again."
-msgstr "Error uploading PDF. Please try again."
+msgstr ""
 
 #: templates/login.html:139
 msgid "Login to Your Account"
-msgstr "Login to Your Account"
+msgstr ""
 
 #: templates/login.html:155
 msgid "Password:"
-msgstr "Password:"
+msgstr ""
 
 #: templates/login.html:160
 msgid "Login as Administrator"
@@ -562,65 +539,5 @@ msgstr ""
 
 #: templates/login.html:165
 msgid "Back to Yonca"
-msgstr "Back to Yonca"
-
-#~ msgid "Language"
-#~ msgstr "Language"
-
-#~ msgid "Access educational resources and study materials."
-#~ msgstr "Access educational resources and study materials."
-
-#~ msgid "Secure PDF Library"
-#~ msgstr "Secure PDF Library"
-
-#~ msgid "Upload and access protected PDF documents."
-#~ msgstr "Upload and access protected PDF documents."
-
-#~ msgid "Recent Messages"
-#~ msgstr "Recent Messages"
-
-#~ msgid "Please enter a message"
-#~ msgstr "Please enter a message"
-
-#~ msgid "Posting..."
-#~ msgstr "Posting..."
-
-#~ msgid "Message posted successfully!"
-#~ msgstr "Message posted successfully!"
-
-#~ msgid "Please log in to post messages"
-#~ msgstr "Please log in to post messages"
-
-#~ msgid "Please log in to reply to messages"
-#~ msgstr "Please log in to reply to messages"
-
-#~ msgid "Reply posted successfully!"
-#~ msgstr "Reply posted successfully!"
-
-#~ msgid "Error posting reply. Please try again."
-#~ msgstr "Error posting reply. Please try again."
-
-#~ msgid "Reply to"
-#~ msgstr "Reply to"
-
-#~ msgid "Upload PDF Document"
-#~ msgstr "Upload PDF Document"
-
-#~ msgid "Upload a PDF document to share securely with PIN protection."
-#~ msgstr "Upload a PDF document to share securely with PIN protection."
-
-#~ msgid "Access PDF Document"
-#~ msgstr "Access PDF Document"
-
-#~ msgid "Enter the access PIN to view this document:"
-#~ msgstr "Enter the access PIN to view this document:"
-
-#~ msgid "Invalid PIN"
-#~ msgstr "Invalid PIN"
-
-#~ msgid "PDF not found"
-#~ msgstr "PDF not found"
-
-#~ msgid "Invalid username or password"
-#~ msgstr "Invalid username or password"
+msgstr ""
 

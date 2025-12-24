@@ -129,16 +129,6 @@
             background: #9bb92a !important;
         }
 
-        #language-switcher select {
-            background: white;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            padding: 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
         .page {
             display: none;
         }
@@ -238,10 +228,14 @@
             padding-top: 2rem;
             border-top: 2px solid #e5e7eb;
             background: #fff;
+            border-radius: 15px;
+            padding: 20px;
         }
 
         #about {
             background: #fff;
+            border-radius: 15px;
+            padding: 20px;
         }
 
         .section-title {
@@ -590,12 +584,6 @@
                 <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.5rem; display: none;">{{ _('Admin') }}</button>
                 <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
             </div>
-            <div id="language-switcher" style="position: absolute; top: 3.5rem; right: 20px;">
-                <select id="language-select" onchange="changeLanguage(this.value)">
-                    <option value="en">English</option>
-                    <option value="ru">Русский</option>
-                </select>
-            </div>
         </div>
     </header>
 
@@ -739,7 +727,7 @@
             </div>
 
             <!-- Resource Upload Section (Admin Only) -->
-            <div id="resource-upload-section" style="display: none;">
+            <div id="resource-upload-section" style="display: none; background: #fff; border-radius: 15px; padding: 20px;">
                 <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload Learning Material') }}</h3>
                 <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload documents, presentations, PDFs, or other materials. PIN protection will be automatically applied for security.') }}</p>
                 <form id="resource-upload-form" enctype="multipart/form-data">
@@ -1662,31 +1650,10 @@
             console.log('Hiding courses');
         }
 
-        function changeLanguage(lang) {
-            // Add language as URL parameter and force reload
-            const url = new URL(window.location);
-            url.searchParams.set('lang', lang);
-            const newUrl = url.toString();
-
-            // Force a full page reload to get new translations from server
-            window.location.replace(newUrl);
-        }
-
-        function initLanguageSelector() {
-            // Get current language from URL parameter or default to 'en'
-            const urlParams = new URLSearchParams(window.location.search);
-            const currentLang = urlParams.get('lang') || 'en';
-            const select = document.getElementById('language-select');
-            if (select) {
-                select.value = currentLang;
-            }
-        }
-
         // Load initial data
         document.addEventListener('DOMContentLoaded', () => {
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status
-            initLanguageSelector();
 
             // Add navigation event listeners
             const navLinks = document.querySelectorAll('.nav-link');
@@ -1764,7 +1731,7 @@
               x: 0,
               y: 0,
               z: STAR_MIN_SCALE + Math.random() * ( 1 - STAR_MIN_SCALE ),
-              color: Math.random() < 0.04 ? '#0f0' : STAR_COLOR
+              color: Math.random() < 0.20 ? `hsl(${100 + Math.random() * 40}, 70%, ${40 + Math.random() * 30}%)` : STAR_COLOR
             });
            }
 
