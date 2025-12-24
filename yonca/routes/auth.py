@@ -36,22 +36,3 @@ def logout():
     """Handle user logout"""
     logout_user()
     return redirect(url_for('main.index'))
-
-@auth_bp.route('/api/user')
-def get_user():
-    """Get current user information"""
-    if current_user.is_authenticated:
-        return jsonify({
-            'id': current_user.id,
-            'username': current_user.username,
-            'is_admin': current_user.is_admin,
-            'courses': [{
-                'id': c.id,
-                'title': c.title,
-                'description': c.description,
-                'time_slot': c.time_slot,
-                'profile_emoji': c.profile_emoji
-            } for c in current_user.courses]
-        })
-    else:
-        return jsonify({'error': 'Not authenticated'}), 401

@@ -9,6 +9,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///yonca.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'filesystem'
+    SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 
 class DevelopmentConfig(Config):
     """Development configuration"""

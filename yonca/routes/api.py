@@ -7,6 +7,13 @@ from yonca.models import Course, ForumMessage, Resource, PDFDocument, db
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+def api_unauthorized():
+    """Return JSON 401 for API unauthorized requests"""
+    return jsonify({'error': 'Authentication required'}), 401
+
+# Set custom unauthorized handler for API blueprint
+api_bp.unauthorized = api_unauthorized
+
 @api_bp.route('/courses')
 def get_courses():
     """Get all courses (user's courses if authenticated, all if not)"""

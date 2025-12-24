@@ -102,3 +102,31 @@ class PDFDocument(db.Model):
 
     def __repr__(self):
         return f'<PDFDocument {self.title}>'
+
+class HomeContent(db.Model):
+    """Home page content model for configurable site content"""
+    id = db.Column(db.Integer, primary_key=True)
+    # Content for logged-in users
+    welcome_title = db.Column(db.String(200), default="Welcome to Yonca")
+    subtitle = db.Column(db.String(500), default="Your gateway to knowledge and community learning.")
+    get_started_text = db.Column(db.String(200), default="Get Started")
+    features = db.Column(db.JSON, default=[
+        {"title": "Courses", "description": "Access educational courses and learning materials."},
+        {"title": "Community Forum", "description": "Connect with fellow learners, ask questions, and share knowledge."},
+        {"title": "Learning Materials", "description": "Access educational resources and study materials."},
+        {"title": "Secure PDF Library", "description": "Upload and access protected PDF documents."}
+    ])
+    # Content for logged-out users
+    logged_out_welcome_title = db.Column(db.String(200), default="Welcome to Yonca")
+    logged_out_subtitle = db.Column(db.String(500), default="Join our learning community today!")
+    logged_out_get_started_text = db.Column(db.String(200), default="Sign Up Now")
+    logged_out_features = db.Column(db.JSON, default=[
+        {"title": "Free Courses", "description": "Access our free educational courses."},
+        {"title": "Community", "description": "Join discussions with fellow learners."},
+        {"title": "Resources", "description": "Browse our learning materials."},
+        {"title": "Sign Up", "description": "Create your account to get started."}
+    ])
+    is_active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f'<HomeContent {self.id}>'

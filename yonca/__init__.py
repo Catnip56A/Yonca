@@ -1,7 +1,7 @@
 """
 Application factory and initialization
 """
-from flask import Flask
+from flask import Flask, request, redirect, url_for, jsonify
 from flask_login import LoginManager
 from flask_cors import CORS
 from flask_session import Session
@@ -32,6 +32,13 @@ def create_app(config_name='development'):
     
     login_manager = LoginManager(app)
     login_manager.login_view = 'auth.login'
+    
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        """Handle unauthorized requests - return JSON for API, redirect for web"""
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'Authentication required'}), 401
+        return redirect(url_for('auth.login'))
     
     @login_manager.user_loader
     def load_user(user_id):
@@ -66,8 +73,8 @@ def create_app(config_name='development'):
     app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'ru']
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(package_dir, 'translations')
     
-    # Enable CORS
-    CORS(app)
+    # Enable CORS with credentials support
+    CORS(app, supports_credentials=True)
     
     # Initialize session management
     Session(app)

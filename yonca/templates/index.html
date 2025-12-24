@@ -500,30 +500,41 @@
     <main class="container">
         <!-- Home Page -->
         <section id="home" class="page active">
+            {% if is_authenticated %}
             <div class="hero">
-                <h1>{{ _('Welcome to Yonca') }}</h1>
-                <p>{{ _('Your gateway to knowledge and community learning.') }}</p>
-                <p>{{ _('Get Started') }}</p>
+                <h1>{{ home_content.welcome_title or _('Welcome to Yonca') }}</h1>
+                <p>{{ home_content.subtitle or _('Your gateway to knowledge and community learning.') }}</p>
+                <p>{{ home_content.get_started_text or _('Get Started') }}</p>
             </div>
 
             <div class="features">
+                {% if home_content.features %}
+                {% for feature in home_content.features %}
                 <div class="feature-card">
-                    <h3>{{ _('Courses') }}</h3>
-                    <p>{{ _('Access educational courses and learning materials.') }}</p>
+                    <h3>{{ feature.title }}</h3>
+                    <p>{{ feature.description }}</p>
                 </div>
-                <div class="feature-card">
-                    <h3>{{ _('Community Forum') }}</h3>
-                    <p>{{ _('Connect with fellow learners, ask questions, and share knowledge.') }}</p>
-                </div>
-                <div class="feature-card">
-                    <h3>{{ _('Learning Materials') }}</h3>
-                    <p>{{ _('Access educational resources and study materials.') }}</p>
-                </div>
-                <div class="feature-card">
-                    <h3>{{ _('Secure PDF Library') }}</h3>
-                    <p>{{ _('Upload and access protected PDF documents.') }}</p>
-                </div>
+                {% endfor %}
+                {% endif %}
             </div>
+            {% else %}
+            <div class="hero">
+                <h1>{{ home_content.logged_out_welcome_title or _('Welcome to Yonca') }}</h1>
+                <p>{{ home_content.logged_out_subtitle or _('Join our learning community today!') }}</p>
+                <p>{{ home_content.logged_out_get_started_text or _('Sign Up Now') }}</p>
+            </div>
+
+            <div class="features">
+                {% if home_content.logged_out_features %}
+                {% for feature in home_content.logged_out_features %}
+                <div class="feature-card">
+                    <h3>{{ feature.title }}</h3>
+                    <p>{{ feature.description }}</p>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            {% endif %}
         </section>
 
         <!-- Courses Page -->
@@ -1258,26 +1269,38 @@
                         document.getElementById('admin-btn').style.display = 'none';
                         document.getElementById('resource-upload-section').style.display = 'none';
                     }
-                } else {
-                    console.log('User not logged in or API error');
+                } else if (response.status === 401) {
+                    // User is not logged in - this is normal for anonymous visitors
+                    console.log('User is not logged in (anonymous visitor)');
                     document.getElementById('auth-buttons').style.display = 'block';
                     document.getElementById('user-info').style.display = 'none';
                     document.getElementById('admin-btn').style.display = 'none';
                     window.currentUser = null;
                     updateForumForm(false);
                     hideHomeCourses();
-
-                    // Hide resource upload section for non-admin users
+                    // Hide resource upload section for anonymous users
+                    document.getElementById('resource-upload-section').style.display = 'none';
+                } else {
+                    // Other API errors
+                    console.warn('API error checking user status:', response.status);
+                    document.getElementById('auth-buttons').style.display = 'block';
+                    document.getElementById('user-info').style.display = 'none';
+                    document.getElementById('admin-btn').style.display = 'none';
+                    window.currentUser = null;
+                    updateForumForm(false);
+                    hideHomeCourses();
                     document.getElementById('resource-upload-section').style.display = 'none';
                 }
             } catch (error) {
-                console.error('Error checking user:', error);
+                console.error('Network error checking user:', error);
+                // Assume anonymous user on network errors
                 document.getElementById('auth-buttons').style.display = 'block';
                 document.getElementById('user-info').style.display = 'none';
                 document.getElementById('admin-btn').style.display = 'none';
                 window.currentUser = null;
                 updateForumForm(false);
                 hideHomeCourses();
+                document.getElementById('resource-upload-section').style.display = 'none';
             }
         }
 
