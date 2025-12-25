@@ -389,6 +389,14 @@
             background-color: rgba(107, 114, 128, 0.1);
         }
 
+        .forum-message .translate-btn {
+            color: #3b82f6;
+        }
+
+        .forum-message .translate-btn:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
         .auth-message {
             text-align: center;
             padding: 2rem;
@@ -685,6 +693,27 @@
                 <!-- Channel Tabs -->
                 <div class="channel-tabs" style="margin-bottom: 2rem;">
                     <!-- Tabs will be loaded dynamically -->
+                </div>
+
+                <!-- Language Selection for Translation -->
+                <div class="language-selector" style="margin-bottom: 2rem; background: #fff; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 1rem 0; color: #1f2937;">🌐 Translation Settings</h4>
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div>
+                            <label for="target-language" style="font-weight: 500; color: #374151;">Translate to:</label>
+                            <select id="target-language" onchange="changeTargetLanguage()" style="margin-left: 0.5rem; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 5px;">
+                                <option value="en">English</option>
+                                <option value="ru">Russian</option>
+                                <option value="az">Azerbaijani</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="auto-translate" onchange="toggleAutoTranslate()" checked>
+                            <label for="auto-translate" style="font-weight: 500; color: #374151;">Auto-translate messages</label>
+                        </div>
+                        <button onclick="translateAllVisibleMessages()" style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">🔄 Translate All</button>
+                    </div>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #6b7280;">Messages will be automatically translated to your selected language. Click individual messages to toggle translation.</p>
                 </div>
 
                 <div class="message-form">
@@ -1180,6 +1209,18 @@
         let currentChannel = 'general';
         let availableChannels = [];
 
+        // Translation functionality
+        let targetLanguage = 'en';
+        let autoTranslateEnabled = false; // Start with false, will be set by checkbox
+        let currentLanguageIndex = 0;
+        const availableLanguages = [
+            {code: 'en', name: 'EN', flag: '🌐'},
+            {code: 'ru', name: 'RU', flag: '🇷🇺'},
+            {code: 'az', name: 'AZ', flag: '🇦🇿'}
+        ];
+
+        // Forum translation variables only
+
         async function loadForumChannels() {
             try {
                 const response = await fetch(`${API_BASE}/api/forum/channels`);
@@ -1285,6 +1326,9 @@
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'forum-message' + (message.is_current_user ? ' current-user' : '');
                     messageDiv.setAttribute('data-message-id', message.id);
+                    messageDiv.setAttribute('data-original-text', message.message);
+                    messageDiv.setAttribute('data-translated-text', '');
+                    messageDiv.setAttribute('data-translation-shown', 'false');
                     messageDiv.style.marginLeft = `${depth * 20}px`;
 
                     let actionsHtml = '';
@@ -1292,8 +1336,9 @@
                     actionsHtml = `
                         <div class="message-actions">
                             <button onclick="replyToMessage(${message.id}, '${message.username}', '${message.channel}')" class="reply-btn">💬 Reply</button>
+                            <button onclick="toggleTranslation(${message.id})" class="translate-btn" title="Toggle translation">🌐 Translate</button>
                     `;
-                    
+
                     // Show edit/delete buttons only for message owner or admin
                     if (window.currentUser && (message.is_current_user || window.currentUser.is_admin)) {
                         actionsHtml += `
@@ -1301,16 +1346,19 @@
                             <button onclick="deleteMessage(${message.id})" class="delete-btn">🗑️ Delete</button>
                         `;
                     }
-                    
+
                     actionsHtml += '</div>';
 
                     messageDiv.innerHTML = `
                         <div class="user">${message.username}${message.is_current_user ? ' (You)' : ''}</div>
-                        <p class="message-text">${message.message}</p>
+                        <p class="message-text" id="message-text-${message.id}">${message.message}</p>
                         <div class="timestamp">Posted on ${new Date(message.timestamp).toLocaleDateString()} at ${new Date(message.timestamp).toLocaleTimeString()}</div>
                         ${actionsHtml}
                     `;
                     container.appendChild(messageDiv);
+
+                    // Note: Auto-translation is handled by toggleAutoTranslate when the setting changes
+                    // Individual translation is handled by the translate button
 
                     // Render replies
                     if (message.replies && message.replies.length > 0) {
@@ -1319,6 +1367,11 @@
                 }
 
                 messages.forEach(message => renderMessage(message, messagesContainer));
+
+                // Apply auto-translation if enabled after messages are loaded
+                if (autoTranslateEnabled) {
+                    setTimeout(() => translateAllVisibleMessages(), 100); // Small delay to ensure DOM is ready
+                }
             } catch (error) {
                 console.error('Error loading forum messages:', error);
             }
@@ -1522,6 +1575,15 @@
                         updateForumForm(true);
                         showHomeCourses(user.courses);
 
+                        // Set user's preferred language
+                        if (user.preferred_language) {
+                            targetLanguage = user.preferred_language;
+                            const languageSelect = document.getElementById('target-language');
+                            if (languageSelect) {
+                                languageSelect.value = user.preferred_language;
+                            }
+                        }
+
                         // Show admin button for admin users
                         if (user.is_admin) {
                             document.getElementById('admin-btn').style.display = 'inline-block';
@@ -1650,8 +1712,465 @@
             console.log('Hiding courses');
         }
 
+        // Translation functions
+        function changeTargetLanguage() {
+            const select = document.getElementById('target-language');
+            targetLanguage = select.value;
+            console.log('Target language changed to:', targetLanguage);
+
+            // Re-translate all visible messages if auto-translate is enabled
+            if (autoTranslateEnabled) {
+                translateAllVisibleMessages();
+            }
+        }
+
+        function toggleAutoTranslate() {
+            const checkbox = document.getElementById('auto-translate');
+            autoTranslateEnabled = checkbox.checked;
+            console.log('Auto-translate:', autoTranslateEnabled);
+
+            if (autoTranslateEnabled) {
+                translateAllVisibleMessages();
+            } else {
+                // Show original text for all messages
+                const messageElements = document.querySelectorAll('.forum-message');
+                messageElements.forEach(element => {
+                    const messageId = element.getAttribute('data-message-id');
+                    const originalText = element.getAttribute('data-original-text');
+                    if (originalText) {
+                        const messageTextElement = document.getElementById(`message-text-${messageId}`);
+                        if (messageTextElement) {
+                            messageTextElement.textContent = originalText;
+                            element.setAttribute('data-translation-shown', 'false');
+                        }
+                    }
+                });
+            }
+        }
+
+
+
+        async function translateEntireSite() {
+            console.log('translateEntireSite called, isTranslating flag:', isTranslating);
+            // Prevent concurrent translations
+            if (isTranslating) {
+                console.log('Translation already in progress, skipping');
+                return;
+            }
+            console.log('Setting isTranslating to true');
+            isTranslating = true;
+
+            // Safety timeout to reset the flag if something goes wrong
+            const safetyTimeout = setTimeout(() => {
+                if (isTranslating) {
+                    console.warn('Translation safety timeout reached, resetting isTranslating flag');
+                    isTranslating = false;
+                }
+            }, 30000); // 30 second safety timeout
+            const targetLang = targetLanguage;
+            console.log('Starting site translation to:', targetLang);
+            console.log('Document readyState:', document.readyState);
+            console.log('Current originalTexts size:', originalTexts.size);
+            console.log('Current siteTranslated flag:', siteTranslated);
+
+            if (!targetLang || targetLang === 'en') {
+                // If switching to English, restore original texts
+                console.log('Restoring original texts');
+                console.log('Original texts to restore:', Array.from(originalTexts.entries()).map(([el, text]) => text));
+                originalTexts.forEach((originalText, element) => {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = originalText;
+                    } else {
+                        element.textContent = originalText;
+                    }
+                });
+                siteTranslated = false;
+                clearTimeout(safetyTimeout);
+                isTranslating = false;
+                // Re-enable button for English
+                const englishButton = document.getElementById('translate-toggle-btn');
+                if (englishButton) {
+                    englishButton.disabled = false;
+                    englishButton.textContent = `${availableLanguages[currentLanguageIndex].flag} ${availableLanguages[currentLanguageIndex].name}`;
+                }
+                return;
+            }
+
+            // If site is already translated, restore to English first
+            if (siteTranslated && originalTexts.size > 0) {
+                console.log('Site already translated, restoring to English first');
+                originalTexts.forEach((originalText, element) => {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = originalText;
+                    } else {
+                        element.textContent = originalText;
+                    }
+                });
+            }
+
+            try {
+                // Collect all translatable text elements
+                const elementsToTranslate = [];
+                console.log('Collecting translatable elements...');
+                console.log('document.body exists:', !!document.body);
+                console.log('document.body children:', document.body ? document.body.children.length : 'N/A');
+                console.log('document.body text content length:', document.body ? document.body.textContent.length : 'N/A');
+
+                // Check which page is currently active
+                const activePage = document.querySelector('.page.active');
+                console.log('Active page:', activePage ? activePage.id : 'none');
+                const allPages = document.querySelectorAll('.page');
+                allPages.forEach(page => {
+                    console.log('Page:', page.id, 'active:', page.classList.contains('active'));
+                });
+
+                // Select translatable text elements
+                const selectors = [
+                    '.page.active h1', '.page.active h2', '.page.active h3', // Only active page headings
+                    '.page.active h4', '.page.active h5', '.page.active h6',
+                    '.page.active p', '.page.active li', // Only active page text
+                    '.page.active td', '.page.active th',
+                    '.page.active label',
+                    '.page.active strong', '.page.active em',
+                    '.page.active b', '.page.active i',
+                    '.page.active blockquote', '.page.active cite',
+                    '.page.active figcaption', '.page.active caption',
+                    '.page.active dt', '.page.active dd'
+                ];
+
+                const elements = [];
+                const seenElements = new Set();
+
+                selectors.forEach(selector => {
+                    try {
+                        const found = document.querySelectorAll(selector);
+                        found.forEach(el => {
+                            if (!seenElements.has(el) && el.textContent && el.textContent.trim().length > 2) {
+                                elements.push(el);
+                                seenElements.add(el);
+                            }
+                        });
+                    } catch (e) {
+                        console.warn(`Selector error: ${selector}`, e);
+                    }
+                });
+
+                console.log('Total elements found:', elements.length);
+
+                // Filter elements that shouldn't be translated
+                const filteredElements = elements.filter(element => {
+                    const text = element.textContent.trim();
+
+                    // Skip empty or very short text
+                    if (text.length < 3 || !/[a-zA-Zа-яА-Я]/.test(text)) return false;
+
+                    // Skip UI containers and controls
+                    if (element.closest('nav, header, button, #auth-buttons, #user-info, .language-selector')) return false;
+
+                    // Skip form elements
+                    if (['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'IMG'].includes(element.tagName)) return false;
+
+                    // Skip navigation text
+                    const navTexts = ['home', 'courses', 'forum', 'resources', 'tavi test', 'contacts', 'about company'];
+                    if (navTexts.some(nav => text.toLowerCase() === nav)) return false;
+
+                    // Skip complex elements with many children
+                    if (element.children.length > 3) return false;
+
+                    // Skip URLs and template syntax
+                    if (/^https?:\/\//i.test(text) || text.includes('{' + '{') || text.includes('}' + '}')) return false;
+
+                    return true;
+                });
+
+                console.log('After filtering:', filteredElements.length, 'elements to translate');
+
+                if (filteredElements.length === 0) {
+                    console.log('No elements passed filtering - checking why...');
+                    // Debug: show why elements were filtered
+                    const navTexts = ['home', 'courses', 'forum', 'resources', 'tavi test', 'contacts', 'about company', 'главная', 'курсы', 'форум', 'ресурсы', 'тест tavi', 'контакты', 'о компании'];
+                    elements.forEach(el => {
+                        const text = el.textContent.trim();
+                        let reason = '';
+                        if (el.closest('.forum-message')) reason = 'forum message';
+                        else if (el.closest('script, style, [style*="display: none"], .hidden')) reason = 'hidden/script/style';
+                        else if (el.hasAttribute && el.hasAttribute('data-no-translate')) reason = 'data-no-translate';
+                        else if (el.closest('nav') || el.classList.contains('nav-link')) reason = 'navigation';
+                        else if (el.closest('#translate-toggle-btn') || el.id === 'translate-toggle-btn') reason = 'translation button';
+                        else if (el.closest('.language-selector') || el.closest('#target-language') ||
+                                el.closest('#auto-translate')) reason = 'translation UI';
+                        else if (el.id === 'auth-buttons' || el.id === 'user-info' ||
+                                el.closest('#auth-buttons') || el.closest('#user-info')) reason = 'auth UI container';
+                        else if (el.tagName === 'HEADER' || el.closest('header')) reason = 'header element';
+                        else if (el.closest('button, .btn, .button, input, textarea, select')) reason = 'inside form control';
+                        else if (el.tagName === 'IMG') reason = 'image element';
+                        else if (el.classList.contains('logo')) reason = 'logo';
+                        else if (window.getComputedStyle(el).backgroundImage && window.getComputedStyle(el).backgroundImage !== 'none' &&
+                                (el.classList.contains('gallery-item') || el.classList.contains('feature-card') ||
+                                 el.classList.contains('contact-item'))) reason = 'visual element with background image';
+                        else if (el.children.length > 3) reason = 'too many child elements';
+                        else if (el.classList.length > 5) reason = 'too many CSS classes';
+                        else if (/^\d+$/.test(text) || /^https?:\/\//.test(text)) reason = 'number/URL';
+                        else if (text.includes('{{') || text.includes('}}')) reason = 'template syntax';
+                        else if (navTexts.some(navText => text.toLowerCase().includes(navText) || navText.includes(text.toLowerCase()))) reason = 'navigation-like text';
+                        else if (/^[^a-zA-Zа-яА-Я]*$/.test(text) || text.length < 3) reason = 'non-text content or too short';
+                        else if (/^(https?:\/\/|mailto:|tel:)/.test(text) || /\S+@\S+\.\S+/.test(text)) reason = 'URL or email';
+                        else if (!el.closest('.page.active') && el.closest('.page')) {
+                            reason = 'inactive page';
+                        } else if (el.closest('.page')) {
+                            reason = 'active page (should be kept)';
+                        } else {
+                            reason = 'not in page (should be kept)';
+                        }
+
+                        console.log(`Element filtered: "${text}" (reason: ${reason})`);
+                    });
+                }
+
+                // Collect texts to translate
+                const textsToTranslate = [];
+                filteredElements.forEach(element => {
+                    const text = element.textContent.trim();
+                    if (text && !originalTexts.has(element)) {
+                        originalTexts.set(element, text);
+                        textsToTranslate.push({
+                            element: element,
+                            text: text
+                        });
+                        console.log('Will translate:', text);
+                    } else if (text && originalTexts.has(element)) {
+                        console.log('Skipping already translated text:', text);
+                    } else {
+                        console.log('Skipping empty or invalid text');
+                    }
+                });
+
+                console.log('Collected', textsToTranslate.length, 'texts to translate');
+                textsToTranslate.forEach((item, index) => {
+                    console.log(`To translate ${index}: "${item.text}" in ${item.element.tagName} (id: ${item.element.id})`);
+                });
+
+                if (textsToTranslate.length === 0) {
+                    console.log('No text found to translate on this page.');
+                    clearTimeout(safetyTimeout);
+                    isTranslating = false;
+                    return;
+                }
+
+                // Translate in batches
+                const batchSize = 5; // Optimized batch size
+                for (let i = 0; i < textsToTranslate.length; i += batchSize) {
+                    const batch = textsToTranslate.slice(i, i + batchSize);
+                    const batchTexts = batch.map(item => item.text);
+
+                    console.log(`Translating batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(textsToTranslate.length/batchSize)}`);
+
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+                        const response = await fetch(`${API_BASE}/api/translate/batch`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                texts: batchTexts,
+                                target_language: targetLang
+                            }),
+                            signal: controller.signal
+                        });
+
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) {
+                            console.error('Translation API error:', response.status);
+                            continue;
+                        }
+
+                        const data = await response.json();
+
+                        if (data.translations) {
+                            data.translations.forEach((translation, index) => {
+                                const item = batch[index];
+                                if (!item || !translation) return;
+
+                                try {
+                                    const element = item.element;
+
+                                    // Simple, safe text replacement
+                                    if (element.children.length === 0) {
+                                        // No children - direct replacement
+                                        element.textContent = translation.translated;
+                                    } else if (element.children.length === 1) {
+                                        const child = element.children[0];
+                                        // Single formatting child - preserve tag
+                                        if (['B', 'I', 'EM', 'STRONG', 'SPAN'].includes(child.tagName) && child.children.length === 0) {
+                                            child.textContent = translation.translated;
+                                        } else {
+                                            element.textContent = translation.translated;
+                                        }
+                                    } else {
+                                        // Multiple children - skip to preserve structure
+                                        console.log('Skipping complex element');
+                                    }
+                                } catch (e) {
+                                    console.error('Translation application error:', e);
+                                }
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Batch translation error:', error.name === 'AbortError' ? 'Timeout' : error.message);
+                    }
+
+                    // Small delay between batches
+                    if (i + batchSize < textsToTranslate.length) {
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                }
+
+                siteTranslated = true;
+                console.log('Site translation completed');
+                console.log('Page visibility after translation:');
+                document.querySelectorAll('.page').forEach(page => {
+                    console.log(`Page ${page.id}: ${page.classList.contains('active') ? 'active' : 'inactive'}`);
+                });
+                clearTimeout(safetyTimeout);
+                isTranslating = false;
+
+            } catch (error) {
+                console.error('Site translation error:', error);
+                clearTimeout(safetyTimeout);
+                isTranslating = false;
+                // Re-enable button on error
+                const errorButton = document.getElementById('translate-toggle-btn');
+                if (errorButton) {
+                    errorButton.disabled = false;
+                    errorButton.textContent = `${availableLanguages[currentLanguageIndex].flag} ${availableLanguages[currentLanguageIndex].name}`;
+                }
+            }
+        }
+
+        async function translateMessage(messageId, text) {
+            if (!text || !text.trim()) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/translate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        target_language: targetLanguage
+                    })
+                });
+
+                const data = await response.json();
+                if (data.translated_text) {
+                    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.setAttribute('data-translated-text', data.translated_text);
+                        // Always update the display when called for auto-translation
+                        const messageTextElement = document.getElementById(`message-text-${messageId}`);
+                        if (messageTextElement) {
+                            messageTextElement.textContent = data.translated_text;
+                            messageElement.setAttribute('data-translation-shown', 'true');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Translation error:', error);
+            }
+        }
+
+        function toggleTranslation(messageId) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (!messageElement) return;
+
+            const originalText = messageElement.getAttribute('data-original-text');
+            const translatedText = messageElement.getAttribute('data-translated-text');
+            const currentlyShowingTranslation = messageElement.getAttribute('data-translation-shown') === 'true';
+            const messageTextElement = document.getElementById(`message-text-${messageId}`);
+
+            if (!messageTextElement) return;
+
+            if (currentlyShowingTranslation) {
+                // Show original text
+                messageTextElement.textContent = originalText;
+                messageElement.setAttribute('data-translation-shown', 'false');
+            } else {
+                // Show translated text
+                if (translatedText) {
+                    messageTextElement.textContent = translatedText;
+                    messageElement.setAttribute('data-translation-shown', 'true');
+                } else {
+                    // Need to translate first
+                    const textToTranslate = originalText;
+                    translateMessage(messageId, textToTranslate);
+                }
+            }
+        }
+
+        async function translateAllVisibleMessages() {
+            const messageElements = document.querySelectorAll('.forum-message');
+            const textsToTranslate = [];
+
+            messageElements.forEach(element => {
+                const messageId = element.getAttribute('data-message-id');
+                const originalText = element.getAttribute('data-original-text');
+                if (originalText && originalText.trim()) {
+                    textsToTranslate.push({
+                        id: messageId,
+                        text: originalText
+                    });
+                }
+            });
+
+            if (textsToTranslate.length === 0) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/translate/batch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        texts: textsToTranslate.map(item => item.text),
+                        target_language: targetLanguage
+                    })
+                });
+
+                const data = await response.json();
+                if (data.translations) {
+                    data.translations.forEach((translation, index) => {
+                        const item = textsToTranslate[index];
+                        const messageElement = document.querySelector(`[data-message-id="${item.id}"]`);
+                        if (messageElement) {
+                            messageElement.setAttribute('data-translated-text', translation.translated);
+                            // Always update the display for "Translate All" function
+                            const messageTextElement = document.getElementById(`message-text-${item.id}`);
+                            if (messageTextElement) {
+                                messageTextElement.textContent = translation.translated;
+                                messageElement.setAttribute('data-translation-shown', 'true');
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Batch translation error:', error);
+            }
+        }
+
         // Load initial data
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize auto-translate state from checkbox
+            const autoTranslateCheckbox = document.getElementById('auto-translate');
+            if (autoTranslateCheckbox) {
+                autoTranslateEnabled = autoTranslateCheckbox.checked;
+            }
+
+            // Set default page
+            showPage('home');
+
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status
 

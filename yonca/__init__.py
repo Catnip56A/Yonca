@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_session import Session
 from flask_babel import Babel
 from yonca.config import config
-from yonca.models import db, User, Course, ForumMessage, ForumChannel, Resource, PDFDocument, TaviTest
+from yonca.models import db, User, Course, ForumMessage, ForumChannel, Resource, PDFDocument, TaviTest, HomeContent, Translation
 from yonca.admin import init_admin
 from yonca.routes.auth import auth_bp
 from yonca.routes.api import api_bp

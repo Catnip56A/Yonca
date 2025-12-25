@@ -4,6 +4,7 @@ API routes for courses, forum, and resources
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import current_user, login_required
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
+from yonca.translation_service import translation_service
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -79,6 +80,9 @@ def get_forum_messages():
     
     def build_thread(message, depth=0):
         """Recursively build message thread"""
+        # Get user's preferred language
+        user_language = current_user.preferred_language if current_user.is_authenticated else 'en'
+
         result = {
             'id': message.id,
             'username': message.username,
@@ -87,13 +91,14 @@ def get_forum_messages():
             'channel': message.channel,
             'is_current_user': current_user.is_authenticated and message.username == current_user.username,
             'depth': depth,
+            'user_language': user_language,
             'replies': []
         }
-        
+
         # Get replies sorted by timestamp
         for reply in message.replies.order_by(ForumMessage.timestamp.asc()).all():
             result['replies'].append(build_thread(reply, depth + 1))
-        
+
         return result
     
     # Get messages for the specified channel
@@ -459,7 +464,103 @@ def get_user():
             'username': current_user.username,
             'email': current_user.email,
             'is_admin': current_user.is_admin,
+            'preferred_language': current_user.preferred_language,
             'courses': [{'id': c.id, 'title': c.title, 'description': c.description} for c in current_user.courses]
         })
     else:
         return jsonify(None)
+
+# Translation endpoints
+@api_bp.route('/translate', methods=['POST'])
+def translate_text():
+    """Translate text using AI translation service"""
+    data = request.get_json()
+
+    if not data or 'text' not in data:
+        return jsonify({'error': 'Text is required'}), 400
+
+    text = data['text']
+    target_language = data.get('target_language', 'en')
+    source_language = data.get('source_language', 'auto')
+
+    if not text or not text.strip():
+        return jsonify({'translated_text': text})
+
+    try:
+        translated_text = translation_service.get_translation(text, target_language, source_language)
+        return jsonify({
+            'original_text': text,
+            'translated_text': translated_text,
+            'target_language': target_language,
+            'source_language': source_language
+        })
+    except Exception as e:
+        current_app.logger.error(f"Translation API error: {str(e)}")
+        return jsonify({'error': 'Translation failed', 'translated_text': text}), 500
+
+@api_bp.route('/translate/batch', methods=['POST'])
+def translate_batch():
+    """Translate multiple texts in batch"""
+    data = request.get_json()
+
+    if not data or 'texts' not in data:
+        return jsonify({'error': 'Texts array is required'}), 400
+
+    texts = data['texts']
+    target_language = data.get('target_language', 'en')
+    source_language = data.get('source_language', 'auto')
+
+    if not isinstance(texts, list):
+        return jsonify({'error': 'Texts must be an array'}), 400
+
+    try:
+        translations = []
+        for text in texts:
+            if text and text.strip():
+                translated = translation_service.get_translation(text, target_language, source_language)
+                translations.append({
+                    'original': text,
+                    'translated': translated
+                })
+            else:
+                translations.append({
+                    'original': text,
+                    'translated': text
+                })
+
+        return jsonify({
+            'translations': translations,
+            'target_language': target_language,
+            'source_language': source_language
+        })
+    except Exception as e:
+        current_app.logger.error(f"Batch translation API error: {str(e)}")
+        return jsonify({'error': 'Batch translation failed'}), 500
+
+@api_bp.route('/languages')
+def get_supported_languages():
+    """Get list of supported languages for translation"""
+    return jsonify(translation_service.get_supported_languages())
+
+@api_bp.route('/user/language', methods=['POST'])
+@login_required
+def set_user_language():
+    """Set user's preferred language for translations"""
+    data = request.get_json()
+
+    if not data or 'language' not in data:
+        return jsonify({'error': 'Language is required'}), 400
+
+    language = data['language']
+    supported_languages = translation_service.get_supported_languages()
+
+    if language not in supported_languages:
+        return jsonify({'error': 'Unsupported language'}), 400
+
+    current_user.preferred_language = language
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'preferred_language': current_user.preferred_language
+    })

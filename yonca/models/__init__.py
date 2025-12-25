@@ -20,7 +20,22 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     _password = db.Column('password', db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    preferred_language = db.Column(db.String(10), default='en')  # User's preferred language for translations
     courses = db.relationship('Course', secondary=user_courses, backref=db.backref('users', lazy='select'))
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, plaintext):
+        self._password = generate_password_hash(plaintext)
+
+    def check_password(self, plaintext):
+        return check_password_hash(self._password, plaintext)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
 
     @property
     def password(self):
@@ -153,3 +168,21 @@ class HomeContent(db.Model):
 
     def __repr__(self):
         return f'<HomeContent {self.id}>'
+
+class Translation(db.Model):
+    """Translation cache model for AI-powered translations"""
+    id = db.Column(db.Integer, primary_key=True)
+    source_text = db.Column(db.Text, nullable=False)
+    source_language = db.Column(db.String(10), default='auto')  # 'auto' for auto-detection
+    target_language = db.Column(db.String(10), nullable=False)
+    translated_text = db.Column(db.Text, nullable=False)
+    translation_service = db.Column(db.String(50), default='google')  # Service used for translation
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
+    # Index for fast lookups
+    __table_args__ = (
+        db.Index('idx_translation_lookup', 'source_text', 'target_language'),
+    )
+
+    def __repr__(self):
+        return f'<Translation {self.source_language}->{self.target_language}: {self.source_text[:50]}...>'
