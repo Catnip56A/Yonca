@@ -313,6 +313,147 @@
                     </div>
                 </div>
 
+                <!-- Site Branding Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-building"></i> Site Branding</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="site_name">Site Name:</label>
+                        <input type="text" id="site_name" name="site_name" class="form-control"
+                               value="{{ form.site_name.data or 'Yonca' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="site_logo_url">Logo URL:</label>
+                        <input type="url" id="site_logo_url" name="site_logo_url" class="form-control"
+                               value="{{ form.site_logo_url.data or '' }}" placeholder="https://example.com/logo.png">
+                    </div>
+                </div>
+
+                <!-- Navigation Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-bars"></i> Navigation Menu</h4>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-nav-item">
+                            <i class="fa fa-plus"></i> Add Menu Item
+                        </button>
+                    </div>
+
+                    <div id="navigation-container">
+                        <!-- Navigation items will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- Courses Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-graduation-cap"></i> Courses Section</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="courses_section_title">Section Title:</label>
+                        <input type="text" id="courses_section_title" name="courses_section_title" class="form-control"
+                               value="{{ form.courses_section_title.data or 'Courses' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="courses_section_description">Section Description:</label>
+                        <textarea id="courses_section_description" name="courses_section_description" class="form-control" rows="3">{{ form.courses_section_description.data or 'Explore our comprehensive course offerings designed to enhance your skills and knowledge.' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Forum Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-comments"></i> Forum Section</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="forum_section_title">Section Title:</label>
+                        <input type="text" id="forum_section_title" name="forum_section_title" class="form-control"
+                               value="{{ form.forum_section_title.data or 'Forum' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="forum_section_description">Section Description:</label>
+                        <textarea id="forum_section_description" name="forum_section_description" class="form-control" rows="3">{{ form.forum_section_description.data or 'Join our community discussions and connect with fellow learners and experts.' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Resources Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-book"></i> Resources Section</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="resources_section_title">Section Title:</label>
+                        <input type="text" id="resources_section_title" name="resources_section_title" class="form-control"
+                               value="{{ form.resources_section_title.data or 'Resources' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="resources_section_description">Section Description:</label>
+                        <textarea id="resources_section_description" name="resources_section_description" class="form-control" rows="3">{{ form.resources_section_description.data or 'Access valuable learning materials, guides, and tools to support your educational journey.' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- TAVI Test Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-clipboard-check"></i> TAVI Test Section</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="tavi_test_section_title">Section Title:</label>
+                        <input type="text" id="tavi_test_section_title" name="tavi_test_section_title" class="form-control"
+                               value="{{ form.tavi_test_section_title.data or 'TAVI Test' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="tavi_test_section_description">Section Description:</label>
+                        <textarea id="tavi_test_section_description" name="tavi_test_section_description" class="form-control" rows="3">{{ form.tavi_test_section_description.data or 'Take our comprehensive assessment to evaluate your current knowledge level and get personalized learning recommendations.' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Contacts Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-address-book"></i> Contacts Section</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="contacts_section_title">Section Title:</label>
+                        <input type="text" id="contacts_section_title" name="contacts_section_title" class="form-control"
+                               value="{{ form.contacts_section_title.data or 'Contacts' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="contacts_section_description">Section Description:</label>
+                        <textarea id="contacts_section_description" name="contacts_section_description" class="form-control" rows="3">{{ form.contacts_section_description.data or 'Get in touch with us for support, inquiries, or collaboration opportunities.' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h4 class="section-title"><i class="fa fa-info-circle"></i> About Section</h4>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="about_section_title">Section Title:</label>
+                        <input type="text" id="about_section_title" name="about_section_title" class="form-control"
+                               value="{{ form.about_section_title.data or 'About' }}">
+                    </div>
+
+                    <div class="form-group-inline">
+                        <label for="about_section_description">Section Description:</label>
+                        <textarea id="about_section_description" name="about_section_description" class="form-control" rows="3">{{ form.about_section_description.data or 'Learn more about our mission, vision, and the team behind Yonca.' }}</textarea>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-save">
                     <i class="fa fa-save"></i> Save Changes
                 </button>
@@ -531,6 +672,11 @@ document.addEventListener('DOMContentLoaded', function() {
         addFeature('logged-out-features-container', 'logged_out_feature');
     });
 
+    // Add navigation item button
+    document.getElementById('add-nav-item').addEventListener('click', function() {
+        addNavigationItem('navigation-container', 'nav');
+    });
+
     // Add gallery image button
     document.getElementById('add-gallery-image').addEventListener('click', function() {
         addGalleryImage('gallery-container', 'gallery');
@@ -539,6 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make features sortable
     makeSortable('features-container');
     makeSortable('logged-out-features-container');
+    makeSortable('navigation-container');
     makeSortable('gallery-container');
 });
 
@@ -554,6 +701,13 @@ function initializeFeatures() {
     {% if home_content.logged_out_features %}
     {% for feature in home_content.logged_out_features %}
     addFeatureFromData('logged-out-features-container', 'logged_out_feature', {{ feature.title|tojson }}, {{ feature.description|tojson }});
+    {% endfor %}
+    {% endif %}
+
+    // Initialize navigation items
+    {% if home_content.navigation_items %}
+    {% for nav_item in home_content.navigation_items %}
+    addNavigationItemFromData('navigation-container', 'nav', {{ nav_item.name|tojson }}, {{ nav_item.url|tojson }});
     {% endfor %}
     {% endif %}
 
@@ -877,6 +1031,79 @@ function addGalleryImageFromData(containerId, prefix, url, alt, caption) {
     // Add event listeners
     imageDiv.querySelector('.remove-feature').addEventListener('click', function() {
         imageDiv.remove();
+    });
+}
+
+// Navigation Item Functions
+function addNavigationItem(containerId, prefix) {
+    const container = document.getElementById(containerId);
+    const navIndex = container.children.length;
+
+    const navDiv = document.createElement('div');
+    navDiv.className = 'feature-item nav-item';
+    navDiv.draggable = true;
+    navDiv.innerHTML = `
+        <div class="feature-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span class="drag-handle" style="cursor: move; color: #6c757d;"><i class="fa fa-grip-vertical"></i></span>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-feature">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+        <div class="form-group-inline">
+            <label>Title:</label>
+            <input type="text" name="${prefix}_title_${navIndex}" class="form-control nav-title"
+                   placeholder="Menu item title" value="">
+        </div>
+        <div class="form-group-inline">
+            <label>URL:</label>
+            <input type="url" name="${prefix}_url_${navIndex}" class="form-control nav-url"
+                   placeholder="https://example.com or /page" value="">
+        </div>
+    `;
+
+    container.appendChild(navDiv);
+
+    // Add event listeners
+    navDiv.querySelector('.remove-feature').addEventListener('click', function() {
+        navDiv.remove();
+    });
+}
+
+function addNavigationItemFromData(containerId, prefix, title, url) {
+    const container = document.getElementById(containerId);
+    const navIndex = container.children.length;
+
+    // Escape quotes for HTML attributes
+    const escapedTitle = title.replace(/"/g, '&quot;');
+    const escapedUrl = url.replace(/"/g, '&quot;');
+
+    const navDiv = document.createElement('div');
+    navDiv.className = 'feature-item nav-item';
+    navDiv.draggable = true;
+    navDiv.innerHTML = `
+        <div class="feature-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span class="drag-handle" style="cursor: move; color: #6c757d;"><i class="fa fa-grip-vertical"></i></span>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-feature">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+        <div class="form-group-inline">
+            <label>Title:</label>
+            <input type="text" name="${prefix}_title_${navIndex}" class="form-control nav-title"
+                   placeholder="Menu item title" value="${escapedTitle}">
+        </div>
+        <div class="form-group-inline">
+            <label>URL:</label>
+            <input type="url" name="${prefix}_url_${navIndex}" class="form-control nav-url"
+                   placeholder="https://example.com or /page" value="${escapedUrl}">
+        </div>
+    `;
+
+    container.appendChild(navDiv);
+
+    // Add event listeners
+    navDiv.querySelector('.remove-feature').addEventListener('click', function() {
+        navDiv.remove();
     });
 }
 

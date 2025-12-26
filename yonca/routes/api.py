@@ -28,7 +28,8 @@ def get_courses():
         'title': c.title, 
         'description': c.description,
         'time_slot': c.time_slot,
-        'profile_emoji': c.profile_emoji
+        'profile_emoji': c.profile_emoji,
+        'dropdown_menu': c.dropdown_menu
     } for c in courses])
 
 @api_bp.route('/user')
@@ -44,7 +45,8 @@ def get_current_user():
                 'title': c.title,
                 'description': c.description,
                 'time_slot': c.time_slot,
-                'profile_emoji': c.profile_emoji
+                'profile_emoji': c.profile_emoji,
+                'dropdown_menu': c.dropdown_menu
             } for c in current_user.courses]
         })
     else:

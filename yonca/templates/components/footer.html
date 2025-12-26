@@ -1,0 +1,56 @@
+<footer class="bg-dark text-light py-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>{{ home_content.site_name or 'Yonca' }}</h5>
+                <p class="text-muted">Your gateway to knowledge and community learning.</p>
+                {% if home_content.site_logo_url %}
+                    <img src="{{ home_content.site_logo_url }}" alt="{{ home_content.site_name or 'Yonca' }}" height="40" class="mb-3">
+                {% endif %}
+            </div>
+
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    {% if home_content.navigation_items %}
+                        {% for nav_item in home_content.navigation_items %}
+                        <li><a href="{{ nav_item.url }}" class="text-muted">{{ nav_item.name }}</a></li>
+                        {% endfor %}
+                    {% else %}
+                        <li><a href="/" class="text-muted">Home</a></li>
+                        <li><a href="/courses" class="text-muted">Courses</a></li>
+                        <li><a href="/forum" class="text-muted">Forum</a></li>
+                        <li><a href="/resources" class="text-muted">Resources</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <h5>Contact Info</h5>
+                {% if home_content.contact_info %}
+                    {% if home_content.contact_info.whatsapp %}
+                    <p class="text-muted"><i class="fab fa-whatsapp"></i> {{ home_content.contact_info.whatsapp }}</p>
+                    {% endif %}
+                    {% if home_content.contact_info.email %}
+                    <p class="text-muted"><i class="fas fa-envelope"></i> {{ home_content.contact_info.email }}</p>
+                    {% endif %}
+                    {% if home_content.contact_info.address %}
+                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ home_content.contact_info.address }}</p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted"><i class="fab fa-whatsapp"></i> +994 51 623 73 94</p>
+                    <p class="text-muted"><i class="fas fa-envelope"></i> info@yonca.az</p>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> Baku, Azerbaijan</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-muted mb-0">&copy; 2025 {{ home_content.site_name or 'Yonca' }}. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>

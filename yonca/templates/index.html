@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://via.placeholder.com">
+
     <title>{{ _('Yonca - Learning Platform') }}</title>
     <style>
         * {
@@ -417,12 +417,45 @@
             margin: 2rem 0;
         }
 
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+            align-items: start;
+        }
+
         .resource-card {
             background: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .resource-card.course-card {
+            cursor: pointer;
+        }
+
+        .resource-card.course-card:hover .dropdown-indicator {
+            color: #abc32f;
+            transform: translateY(2px);
+        }
+
+        .dropdown-indicator {
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .dropdown-indicator.active {
+            color: #abc32f;
+            transform: rotate(180deg);
         }
 
         .resource-card h4 {
@@ -566,6 +599,34 @@
         .channel-tab.locked:hover {
             background: #fecaca;
         }
+
+        /* Course dropdown styles */
+        .course-card {
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: visible;
+        }
+
+        .course-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .course-dropdown {
+            margin-top: 15px;
+            padding: 10px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none !important;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa !important;
+        }
     </style>
 </head>
 <body>
@@ -652,15 +713,15 @@
                     {% endfor %}
                     {% else %}
                     <div class="gallery-item">
-                        <img src="https://via.placeholder.com/400x250/abc32f/ffffff?text=Learning+Community" alt="Learning Community" loading="lazy">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%23abc32f' width='400' height='250'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3ELearning Community%3C/text%3E%3C/svg%3E" alt="Learning Community" loading="lazy">
                         <div class="gallery-caption">Our vibrant learning community</div>
                     </div>
                     <div class="gallery-item">
-                        <img src="https://via.placeholder.com/400x250/4a90e2/ffffff?text=Interactive+Courses" alt="Interactive Courses" loading="lazy">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%234a90e2' width='400' height='250'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EInteractive Courses%3C/text%3E%3C/svg%3E" alt="Interactive Courses" loading="lazy">
                         <div class="gallery-caption">Engage with interactive course content</div>
                     </div>
                     <div class="gallery-item">
-                        <img src="https://via.placeholder.com/400x250/7ed321/ffffff?text=Study+Groups" alt="Study Groups" loading="lazy">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%237ed321' width='400' height='250'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EStudy Groups%3C/text%3E%3C/svg%3E" alt="Study Groups" loading="lazy">
                         <div class="gallery-caption">Collaborate in study groups</div>
                     </div>
                     {% endif %}
@@ -969,13 +1030,44 @@
 
                 courses.forEach(course => {
                     const courseCard = document.createElement('div');
-                    courseCard.className = 'resource-card';
+                    courseCard.className = 'resource-card course-card';
+                    courseCard.style.cursor = 'pointer';
                     courseCard.innerHTML = `
                         <h4>${course.title}</h4>
                         <p>${course.description}</p>
                         <p><strong>{{ _('Time Slot:') }}</strong> ${course.time_slot || 'TBD'}</p>
-                        <div style="margin-top: 1rem;">${course.profile_emoji || '📚'}</div>
+                        <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <span>${course.profile_emoji || '📚'}</span>
+                            <span class="dropdown-indicator" style="font-size: 14px; color: #6b7280; margin-left: 8px;">▼</span>
+                        </div>
+                        <div class="course-dropdown" style="display: none;"></div>
                     `;
+
+                    // Make course card clickable
+                    courseCard.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const dropdown = this.querySelector('.course-dropdown');
+                        const indicator = this.querySelector('.dropdown-indicator');
+
+                        // Hide other dropdowns
+                        document.querySelectorAll('.course-dropdown').forEach(d => {
+                            if (d !== dropdown) {
+                                d.style.display = 'none';
+                                d.closest('.course-card').querySelector('.dropdown-indicator').classList.remove('active');
+                            }
+                        });
+
+                        // Toggle this dropdown
+                        if (dropdown.style.display === 'none') {
+                            dropdown.style.display = 'block';
+                            indicator.classList.add('active');
+                            populateCourseDropdown(dropdown, course);
+                        } else {
+                            dropdown.style.display = 'none';
+                            indicator.classList.remove('active');
+                        }
+                    });
+
                     coursesGrid.appendChild(courseCard);
                 });
             } catch (error) {
@@ -983,6 +1075,135 @@
                 document.querySelector('.courses-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading courses. Please try again.") }}</p>';
             }
         }
+
+        // Populate course dropdown menu
+        function populateCourseDropdown(dropdown, course) {
+            dropdown.innerHTML = '';
+
+            if (window.currentUser) {
+                // Logged-in user menu
+                const menuItems = [
+                    { text: '{{ _("View Course Details") }}', action: 'details', icon: '📖' },
+                    { text: '{{ _("Enroll in Course") }}', action: 'enroll', icon: '✅' },
+                    { text: '{{ _("Contact Instructor") }}', action: 'contact', icon: '💬' }
+                ];
+
+                menuItems.forEach(item => {
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'dropdown-item';
+                    menuItem.style.padding = '10px 15px';
+                    menuItem.style.cursor = 'pointer';
+                    menuItem.style.borderBottom = '1px solid #eee';
+                    menuItem.style.display = 'flex';
+                    menuItem.style.alignItems = 'center';
+                    menuItem.innerHTML = `<span style="margin-right: 10px;">${item.icon}</span>${item.text}`;
+
+                    menuItem.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        handleCourseAction(item.action, course);
+                        dropdown.style.display = 'none';
+                    });
+
+                    menuItem.addEventListener('mouseenter', function() {
+                        this.style.backgroundColor = '#f8f9fa';
+                    });
+
+                    menuItem.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = 'white';
+                    });
+
+                    dropdown.appendChild(menuItem);
+                });
+            } else {
+                // Non-logged-in user menu (configurable from admin)
+                const menuItems = course.dropdown_menu || [
+                    { text: '{{ _("Login to Enroll") }}', icon: '🔐', url: '/login' },
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '#' },
+                    { text: '{{ _("Contact Us") }}', icon: '💬', url: '/#contact' }
+                ];
+
+                menuItems.forEach(item => {
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'dropdown-item';
+                    menuItem.style.padding = '10px 15px';
+                    menuItem.style.cursor = 'pointer';
+                    menuItem.style.borderBottom = '1px solid #eee';
+                    menuItem.style.display = 'flex';
+                    menuItem.style.alignItems = 'center';
+                    menuItem.innerHTML = `<span style="margin-right: 10px;">${item.icon || '🔗'}</span>${item.text}`;
+
+                    menuItem.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (item.url && item.url !== '#') {
+                            // Replace {description} placeholder with course slug
+                            let url = item.url;
+                            if (url.includes('{description}')) {
+                                const courseSlug = course.title.toLowerCase()
+                                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                                    .replace(/-+/g, '-') // Replace multiple hyphens with single
+                                    .trim(); // Remove leading/trailing whitespace
+                                url = url.replace('{description}', `${courseSlug}-${course.id}`);
+                            }
+                            window.location.href = url;
+                        } else {
+                            handleCourseAction('details', course);
+                        }
+                        dropdown.style.display = 'none';
+                    });
+
+                    menuItem.addEventListener('mouseenter', function() {
+                        this.style.backgroundColor = '#f8f9fa';
+                    });
+
+                    menuItem.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = 'white';
+                    });
+
+                    dropdown.appendChild(menuItem);
+                });
+            }
+        }
+
+        // Handle course actions
+        function handleCourseAction(action, course) {
+            switch (action) {
+                case 'details':
+                    alert(`{{ _("Course Details") }}: ${course.title}\n\n${course.description}\n\n{{ _("Time Slot") }}: ${course.time_slot || 'TBD'}`);
+                    break;
+                case 'enroll':
+                    if (window.currentUser) {
+                        alert(`{{ _("Enrolling in") }}: ${course.title}`);
+                        // TODO: Implement enrollment logic
+                    } else {
+                        window.location.href = '/login';
+                    }
+                    break;
+                case 'contact':
+                    // Scroll to contact section
+                    const contactSection = document.getElementById('contact');
+                    if (contactSection) {
+                        contactSection.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        window.location.href = '/#contact';
+                    }
+                    break;
+                case 'login':
+                    window.location.href = '/login';
+                    break;
+                default:
+                    console.log('Unknown action:', action);
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.course-card')) {
+                document.querySelectorAll('.course-dropdown').forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
 
         // Load resources
         async function loadResources() {
@@ -1727,7 +1948,6 @@
         function toggleAutoTranslate() {
             const checkbox = document.getElementById('auto-translate');
             autoTranslateEnabled = checkbox.checked;
-            console.log('Auto-translate:', autoTranslateEnabled);
 
             if (autoTranslateEnabled) {
                 translateAllVisibleMessages();
@@ -1750,304 +1970,9 @@
 
 
 
-        async function translateEntireSite() {
-            console.log('translateEntireSite called, isTranslating flag:', isTranslating);
-            // Prevent concurrent translations
-            if (isTranslating) {
-                console.log('Translation already in progress, skipping');
-                return;
-            }
-            console.log('Setting isTranslating to true');
-            isTranslating = true;
 
-            // Safety timeout to reset the flag if something goes wrong
-            const safetyTimeout = setTimeout(() => {
-                if (isTranslating) {
-                    console.warn('Translation safety timeout reached, resetting isTranslating flag');
-                    isTranslating = false;
-                }
-            }, 30000); // 30 second safety timeout
-            const targetLang = targetLanguage;
-            console.log('Starting site translation to:', targetLang);
-            console.log('Document readyState:', document.readyState);
-            console.log('Current originalTexts size:', originalTexts.size);
-            console.log('Current siteTranslated flag:', siteTranslated);
 
-            if (!targetLang || targetLang === 'en') {
-                // If switching to English, restore original texts
-                console.log('Restoring original texts');
-                console.log('Original texts to restore:', Array.from(originalTexts.entries()).map(([el, text]) => text));
-                originalTexts.forEach((originalText, element) => {
-                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                        element.placeholder = originalText;
-                    } else {
-                        element.textContent = originalText;
-                    }
-                });
-                siteTranslated = false;
-                clearTimeout(safetyTimeout);
-                isTranslating = false;
-                // Re-enable button for English
-                const englishButton = document.getElementById('translate-toggle-btn');
-                if (englishButton) {
-                    englishButton.disabled = false;
-                    englishButton.textContent = `${availableLanguages[currentLanguageIndex].flag} ${availableLanguages[currentLanguageIndex].name}`;
-                }
-                return;
-            }
 
-            // If site is already translated, restore to English first
-            if (siteTranslated && originalTexts.size > 0) {
-                console.log('Site already translated, restoring to English first');
-                originalTexts.forEach((originalText, element) => {
-                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                        element.placeholder = originalText;
-                    } else {
-                        element.textContent = originalText;
-                    }
-                });
-            }
-
-            try {
-                // Collect all translatable text elements
-                const elementsToTranslate = [];
-                console.log('Collecting translatable elements...');
-                console.log('document.body exists:', !!document.body);
-                console.log('document.body children:', document.body ? document.body.children.length : 'N/A');
-                console.log('document.body text content length:', document.body ? document.body.textContent.length : 'N/A');
-
-                // Check which page is currently active
-                const activePage = document.querySelector('.page.active');
-                console.log('Active page:', activePage ? activePage.id : 'none');
-                const allPages = document.querySelectorAll('.page');
-                allPages.forEach(page => {
-                    console.log('Page:', page.id, 'active:', page.classList.contains('active'));
-                });
-
-                // Select translatable text elements
-                const selectors = [
-                    '.page.active h1', '.page.active h2', '.page.active h3', // Only active page headings
-                    '.page.active h4', '.page.active h5', '.page.active h6',
-                    '.page.active p', '.page.active li', // Only active page text
-                    '.page.active td', '.page.active th',
-                    '.page.active label',
-                    '.page.active strong', '.page.active em',
-                    '.page.active b', '.page.active i',
-                    '.page.active blockquote', '.page.active cite',
-                    '.page.active figcaption', '.page.active caption',
-                    '.page.active dt', '.page.active dd'
-                ];
-
-                const elements = [];
-                const seenElements = new Set();
-
-                selectors.forEach(selector => {
-                    try {
-                        const found = document.querySelectorAll(selector);
-                        found.forEach(el => {
-                            if (!seenElements.has(el) && el.textContent && el.textContent.trim().length > 2) {
-                                elements.push(el);
-                                seenElements.add(el);
-                            }
-                        });
-                    } catch (e) {
-                        console.warn(`Selector error: ${selector}`, e);
-                    }
-                });
-
-                console.log('Total elements found:', elements.length);
-
-                // Filter elements that shouldn't be translated
-                const filteredElements = elements.filter(element => {
-                    const text = element.textContent.trim();
-
-                    // Skip empty or very short text
-                    if (text.length < 3 || !/[a-zA-Zа-яА-Я]/.test(text)) return false;
-
-                    // Skip UI containers and controls
-                    if (element.closest('nav, header, button, #auth-buttons, #user-info, .language-selector')) return false;
-
-                    // Skip form elements
-                    if (['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'IMG'].includes(element.tagName)) return false;
-
-                    // Skip navigation text
-                    const navTexts = ['home', 'courses', 'forum', 'resources', 'tavi test', 'contacts', 'about company'];
-                    if (navTexts.some(nav => text.toLowerCase() === nav)) return false;
-
-                    // Skip complex elements with many children
-                    if (element.children.length > 3) return false;
-
-                    // Skip URLs and template syntax
-                    if (/^https?:\/\//i.test(text) || text.includes('{' + '{') || text.includes('}' + '}')) return false;
-
-                    return true;
-                });
-
-                console.log('After filtering:', filteredElements.length, 'elements to translate');
-
-                if (filteredElements.length === 0) {
-                    console.log('No elements passed filtering - checking why...');
-                    // Debug: show why elements were filtered
-                    const navTexts = ['home', 'courses', 'forum', 'resources', 'tavi test', 'contacts', 'about company', 'главная', 'курсы', 'форум', 'ресурсы', 'тест tavi', 'контакты', 'о компании'];
-                    elements.forEach(el => {
-                        const text = el.textContent.trim();
-                        let reason = '';
-                        if (el.closest('.forum-message')) reason = 'forum message';
-                        else if (el.closest('script, style, [style*="display: none"], .hidden')) reason = 'hidden/script/style';
-                        else if (el.hasAttribute && el.hasAttribute('data-no-translate')) reason = 'data-no-translate';
-                        else if (el.closest('nav') || el.classList.contains('nav-link')) reason = 'navigation';
-                        else if (el.closest('#translate-toggle-btn') || el.id === 'translate-toggle-btn') reason = 'translation button';
-                        else if (el.closest('.language-selector') || el.closest('#target-language') ||
-                                el.closest('#auto-translate')) reason = 'translation UI';
-                        else if (el.id === 'auth-buttons' || el.id === 'user-info' ||
-                                el.closest('#auth-buttons') || el.closest('#user-info')) reason = 'auth UI container';
-                        else if (el.tagName === 'HEADER' || el.closest('header')) reason = 'header element';
-                        else if (el.closest('button, .btn, .button, input, textarea, select')) reason = 'inside form control';
-                        else if (el.tagName === 'IMG') reason = 'image element';
-                        else if (el.classList.contains('logo')) reason = 'logo';
-                        else if (window.getComputedStyle(el).backgroundImage && window.getComputedStyle(el).backgroundImage !== 'none' &&
-                                (el.classList.contains('gallery-item') || el.classList.contains('feature-card') ||
-                                 el.classList.contains('contact-item'))) reason = 'visual element with background image';
-                        else if (el.children.length > 3) reason = 'too many child elements';
-                        else if (el.classList.length > 5) reason = 'too many CSS classes';
-                        else if (/^\d+$/.test(text) || /^https?:\/\//.test(text)) reason = 'number/URL';
-                        else if (text.includes('{{') || text.includes('}}')) reason = 'template syntax';
-                        else if (navTexts.some(navText => text.toLowerCase().includes(navText) || navText.includes(text.toLowerCase()))) reason = 'navigation-like text';
-                        else if (/^[^a-zA-Zа-яА-Я]*$/.test(text) || text.length < 3) reason = 'non-text content or too short';
-                        else if (/^(https?:\/\/|mailto:|tel:)/.test(text) || /\S+@\S+\.\S+/.test(text)) reason = 'URL or email';
-                        else if (!el.closest('.page.active') && el.closest('.page')) {
-                            reason = 'inactive page';
-                        } else if (el.closest('.page')) {
-                            reason = 'active page (should be kept)';
-                        } else {
-                            reason = 'not in page (should be kept)';
-                        }
-
-                        console.log(`Element filtered: "${text}" (reason: ${reason})`);
-                    });
-                }
-
-                // Collect texts to translate
-                const textsToTranslate = [];
-                filteredElements.forEach(element => {
-                    const text = element.textContent.trim();
-                    if (text && !originalTexts.has(element)) {
-                        originalTexts.set(element, text);
-                        textsToTranslate.push({
-                            element: element,
-                            text: text
-                        });
-                        console.log('Will translate:', text);
-                    } else if (text && originalTexts.has(element)) {
-                        console.log('Skipping already translated text:', text);
-                    } else {
-                        console.log('Skipping empty or invalid text');
-                    }
-                });
-
-                console.log('Collected', textsToTranslate.length, 'texts to translate');
-                textsToTranslate.forEach((item, index) => {
-                    console.log(`To translate ${index}: "${item.text}" in ${item.element.tagName} (id: ${item.element.id})`);
-                });
-
-                if (textsToTranslate.length === 0) {
-                    console.log('No text found to translate on this page.');
-                    clearTimeout(safetyTimeout);
-                    isTranslating = false;
-                    return;
-                }
-
-                // Translate in batches
-                const batchSize = 5; // Optimized batch size
-                for (let i = 0; i < textsToTranslate.length; i += batchSize) {
-                    const batch = textsToTranslate.slice(i, i + batchSize);
-                    const batchTexts = batch.map(item => item.text);
-
-                    console.log(`Translating batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(textsToTranslate.length/batchSize)}`);
-
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-
-                        const response = await fetch(`${API_BASE}/api/translate/batch`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                texts: batchTexts,
-                                target_language: targetLang
-                            }),
-                            signal: controller.signal
-                        });
-
-                        clearTimeout(timeoutId);
-
-                        if (!response.ok) {
-                            console.error('Translation API error:', response.status);
-                            continue;
-                        }
-
-                        const data = await response.json();
-
-                        if (data.translations) {
-                            data.translations.forEach((translation, index) => {
-                                const item = batch[index];
-                                if (!item || !translation) return;
-
-                                try {
-                                    const element = item.element;
-
-                                    // Simple, safe text replacement
-                                    if (element.children.length === 0) {
-                                        // No children - direct replacement
-                                        element.textContent = translation.translated;
-                                    } else if (element.children.length === 1) {
-                                        const child = element.children[0];
-                                        // Single formatting child - preserve tag
-                                        if (['B', 'I', 'EM', 'STRONG', 'SPAN'].includes(child.tagName) && child.children.length === 0) {
-                                            child.textContent = translation.translated;
-                                        } else {
-                                            element.textContent = translation.translated;
-                                        }
-                                    } else {
-                                        // Multiple children - skip to preserve structure
-                                        console.log('Skipping complex element');
-                                    }
-                                } catch (e) {
-                                    console.error('Translation application error:', e);
-                                }
-                            });
-                        }
-                    } catch (error) {
-                        console.error('Batch translation error:', error.name === 'AbortError' ? 'Timeout' : error.message);
-                    }
-
-                    // Small delay between batches
-                    if (i + batchSize < textsToTranslate.length) {
-                        await new Promise(resolve => setTimeout(resolve, 50));
-                    }
-                }
-
-                siteTranslated = true;
-                console.log('Site translation completed');
-                console.log('Page visibility after translation:');
-                document.querySelectorAll('.page').forEach(page => {
-                    console.log(`Page ${page.id}: ${page.classList.contains('active') ? 'active' : 'inactive'}`);
-                });
-                clearTimeout(safetyTimeout);
-                isTranslating = false;
-
-            } catch (error) {
-                console.error('Site translation error:', error);
-                clearTimeout(safetyTimeout);
-                isTranslating = false;
-                // Re-enable button on error
-                const errorButton = document.getElementById('translate-toggle-btn');
-                if (errorButton) {
-                    errorButton.disabled = false;
-                    errorButton.textContent = `${availableLanguages[currentLanguageIndex].flag} ${availableLanguages[currentLanguageIndex].name}`;
-                }
-            }
-        }
 
         async function translateMessage(messageId, text) {
             if (!text || !text.trim()) return;
@@ -2078,7 +2003,7 @@
                     }
                 }
             } catch (error) {
-                console.error('Translation error:', error);
+                // Translation error handled silently
             }
         }
 
@@ -2156,7 +2081,7 @@
                     });
                 }
             } catch (error) {
-                console.error('Batch translation error:', error);
+                // Batch translation error handled silently
             }
         }
 
@@ -2168,8 +2093,23 @@
                 autoTranslateEnabled = autoTranslateCheckbox.checked;
             }
 
-            // Set default page
-            showPage('home');
+            // Check if initial page is set from server
+            const initialPage = '{{ initial_page|default("home") }}';
+            
+            // Check URL hash and show appropriate page
+            const hash = window.location.hash.substring(1); // Remove the '#'
+            if (hash && hash !== 'home') {
+                // Valid page hashes - must match section IDs in HTML
+                const validPages = ['courses', 'forum', 'resources', 'tavi', 'contacts', 'about'];
+                if (validPages.includes(hash)) {
+                    showPage(hash);
+                } else {
+                    showPage(initialPage);
+                }
+            } else {
+                // Show initial page from server or default to home
+                showPage(initialPage);
+            }
 
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status

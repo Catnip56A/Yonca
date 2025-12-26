@@ -91,6 +91,25 @@ class AdminIndexView(AdminIndexView):
                 home_content.logged_out_welcome_title = form.logged_out_welcome_title.data
                 home_content.logged_out_subtitle = form.logged_out_subtitle.data
                 home_content.logged_out_get_started_text = form.logged_out_get_started_text.data
+                
+                # Section content
+                home_content.courses_section_title = form.courses_section_title.data
+                home_content.courses_section_description = form.courses_section_description.data
+                home_content.forum_section_title = form.forum_section_title.data
+                home_content.forum_section_description = form.forum_section_description.data
+                home_content.resources_section_title = form.resources_section_title.data
+                home_content.resources_section_description = form.resources_section_description.data
+                home_content.tavi_test_section_title = form.tavi_test_section_title.data
+                home_content.tavi_test_section_description = form.tavi_test_section_description.data
+                home_content.contacts_section_title = form.contacts_section_title.data
+                home_content.contacts_section_description = form.contacts_section_description.data
+                home_content.about_section_title = form.about_section_title.data
+                home_content.about_section_description = form.about_section_description.data
+                
+                # Branding and navigation
+                home_content.site_name = form.site_name.data
+                home_content.site_logo_url = form.site_logo_url.data
+                
                 home_content.is_active = True  # Always keep home content active
                 print(f"DEBUG: Setting is_active to: True (always active)")
                 
@@ -192,10 +211,39 @@ class AdminIndexView(AdminIndexView):
                 
                 home_content.gallery_images = gallery_images
                 
+                # Process navigation items
+                navigation_items = []
+                
+                # Get all navigation indices from form data (title and url fields)
+                nav_indices = set()
+                for key in form_data.keys():
+                    if key.startswith('nav_title_'):
+                        index = key.replace('nav_title_', '')
+                        nav_indices.add(index)
+                    elif key.startswith('nav_url_'):
+                        index = key.replace('nav_url_', '')
+                        nav_indices.add(index)
+                
+                # Process each navigation index
+                for index in sorted(nav_indices):
+                    title_key = f'nav_title_{index}'
+                    url_key = f'nav_url_{index}'
+                    
+                    title = form_data.get(title_key, '').strip()
+                    url = form_data.get(url_key, '').strip()
+                    
+                    if title and url:  # Only add if both title and url are provided
+                        navigation_items.append({'name': title, 'url': url})
+                
+                # If no navigation items were provided, keep the existing ones
+                if navigation_items:
+                    home_content.navigation_items = navigation_items
+                
                 print(f"DEBUG: About to commit changes to database")
                 print(f"DEBUG: home_content.features: {home_content.features}")
                 print(f"DEBUG: home_content.logged_out_features: {home_content.logged_out_features}")
                 print(f"DEBUG: home_content.gallery_images: {home_content.gallery_images}")
+                print(f"DEBUG: home_content.navigation_items: {home_content.navigation_items}")
                 
                 db.session.commit()
                 print(f"DEBUG: Database commit successful")
@@ -224,6 +272,25 @@ class AdminIndexView(AdminIndexView):
         form.logged_out_welcome_title.data = home_content.logged_out_welcome_title
         form.logged_out_subtitle.data = home_content.logged_out_subtitle
         form.logged_out_get_started_text.data = home_content.logged_out_get_started_text
+        
+        # Section content
+        form.courses_section_title.data = home_content.courses_section_title
+        form.courses_section_description.data = home_content.courses_section_description
+        form.forum_section_title.data = home_content.forum_section_title
+        form.forum_section_description.data = home_content.forum_section_description
+        form.resources_section_title.data = home_content.resources_section_title
+        form.resources_section_description.data = home_content.resources_section_description
+        form.tavi_test_section_title.data = home_content.tavi_test_section_title
+        form.tavi_test_section_description.data = home_content.tavi_test_section_description
+        form.contacts_section_title.data = home_content.contacts_section_title
+        form.contacts_section_description.data = home_content.contacts_section_description
+        form.about_section_title.data = home_content.about_section_title
+        form.about_section_description.data = home_content.about_section_description
+        
+        # Branding and navigation
+        form.site_name.data = home_content.site_name
+        form.site_logo_url.data = home_content.site_logo_url
+        
         form.is_active.data = home_content.is_active
         
         return self.render('admin/index.html', form=form, home_content=home_content)
@@ -262,6 +329,29 @@ class HomeContentForm(FlaskForm):
     logged_out_subtitle = TextAreaField('Subtitle (Logged Out)', [Optional()], default="Join our learning community today!")
     logged_out_get_started_text = StringField('Get Started Text (Logged Out)', [Optional()], default="Sign Up Now")
     
+    # Section content
+    courses_section_title = StringField('Courses Section Title', [Optional()], default="Our Courses")
+    courses_section_description = TextAreaField('Courses Section Description', [Optional()], default="Explore our comprehensive collection of educational courses.")
+    
+    forum_section_title = StringField('Forum Section Title', [Optional()], default="Community Forum")
+    forum_section_description = TextAreaField('Forum Section Description', [Optional()], default="Connect with fellow learners and share knowledge.")
+    
+    resources_section_title = StringField('Resources Section Title', [Optional()], default="Learning Resources")
+    resources_section_description = TextAreaField('Resources Section Description', [Optional()], default="Access learning materials and educational resources.")
+    
+    tavi_test_section_title = StringField('TAVI Test Section Title', [Optional()], default="TAVI Test")
+    tavi_test_section_description = TextAreaField('TAVI Test Section Description', [Optional()], default="Take our interactive assessment.")
+    
+    contacts_section_title = StringField('Contacts Section Title', [Optional()], default="Contact Us")
+    contacts_section_description = TextAreaField('Contacts Section Description', [Optional()], default="Get in touch with us.")
+    
+    about_section_title = StringField('About Section Title', [Optional()], default="About Yonca")
+    about_section_description = TextAreaField('About Section Description', [Optional()], default="Learn about our mission and vision.")
+    
+    # Branding and navigation
+    site_name = StringField('Site Name', [Optional()], default="Yonca")
+    site_logo_url = StringField('Logo URL', [Optional()], default="/static/images/Logo.jpeg")
+    
     is_active = BooleanField('Active', default=True)
 
 class UserView(SecureModelView):
@@ -284,14 +374,167 @@ class UserView(SecureModelView):
             model.password = form.new_password.data
         return super(UserView, self).on_model_change(form, model, is_created)
 
+class CourseForm(FlaskForm):
+    """Form for editing course with dropdown menu management"""
+    title = StringField('Title', [DataRequired()])
+    description = TextAreaField('Description', [Optional()])
+    time_slot = StringField('Time Slot', [Optional()])
+    profile_emoji = StringField('Profile Emoji', [Optional()])
+
 class CourseView(SecureModelView):
-    """Admin view for Course model"""
+    """Admin view for Course model with custom dropdown menu management"""
     column_list = ('id', 'title', 'description', 'time_slot', 'profile_emoji', 'users')
     column_searchable_list = ['title', 'description']
-    form_columns = ('title', 'description', 'time_slot', 'profile_emoji')
+    form = CourseForm
+    form_excluded_columns = ('dropdown_menu',)
     column_formatters = {
         'users': lambda v, c, m, p: ', '.join([user.username for user in m.users]) if m.users else 'None'
     }
+
+    @expose('/edit/', methods=['GET', 'POST'])
+    def edit_view(self, id=None, url=None):
+        """Custom edit view with dropdown menu management"""
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return redirect(url_for('auth.login'))
+
+        # Get id from request args if not provided
+        if id is None:
+            id = request.args.get('id')
+        
+        course = self.get_one(id)
+        if not course:
+            return redirect(url_for('admin.index'))
+
+        if request.method == 'POST':
+            # Handle form submission
+            course.title = request.form.get('title', '')
+            course.description = request.form.get('description', '')
+            course.time_slot = request.form.get('time_slot', '')
+            course.profile_emoji = request.form.get('profile_emoji', '')
+
+            # Course page content
+            course.page_welcome_title = request.form.get('page_welcome_title', '')
+            course.page_subtitle = request.form.get('page_subtitle', '')
+            course.page_description = request.form.get('page_description', '')
+            course.page_show_navigation = 'page_show_navigation' in request.form
+            course.page_show_footer = 'page_show_footer' in request.form
+
+            # Handle dropdown menu items
+            menu_items = []
+            item_count = 0
+
+            while f'menu_text_{item_count}' in request.form:
+                text = request.form.get(f'menu_text_{item_count}', '').strip()
+                icon = request.form.get(f'menu_icon_{item_count}', '').strip()
+                link = request.form.get(f'menu_link_{item_count}', '').strip()
+
+                if text:  # Only add if text is provided
+                    menu_items.append({
+                        'text': text,
+                        'icon': icon,
+                        'url': link
+                    })
+
+                item_count += 1
+
+            course.dropdown_menu = menu_items
+
+            # Handle course page features
+            features = []
+            feature_count = 0
+
+            while f'feature_title_{feature_count}' in request.form:
+                title = request.form.get(f'feature_title_{feature_count}', '').strip()
+                desc = request.form.get(f'feature_desc_{feature_count}', '').strip()
+
+                if title or desc:  # Only add if there's content
+                    features.append({
+                        'title': title,
+                        'description': desc
+                    })
+
+                feature_count += 1
+
+            course.page_features = features
+
+            db.session.commit()
+            flash('Course updated successfully!', 'success')
+            return redirect(url_for('admin.index'))
+
+        # Get existing menu items
+        menu_items = course.dropdown_menu or []
+
+        return self.render('admin/course_edit.html',
+                         course=course,
+                         menu_items=menu_items,
+                         menu_item_count=len(menu_items))
+
+    @expose('/new/', methods=['GET', 'POST'])
+    def create_view(self):
+        """Custom create view with dropdown menu management"""
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return redirect(url_for('auth.login'))
+
+        if request.method == 'POST':
+            course = Course(
+                title=request.form.get('title', ''),
+                description=request.form.get('description', ''),
+                time_slot=request.form.get('time_slot', ''),
+                profile_emoji=request.form.get('profile_emoji', ''),
+                page_welcome_title=request.form.get('page_welcome_title', ''),
+                page_subtitle=request.form.get('page_subtitle', ''),
+                page_description=request.form.get('page_description', ''),
+                page_show_navigation='page_show_navigation' in request.form,
+                page_show_footer='page_show_footer' in request.form
+            )
+
+            # Handle dropdown menu items
+            menu_items = []
+            item_count = 0
+
+            while f'menu_text_{item_count}' in request.form:
+                text = request.form.get(f'menu_text_{item_count}', '').strip()
+                icon = request.form.get(f'menu_icon_{item_count}', '').strip()
+                link = request.form.get(f'menu_link_{item_count}', '').strip()
+
+                if text:  # Only add if text is provided
+                    menu_items.append({
+                        'text': text,
+                        'icon': icon,
+                        'url': link
+                    })
+
+                item_count += 1
+
+            course.dropdown_menu = menu_items
+
+            # Handle course page features
+            features = []
+            feature_count = 0
+
+            while f'feature_title_{feature_count}' in request.form:
+                title = request.form.get(f'feature_title_{feature_count}', '').strip()
+                desc = request.form.get(f'feature_desc_{feature_count}', '').strip()
+
+                if title or desc:  # Only add if there's content
+                    features.append({
+                        'title': title,
+                        'description': desc
+                    })
+
+                feature_count += 1
+
+            course.page_features = features
+
+            db.session.add(course)
+            db.session.commit()
+            flash('Course created successfully!', 'success')
+            return redirect(url_for('admin.index'))
+
+        return self.render('admin/course_edit.html',
+                         course=None,
+                         menu_items=[],
+                         menu_item_count=0)
 
 class ResourceForm(Form):
     """Custom form for resource creation with file upload"""

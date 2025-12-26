@@ -1,0 +1,402 @@
+{% extends 'admin/master.html' %}
+{% block head %}
+{{ super() }}
+<style>
+.menu-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+}
+.menu-item .form-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.menu-item .form-group {
+    flex: 1;
+}
+.menu-item .remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.menu-item .remove-btn:hover {
+    background: #c82333;
+}
+.add-menu-item-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.add-menu-item-btn:hover {
+    background: #218838;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>{% if course %}Edit Course{% else %}Create Course{% endif %}</h1>
+
+    <form method="POST" id="courseForm">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ course.title if course else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ course.description if course else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="time_slot">Time Slot</label>
+            <input type="text" class="form-control" id="time_slot" name="time_slot" value="{{ course.time_slot if course else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="profile_emoji">Profile Emoji</label>
+            <input type="text" class="form-control" id="profile_emoji" name="profile_emoji" value="{{ course.profile_emoji if course else '' }}">
+        </div>
+
+        <h3>Dropdown Menu Items (for non-logged-in users)</h3>
+        <p class="text-muted">Configure the menu items that appear when non-logged-in users click on this course.</p>
+
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+            <strong>💡 URL Suggestions:</strong>
+            <ul style="margin: 10px 0 0 20px;">
+                <li><strong>Internal pages:</strong> /login, /register, /courses, /forum, /resources</li>
+                <li><strong>Page sections:</strong> #contact, #about, #details, #enroll</li>
+                <li><strong>Social media:</strong> https://youtube.com, https://facebook.com, etc.</li>
+                <li><strong>Communication:</strong> mailto:email@example.com, tel:+1234567890</li>
+                <li><strong>External links:</strong> Any full URL starting with https://</li>
+            </ul>
+            <strong>🎨 Icon Suggestions:</strong> 🔐 🔑 📧 💬 📱 📺 📖 🎥 📞 🌐 🔗 📋 ✅ 👥 📄 📅 ⭐<br>
+            <strong>📝 Text Suggestions:</strong> Login to Enroll, View Details, Contact Instructor, Watch Intro Video, etc.
+        </div>
+
+        <div id="menuItems">
+            {% for i in range(menu_item_count) %}
+            <div class="menu-item" data-index="{{ i }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Menu Text</label>
+                        <input type="text" class="form-control" name="menu_text_{{ i }}" value="{{ menu_items[i].text if menu_items and i < menu_items|length else '' }}" placeholder="e.g., Login to Enroll" list="textSuggestions{{ i }}">
+                        <datalist id="textSuggestions{{ i }}">
+                            <option value="Login to Enroll">Login to Enroll</option>
+                            <option value="Sign Up Now">Sign Up Now</option>
+                            <option value="View Details">View Details</option>
+                            <option value="Watch Intro Video">Watch Intro Video</option>
+                            <option value="Contact Instructor">Contact Instructor</option>
+                            <option value="Join Community">Join Community</option>
+                            <option value="Download Syllabus">Download Syllabus</option>
+                            <option value="Schedule Consultation">Schedule Consultation</option>
+                            <option value="View Testimonials">View Testimonials</option>
+                            <option value="Get Started">Get Started</option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon/Emoji</label>
+                        <input type="text" class="form-control" name="menu_icon_{{ i }}" value="{{ menu_items[i].icon if menu_items and i < menu_items|length else '' }}" placeholder="e.g., 🔗 or 📧" list="iconSuggestions{{ i }}">
+                        <datalist id="iconSuggestions{{ i }}">
+                            <option value="🔐">Lock (Login)</option>
+                            <option value="🔑">Key (Access)</option>
+                            <option value="📧">Email</option>
+                            <option value="💬">Chat (Contact)</option>
+                            <option value="📱">Phone</option>
+                            <option value="📺">Video</option>
+                            <option value="📖">Book (Details)</option>
+                            <option value="🎥">Camera (Video)</option>
+                            <option value="📞">Telephone</option>
+                            <option value="🌐">Globe (Web)</option>
+                            <option value="🔗">Link</option>
+                            <option value="📋">Clipboard</option>
+                            <option value="✅">Checkmark</option>
+                            <option value="👥">People (Community)</option>
+                            <option value="📄">Document (Syllabus)</option>
+                            <option value="📅">Calendar (Schedule)</option>
+                            <option value="⭐">Star (Testimonials)</option>
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Link URL</label>
+                        <input type="text" class="form-control" name="menu_link_{{ i }}" value="{{ menu_items[i].url if menu_items and i < menu_items|length else '' }}" placeholder="e.g., /login or #contact" list="urlSuggestions{{ i }}">
+                        <datalist id="urlSuggestions{{ i }}">
+                            <option value="/login">Login Page</option>
+                            <option value="/register">Registration Page</option>
+                            <option value="/#contact">Contact Section</option>
+                            <option value="/#about">About Section</option>
+                            <option value="/courses">Courses Page</option>
+                            <option value="/forum">Forum Page</option>
+                            <option value="/resources">Resources Page</option>
+                            <option value="https://www.youtube.com/">YouTube</option>
+                            <option value="https://www.facebook.com/">Facebook</option>
+                            <option value="https://www.instagram.com/">Instagram</option>
+                            <option value="https://www.linkedin.com/">LinkedIn</option>
+                            <option value="https://wa.me/">WhatsApp</option>
+                            <option value="https://t.me/">Telegram</option>
+                            <option value="mailto:">Email</option>
+                            <option value="tel:">Phone Call</option>
+                            <option value="#details">Show Course Details</option>
+                            <option value="#enroll">Scroll to Enrollment</option>
+                            <option value="/{description}">Course Detail Page</option>
+                        </datalist>
+                        <small class="form-text text-muted">Use <code>{description}</code> for course-specific URLs (e.g., <code>/{description}</code> becomes <code>/course-name-1</code>)</small>
+                    </div>
+                    <button type="button" class="remove-btn" onclick="removeMenuItem(this)">Remove</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="add-menu-item-btn" onclick="addMenuItem()">+ Add Menu Item</button>
+
+        <h3 style="margin-top: 40px; border-top: 2px solid #dee2e6; padding-top: 20px;">Course Page Content</h3>
+        <p class="text-muted">Configure the content that appears on the course detail page (activated by <code>{description}</code> URLs).</p>
+
+        <div class="form-group">
+            <label for="page_welcome_title">Page Welcome Title</label>
+            <input type="text" class="form-control" id="page_welcome_title" name="page_welcome_title"
+                   value="{{ course.page_welcome_title if course and course.page_welcome_title else '' }}"
+                   placeholder="e.g., Welcome to {{ course.title }}">
+            <small class="form-text text-muted">Leave empty to use course title as welcome message</small>
+        </div>
+
+        <div class="form-group">
+            <label for="page_subtitle">Page Subtitle</label>
+            <input type="text" class="form-control" id="page_subtitle" name="page_subtitle"
+                   value="{{ course.page_subtitle if course and course.page_subtitle else '' }}"
+                   placeholder="e.g., Start your learning journey today">
+        </div>
+
+        <div class="form-group">
+            <label for="page_description">Page Description</label>
+            <textarea class="form-control" id="page_description" name="page_description" rows="4"
+                      placeholder="Detailed description of what students will learn in this course">{{ course.page_description if course and course.page_description else '' }}</textarea>
+        </div>
+
+        <h4>Course Features</h4>
+        <div id="courseFeatures">
+            {% if course and course.page_features %}
+                {% for feature in course.page_features %}
+                <div class="menu-item" data-index="{{ loop.index0 }}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Feature Title</label>
+                            <input type="text" class="form-control" name="feature_title_{{ loop.index0 }}"
+                                   value="{{ feature.title }}" placeholder="e.g., Interactive Learning">
+                        </div>
+                        <div class="form-group">
+                            <label>Feature Description</label>
+                            <textarea class="form-control" name="feature_desc_{{ loop.index0 }}" rows="2"
+                                      placeholder="Describe this feature">{{ feature.description }}</textarea>
+                        </div>
+                        <button type="button" class="remove-btn" onclick="removeFeature(this)">Remove</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <button type="button" class="add-menu-item-btn" onclick="addFeature()">+ Add Feature</button>
+
+        <div class="form-group" style="margin-top: 20px;">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="page_show_navigation" name="page_show_navigation"
+                       {% if course and course.page_show_navigation %}checked{% endif %}>
+                <label class="form-check-label" for="page_show_navigation">
+                    Show navigation menu on course page
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="page_show_footer" name="page_show_footer"
+                       {% if course and course.page_show_footer %}checked{% endif %}>
+                <label class="form-check-label" for="page_show_footer">
+                    Show footer on course page
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">{% if course %}Update Course{% else %}Create Course{% endif %}</button>
+            <a href="{{ url_for('admin.index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+let menuItemCount = {{ menu_item_count }};
+let featureCount = {{ course.page_features|length if course and course.page_features else 0 }};
+
+function addMenuItem() {
+    const container = document.getElementById('menuItems');
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'menu-item';
+    itemDiv.setAttribute('data-index', menuItemCount);
+    itemDiv.innerHTML = `
+        <div class="form-row">
+            <div class="form-group">
+                <label>Menu Text</label>
+                <input type="text" class="form-control" name="menu_text_${menuItemCount}" placeholder="e.g., Login to Enroll" list="textSuggestions${menuItemCount}">
+                <datalist id="textSuggestions${menuItemCount}">
+                    <option value="Login to Enroll">Login to Enroll</option>
+                    <option value="Sign Up Now">Sign Up Now</option>
+                    <option value="View Details">View Details</option>
+                    <option value="Watch Intro Video">Watch Intro Video</option>
+                    <option value="Contact Instructor">Contact Instructor</option>
+                    <option value="Join Community">Join Community</option>
+                    <option value="Download Syllabus">Download Syllabus</option>
+                    <option value="Schedule Consultation">Schedule Consultation</option>
+                    <option value="View Testimonials">View Testimonials</option>
+                    <option value="Get Started">Get Started</option>
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label>Icon/Emoji</label>
+                <input type="text" class="form-control" name="menu_icon_${menuItemCount}" placeholder="e.g., 🔗 or 📧" list="iconSuggestions${menuItemCount}">
+                <datalist id="iconSuggestions${menuItemCount}">
+                    <option value="🔐">Lock (Login)</option>
+                    <option value="🔑">Key (Access)</option>
+                    <option value="📧">Email</option>
+                    <option value="💬">Chat (Contact)</option>
+                    <option value="📱">Phone</option>
+                    <option value="📺">Video</option>
+                    <option value="📖">Book (Details)</option>
+                    <option value="🎥">Camera (Video)</option>
+                    <option value="📞">Telephone</option>
+                    <option value="🌐">Globe (Web)</option>
+                    <option value="🔗">Link</option>
+                    <option value="📋">Clipboard</option>
+                    <option value="✅">Checkmark</option>
+                    <option value="👥">People (Community)</option>
+                    <option value="📄">Document (Syllabus)</option>
+                    <option value="📅">Calendar (Schedule)</option>
+                    <option value="⭐">Star (Testimonials)</option>
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label>Link URL</label>
+                <input type="text" class="form-control" name="menu_link_${menuItemCount}" placeholder="e.g., /login or #contact" list="urlSuggestions${menuItemCount}">
+                <datalist id="urlSuggestions${menuItemCount}">
+                    <option value="/login">Login Page</option>
+                    <option value="/register">Registration Page</option>
+                    <option value="/#contact">Contact Section</option>
+                    <option value="/#about">About Section</option>
+                    <option value="/courses">Courses Page</option>
+                    <option value="/forum">Forum Page</option>
+                    <option value="/resources">Resources Page</option>
+                    <option value="https://www.youtube.com/">YouTube</option>
+                    <option value="https://www.facebook.com/">Facebook</option>
+                    <option value="https://www.instagram.com/">Instagram</option>
+                    <option value="https://www.linkedin.com/">LinkedIn</option>
+                    <option value="https://wa.me/">WhatsApp</option>
+                    <option value="https://t.me/">Telegram</option>
+                    <option value="mailto:">Email</option>
+                    <option value="tel:">Phone Call</option>
+                    <option value="#details">Show Course Details</option>
+                    <option value="#enroll">Scroll to Enrollment</option>
+                    <option value="/{description}">Course Detail Page</option>
+                </datalist>
+                <small class="form-text text-muted">Use <code>{description}</code> for course-specific URLs (e.g., <code>/{description}</code> becomes <code>/course-name-1</code>)</small>
+            </div>
+            <button type="button" class="remove-btn" onclick="removeMenuItem(this)">Remove</button>
+        </div>
+    `;
+    container.appendChild(itemDiv);
+    menuItemCount++;
+}
+
+function removeMenuItem(button) {
+    const itemDiv = button.closest('.menu-item');
+    itemDiv.remove();
+    // Re-index remaining items
+    const items = document.querySelectorAll('#menuItems .menu-item');
+    items.forEach((item, index) => {
+        item.setAttribute('data-index', index);
+        const inputs = item.querySelectorAll('input');
+        inputs.forEach(input => {
+            const nameParts = input.name.split('_');
+            if (nameParts.length >= 3) {
+                input.name = `${nameParts[0]}_${nameParts[1]}_${index}`;
+            }
+        });
+    });
+    menuItemCount = items.length;
+}
+
+function addFeature() {
+    const container = document.getElementById('courseFeatures');
+    const featureDiv = document.createElement('div');
+    featureDiv.className = 'menu-item';
+    featureDiv.setAttribute('data-index', featureCount);
+    featureDiv.innerHTML = `
+        <div class="form-row">
+            <div class="form-group">
+                <label>Feature Title</label>
+                <input type="text" class="form-control" name="feature_title_${featureCount}"
+                       placeholder="e.g., Interactive Learning">
+            </div>
+            <div class="form-group">
+                <label>Feature Description</label>
+                <textarea class="form-control" name="feature_desc_${featureCount}" rows="2"
+                          placeholder="Describe this feature"></textarea>
+            </div>
+            <button type="button" class="remove-btn" onclick="removeFeature(this)">Remove</button>
+        </div>
+    `;
+    container.appendChild(featureDiv);
+    featureCount++;
+}
+
+function removeFeature(button) {
+    const itemDiv = button.closest('.menu-item');
+    itemDiv.remove();
+    // Re-index remaining items
+    const items = document.querySelectorAll('#courseFeatures .menu-item');
+    items.forEach((item, index) => {
+        item.setAttribute('data-index', index);
+        const inputs = item.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            const nameParts = input.name.split('_');
+            if (nameParts.length >= 3) {
+                input.name = `${nameParts[0]}_${nameParts[1]}_${index}`;
+            }
+        });
+    });
+    featureCount = items.length;
+}
+
+// Add some default menu items if none exist
+document.addEventListener('DOMContentLoaded', function() {
+    if (menuItemCount === 0) {
+        addMenuItem();
+        // Set default values for the first item
+        const firstItem = document.querySelector('.menu-item');
+        if (firstItem) {
+            firstItem.querySelector('input[name*="text"]').value = 'Login to Enroll';
+            firstItem.querySelector('input[name*="icon"]').value = '🔐';
+            firstItem.querySelector('input[name*="link"]').value = '/login';
+        }
+    }
+
+    // Add default features if none exist
+    if (featureCount === 0) {
+        addFeature();
+        // Set default values for the first feature
+        const firstFeature = document.querySelector('#courseFeatures .menu-item');
+        if (firstFeature) {
+            firstFeature.querySelector('input[name*="title"]').value = 'Interactive Learning';
+            firstFeature.querySelector('textarea[name*="desc"]').value = 'Engage with dynamic course content and interactive exercises.';
+        }
+    }
+});
+</script>
+{% endblock %}

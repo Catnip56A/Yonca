@@ -58,6 +58,25 @@ class Course(db.Model):
     description = db.Column(db.Text)
     time_slot = db.Column(db.String(100))
     profile_emoji = db.Column(db.String(10))
+    # Dropdown menu items for non-logged-in users (configurable in admin)
+    dropdown_menu = db.Column(db.JSON, default=[
+        {"text": "Login to Enroll", "icon": "🔐", "url": "/login"},
+        {"text": "View Details", "icon": "📖", "url": "#"},
+        {"text": "Contact Us", "icon": "💬", "url": "/#contact"}
+    ])
+
+    # Course page content (managed by admin)
+    page_welcome_title = db.Column(db.String(200), default="")
+    page_subtitle = db.Column(db.String(500), default="")
+    page_description = db.Column(db.Text, default="")
+    page_features = db.Column(db.JSON, default=[
+        {"title": "Interactive Learning", "description": "Engage with dynamic course content and interactive exercises."},
+        {"title": "Expert Guidance", "description": "Learn from industry professionals and experienced educators."},
+        {"title": "Community Support", "description": "Connect with fellow learners and get help when you need it."}
+    ])
+    page_gallery_images = db.Column(db.JSON, default=[])
+    page_show_navigation = db.Column(db.Boolean, default=True)
+    page_show_footer = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<Course {self.title}>'
@@ -159,11 +178,45 @@ class HomeContent(db.Model):
         {"title": "Sign Up", "description": "Create your account to get started."}
     ])
     # Gallery images
-    gallery_images = db.Column(db.JSON, default=[
-        {"url": "https://via.placeholder.com/400x250/abc32f/ffffff?text=Learning+Community", "alt": "Learning Community", "caption": "Our vibrant learning community"},
-        {"url": "https://via.placeholder.com/400x250/4a90e2/ffffff?text=Interactive+Courses", "alt": "Interactive Courses", "caption": "Engage with interactive course content"},
-        {"url": "https://via.placeholder.com/400x250/7ed321/ffffff?text=Study+Groups", "alt": "Study Groups", "caption": "Collaborate in study groups"}
+    gallery_images = db.Column(db.JSON, default=[])
+    
+    # Section-specific content
+    courses_section_title = db.Column(db.String(200), default="Our Courses")
+    courses_section_description = db.Column(db.Text, default="Explore our comprehensive collection of educational courses designed to help you learn and grow.")
+    
+    forum_section_title = db.Column(db.String(200), default="Community Forum")
+    forum_section_description = db.Column(db.Text, default="Connect with fellow learners, share knowledge, and get help from our active community.")
+    
+    resources_section_title = db.Column(db.String(200), default="Learning Resources")
+    resources_section_description = db.Column(db.Text, default="Access a comprehensive library of learning materials, guides, and educational resources.")
+    
+    tavi_test_section_title = db.Column(db.String(200), default="TAVI Test")
+    tavi_test_section_description = db.Column(db.Text, default="Take our interactive assessment to discover your learning style and get personalized recommendations.")
+    
+    contacts_section_title = db.Column(db.String(200), default="Contact Us")
+    contacts_section_description = db.Column(db.Text, default="Get in touch with us for support, questions, or collaboration opportunities.")
+    contact_info = db.Column(db.JSON, default={
+        "whatsapp": "+994 51 623 73 94",
+        "email": "info@yonca.az",
+        "address": "Baku, Azerbaijan"
+    })
+    
+    about_section_title = db.Column(db.String(200), default="About Yonca")
+    about_section_description = db.Column(db.Text, default="Yonca is a comprehensive learning platform dedicated to providing quality education and fostering a supportive learning community.")
+    
+    # Navigation and branding
+    site_logo_url = db.Column(db.String(500), default="/static/images/Logo.jpeg")
+    site_name = db.Column(db.String(200), default="Yonca")
+    navigation_items = db.Column(db.JSON, default=[
+        {"name": "Home", "url": "/", "active": True},
+        {"name": "Courses", "url": "/#courses", "active": True},
+        {"name": "Forum", "url": "/#forum", "active": True},
+        {"name": "Resources", "url": "/#resources", "active": True},
+        {"name": "TAVI Test", "url": "/#tavi", "active": True},
+        {"name": "Contacts", "url": "/#contacts", "active": True},
+        {"name": "About", "url": "/#about", "active": True}
     ])
+    
     is_active = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
