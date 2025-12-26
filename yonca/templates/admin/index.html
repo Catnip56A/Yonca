@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/master.html' %}
 {% block head %}
 {{ super() }}
 <style>
@@ -195,6 +195,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
+            <div style="margin-bottom: 20px;">
+                <a href="/" class="btn btn-success" style="float: right;">
+                    <i class="fa fa-home"></i> Return to Site
+                </a>
+            </div>
             <h1><i class="fa fa-magic"></i> Home Page Builder</h1>
             <p class="text-muted">Design your home page with our intuitive drag-and-drop builder</p>
         </div>
@@ -326,9 +331,22 @@
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="site_logo_url">Logo URL:</label>
-                        <input type="url" id="site_logo_url" name="site_logo_url" class="form-control"
-                               value="{{ form.site_logo_url.data or '' }}" placeholder="https://example.com/logo.png">
+                        <label for="site_logo_file">Site Logo:</label>
+                        <div class="file-upload-group">
+                            <input type="file" id="site_logo_file" name="site_logo_file" class="form-control-file" accept="image/*">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="uploadLogo()" id="upload_logo_btn">Upload Logo</button>
+                            <span id="logo_upload_status" class="ml-2"></span>
+                            {% if home_content.site_logo_url %}
+                            <div class="mt-2">
+                                <small class="text-success">✓ Current logo:</small><br>
+                                <img src="{{ home_content.site_logo_url }}" alt="Current logo" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd;">
+                            </div>
+                            {% else %}
+                            <div class="mt-2">
+                                <small class="text-muted">No logo uploaded</small>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -336,9 +354,11 @@
                 <div class="content-section">
                     <div class="section-header">
                         <h4 class="section-title"><i class="fa fa-bars"></i> Navigation Menu</h4>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-nav-item">
-                            <i class="fa fa-plus"></i> Add Menu Item
-                        </button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="add-nav-item">
+                                <i class="fa fa-plus"></i> Add Menu Item
+                            </button>
+                        </div>
                     </div>
 
                     <div id="navigation-container">
@@ -1160,6 +1180,72 @@ function updatePreviewFeatures() {
             `;
             loggedOutPreview.appendChild(featureDiv);
         }
+    });
+}
+
+// Logo upload function
+function uploadLogo() {
+    const fileInput = document.getElementById('site_logo_file');
+    const uploadBtn = document.getElementById('upload_logo_btn');
+    const statusSpan = document.getElementById('logo_upload_status');
+    const fileUploadGroup = fileInput.closest('.file-upload-group');
+
+    if (!fileInput.files[0]) {
+        statusSpan.textContent = 'Please select a file first';
+        statusSpan.className = 'ml-2 text-warning';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    uploadBtn.disabled = true;
+    statusSpan.textContent = 'Uploading...';
+    statusSpan.className = 'ml-2 text-info';
+
+    fetch('/api/logo/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update or create hidden input to store the logo URL
+            let hiddenInput = fileUploadGroup.querySelector('input[type="hidden"][name="site_logo_url"]');
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'site_logo_url';
+                fileUploadGroup.appendChild(hiddenInput);
+            }
+            hiddenInput.value = data.image_url;
+
+            // Update status and show preview
+            statusSpan.textContent = 'Upload successful!';
+            statusSpan.className = 'ml-2 text-success';
+
+            // Update the status div
+            const statusDiv = fileUploadGroup.querySelector('.mt-2');
+            statusDiv.innerHTML = `
+                <small class="text-success">✓ Logo uploaded</small>
+                <br>
+                <img src="${data.image_url}" alt="Site logo" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd;">
+            `;
+
+            // Clear file input
+            fileInput.value = '';
+        } else {
+            statusSpan.textContent = 'Upload failed: ' + data.error;
+            statusSpan.className = 'ml-2 text-danger';
+        }
+    })
+    .catch(error => {
+        console.error('Upload error:', error);
+        statusSpan.textContent = 'Upload failed';
+        statusSpan.className = 'ml-2 text-danger';
+    })
+    .finally(() => {
+        uploadBtn.disabled = false;
     });
 }
 </script>

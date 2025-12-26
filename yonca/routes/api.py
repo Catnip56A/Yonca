@@ -621,3 +621,40 @@ def upload_feature_image():
         })
 
     return jsonify({'error': 'Invalid file type'}), 400
+
+@api_bp.route('/logo/upload', methods=['POST'])
+@login_required
+def upload_logo():
+    """Upload site logo"""
+    if not current_user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}):
+        # Create uploads directory if it doesn't exist
+        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'logo')
+        os.makedirs(upload_dir, exist_ok=True)
+
+        # Generate unique filename
+        filename = secure_filename(file.filename)
+        name, ext = os.path.splitext(filename)
+        unique_filename = f"logo_{int(time.time())}{ext}"
+        file_path = os.path.join(upload_dir, unique_filename)
+
+        file.save(file_path)
+
+        # Return the URL path for the uploaded logo
+        image_url = f"/static/uploads/logo/{unique_filename}"
+        return jsonify({
+            'success': True,
+            'image_url': image_url,
+            'filename': unique_filename
+        })
+    else:
+        return jsonify({'error': 'Invalid file type. Only images are allowed.'}), 400

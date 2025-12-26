@@ -80,7 +80,8 @@ def create_app(config_name='development'):
     Session(app)
     
     # Initialize admin interface
-    init_admin(app)
+    admin = init_admin(app)
+    app.admin = admin
     
     # Register blueprints
     app.register_blueprint(auth_bp)

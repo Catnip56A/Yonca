@@ -16,6 +16,18 @@ from yonca.models import User, Course, ForumMessage, ForumChannel, TaviTest, Res
 class AdminIndexView(AdminIndexView):
     """Custom admin index view with authentication and home content management"""
     
+    def render(self, template, **kwargs):
+        """Override render to ensure admin_base_template is set"""
+        if 'admin_base_template' not in kwargs:
+            # Get base template from theme, with fallback
+            try:
+                base_template = self.admin.theme.base_template
+            except AttributeError:
+                # Fallback to default Flask-Admin base template
+                base_template = 'admin/base.html'
+            kwargs['admin_base_template'] = base_template
+        return super().render(template, **kwargs)
+    
     @expose('/', methods=['GET', 'POST'])
     def index(self):
         if not current_user.is_authenticated or not current_user.is_admin:
@@ -108,7 +120,12 @@ class AdminIndexView(AdminIndexView):
                 
                 # Branding and navigation
                 home_content.site_name = form.site_name.data
-                home_content.site_logo_url = form.site_logo_url.data
+                
+                # Handle logo upload
+                logo_url = request.form.get('site_logo_url')
+                if logo_url:
+                    home_content.site_logo_url = logo_url
+                # If no new logo uploaded, keep existing one
                 
                 home_content.is_active = True  # Always keep home content active
                 print(f"DEBUG: Setting is_active to: True (always active)")
@@ -317,6 +334,21 @@ class LogoutView(BaseView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
+class CourseManagementView(BaseView):
+    """Custom view for managing course pages"""
+    
+    @expose('/')
+    def index(self):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return redirect(url_for('auth.login'))
+        
+        # Fetch all courses
+        courses = Course.query.all()
+        return self.render('admin/course_management.html', courses=courses)
+    
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
+
 class HomeContentForm(FlaskForm):
     """Form for editing home content"""
     # Logged-in user content
@@ -350,7 +382,7 @@ class HomeContentForm(FlaskForm):
     
     # Branding and navigation
     site_name = StringField('Site Name', [Optional()], default="Yonca")
-    site_logo_url = StringField('Logo URL', [Optional()], default="/static/images/Logo.jpeg")
+    site_logo_url = StringField('Logo URL', [Optional()])
     
     is_active = BooleanField('Active', default=True)
 
@@ -358,7 +390,7 @@ class UserView(SecureModelView):
     """Admin view for User model with password management"""
     column_list = ('id', 'username', 'email', 'is_admin', 'courses')
     column_searchable_list = ['username', 'email']
-    form_columns = ('username', 'email', 'is_admin', 'courses', 'new_password')
+    form_columns = ('username', 'email', 'is_admin', 'is_teacher', 'courses', 'new_password')
     form_excluded_columns = ('_password', 'password')
     column_formatters = {
         'courses': lambda v, c, m, p: ', '.join([course.title for course in m.courses]) if m.courses else 'None'
@@ -607,6 +639,7 @@ def init_admin(app):
     admin = Admin(app, name='Yonca Admin', index_view=AdminIndexView())
     admin.add_view(UserView(User, db.session))
     admin.add_view(CourseView(Course, db.session))
+    admin.add_view(CourseManagementView(name='Course Management', endpoint='course_management'))
     admin.add_view(ForumChannelView(ForumChannel, db.session))
     admin.add_view(SecureModelView(ForumMessage, db.session))
     admin.add_view(ResourceView(Resource, db.session))

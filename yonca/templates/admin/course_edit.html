@@ -45,6 +45,11 @@
 
 {% block body %}
 <div class="container">
+    <div style="margin-bottom: 20px;">
+        <a href="/" class="btn btn-success" style="float: right;">
+            <i class="fa fa-home"></i> Return to Site
+        </a>
+    </div>
     <h1>{% if course %}Edit Course{% else %}Create Course{% endif %}</h1>
 
     <form method="POST" id="courseForm">

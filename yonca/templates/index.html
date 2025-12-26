@@ -44,9 +44,11 @@
 
         .white-overlay {
             background: #fff;
-            height: 66vh;
+            min-height: 66vh; /* keep initial visual height but allow expansion */
+            height: auto;
             overflow: visible;
             border-radius: 20px;
+            padding: 24px; /* give inner content breathing room */
         }
 
         .logo {
@@ -1048,7 +1050,7 @@
             const availableCoursesText = "{{ _('Available Courses') }}";
             
             try {
-                const response = await fetch(`${API_BASE}/api/courses`);
+                const response = await fetch(`${API_BASE}/api/courses`, { cache: 'no-store', credentials: 'include' });
                 const courses = await response.json();
 
                 // Clear both grids
@@ -1081,6 +1083,7 @@
                     } else {
                         enrolledSection.style.display = 'none';
                         availableTitle.textContent = '{{ _("Available Courses") }}';
+
                     }
                 } else {
                     // For non-authenticated users, all courses are "available"
@@ -1219,7 +1222,7 @@
                         .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
                         .trim();
                     menuItems = [
-                        { text: '{{ _("Enroll Now") }}', icon: '✅', url: '/course/' + courseSlug + '-' + course.id },
+                        { text: '{{ _("Enroll Now") }}', icon: '✅', url: 'https://epoint.az/yonca-psychological-support-and-development-center' },
                         { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
                     ];
                 }
@@ -1323,6 +1326,20 @@
                 document.querySelectorAll('.course-dropdown').forEach(dropdown => {
                     dropdown.style.display = 'none';
                 });
+            }
+        });
+        // Ensure we re-check auth and reload courses when the page is shown (covers reload and bfcache restores)
+        window.addEventListener('pageshow', (event) => {
+            // If the page was persisted in bfcache or it's a manual reload, re-fetch user and courses
+            try {
+                window.currentUser = undefined;
+                checkUser();
+                // Only call loadCourses if the courses section exists on the page
+                if (document.getElementById('courses')) {
+                    loadCourses();
+                }
+            } catch (e) {
+                console.warn('pageshow handler error', e);
             }
         });
 

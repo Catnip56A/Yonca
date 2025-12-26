@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     _password = db.Column('password', db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_teacher = db.Column(db.Boolean, default=False)
     preferred_language = db.Column(db.String(10), default='en')  # User's preferred language for translations
     courses = db.relationship('Course', secondary=user_courses, backref=db.backref('users', lazy='select'))
 
@@ -111,6 +112,22 @@ class ForumChannel(db.Model):
 
     def __repr__(self):
         return f'<ForumChannel {self.name} ({self.slug})>'
+
+
+class CourseAssignmentSubmission(db.Model):
+    """Assignment submission model for student uploads"""
+    id = db.Column(db.Integer, primary_key=True)
+    assignment_id = db.Column(db.Integer, db.ForeignKey('course_assignment.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    file_path = db.Column(db.String(300), nullable=False)
+    submitted_at = db.Column(db.DateTime, server_default=db.func.now())
+    grade = db.Column(db.Integer, nullable=True)
+    comment = db.Column(db.Text, nullable=True)
+    assignment = db.relationship('CourseAssignment', backref=db.backref('submissions', lazy='dynamic'))
+    user = db.relationship('User')
+
+    def __repr__(self):
+        return f'<CourseAssignmentSubmission {self.id}>'
 
 class Resource(db.Model):
     """Resource model for learning materials"""
@@ -237,4 +254,84 @@ class Translation(db.Model):
     )
 
     def __repr__(self):
-        return f'<Translation {self.source_language}->{self.target_language}: {self.source_text[:50]}...>'
+        return f'<Translation {self.source_language}->{self.target_language}: {self.source_text[:50]}>'
+
+class CourseContent(db.Model):
+    """Course content modules/sections"""
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    content_type = db.Column(db.String(50), default='text')  # text, video, file, link
+    content_data = db.Column(db.Text)  # URL, file path, or text content
+    order = db.Column(db.Integer, default=0)
+    is_published = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
+    course = db.relationship('Course', backref=db.backref('contents', lazy='dynamic'))
+    folder_id = db.Column(db.Integer, db.ForeignKey('course_content_folder.id'), nullable=True)
+    folder = db.relationship('CourseContentFolder', backref=db.backref('items', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<CourseContent {self.title}>'
+
+class CourseContentFolder(db.Model):
+    """Folders for organizing course content"""
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    order = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    course = db.relationship('Course', backref=db.backref('content_folders', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<CourseContentFolder {self.title}>'
+
+class CourseAssignment(db.Model):
+    """Course assignments"""
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    due_date = db.Column(db.DateTime)
+    points = db.Column(db.Integer, default=100)
+    is_published = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
+    course = db.relationship('Course', backref=db.backref('assignments', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<CourseAssignment {self.title}>'
+
+class CourseAnnouncement(db.Model):
+    """Course announcements/messages"""
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    is_published = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    
+    course = db.relationship('Course', backref=db.backref('announcements', lazy='dynamic'))
+    author = db.relationship('User')
+    
+    def __repr__(self):
+        return f'<CourseAnnouncement {self.title}>'
+
+class CourseAnnouncementReply(db.Model):
+    """Replies/messages sent to course announcements"""
+    id = db.Column(db.Integer, primary_key=True)
+    announcement_id = db.Column(db.Integer, db.ForeignKey('course_announcement.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    parent_reply_id = db.Column(db.Integer, db.ForeignKey('course_announcement_reply.id'), nullable=True)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    announcement = db.relationship('CourseAnnouncement', backref=db.backref('replies', lazy='dynamic'))
+    user = db.relationship('User')
+    parent_reply = db.relationship('CourseAnnouncementReply', remote_side=[id], backref=db.backref('child_replies', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<CourseAnnouncementReply {self.id}>'
