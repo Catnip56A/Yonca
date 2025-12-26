@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - Student Menu{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .student-menu {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .course-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .course-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .course-description {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .menu-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .menu-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+
+    .menu-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .menu-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .menu-description {
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .back-button {
+        display: inline-block;
+        margin-bottom: 2rem;
+        padding: 0.75rem 1.5rem;
+        background: #f8f9fa;
+        color: #333;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        background: #e9ecef;
+        color: #000;
+    }
+
+    .enrollment-status {
+        background: #d4edda;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border: 1px solid #c3e6cb;
+    }
+
+    .enrollment-status.not-enrolled {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="student-menu">
+    <a href="/" class="back-button">← Back to Home</a>
+
+    <div class="course-header">
+        <div class="course-title">{{ course.title }}</div>
+        <div class="course-description">{{ course.description or 'Welcome to this course!' }}</div>
+        {% if course.time_slot %}
+        <div style="font-size: 1rem; opacity: 0.8;">🕐 {{ course.time_slot }}</div>
+        {% endif %}
+    </div>
+
+    <div class="enrollment-status">
+        <strong>✓ You are enrolled in this course</strong><br>
+        Access all course materials, assignments, and resources below.
+    </div>
+
+    <div class="menu-grid">
+        <a href="/forum" class="menu-card">
+            <div class="menu-icon">💬</div>
+            <div class="menu-title">Course Forum</div>
+            <div class="menu-description">Discuss topics with fellow students and instructors. Get help with assignments and share insights.</div>
+        </a>
+
+        <a href="/resources" class="menu-card">
+            <div class="menu-icon">📚</div>
+            <div class="menu-title">Learning Resources</div>
+            <div class="menu-description">Access course materials, PDFs, videos, and additional learning resources.</div>
+        </a>
+
+        <a href="#assignments" class="menu-card">
+            <div class="menu-icon">📝</div>
+            <div class="menu-title">Assignments</div>
+            <div class="menu-description">View and submit assignments, track your progress, and get feedback from instructors.</div>
+        </a>
+
+        <a href="#grades" class="menu-card">
+            <div class="menu-icon">📊</div>
+            <div class="menu-title">Grades & Progress</div>
+            <div class="menu-description">Check your grades, view progress reports, and track your learning achievements.</div>
+        </a>
+
+        <a href="#schedule" class="menu-card">
+            <div class="menu-icon">📅</div>
+            <div class="menu-title">Course Schedule</div>
+            <div class="menu-description">View upcoming classes, deadlines, and important course dates.</div>
+        </a>
+
+        <a href="#profile" class="menu-card">
+            <div class="menu-icon">👤</div>
+            <div class="menu-title">My Profile</div>
+            <div class="menu-description">Update your profile, view certificates, and manage your account settings.</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -61,8 +61,7 @@ class Course(db.Model):
     # Dropdown menu items for non-logged-in users (configurable in admin)
     dropdown_menu = db.Column(db.JSON, default=[
         {"text": "Login to Enroll", "icon": "🔐", "url": "/login"},
-        {"text": "View Details", "icon": "📖", "url": "#"},
-        {"text": "Contact Us", "icon": "💬", "url": "/#contact"}
+        {"text": "View Details", "icon": "📖", "url": "#"}
     ])
 
     # Course page content (managed by admin)
@@ -70,9 +69,9 @@ class Course(db.Model):
     page_subtitle = db.Column(db.String(500), default="")
     page_description = db.Column(db.Text, default="")
     page_features = db.Column(db.JSON, default=[
-        {"title": "Interactive Learning", "description": "Engage with dynamic course content and interactive exercises."},
-        {"title": "Expert Guidance", "description": "Learn from industry professionals and experienced educators."},
-        {"title": "Community Support", "description": "Connect with fellow learners and get help when you need it."}
+        {"title": "Interactive Learning", "description": "Engage with dynamic course content and interactive exercises.", "image": ""},
+        {"title": "Expert Guidance", "description": "Learn from industry professionals and experienced educators.", "image": ""},
+        {"title": "Community Support", "description": "Connect with fellow learners and get help when you need it.", "image": ""}
     ])
     page_gallery_images = db.Column(db.JSON, default=[])
     page_show_navigation = db.Column(db.Boolean, default=True)

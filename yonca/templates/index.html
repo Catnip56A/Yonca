@@ -448,6 +448,16 @@
             transform: translateY(2px);
         }
 
+        .resource-card.course-card.enrolled-course {
+            border-left: 4px solid #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02));
+        }
+
+        .resource-card.course-card.enrolled-course:hover {
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.15);
+            border-left-color: #059669;
+        }
+
         .dropdown-indicator {
             transition: all 0.3s ease;
             font-weight: bold;
@@ -733,8 +743,21 @@
         <section id="courses" class="page">
             <h2 class="section-title">{{ _('Courses') }}</h2>
             <p>{{ _('Explore our available courses and start your learning journey.') }}</p>
-            <div class="courses-grid">
-                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading courses...') }}</p>
+
+            <!-- Enrolled Courses Section (shown only for authenticated users) -->
+            <div id="enrolled-courses-section" style="display: none;">
+                <h3 style="color: #10b981; margin-top: 2rem; margin-bottom: 1rem;">{{ _('My Enrolled Courses') }}</h3>
+                <div class="courses-grid enrolled-courses-grid">
+                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses...') }}</p>
+                </div>
+            </div>
+
+            <!-- Available Courses Section -->
+            <div id="available-courses-section">
+                <h3 id="available-courses-title" style="margin-top: 2rem; margin-bottom: 1rem;">{{ _('Available Courses') }}</h3>
+                <div class="courses-grid available-courses-grid">
+                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading courses...') }}</p>
+                </div>
             </div>
         </section>
 
@@ -1004,6 +1027,8 @@
             if (pageId === 'courses') {
                 console.log('Loading courses...');
                 loadCourses();
+                // Refresh dropdowns in case they were populated before auth check completed
+                setTimeout(() => refreshCourseDropdowns(), 100);
             } else if (pageId === 'forum') {
                 console.log('Loading forum...');
                 loadForumChannels();
@@ -1017,159 +1042,255 @@
 
         // Load courses
         async function loadCourses() {
+            // Define translated strings to avoid Jinja2 conflicts in JavaScript
+            const enrolledAllCoursesText = "{{ _('You\'re enrolled in all available courses!') }}";
+            const errorLoadingCoursesText = "{{ _('Error loading courses. Please try again.') }}";
+            const availableCoursesText = "{{ _('Available Courses') }}";
+            
             try {
                 const response = await fetch(`${API_BASE}/api/courses`);
                 const courses = await response.json();
-                const coursesGrid = document.querySelector('.courses-grid');
-                coursesGrid.innerHTML = '';
+
+                // Clear both grids
+                const enrolledGrid = document.querySelector('.enrolled-courses-grid');
+                const availableGrid = document.querySelector('.available-courses-grid');
+                const enrolledSection = document.getElementById('enrolled-courses-section');
+                const availableTitle = document.getElementById('available-courses-title');
+
+                enrolledGrid.innerHTML = '';
+                availableGrid.innerHTML = '';
 
                 if (courses.length === 0) {
-                    coursesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No courses available at the moment.") }}</p>';
+                    availableGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No courses available at the moment.") }}</p>';
                     return;
                 }
 
-                courses.forEach(course => {
-                    const courseCard = document.createElement('div');
-                    courseCard.className = 'resource-card course-card';
-                    courseCard.style.cursor = 'pointer';
-                    courseCard.innerHTML = `
-                        <h4>${course.title}</h4>
-                        <p>${course.description}</p>
-                        <p><strong>{{ _('Time Slot:') }}</strong> ${course.time_slot || 'TBD'}</p>
-                        <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
-                            <span>${course.profile_emoji || '📚'}</span>
-                            <span class="dropdown-indicator" style="font-size: 14px; color: #6b7280; margin-left: 8px;">▼</span>
-                        </div>
-                        <div class="course-dropdown" style="display: none;"></div>
-                    `;
+                // Separate courses based on enrollment status
+                let enrolledCourses = [];
+                let availableCourses = [];
 
-                    // Make course card clickable
-                    courseCard.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const dropdown = this.querySelector('.course-dropdown');
-                        const indicator = this.querySelector('.dropdown-indicator');
+                if (window.currentUser) {
+                    // For authenticated users, separate enrolled and available courses
+                    enrolledCourses = courses.filter(course => course.is_enrolled);
+                    availableCourses = courses.filter(course => !course.is_enrolled);
 
-                        // Hide other dropdowns
-                        document.querySelectorAll('.course-dropdown').forEach(d => {
-                            if (d !== dropdown) {
-                                d.style.display = 'none';
-                                d.closest('.course-card').querySelector('.dropdown-indicator').classList.remove('active');
-                            }
-                        });
+                    // Show enrolled courses section if user has enrolled courses
+                    if (enrolledCourses.length > 0) {
+                        enrolledSection.style.display = 'block';
+                        availableTitle.textContent = '{{ _("Other Available Courses") }}';
+                    } else {
+                        enrolledSection.style.display = 'none';
+                        availableTitle.textContent = '{{ _("Available Courses") }}';
+                    }
+                } else {
+                    // For non-authenticated users, all courses are "available"
+                    availableCourses = courses;
+                    enrolledSection.style.display = 'none';
+                    availableTitle.textContent = availableCoursesText;
+                }
 
-                        // Toggle this dropdown
-                        if (dropdown.style.display === 'none') {
-                            dropdown.style.display = 'block';
-                            indicator.classList.add('active');
-                            populateCourseDropdown(dropdown, course);
-                        } else {
-                            dropdown.style.display = 'none';
-                            indicator.classList.remove('active');
-                        }
+                // Render enrolled courses
+                if (enrolledCourses.length > 0) {
+                    enrolledCourses.forEach(course => {
+                        const courseCard = createCourseCard(course, true); // true = enrolled
+                        enrolledGrid.appendChild(courseCard);
                     });
+                }
 
-                    coursesGrid.appendChild(courseCard);
-                });
+                // Render available courses
+                if (availableCourses.length > 0) {
+                    availableCourses.forEach(course => {
+                        const courseCard = createCourseCard(course, false); // false = not enrolled
+                        availableGrid.appendChild(courseCard);
+                    });
+                } else if (window.currentUser && enrolledCourses.length > 0) {
+                    availableGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">' + enrolledAllCoursesText + '</p>';
+                }
+
             } catch (error) {
                 console.error('Error loading courses:', error);
-                document.querySelector('.courses-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading courses. Please try again.") }}</p>';
+                document.querySelector('.available-courses-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">' + errorLoadingCoursesText + '</p>';
             }
         }
 
+        // Create course card with enrollment styling
+        function createCourseCard(course, isEnrolled) {
+            const courseCard = document.createElement('div');
+            courseCard.className = `resource-card course-card ${isEnrolled ? 'enrolled-course' : ''}`;
+            courseCard.style.cursor = 'pointer';
+
+            const enrolledBadge = isEnrolled ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">✓ ENROLLED</span>' : '';
+
+            // Only show dropdown elements for non-enrolled users
+            const dropdownElements = isEnrolled ? '' : `
+                <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>${course.profile_emoji || '📚'}</span>
+                    <span class="dropdown-indicator" style="font-size: 14px; color: #6b7280; margin-left: 8px;">▼</span>
+                </div>
+                <div class="course-dropdown" style="display: none;"></div>
+            `;
+
+            courseCard.innerHTML = `
+                <h4>${course.title} ${enrolledBadge}</h4>
+                <p>${course.description}</p>
+                <p><strong>Time Slot:</strong> ${course.time_slot || 'TBD'}</p>
+                ${dropdownElements}
+            `;
+
+            // Add special styling for enrolled courses
+            if (isEnrolled) {
+                courseCard.style.borderLeft = '4px solid #10b981';
+                courseCard.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02))';
+            }
+
+            // Make course card clickable
+            courseCard.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                // If user is enrolled in this course, go directly to student menu
+                if (window.currentUser && isEnrolled) {
+                    const courseSlug = course.title.toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                        .replace(/\s+/g, '-') // Replace spaces with hyphens
+                        .replace(/-+/g, '-') // Replace multiple hyphens with single
+                        .trim(); // Remove leading/trailing whitespace
+                    window.location.href = `/course/${courseSlug}-${course.id}`;
+                    return;
+                }
+
+                // For non-enrolled users, show dropdown menu
+                const dropdown = this.querySelector('.course-dropdown');
+                const indicator = this.querySelector('.dropdown-indicator');
+
+                // Hide other dropdowns
+                document.querySelectorAll('.course-dropdown').forEach(d => {
+                    if (d !== dropdown) {
+                        d.style.display = 'none';
+                        d.closest('.course-card').querySelector('.dropdown-indicator').classList.remove('active');
+                    }
+                });
+
+                // Toggle this dropdown
+                if (dropdown.style.display === 'none') {
+                    dropdown.style.display = 'block';
+                    indicator.classList.add('active');
+                    populateCourseDropdown(dropdown, course, isEnrolled);
+                } else {
+                    dropdown.style.display = 'none';
+                    indicator.classList.remove('active');
+                }
+            });
+
+            return courseCard;
+        }
+
         // Populate course dropdown menu
-        function populateCourseDropdown(dropdown, course) {
+        function populateCourseDropdown(dropdown, course, isEnrolled = false) {
             dropdown.innerHTML = '';
 
-            if (window.currentUser) {
-                // Logged-in user menu
-                const menuItems = [
-                    { text: '{{ _("View Course Details") }}', action: 'details', icon: '📖' },
-                    { text: '{{ _("Enroll in Course") }}', action: 'enroll', icon: '✅' },
-                    { text: '{{ _("Contact Instructor") }}', action: 'contact', icon: '💬' }
+            let menuItems = [];
+
+            // Check if user authentication has been determined
+            // If window.currentUser is undefined, it means checkUser() hasn't completed yet
+            if (typeof window.currentUser === 'undefined') {
+                // Authentication check still pending - show loading or default state
+                const courseSlug = course.title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/-+/g, '-') // Replace multiple hyphens with single
+                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                    .trim();
+                menuItems = [
+                    { text: '{{ _("Loading...") }}', icon: '⏳', url: '#' },
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
                 ];
-
-                menuItems.forEach(item => {
-                    const menuItem = document.createElement('div');
-                    menuItem.className = 'dropdown-item';
-                    menuItem.style.padding = '10px 15px';
-                    menuItem.style.cursor = 'pointer';
-                    menuItem.style.borderBottom = '1px solid #eee';
-                    menuItem.style.display = 'flex';
-                    menuItem.style.alignItems = 'center';
-                    menuItem.innerHTML = `<span style="margin-right: 10px;">${item.icon}</span>${item.text}`;
-
-                    menuItem.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        handleCourseAction(item.action, course);
-                        dropdown.style.display = 'none';
-                    });
-
-                    menuItem.addEventListener('mouseenter', function() {
-                        this.style.backgroundColor = '#f8f9fa';
-                    });
-
-                    menuItem.addEventListener('mouseleave', function() {
-                        this.style.backgroundColor = 'white';
-                    });
-
-                    dropdown.appendChild(menuItem);
-                });
+            } else if (window.currentUser) {
+                // User is logged in
+                if (isEnrolled) {
+                    // User is enrolled in this course - dropdown should not be shown for enrolled users
+                    // The entire card will be clickable instead
+                    return; // Don't populate dropdown for enrolled users
+                } else {
+                    // User is logged in but not enrolled
+                    const courseSlug = course.title.toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                        .replace(/\s+/g, '-') // Replace spaces with hyphens
+                        .replace(/-+/g, '-') // Replace multiple hyphens with single
+                        .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                        .trim();
+                    menuItems = [
+                        { text: '{{ _("Enroll Now") }}', icon: '✅', url: '/course/' + courseSlug + '-' + course.id },
+                        { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                    ];
+                }
             } else {
-                // Non-logged-in user menu (configurable from admin)
-                const menuItems = course.dropdown_menu || [
+                // User is not logged in
+                const courseSlug = course.title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/-+/g, '-') // Replace multiple hyphens with single
+                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                    .trim();
+                menuItems = [
                     { text: '{{ _("Login to Enroll") }}', icon: '🔐', url: '/login' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '#' },
-                    { text: '{{ _("Contact Us") }}', icon: '💬', url: '/#contact' }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
                 ];
-
-                menuItems.forEach(item => {
-                    const menuItem = document.createElement('div');
-                    menuItem.className = 'dropdown-item';
-                    menuItem.style.padding = '10px 15px';
-                    menuItem.style.cursor = 'pointer';
-                    menuItem.style.borderBottom = '1px solid #eee';
-                    menuItem.style.display = 'flex';
-                    menuItem.style.alignItems = 'center';
-                    menuItem.innerHTML = `<span style="margin-right: 10px;">${item.icon || '🔗'}</span>${item.text}`;
-
-                    menuItem.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        if (item.url && item.url !== '#') {
-                            // Replace {description} placeholder with course slug
-                            let url = item.url;
-                            if (url.includes('{description}')) {
-                                const courseSlug = course.title.toLowerCase()
-                                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                                    .replace(/\s+/g, '-') // Replace spaces with hyphens
-                                    .replace(/-+/g, '-') // Replace multiple hyphens with single
-                                    .trim(); // Remove leading/trailing whitespace
-                                url = url.replace('{description}', `${courseSlug}-${course.id}`);
-                            }
-                            window.location.href = url;
-                        } else {
-                            handleCourseAction('details', course);
-                        }
-                        dropdown.style.display = 'none';
-                    });
-
-                    menuItem.addEventListener('mouseenter', function() {
-                        this.style.backgroundColor = '#f8f9fa';
-                    });
-
-                    menuItem.addEventListener('mouseleave', function() {
-                        this.style.backgroundColor = 'white';
-                    });
-
-                    dropdown.appendChild(menuItem);
-                });
             }
+
+            menuItems.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'dropdown-item';
+                menuItem.style.padding = '10px 15px';
+                menuItem.style.cursor = 'pointer';
+                menuItem.style.borderBottom = '1px solid #eee';
+                menuItem.style.display = 'flex';
+                menuItem.style.alignItems = 'center';
+                menuItem.innerHTML = `<span style="margin-right: 10px;">${item.icon || '🔗'}</span>${item.text}`;
+
+                menuItem.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (item.url && item.url !== '#') {
+                        // Replace {description} placeholder with course slug
+                        let url = item.url;
+                        if (url.includes('{description}')) {
+                            const courseSlug = course.title.toLowerCase()
+                                .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                                .replace(/-+/g, '-') // Replace multiple hyphens with single
+                                .trim(); // Remove leading/trailing whitespace
+                            url = url.replace('{description}', `${courseSlug}-${course.id}`);
+                        }
+                        window.location.href = url;
+                    } else {
+                        handleCourseAction('details', course);
+                    }
+                    dropdown.style.display = 'none';
+                });
+
+                menuItem.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f8f9fa';
+                });
+
+                menuItem.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'white';
+                });
+
+                dropdown.appendChild(menuItem);
+            });
         }
 
         // Handle course actions
         function handleCourseAction(action, course) {
             switch (action) {
                 case 'details':
-                    alert(`{{ _("Course Details") }}: ${course.title}\n\n${course.description}\n\n{{ _("Time Slot") }}: ${course.time_slot || 'TBD'}`);
+                    // Navigate to course page
+                    const courseSlug = course.title.toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                        .replace(/\s+/g, '-') // Replace spaces with hyphens
+                        .replace(/-+/g, '-') // Replace multiple hyphens with single
+                        .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                        .trim();
+                    window.location.href = `/course/${courseSlug}-${course.id}`;
                     break;
                 case 'enroll':
                     if (window.currentUser) {
@@ -1775,7 +1896,34 @@
             }
         }
 
-        // User authentication
+        // Refresh all course dropdowns with current user authentication status
+        function refreshCourseDropdowns() {
+            // Find all course cards and refresh their dropdowns if they're open
+            const courseCards = document.querySelectorAll('.course-card');
+            courseCards.forEach((card, index) => {
+                const dropdown = card.querySelector('.course-dropdown');
+                if (dropdown && dropdown.style.display !== 'none') {
+                    // Check if this card has enrolled styling
+                    const isEnrolled = card.classList.contains('enrolled-course');
+                    
+                    // Create a mock course object - in a real implementation, 
+                    // you'd store the full course data in the DOM or have a global courses array
+                    const courseTitle = card.querySelector('h4')?.textContent?.replace('✓ ENROLLED', '').trim() || 'Course';
+                    const courseDesc = card.querySelectorAll('p')[0]?.textContent || '';
+                    const timeSlot = card.querySelectorAll('p')[1]?.textContent?.replace('Time Slot: ', '') || 'TBD';
+                    
+                    const mockCourse = { 
+                        title: courseTitle, 
+                        description: courseDesc,
+                        time_slot: timeSlot,
+                        dropdown_menu: null,
+                        id: index + 1 // Simple ID for URL generation
+                    };
+                    
+                    populateCourseDropdown(dropdown, mockCourse, isEnrolled);
+                }
+            });
+        }
         async function checkUser() {
             try {
                 console.log('Checking user login status...');
@@ -1816,6 +1964,9 @@
                         
                         // Load forum messages for authenticated user
                         loadForumMessages(currentChannel);
+                        
+                        // Refresh course dropdowns with authenticated user context
+                        refreshCourseDropdowns();
                     } else {
                         // User is not logged in - anonymous visitor
                         console.log('User is not logged in (anonymous visitor)');
@@ -1830,6 +1981,9 @@
                         
                         // Load forum messages for anonymous user
                         loadForumMessages(currentChannel);
+                        
+                        // Refresh course dropdowns with anonymous user context
+                        refreshCourseDropdowns();
                     }
                 } else {
                     // API error
@@ -2087,6 +2241,9 @@
 
         // Load initial data
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize currentUser as undefined to indicate auth check is pending
+            window.currentUser = undefined;
+            
             // Initialize auto-translate state from checkbox
             const autoTranslateCheckbox = document.getElementById('auto-translate');
             if (autoTranslateCheckbox) {

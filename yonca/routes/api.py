@@ -1,6 +1,9 @@
 """
 API routes for courses, forum, and resources
 """
+import os
+import time
+from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify, current_app
 from flask_login import current_user, login_required
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
@@ -12,25 +15,43 @@ def api_unauthorized():
     """Return JSON 401 for API unauthorized requests"""
     return jsonify({'error': 'Authentication required'}), 401
 
+def allowed_file(filename, allowed_extensions):
+    """Check if file extension is allowed"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
 # Set custom unauthorized handler for API blueprint
 api_bp.unauthorized = api_unauthorized
 
 @api_bp.route('/courses')
 def get_courses():
-    """Get all courses (user's courses if authenticated, all if not)"""
+    """Get all courses with enrollment status for authenticated users"""
     if current_user.is_authenticated:
-        courses = current_user.courses
+        # Get all courses
+        all_courses = Course.query.all()
+        # Get user's enrolled course IDs
+        enrolled_course_ids = {course.id for course in current_user.courses}
+
+        return jsonify([{
+            'id': c.id,
+            'title': c.title,
+            'description': c.description,
+            'time_slot': c.time_slot,
+            'profile_emoji': c.profile_emoji,
+            'dropdown_menu': c.dropdown_menu,
+            'is_enrolled': c.id in enrolled_course_ids
+        } for c in all_courses])
     else:
+        # For non-authenticated users, return all courses without enrollment status
         courses = Course.query.all()
-    
-    return jsonify([{
-        'id': c.id, 
-        'title': c.title, 
-        'description': c.description,
-        'time_slot': c.time_slot,
-        'profile_emoji': c.profile_emoji,
-        'dropdown_menu': c.dropdown_menu
-    } for c in courses])
+
+        return jsonify([{
+            'id': c.id,
+            'title': c.title,
+            'description': c.description,
+            'time_slot': c.time_slot,
+            'profile_emoji': c.profile_emoji,
+            'dropdown_menu': c.dropdown_menu
+        } for c in courses])
 
 @api_bp.route('/user')
 def get_current_user():
@@ -566,3 +587,37 @@ def set_user_language():
         'success': True,
         'preferred_language': current_user.preferred_language
     })
+
+@api_bp.route('/feature-images/upload', methods=['POST'])
+@login_required
+def upload_feature_image():
+    """Upload feature image for courses"""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif', 'webp'}):
+        # Create uploads directory if it doesn't exist
+        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'features')
+        os.makedirs(upload_dir, exist_ok=True)
+
+        # Generate unique filename
+        filename = secure_filename(file.filename)
+        name, ext = os.path.splitext(filename)
+        unique_filename = f"{name}_{int(time.time())}{ext}"
+        file_path = os.path.join(upload_dir, unique_filename)
+
+        file.save(file_path)
+
+        # Return the URL path for the uploaded image
+        image_url = f"/static/uploads/features/{unique_filename}"
+        return jsonify({
+            'success': True,
+            'image_url': image_url,
+            'filename': unique_filename
+        })
+
+    return jsonify({'error': 'Invalid file type'}), 400

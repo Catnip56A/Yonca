@@ -419,26 +419,6 @@ class CourseView(SecureModelView):
             course.page_show_navigation = 'page_show_navigation' in request.form
             course.page_show_footer = 'page_show_footer' in request.form
 
-            # Handle dropdown menu items
-            menu_items = []
-            item_count = 0
-
-            while f'menu_text_{item_count}' in request.form:
-                text = request.form.get(f'menu_text_{item_count}', '').strip()
-                icon = request.form.get(f'menu_icon_{item_count}', '').strip()
-                link = request.form.get(f'menu_link_{item_count}', '').strip()
-
-                if text:  # Only add if text is provided
-                    menu_items.append({
-                        'text': text,
-                        'icon': icon,
-                        'url': link
-                    })
-
-                item_count += 1
-
-            course.dropdown_menu = menu_items
-
             # Handle course page features
             features = []
             feature_count = 0
@@ -446,11 +426,13 @@ class CourseView(SecureModelView):
             while f'feature_title_{feature_count}' in request.form:
                 title = request.form.get(f'feature_title_{feature_count}', '').strip()
                 desc = request.form.get(f'feature_desc_{feature_count}', '').strip()
+                image = request.form.get(f'feature_image_{feature_count}', '').strip()
 
-                if title or desc:  # Only add if there's content
+                if title or desc or image:  # Only add if there's content
                     features.append({
                         'title': title,
-                        'description': desc
+                        'description': desc,
+                        'image': image
                     })
 
                 feature_count += 1
@@ -461,7 +443,7 @@ class CourseView(SecureModelView):
             flash('Course updated successfully!', 'success')
             return redirect(url_for('admin.index'))
 
-        # Get existing menu items
+        # Get existing menu items (no longer used, but keep for backward compatibility)
         menu_items = course.dropdown_menu or []
 
         return self.render('admin/course_edit.html',
@@ -488,26 +470,6 @@ class CourseView(SecureModelView):
                 page_show_footer='page_show_footer' in request.form
             )
 
-            # Handle dropdown menu items
-            menu_items = []
-            item_count = 0
-
-            while f'menu_text_{item_count}' in request.form:
-                text = request.form.get(f'menu_text_{item_count}', '').strip()
-                icon = request.form.get(f'menu_icon_{item_count}', '').strip()
-                link = request.form.get(f'menu_link_{item_count}', '').strip()
-
-                if text:  # Only add if text is provided
-                    menu_items.append({
-                        'text': text,
-                        'icon': icon,
-                        'url': link
-                    })
-
-                item_count += 1
-
-            course.dropdown_menu = menu_items
-
             # Handle course page features
             features = []
             feature_count = 0
@@ -515,11 +477,13 @@ class CourseView(SecureModelView):
             while f'feature_title_{feature_count}' in request.form:
                 title = request.form.get(f'feature_title_{feature_count}', '').strip()
                 desc = request.form.get(f'feature_desc_{feature_count}', '').strip()
+                image = request.form.get(f'feature_image_{feature_count}', '').strip()
 
-                if title or desc:  # Only add if there's content
+                if title or desc or image:  # Only add if there's content
                     features.append({
                         'title': title,
-                        'description': desc
+                        'description': desc,
+                        'image': image
                     })
 
                 feature_count += 1

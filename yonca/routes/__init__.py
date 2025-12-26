@@ -59,21 +59,21 @@ def course_page(course_slug):
 
     # Find course by slug
     course = None
-    
+
     # First try exact slug match
     courses = Course.query.all()
     for c in courses:
         if slugify(c.title) == course_slug:
             course = c
             break
-    
+
     # If not found, try to parse ID from slug (for backward compatibility with slug-id format)
     if not course and course_slug:
         parts = course_slug.split('-')
         if parts and parts[-1].isdigit():
             course_id = int(parts[-1])
             course = Course.query.get(course_id)
-    
+
     # Also handle malformed slugs that might have extra characters
     if not course and course_slug:
         # Try to find course by partial slug match
@@ -87,6 +87,20 @@ def course_page(course_slug):
         from flask import abort
         abort(404)
 
+    # If user is authenticated, show student menu instead of public course page
+    if current_user.is_authenticated:
+        # Get home content for navigation
+        home_content = HomeContent.query.filter_by(is_active=True).first()
+        if not home_content:
+            home_content = HomeContent()
+
+        return render_template('student_menu.html',
+                             course=course,
+                             home_content=home_content,
+                             current_locale=get_locale(),
+                             is_authenticated=True)
+
+    # For non-authenticated users, show the regular course page
     # Get home content for navigation
     home_content = HomeContent.query.filter_by(is_active=True).first()
     if not home_content:

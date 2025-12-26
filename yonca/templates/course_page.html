@@ -167,6 +167,15 @@
         display: block;
     }
 
+    .feature-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: block;
+    }
+
     .feature-title {
         font-size: 1.3rem;
         font-weight: 600;
@@ -331,7 +340,11 @@
         <div class="course-features">
             {% for feature in course.page_features %}
             <div class="feature-card">
+                {% if feature.image %}
+                <img src="{{ feature.image }}" alt="{{ feature.title }}" class="feature-image">
+                {% else %}
                 <div class="feature-icon">🚀</div>
+                {% endif %}
                 <h3 class="feature-title">{{ feature.title }}</h3>
                 <p class="feature-description">{{ feature.description }}</p>
             </div>
