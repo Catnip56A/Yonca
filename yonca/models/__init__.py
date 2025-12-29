@@ -62,7 +62,7 @@ class Course(db.Model):
     # Dropdown menu items for non-logged-in users (configurable in admin)
     dropdown_menu = db.Column(db.JSON, default=[
         {"text": "Login to Enroll", "icon": "🔐", "url": "/login"},
-        {"text": "View Details", "icon": "📖", "url": "#"}
+        {"text": "View Details", "icon": "📖", "url": "/course/{description}"}
     ])
 
     # Course page content (managed by admin)

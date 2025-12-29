@@ -422,20 +422,73 @@
                             </div>
                             <p class="text-muted mb-0">{{ item.message }}</p>
                             {% if current_user.is_teacher %}
-                                {% set replies = CourseAnnouncementReply.query.filter_by(announcement_id=item.id).order_by(CourseAnnouncementReply.created_at.asc()).all() %}
-                                {% if replies %}
-                                    <div class="announcement-replies" style="margin-top: 1rem; margin-left: 2rem;">
-                                        <strong>Replies:</strong>
-                                        <ul class="list-unstyled">
-                                            {% for reply in replies %}
-                                                <li style="margin-bottom: 0.75rem;">
-                                                    <div><b>{{ reply.user.username if reply.user else 'User' }}</b> <small class="text-muted">{{ reply.created_at.strftime('%b %d, %Y %I:%M %p') }}</small></div>
-                                                    <div>{{ reply.message }}</div>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
+                                {% set all_replies = CourseAnnouncementReply.query.filter_by(announcement_id=item.id).order_by(CourseAnnouncementReply.created_at.asc()).all() %}
+                                {% set top_level_replies = all_replies | selectattr('parent_reply_id', 'equalto', None) | list %}
+                                
+                                {% if all_replies %}
+                                    <div class="announcement-replies" style="margin-top: 1rem;">
+                                        <strong>Replies ({{ all_replies|length }}):</strong>
+                                        
+                                        {% macro render_reply(reply, depth=0) %}
+                                        <div style="margin-left: {{ depth * 2 }}rem; margin-top: 0.75rem; padding: 0.75rem; background: {% if depth % 2 == 0 %}#f8f9fa{% else %}#ffffff{% endif %}; border-left: 3px solid #2563eb; border-radius: 4px;">
+                                            <div style="margin-bottom: 0.5rem;">
+                                                <b>{{ reply.user.username if reply.user else 'User' }}</b> 
+                                                <small class="text-muted">{{ reply.created_at.strftime('%b %d, %Y %I:%M %p') }}</small>
+                                            </div>
+                                            <div style="margin-bottom: 0.5rem;">{{ reply.message }}</div>
+                                            <button class="btn btn-xs btn-outline-secondary" onclick="document.getElementById('reply-form-{{ reply.id }}').style.display='block'; this.style.display='none';" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                                                <i class="fas fa-reply"></i> Reply
+                                            </button>
+                                            
+                                            <!-- Nested reply form -->
+                                            <div id="reply-form-{{ reply.id }}" style="display: none; margin-top: 0.75rem; padding: 0.75rem; background: #ffffff; border-radius: 4px;">
+                                                <form method="POST">
+                                                    <input type="hidden" name="action" value="reply_announcement">
+                                                    <input type="hidden" name="announcement_id" value="{{ item.id }}">
+                                                    <input type="hidden" name="parent_reply_id" value="{{ reply.id }}">
+                                                    <div class="form-group mb-2">
+                                                        <textarea class="form-control form-control-sm" name="message" rows="2" placeholder="Type your reply..." required></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-paper-plane"></i> Post
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('reply-form-{{ reply.id }}').style.display='none'; this.parentElement.parentElement.previousElementSibling.style.display='inline-block';">
+                                                        Cancel
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            
+                                            <!-- Render nested replies recursively -->
+                                            {% set child_replies = all_replies | selectattr('parent_reply_id', 'equalto', reply.id) | list %}
+                                            {% if child_replies %}
+                                                {% for child in child_replies %}
+                                                    {{ render_reply(child, depth + 1) }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        {% endmacro %}
+                                        
+                                        <!-- Render top-level replies -->
+                                        {% for reply in top_level_replies %}
+                                            {{ render_reply(reply, 0) }}
+                                        {% endfor %}
                                     </div>
                                 {% endif %}
+                                
+                                <!-- Main Reply Form for Teachers -->
+                                <div style="margin-top: 1rem; padding: 1rem; background: #e8f4f8; border-radius: 6px;">
+                                    <form method="POST">
+                                        <input type="hidden" name="action" value="reply_announcement">
+                                        <input type="hidden" name="announcement_id" value="{{ item.id }}">
+                                        <div class="form-group mb-2">
+                                            <label for="reply-{{ item.id }}"><strong>Add Reply:</strong></label>
+                                            <textarea class="form-control" name="message" id="reply-{{ item.id }}" rows="2" placeholder="Type your reply..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Post Reply
+                                        </button>
+                                    </form>
+                                </div>
                             {% endif %}
                         </div>
                         {% endfor %}

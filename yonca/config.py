@@ -5,8 +5,8 @@ import os
 
 class Config:
     """Base configuration"""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'replace-with-a-secure-key'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///yonca.db'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'postgresql://postgres:ALHIKO3325!56Catnip?!@localhost:5432/postgres'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///yonca.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'filesystem'
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS

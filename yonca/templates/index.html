@@ -1157,7 +1157,7 @@
                         .replace(/\s+/g, '-') // Replace spaces with hyphens
                         .replace(/-+/g, '-') // Replace multiple hyphens with single
                         .trim(); // Remove leading/trailing whitespace
-                    window.location.href = `/course/${courseSlug}-${course.id}`;
+                    window.location.href = `/course/${courseSlug}`;
                     return;
                 }
 
@@ -1192,51 +1192,39 @@
             dropdown.innerHTML = '';
 
             let menuItems = [];
+            
+            // Generate course slug
+            const courseSlug = course.title.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .replace(/-+/g, '-') // Replace multiple hyphens with single
+                .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                .trim();
 
             // Check if user authentication has been determined
-            // If window.currentUser is undefined, it means checkUser() hasn't completed yet
             if (typeof window.currentUser === 'undefined') {
-                // Authentication check still pending - show loading or default state
-                const courseSlug = course.title.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                    .replace(/\s+/g, '-') // Replace spaces with hyphens
-                    .replace(/-+/g, '-') // Replace multiple hyphens with single
-                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-                    .trim();
+                // Authentication check still pending - show loading
                 menuItems = [
                     { text: '{{ _("Loading...") }}', icon: '⏳', url: '#' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: `/course/${courseSlug}` }
                 ];
             } else if (window.currentUser) {
                 // User is logged in
                 if (isEnrolled) {
-                    // User is enrolled in this course - dropdown should not be shown for enrolled users
-                    // The entire card will be clickable instead
-                    return; // Don't populate dropdown for enrolled users
+                    // User is enrolled - don't show dropdown (card is clickable)
+                    return;
                 } else {
                     // User is logged in but not enrolled
-                    const courseSlug = course.title.toLowerCase()
-                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                        .replace(/\s+/g, '-') // Replace spaces with hyphens
-                        .replace(/-+/g, '-') // Replace multiple hyphens with single
-                        .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-                        .trim();
                     menuItems = [
                         { text: '{{ _("Enroll Now") }}', icon: '✅', url: 'https://epoint.az/yonca-psychological-support-and-development-center' },
-                        { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                        { text: '{{ _("View Details") }}', icon: '📖', url: `/course/${courseSlug}` }
                     ];
                 }
             } else {
                 // User is not logged in
-                const courseSlug = course.title.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                    .replace(/\s+/g, '-') // Replace spaces with hyphens
-                    .replace(/-+/g, '-') // Replace multiple hyphens with single
-                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-                    .trim();
                 menuItems = [
                     { text: '{{ _("Login to Enroll") }}', icon: '🔐', url: '/login' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: `/course/${courseSlug}` }
                 ];
             }
 
