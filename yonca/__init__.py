@@ -8,6 +8,7 @@ from flask_session import Session
 from flask_babel import Babel
 from yonca.config import config
 from yonca.models import db, User, Course, ForumMessage, ForumChannel, Resource, PDFDocument, TaviTest, HomeContent, Translation
+from flask_migrate import Migrate
 from yonca.admin import init_admin
 from yonca.routes.auth import auth_bp
 from yonca.routes.api import api_bp
@@ -29,6 +30,7 @@ def create_app(config_name='development'):
     
     # Initialize extensions
     db.init_app(app)
+    migrate = Migrate(app, db)
     
     login_manager = LoginManager(app)
     login_manager.login_view = 'auth.login'
@@ -89,8 +91,9 @@ def create_app(config_name='development'):
     app.register_blueprint(main_bp)
     
     # Create database tables
-    with app.app_context():
-        db.create_all()
+    # Remove db.create_all(); migrations will handle schema
+    # with app.app_context():
+    #     db.create_all()
     
     return app
 
