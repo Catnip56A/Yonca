@@ -1146,41 +1146,56 @@
                 courseCard.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02))';
             }
 
+            // Add action button for enrolled users
+            if (isEnrolled) {
+                const actionBtn = document.createElement('a');
+                actionBtn.textContent = 'Go to Course';
+                actionBtn.href = `/course/${course.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim()}-${course.id}`;
+                actionBtn.style.background = '#10b981';
+                actionBtn.style.color = 'white';
+                actionBtn.style.textDecoration = 'none';
+                actionBtn.style.border = '1px solid #10b981';
+                actionBtn.style.padding = '0.5rem 1rem';
+                actionBtn.style.borderRadius = '4px';
+                actionBtn.style.fontWeight = '500';
+                actionBtn.style.display = 'inline-block';
+                actionBtn.style.marginTop = '0.5rem';
+                courseCard.appendChild(actionBtn);
+            }
+
             // Make course card clickable
             courseCard.addEventListener('click', function(e) {
                 e.stopPropagation();
-
-                // If user is enrolled in this course, go directly to student menu
+                const courseSlug = course.title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '')
+                    .trim();
                 if (window.currentUser && isEnrolled) {
-                    const courseSlug = course.title.toLowerCase()
-                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                        .replace(/\s+/g, '-') // Replace spaces with hyphens
-                        .replace(/-+/g, '-') // Replace multiple hyphens with single
-                        .trim(); // Remove leading/trailing whitespace
                     window.location.href = `/course/${courseSlug}-${course.id}`;
                     return;
                 }
-
-                // For non-enrolled users, show dropdown menu
-                const dropdown = this.querySelector('.course-dropdown');
-                const indicator = this.querySelector('.dropdown-indicator');
-
-                // Hide other dropdowns
-                document.querySelectorAll('.course-dropdown').forEach(d => {
-                    if (d !== dropdown) {
-                        d.style.display = 'none';
-                        d.closest('.course-card').querySelector('.dropdown-indicator').classList.remove('active');
+                // For non-enrolled users, open dropdown instead of redirect
+                if (!isEnrolled) {
+                    const dropdown = this.querySelector('.course-dropdown');
+                    const indicator = this.querySelector('.dropdown-indicator');
+                    // Hide other dropdowns
+                    document.querySelectorAll('.course-dropdown').forEach(d => {
+                        if (d !== dropdown) {
+                            d.style.display = 'none';
+                            d.closest('.course-card').querySelector('.dropdown-indicator').classList.remove('active');
+                        }
+                    });
+                    // Toggle this dropdown
+                    if (dropdown.style.display === 'none') {
+                        dropdown.style.display = 'block';
+                        indicator.classList.add('active');
+                        populateCourseDropdown(dropdown, course, isEnrolled);
+                    } else {
+                        dropdown.style.display = 'none';
+                        indicator.classList.remove('active');
                     }
-                });
-
-                // Toggle this dropdown
-                if (dropdown.style.display === 'none') {
-                    dropdown.style.display = 'block';
-                    indicator.classList.add('active');
-                    populateCourseDropdown(dropdown, course, isEnrolled);
-                } else {
-                    dropdown.style.display = 'none';
-                    indicator.classList.remove('active');
                 }
             });
 
@@ -1198,14 +1213,14 @@
             if (typeof window.currentUser === 'undefined') {
                 // Authentication check still pending - show loading or default state
                 const courseSlug = course.title.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                    .replace(/\s+/g, '-') // Replace spaces with hyphens
-                    .replace(/-+/g, '-') // Replace multiple hyphens with single
-                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '')
                     .trim();
                 menuItems = [
                     { text: '{{ _("Loading...") }}', icon: '⏳', url: '#' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug + '-' + course.id }
                 ];
             } else if (window.currentUser) {
                 // User is logged in
@@ -1216,27 +1231,27 @@
                 } else {
                     // User is logged in but not enrolled
                     const courseSlug = course.title.toLowerCase()
-                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                        .replace(/\s+/g, '-') // Replace spaces with hyphens
-                        .replace(/-+/g, '-') // Replace multiple hyphens with single
-                        .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                        .replace(/[^a-z0-9\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-')
+                        .replace(/^-|-$/g, '')
                         .trim();
                     menuItems = [
                         { text: '{{ _("Enroll Now") }}', icon: '✅', url: 'https://epoint.az/yonca-psychological-support-and-development-center' },
-                        { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                        { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug + '-' + course.id }
                     ];
                 }
             } else {
                 // User is not logged in
                 const courseSlug = course.title.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                    .replace(/\s+/g, '-') // Replace spaces with hyphens
-                    .replace(/-+/g, '-') // Replace multiple hyphens with single
-                    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '')
                     .trim();
                 menuItems = [
                     { text: '{{ _("Login to Enroll") }}', icon: '🔐', url: '/login' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '/course/' + courseSlug + '-' + course.id }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug + '-' + course.id }
                 ];
             }
 

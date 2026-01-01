@@ -279,12 +279,14 @@ class CourseContentFolder(db.Model):
     """Folders for organizing course content"""
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    parent_folder_id = db.Column(db.Integer, db.ForeignKey('course_content_folder.id'), nullable=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     order = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     course = db.relationship('Course', backref=db.backref('content_folders', lazy='dynamic'))
+    parent_folder = db.relationship('CourseContentFolder', remote_side=[id], backref=db.backref('subfolders', lazy='dynamic'))
 
     def __repr__(self):
         return f'<CourseContentFolder {self.title}>'

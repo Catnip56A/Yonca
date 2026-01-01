@@ -1,0 +1,692 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - {{ home_content.site_name }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+    }
+    .logo img {
+        height: 32px;
+        width: auto;
+    }
+    .nav-link {
+        color: #374151;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .nav-link.active {
+        background-color: #abc32f;
+        color: white;
+    }
+    .nav-link:hover {
+        background-color: #f3f4f6;
+        color: #abc32f;
+    }
+    .list-group-item {
+        font-size: 1rem;
+    }
+    .tab-content {
+        margin-top: 24px;
+    }
+    .folder-item[data-depth="0"] { margin-left: 0px; }
+    .folder-item[data-depth="1"] { margin-left: 20px; }
+    .folder-item[data-depth="2"] { margin-left: 40px; }
+    .folder-item[data-depth="3"] { margin-left: 60px; }
+    .folder-item[data-depth="4"] { margin-left: 80px; }
+    .folder-item[data-depth="5"] { margin-left: 100px; }
+    .reply-card[data-depth] { background: #f8f9fa; }
+    .reply-card[data-depth="0"] { margin-left: 0px; }
+    .reply-card[data-depth="1"] { margin-left: 20px; background: #e9ecef; }
+    .reply-card[data-depth="2"] { margin-left: 40px; }
+    .reply-card[data-depth="3"] { margin-left: 60px; background: #e9ecef; }
+    .reply-card[data-depth="4"] { margin-left: 80px; }
+    .reply-card[data-depth="5"] { margin-left: 100px; background: #e9ecef; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:40px;">
+    {% if is_teacher_or_admin %}
+    <div class="alert alert-info" style="margin-bottom: 20px;">
+        <strong>Teacher/Admin Mode:</strong> You have editing privileges for this course.
+    </div>
+    {% endif %}
+    <div style="margin-bottom: 20px;">
+        <a href="#" class="btn btn-outline-secondary" onclick="window.location.replace('/courses'); return false;">
+            <i class="fa fa-arrow-left"></i> Back to Courses
+        </a>
+    </div>
+    <ul class="nav nav-tabs" id="courseTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="content-tab" data-toggle="tab" href="#content" role="tab">Content</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="assignments-tab" data-toggle="tab" href="#assignments" role="tab">Assignments</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="announcements-tab" data-toggle="tab" href="#announcements" role="tab">Announcements</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="courseTabsContent">
+        {% macro render_folder(folder, depth=0) %}
+        <div class="folder-item" data-depth="{{ depth }}">
+            <div class="card mb-2">
+                <div class="card-header" style="background: #e3f2fd; cursor: pointer;" data-toggle="collapse" data-target="#folder-{{ folder.id }}">
+                    <strong>📁 {{ folder.title }} <span class="ml-1" id="icon-{{ folder.id }}">▼</span></strong>
+                    {% if is_teacher_or_admin %}
+                    <button type="button" class="btn btn-warning btn-sm ml-2 float-right" data-toggle="modal" data-target="#moveFolderModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.title }}">
+                        Move Folder
+                    </button>
+                    {% endif %}
+                </div>
+                <div id="folder-{{ folder.id }}" class="collapse">
+                    <div class="card-body">
+                        {% if folder.description %}<p class="text-muted">{{ folder.description }}</p>{% endif %}
+
+                        {# Display files in this folder #}
+                        {% set folder_items = folder.items.filter_by(is_published=True).all() %}
+                        {% if folder_items %}
+                        <ul class="list-group mb-2">
+                            {% for item in folder_items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ item.title }}</strong><br>
+                                    <small>{{ item.description }}</small>
+                                </div>
+                                <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">View/Download</a>
+                                {% if is_teacher_or_admin %}
+                                <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
+                                    Move File
+                                </button>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        
+                        {# Recursively render subfolders #}
+                        {% set subfolders = folder.subfolders.all() %}
+                        {% if subfolders %}
+                        <ul class="list-group">
+                            {% for subfolder in subfolders %}
+                            <li class="list-group-item">
+                                {{ render_folder(subfolder, depth + 1) }}
+                            </li>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endmacro %}
+        
+        <div class="tab-pane fade show active" id="content" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                <h4>Course Content</h4>
+                {% if is_teacher_or_admin %}
+                <div>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createFolderModal" data-parent-id="" data-parent-name="Root">
+                        + Create Folder
+                    </button>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadFileModal" data-folder-id="" data-folder-name="Root">
+                        + Upload File
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            
+            {# Display root-level folders #}
+            {% set root_folders = content_folders.filter_by(parent_folder_id=None).all() %}
+            {% if root_folders %}
+            {% for folder in root_folders %}
+                {{ render_folder(folder, 0) }}
+            {% endfor %}
+            {% endif %}
+            
+            {# Display unassigned content #}
+            {% set unassigned = contents | selectattr('folder_id','equalto', None) | list %}
+            {% if unassigned and unassigned|length > 0 %}
+                <h5 class="mt-3">Unsorted Files</h5>
+                <ul class="list-group mb-4">
+                    {% for item in unassigned %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ item.title }}</strong><br>
+                            <small>{{ item.description }}</small>
+                        </div>
+                        <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">View/Download</a>
+                        {% if is_teacher_or_admin %}
+                        <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
+                            Move File
+                        </button>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {# Removed the separate list section for root-level folders #}
+            
+            {% if not root_folders and not unassigned %}
+            <p class="text-muted">No course materials available yet.</p>
+            {% endif %}
+        </div>
+        <div class="tab-pane fade" id="assignments" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                <h4>Assignments</h4>
+                {% if is_teacher_or_admin %}
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addAssignmentModal">
+                    + Create Assignment
+                </button>
+                {% endif %}
+            </div>
+            {% if assignments %}
+            <ul class="list-group mb-4">
+                {% for assignment in assignments %}
+                <li class="list-group-item">
+                    <div><strong>{{ assignment.title }}</strong> <span class="badge badge-info">{{ assignment.points }} pts</span></div>
+                    <div><small>{{ assignment.description }}</small></div>
+                    <div><small>Due: {% if assignment.due_date %}{{ assignment.due_date.strftime('%b %d, %Y %I:%M %p') }}{% else %}N/A{% endif %}</small></div>
+                    
+                    {% if not is_teacher_or_admin %}
+                    {# Student submission section #}
+                    {% set user_submission = assignment.submissions.filter_by(user_id=current_user.id).first() %}
+                    {% if user_submission %}
+                        {% set status = 'success' %}
+                        {% set status_text = 'On Time' %}
+                        {% if assignment.due_date %}
+                            {% if user_submission.submitted_at > assignment.due_date %}
+                                {% set status = 'danger' %}
+                                {% set status_text = 'Late' %}
+                            {% elif user_submission.submitted_at < assignment.due_date %}
+                                {% set status = 'warning' %}
+                                {% set status_text = 'Early' %}
+                            {% endif %}
+                        {% endif %}
+                        <div class="alert alert-{{ status }} mt-2">
+                            <strong>✓ {{ status_text }}</strong> on {{ user_submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}<br>
+                            <a href="{{ user_submission.file_path }}" target="_blank" class="btn btn-sm btn-info mt-1">View Your Submission</a>
+                            {% if user_submission.grade is not none %}
+                            <div class="mt-2"><strong>Grade:</strong> {{ user_submission.grade }}/{{ assignment.points }}</div>
+                            {% endif %}
+                            {% if user_submission.comment %}
+                            <div class="mt-1"><strong>Feedback:</strong> {{ user_submission.comment }}</div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        {% set status = 'secondary' %}
+                        {% set status_text = 'Not Submitted' %}
+                        {% if assignment.due_date and assignment.due_date < datetime.now() %}
+                            {% set status = 'danger' %}
+                            {% set status_text = 'Overdue' %}
+                        {% endif %}
+                        <div class="alert alert-{{ status }} mt-2">
+                            <strong>{{ status_text }}</strong>
+                        </div>
+                        <form method="post" enctype="multipart/form-data" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}" class="mt-2">
+                            <input type="hidden" name="action" value="submit_assignment">
+                            <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                            <div class="form-group">
+                                <label>Upload Your Work:</label>
+                                <input type="file" class="form-control-file" name="submission_file" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">Submit Assignment</button>
+                        </form>
+                    {% endif %}
+                    {% endif %}
+                    
+                    {% if is_teacher_or_admin %}
+                    <button class="btn btn-sm btn-primary mt-2" type="button" data-toggle="collapse" data-target="#submissions-{{ assignment.id }}">
+                        View Submissions
+                    </button>
+                    <div class="collapse mt-2" id="submissions-{{ assignment.id }}">
+                        {% set submissions = assignment.submissions.all() %}
+                        {% if submissions %}
+                        <ul class="list-group mt-2">
+                            {% for submission in submissions %}
+                            <li class="list-group-item">
+                                {% set status = 'success' %}
+                                {% set status_text = 'On Time' %}
+                                {% if assignment.due_date %}
+                                    {% if submission.submitted_at > assignment.due_date %}
+                                        {% set status = 'danger' %}
+                                        {% set status_text = 'Late' %}
+                                    {% elif submission.submitted_at < assignment.due_date %}
+                                        {% set status = 'warning' %}
+                                        {% set status_text = 'Early' %}
+                                    {% endif %}
+                                {% endif %}
+                                <strong>{{ submission.user.username }}</strong> 
+                                <span class="badge badge-{{ status }}">{{ status_text }}</span>
+                                - Submitted: {{ submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}<br>
+                                <a href="{{ submission.file_path }}" target="_blank" class="btn btn-sm btn-info mt-1">View Submission</a>
+                                <form method="post" class="mt-2" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}">
+                                    <input type="hidden" name="action" value="grade_submission">
+                                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                                    <div class="form-row">
+                                        <div class="col-md-3">
+                                            <input type="number" name="grade" class="form-control form-control-sm" placeholder="Grade" value="{{ submission.grade or '' }}" min="0" max="{{ assignment.points }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="Comment" value="{{ submission.comment or '' }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="submit" class="btn btn-sm btn-success">Save Grade</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                {% if submission.grade is not none %}
+                                <div class="alert alert-success mt-2 mb-0">Grade: {{ submission.grade }}/{{ assignment.points }}</div>
+                                {% endif %}
+                                {% if submission.comment %}
+                                <div class="alert alert-info mt-1 mb-0">Comment: {{ submission.comment }}</div>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted mt-2">No submissions yet.</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No assignments available.</p>
+            {% endif %}
+        </div>
+        {% macro render_reply(reply, ann_id, depth=0) %}
+        <div class="card mb-2 reply-card" data-depth="{{ depth }}">
+            <div class="card-body p-2">
+                <strong>{{ reply.user.username }}</strong> <small class="text-muted">{{ reply.created_at.strftime('%b %d, %I:%M %p') }}</small>
+                <p class="mb-1">{{ reply.message }}</p>
+                
+                <!-- Reply button -->
+                <button class="btn btn-sm btn-link p-0" type="button" data-toggle="collapse" data-target="#reply-form-{{ ann_id }}-{{ reply.id }}">
+                    Reply
+                </button>
+                
+                <!-- Reply form -->
+                <div class="collapse" id="reply-form-{{ ann_id }}-{{ reply.id }}">
+                    <form method="post" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}" class="mt-2">
+                        <input type="hidden" name="action" value="add_reply">
+                        <input type="hidden" name="announcement_id" value="{{ ann_id }}">
+                        <input type="hidden" name="parent_reply_id" value="{{ reply.id }}">
+                        <div class="form-group">
+                            <textarea class="form-control form-control-sm" name="reply_message" rows="2" placeholder="Write a reply..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary">Post Reply</button>
+                    </form>
+                </div>
+                
+                <!-- Recursively render child replies -->
+                {% set child_replies = reply.child_replies.all() %}
+                {% if child_replies %}
+                <div class="mt-2">
+                    {% for child_reply in child_replies %}
+                        {{ render_reply(child_reply, ann_id, depth + 1) }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endmacro %}
+        
+        <div class="tab-pane fade" id="announcements" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                <h4>Announcements</h4>
+                {% if is_teacher_or_admin %}
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addAnnouncementModal">
+                    + Add Announcement
+                </button>
+                {% endif %}
+            </div>
+            {% if announcements %}
+            <ul class="list-group mb-4">
+                {% for ann in announcements %}
+                <li class="list-group-item">
+                    <div><strong>{{ ann.title }}</strong></div>
+                    <div>{{ ann.message }}</div>
+                    <div><small>Posted: {{ ann.created_at.strftime('%b %d, %Y %I:%M %p') }}</small></div>
+                    
+                    <!-- Reply button -->
+                    <button class="btn btn-sm btn-link" type="button" data-toggle="collapse" data-target="#reply-form-{{ ann.id }}">
+                        Reply
+                    </button>
+                    
+                    <!-- Reply form -->
+                    <div class="collapse" id="reply-form-{{ ann.id }}">
+                        <form method="post" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}" class="mt-2">
+                            <input type="hidden" name="action" value="add_reply">
+                            <input type="hidden" name="announcement_id" value="{{ ann.id }}">
+                            <div class="form-group">
+                                <textarea class="form-control" name="reply_message" rows="2" placeholder="Write a reply..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary">Post Reply</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Display replies recursively -->
+                    {% set top_level_replies = ann.replies.filter_by(parent_reply_id=None).all() %}
+                    {% if top_level_replies %}
+                    <div class="mt-3">
+                        {% for reply in top_level_replies %}
+                            {{ render_reply(reply, ann.id, 0) }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No announcements yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if is_teacher_or_admin %}
+    <!-- Add Announcement Modal -->
+    <div class="modal fade" id="addAnnouncementModal" tabindex="-1" role="dialog" aria-labelledby="addAnnouncementModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}">
+            <input type="hidden" name="action" value="add_announcement">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addAnnouncementModalLabel">Add Announcement</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Title *</label>
+                <input type="text" class="form-control" name="announcement_title" required>
+              </div>
+              <div class="form-group">
+                <label>Message *</label>
+                <textarea class="form-control" name="announcement_message" rows="6" required></textarea>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="announcement_published" id="announcementPublished" checked>
+                <label class="form-check-label" for="announcementPublished">Publish immediately</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Add Announcement</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Folder Modal -->
+    <div class="modal fade" id="createFolderModal" tabindex="-1" role="dialog" aria-labelledby="createFolderModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}">
+            <input type="hidden" name="action" value="create_folder">
+            <input type="hidden" name="parent_folder_id" id="parentFolderId" value="">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createFolderModalLabel">Create Folder</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-info">
+                Parent: <strong id="parentFolderName">Root</strong>
+              </div>
+              <div class="form-group">
+                <label>Folder Name *</label>
+                <input type="text" class="form-control" name="folder_title" required>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" name="folder_description" rows="2"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create Folder</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload File Modal -->
+    <div class="modal fade" id="uploadFileModal" tabindex="-1" role="dialog" aria-labelledby="uploadFileModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post" enctype="multipart/form-data" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}">
+            <input type="hidden" name="action" value="upload_file">
+            <input type="hidden" name="file_folder_id" id="fileFolderId" value="">
+            <div class="modal-header">
+              <h5 class="modal-title" id="uploadFileModalLabel">Upload File</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-info">
+                Upload to: <strong id="fileFolderName">Root</strong>
+              </div>
+              <div class="form-group">
+                <label>File *</label>
+                <input type="file" class="form-control-file" name="content_file" required>
+              </div>
+              <div class="form-group">
+                <label>Title *</label>
+                <input type="text" class="form-control" name="file_title" required>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" name="file_description" rows="2"></textarea>
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="file_published" id="filePublished" checked>
+                <label class="form-check-label" for="filePublished">Publish immediately</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Upload File</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Assignment Modal -->
+    <div class="modal fade" id="addAssignmentModal" tabindex="-1" role="dialog" aria-labelledby="addAssignmentModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('main.course_page_enrolled', course_slug=course.title|lower|replace(' ', '-') ~ '-' ~ course.id) }}">
+            <input type="hidden" name="action" value="add_assignment">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addAssignmentModalLabel">Create Assignment</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Title *</label>
+                <input type="text" class="form-control" name="assignment_title" required>
+              </div>
+              <div class="form-group">
+                <label>Description *</label>
+                <textarea class="form-control" name="assignment_description" rows="4" required></textarea>
+              </div>
+              <div class="form-group">
+                <label>Due Date</label>
+                <input type="datetime-local" class="form-control" name="assignment_due_date">
+              </div>
+              <div class="form-group">
+                <label>Points</label>
+                <input type="number" class="form-control" name="assignment_points" value="100" min="0">
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="assignment_published" id="assignmentPublished" checked>
+                <label class="form-check-label" for="assignmentPublished">Publish immediately</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Create Assignment</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Move File Modal -->
+    <div class="modal fade" id="moveFileModal" tabindex="-1" role="dialog" aria-labelledby="moveFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moveFileModalLabel">Move File</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="/move_file">
+                    <div class="modal-body">
+                        <input type="hidden" name="file_id" id="moveFileId">
+                        <div class="form-group">
+                            <label for="newFolderId">Select Destination Folder</label>
+                            <select class="form-control" name="new_folder_id" id="newFolderId">
+                                <option value="">Root</option>
+                                {% for key in folder_paths.keys() %}
+                                <option value="{{ key }}">{{ folder_paths[key] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Move</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Move Folder Modal -->
+    <div class="modal fade" id="moveFolderModal" tabindex="-1" role="dialog" aria-labelledby="moveFolderModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moveFolderModalLabel">Move Folder</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="/move_folder">
+                    <div class="modal-body">
+                        <input type="hidden" name="folder_id" id="moveFolderId">
+                        <div class="form-group">
+                            <label for="newParentFolderId">Select New Parent Folder</label>
+                            <select class="form-control" name="new_parent_folder_id" id="newParentFolderId">
+                                <option value="">Root</option>
+                                {% for key in folder_paths.keys() %}
+                                <option value="{{ key }}">{{ folder_paths[key] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Move Folder</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Manually handle folder button clicks
+    $(document).on('click', '[data-target="#createFolderModal"]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var parentId = $(this).data('parent-id');
+        var parentName = $(this).data('parent-name');
+
+        $('#parentFolderId').val(parentId || '');
+        $('#parentFolderName').text(parentName || 'Root');
+
+        try {
+            $('#createFolderModal').modal('show');
+        } catch(err) {
+            console.error('Error showing modal:', err);
+        }
+    });
+
+    // Manually handle file button clicks
+    $(document).on('click', '[data-target="#uploadFileModal"]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var folderId = $(this).data('folder-id');
+        var folderName = $(this).data('folder-name');
+
+        $('#fileFolderId').val(folderId || '');
+        $('#fileFolderName').text(folderName || 'Root');
+
+        try {
+            $('#uploadFileModal').modal('show');
+        } catch(err) {
+            console.error('Error showing modal:', err);
+        }
+    });
+
+    // Populate the Move File Modal with file data
+    $('#moveFileModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var fileId = button.data('file-id'); // Extract file ID from data-* attributes
+        var fileName = button.data('file-name'); // Extract file name
+
+        var modal = $(this);
+        modal.find('#moveFileId').val(fileId);
+        modal.find('.modal-title').text('Move File: ' + fileName);
+    });
+
+    // Populate the Move Folder Modal with folder data
+    $('#moveFolderModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var folderId = button.data('folder-id'); // Extract folder ID from data-* attributes
+        var folderName = button.data('folder-name'); // Extract folder name
+
+        var modal = $(this);
+        modal.find('#moveFolderId').val(folderId);
+        modal.find('.modal-title').text('Move Folder: ' + folderName);
+    });
+
+    // Toggle folder arrow icons
+    $('.collapse').on('show.bs.collapse', function () {
+        var folderId = $(this).attr('id').replace('folder-', '');
+        $('#icon-' + folderId).text('▲');
+    });
+    $('.collapse').on('hide.bs.collapse', function () {
+        var folderId = $(this).attr('id').replace('folder-', '');
+        $('#icon-' + folderId).text('▼');
+    });
+});
+</script>
+{% endblock %}

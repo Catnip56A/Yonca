@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - {{ home_content.site_name }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+    }
+    .logo img {
+        height: 32px;
+        width: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
+    <h1 style="font-size:2.2rem; font-weight:700; color:#abc32f;">{{ course.page_welcome_title or course.title }}</h1>
+    {% if course.page_subtitle %}
+    <h2 style="font-size:1.3rem; color:#374151; margin-top:0.5rem;">{{ course.page_subtitle }}</h2>
+    {% endif %}
+    {% if course.page_description %}
+    <p style="margin-top:1.2rem; font-size:1.1rem; color:#444;">{{ course.page_description|safe }}</p>
+    {% endif %}
+    {% if course.page_features %}
+    <div class="row" style="margin-top:2rem;">
+        {% for feature in course.page_features %}
+        <div class="col-md-4" style="margin-bottom:1.5rem;">
+            <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%;">
+                <h4 style="color:#abc32f; font-size:1.1rem; font-weight:600;">{{ feature.title }}</h4>
+                <p style="color:#555;">{{ feature.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if course.page_gallery_images and course.page_gallery_images|length > 0 %}
+    <div class="course-gallery" style="margin-top:2rem;">
+        <div class="row">
+            {% for img in course.page_gallery_images %}
+            <div class="col-md-3 col-6" style="margin-bottom:1rem;">
+                <img src="{{ img }}" alt="Course image" style="width:100%; border-radius:8px; box-shadow:0 1px 4px #ccc;" />
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div style="margin-top:2rem;">
+        {% if not current_user.is_authenticated %}
+            <a href="/login" class="btn btn-success">Login to Enroll</a>
+        {% else %}
+            <span class="badge badge-info">You are not enrolled in this course.</span>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
