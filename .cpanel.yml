@@ -1,11 +1,15 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/rcsjkudmfy/myflaskapp
+    _ export DEPLOYPATH=/home/rcsjkudmfy/myflaskapp/
     - /bin/cp -R * $DEPLOYPATH
     - cd $DEPLOYPATH
-    - python3 -m venv venv
+    - rm -rf venv
+    - python3 -m venv --without-pip --copies venv
     - source venv/bin/activate
-    - pip install --upgrade pip
+    - curl https://bootstrap.pypa.io/pip/3.6/get-pip.py -o get-pip.py
+    - python get-pip.py
+    - rm get-pip.py
     - pip install -r requirements.txt
+    - mkdir -p tmp
     - touch tmp/restart.txt
