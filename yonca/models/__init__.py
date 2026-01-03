@@ -13,6 +13,13 @@ user_courses = db.Table('user_courses',
     db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True)
 )
 
+# Association table for tracking which users have accessed which resources via PIN
+user_resource_access = db.Table('user_resource_access',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('resource_id', db.Integer, db.ForeignKey('resource.id'), primary_key=True),
+    db.Column('accessed_at', db.DateTime, server_default=db.func.now())
+)
+
 class User(db.Model, UserMixin):
     """User model for authentication and course enrollment"""
     id = db.Column(db.Integer, primary_key=True)
@@ -23,6 +30,7 @@ class User(db.Model, UserMixin):
     is_teacher = db.Column(db.Boolean, default=False)
     preferred_language = db.Column(db.String(10), default='en')  # User's preferred language for translations
     courses = db.relationship('Course', secondary=user_courses, backref=db.backref('users', lazy='select'))
+    accessed_resources = db.relationship('Resource', secondary=user_resource_access, backref=db.backref('accessed_users', lazy='select'))
 
     @property
     def password(self):
@@ -119,7 +127,9 @@ class CourseAssignmentSubmission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     assignment_id = db.Column(db.Integer, db.ForeignKey('course_assignment.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    file_path = db.Column(db.String(300), nullable=False)
+    file_path = db.Column(db.String(300), nullable=True)  # Legacy field, now nullable
+    drive_file_id = db.Column(db.String(100))  # Google Drive file ID
+    drive_view_link = db.Column(db.String(300))  # Google Drive view link
     submitted_at = db.Column(db.DateTime, server_default=db.func.now())
     grade = db.Column(db.Integer, nullable=True)
     comment = db.Column(db.Text, nullable=True)
@@ -134,7 +144,8 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    file_url = db.Column(db.String(300))
+    drive_file_id = db.Column(db.String(100))  # Google Drive file ID
+    drive_view_link = db.Column(db.String(300))  # Google Drive view link
     access_pin = db.Column(db.String(10), nullable=False)
     pin_expires_at = db.Column(db.DateTime, nullable=False)
     pin_last_reset = db.Column(db.DateTime, server_default=db.func.now())
@@ -187,7 +198,8 @@ class PDFDocument(db.Model):
     description = db.Column(db.Text)
     filename = db.Column(db.String(300), nullable=False)
     original_filename = db.Column(db.String(300), nullable=False)
-    file_path = db.Column(db.String(500), nullable=False)
+    drive_file_id = db.Column(db.String(100))  # Google Drive file ID
+    drive_view_link = db.Column(db.String(300))  # Google Drive view link
     file_size = db.Column(db.Integer)
     access_pin = db.Column(db.String(10), nullable=False)
     uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -248,7 +260,7 @@ class HomeContent(db.Model):
     about_section_description = db.Column(db.Text, default="Yonca is a comprehensive learning platform dedicated to providing quality education and fostering a supportive learning community.")
     
     # Navigation and branding
-    site_logo_url = db.Column(db.String(500), default="/static/images/Logo.jpeg")
+    site_logo_url = db.Column(db.String(500), default="https://lh3.googleusercontent.com/d/1abc123def456ghi789jkl012mno345pqr/view")
     site_name = db.Column(db.String(200), default="Yonca")
     navigation_items = db.Column(db.JSON, default=[
         {"name": "Home", "url": "/", "active": True},
@@ -290,7 +302,9 @@ class CourseContent(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     content_type = db.Column(db.String(50), default='text')  # text, video, file, link
-    content_data = db.Column(db.Text)  # URL, file path, or text content
+    content_data = db.Column(db.Text)  # URL, file path, or text content for non-file types
+    drive_file_id = db.Column(db.String(100))  # Google Drive file ID for file content
+    drive_view_link = db.Column(db.String(300))  # Google Drive view link for file content
     order = db.Column(db.Integer, default=0)
     is_published = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())

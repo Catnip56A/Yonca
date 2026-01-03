@@ -154,31 +154,54 @@ def course_page_enrolled(course_slug):
                 flash('Please select a file to upload.', 'error')
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
-            # Create upload directory if it doesn't exist
-            upload_dir = os.path.join('static', 'assignment_submissions', str(course.id), str(assignment_id))
-            os.makedirs(upload_dir, exist_ok=True)
+            # Create temporary directory
+            temp_dir = os.path.join('static', 'temp')
+            os.makedirs(temp_dir, exist_ok=True)
             
             # Generate unique filename
             filename = secure_filename(uploaded_file.filename)
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             unique_filename = f"{current_user.id}_{timestamp}_{filename}"
-            file_path = os.path.join(upload_dir, unique_filename)
+            temp_file_path = os.path.join(temp_dir, unique_filename)
             
-            # Save the file
-            uploaded_file.save(file_path)
+            # Save the file temporarily
+            uploaded_file.save(temp_file_path)
             
-            # Store relative path in database
-            relative_path = f"/static/assignment_submissions/{course.id}/{assignment_id}/{unique_filename}"
+            # Upload to Google Drive
+            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+            service = authenticate()
+            if not service:
+                flash('Failed to authenticate with Google Drive.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            drive_file_id = upload_file(service, temp_file_path, filename)
+            if not drive_file_id:
+                flash('Failed to upload file to Google Drive.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Create view-only link
+            view_link = create_view_only_link(service, drive_file_id, is_image=False)
+            if not view_link:
+                flash('Failed to create view link.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
             # Create submission record
             new_submission = CourseAssignmentSubmission(
                 assignment_id=int(assignment_id),
                 user_id=current_user.id,
-                file_path=relative_path,
+                drive_file_id=drive_file_id,
+                drive_view_link=view_link,
                 submitted_at=datetime.now()
             )
             db.session.add(new_submission)
             db.session.commit()
+            
+            # Clean up temporary file
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass
+            
             flash('Assignment submitted successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
         
@@ -250,21 +273,36 @@ def course_page_enrolled(course_slug):
                 flash('Please select a file to upload.', 'error')
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
-            # Create upload directory
-            upload_dir = os.path.join('static', 'course_uploads', str(course.id))
-            os.makedirs(upload_dir, exist_ok=True)
+            # Create temporary directory
+            temp_dir = os.path.join('static', 'temp')
+            os.makedirs(temp_dir, exist_ok=True)
             
             # Generate unique filename
             filename = secure_filename(uploaded_file.filename)
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             unique_filename = f"{timestamp}_{filename}"
-            file_path = os.path.join(upload_dir, unique_filename)
+            temp_file_path = os.path.join(temp_dir, unique_filename)
             
-            # Save the file
-            uploaded_file.save(file_path)
+            # Save the file temporarily
+            uploaded_file.save(temp_file_path)
             
-            # Store relative path
-            relative_path = f"/static/course_uploads/{course.id}/{unique_filename}"
+            # Upload to Google Drive
+            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+            service = authenticate()
+            if not service:
+                flash('Failed to authenticate with Google Drive.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            drive_file_id = upload_file(service, temp_file_path, filename)
+            if not drive_file_id:
+                flash('Failed to upload file to Google Drive.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Create view-only link
+            view_link = create_view_only_link(service, drive_file_id, is_image=False)
+            if not view_link:
+                flash('Failed to create view link.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
             # Create content record
             new_content = CourseContent(
@@ -273,13 +311,22 @@ def course_page_enrolled(course_slug):
                 title=file_title,
                 description=file_description,
                 content_type='file',
-                content_data=relative_path,
+                content_data='',  # Not used for file content
+                drive_file_id=drive_file_id,
+                drive_view_link=view_link,
                 is_published=is_published,
                 order=0,
                 created_at=datetime.now()
             )
             db.session.add(new_content)
             db.session.commit()
+            
+            # Clean up temporary file
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass
+            
             flash('File uploaded successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
 
@@ -427,21 +474,42 @@ def edit_course_page(slug):
                 flash('No file was uploaded.', 'error')
                 return redirect(request.url, code=303)
             
-            # Create upload directory if it doesn't exist
-            upload_dir = os.path.join('static', 'course_uploads', str(course.id))
-            os.makedirs(upload_dir, exist_ok=True)
+            # Create temporary directory
+            temp_dir = os.path.join('static', 'temp')
+            os.makedirs(temp_dir, exist_ok=True)
             
             # Generate unique filename
             filename = secure_filename(uploaded_file.filename)
             timestamp = dt.now().strftime('%Y%m%d_%H%M%S')
             unique_filename = f"{timestamp}_{filename}"
-            file_path = os.path.join(upload_dir, unique_filename)
+            temp_file_path = os.path.join(temp_dir, unique_filename)
             
-            # Save the file
-            uploaded_file.save(file_path)
+            # Save the file temporarily
+            uploaded_file.save(temp_file_path)
             
-            # Store relative path in database
-            relative_path = f"/static/course_uploads/{course.id}/{unique_filename}"
+            # Upload to Google Drive
+            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+            service = authenticate()
+            if not service:
+                flash('Failed to authenticate with Google Drive.', 'error')
+                return redirect(request.url, code=303)
+            
+            drive_file_id = upload_file(service, temp_file_path, filename)
+            if not drive_file_id:
+                flash('Failed to upload file to Google Drive.', 'error')
+                return redirect(request.url, code=303)
+            
+            # Create view-only link
+            view_link = create_view_only_link(service, drive_file_id, is_image=False)
+            if not view_link:
+                flash('Failed to create view link.', 'error')
+                return redirect(request.url, code=303)
+            
+            # Clean up temporary file
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass
             
             # Optional folder assignment
             folder_id = request.form.get('content_folder_id')
@@ -451,7 +519,9 @@ def edit_course_page(slug):
                 title=request.form.get('content_title', ''),
                 description=request.form.get('content_description', ''),
                 content_type=request.form.get('content_type', 'file'),
-                content_data=relative_path,
+                content_data=view_link,  # Store the Google Drive view link
+                drive_file_id=drive_file_id,
+                drive_view_link=view_link,
                 order=CourseContent.query.filter_by(course_id=course.id).count() + 1,
                 folder_id=int(folder_id) if folder_id else None,
                 is_published=request.form.get('content_published') == 'on'

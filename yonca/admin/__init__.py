@@ -123,10 +123,52 @@ class AdminIndexView(AdminIndexView):
                 home_content.site_name = form.site_name.data
                 
                 # Handle logo upload
+                logo_file = request.files.get('site_logo_file')
                 logo_url = request.form.get('site_logo_url')
-                if logo_url:
+                
+                if logo_file and logo_file.filename:
+                    # Upload logo to Google Drive
+                    from werkzeug.utils import secure_filename
+                    import os
+                    import random
+                    from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+                    
+                    # Create temporary directory for file processing
+                    temp_dir = os.path.join(current_app.static_folder, 'temp')
+                    os.makedirs(temp_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(logo_file.filename)
+                    unique_filename = f"logo_{random.randint(1000, 9999)}_{filename}"
+                    temp_file_path = os.path.join(temp_dir, unique_filename)
+                    
+                    # Save file temporarily
+                    logo_file.save(temp_file_path)
+                    
+                    # Upload to Google Drive
+                    service = authenticate()
+                    if service:
+                        drive_file_id = upload_file(service, temp_file_path, filename)
+                        if drive_file_id:
+                            view_link = create_view_only_link(service, drive_file_id, is_image=True)
+                            if view_link:
+                                home_content.site_logo_url = view_link
+                                flash('Logo uploaded successfully to Google Drive', 'success')
+                            else:
+                                flash('Failed to create view link for logo', 'error')
+                        else:
+                            flash('Failed to upload logo to Google Drive', 'error')
+                    else:
+                        flash('Failed to authenticate with Google Drive for logo upload', 'error')
+                    
+                    # Clean up temporary file
+                    try:
+                        os.remove(temp_file_path)
+                    except:
+                        pass
+                elif logo_url:
+                    # Use provided URL
                     home_content.site_logo_url = logo_url
-                # If no new logo uploaded, keep existing one
                 
                 home_content.is_active = True  # Always keep home content active
                 print(f"DEBUG: Setting is_active to: True (always active)")
@@ -192,25 +234,44 @@ class AdminIndexView(AdminIndexView):
                     if file_key in request.files and request.files[file_key].filename:
                         file = request.files[file_key]
                         if file and file.filename:
-                            # Handle file upload
+                            # Handle file upload to Google Drive
                             from werkzeug.utils import secure_filename
                             import os
                             import random
+                            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
                             
-                            # Create uploads directory if it doesn't exist
-                            upload_dir = os.path.join(current_app.static_folder, 'uploads', 'gallery')
-                            os.makedirs(upload_dir, exist_ok=True)
+                            # Create temporary directory for file processing
+                            temp_dir = os.path.join(current_app.static_folder, 'temp')
+                            os.makedirs(temp_dir, exist_ok=True)
                             
                             # Generate secure filename
                             filename = secure_filename(file.filename)
-                            unique_filename = f"{random.randint(1000, 9999)}_{filename}"
-                            file_path = os.path.join(upload_dir, unique_filename)
+                            unique_filename = f"gallery_{random.randint(1000, 9999)}_{filename}"
+                            temp_file_path = os.path.join(temp_dir, unique_filename)
                             
-                            # Save file
-                            file.save(file_path)
-                            url = f'/static/uploads/gallery/{unique_filename}'
+                            # Save file temporarily
+                            file.save(temp_file_path)
                             
-                            gallery_images.append({'url': url, 'alt': alt, 'caption': caption})
+                            # Upload to Google Drive
+                            service = authenticate()
+                            if service:
+                                drive_file_id = upload_file(service, temp_file_path, filename)
+                                if drive_file_id:
+                                    view_link = create_view_only_link(service, drive_file_id, is_image=True)
+                                    if view_link:
+                                        gallery_images.append({'url': view_link, 'alt': alt, 'caption': caption, 'drive_file_id': drive_file_id})
+                                    else:
+                                        flash(f'Failed to create view link for gallery image {filename}', 'error')
+                                else:
+                                    flash(f'Failed to upload gallery image {filename} to Google Drive', 'error')
+                            else:
+                                flash('Failed to authenticate with Google Drive for gallery upload', 'error')
+                            
+                            # Clean up temporary file
+                            try:
+                                os.remove(temp_file_path)
+                            except:
+                                pass
                     else:
                         # No new file uploaded - check if this corresponds to an existing image
                         # by checking if the index is within the range of existing images
@@ -384,6 +445,7 @@ class HomeContentForm(FlaskForm):
     # Branding and navigation
     site_name = StringField('Site Name', [Optional()], default="Yonca")
     site_logo_url = StringField('Logo URL', [Optional()])
+    site_logo_file = FileField('Logo File', [Optional()])
     
     is_active = BooleanField('Active', default=True)
 
@@ -537,22 +599,25 @@ class ResourceForm(Form):
     """Custom form for resource creation with file upload"""
     title = StringField('Title', [DataRequired()])
     description = TextAreaField('Description')
-    file = FileField('File', [DataRequired()])
+    file = FileField('File')  # Optional file upload
+    access_pin = StringField('Access PIN', render_kw={'readonly': True, 'style': 'background-color: #f8f9fa;'})
     is_active = BooleanField('Active', default=True)
 
 class ResourceView(SecureModelView):
     """Admin view for Resource model with file upload"""
-    column_list = ('id', 'title', 'description', 'file_url', 'access_pin', 'pin_expires_at', 'pin_last_reset', 'uploaded_by', 'upload_date', 'is_active', 'reset_pin_button')
+    column_list = ('id', 'title', 'description', 'drive_view_link', 'access_pin', 'pin_expires_at', 'pin_last_reset', 'uploaded_by', 'upload_date', 'is_active', 'reset_pin_button')
     column_searchable_list = ['title', 'description']
-    column_formatters = {
-        'pin_expires_at': lambda v, c, m, p: m.pin_expires_at.strftime('%Y-%m-%d %H:%M:%S') if m.pin_expires_at else 'N/A',
-        'pin_last_reset': lambda v, c, m, p: m.pin_last_reset.strftime('%Y-%m-%d %H:%M:%S') if m.pin_last_reset else 'N/A'
-    }
     form = ResourceForm
-    form_excluded_columns = ('uploaded_by', 'upload_date', 'file_url', 'access_pin', 'pin_expires_at', 'pin_last_reset')
+    form_excluded_columns = ('uploaded_by', 'upload_date', 'drive_file_id', 'drive_view_link', 'pin_expires_at', 'pin_last_reset')
+    
+    # Enable file uploads
+    form_enctype = 'multipart/form-data'
     
     column_formatters = dict(
-        reset_pin_button=lambda v, c, m, p: Markup(f'<a href="/admin/resource/reset_pin/{m.id}" class="btn btn-sm btn-warning"><i class="fa fa-refresh"></i> Reset PIN</a>')
+        reset_pin_button=lambda v, c, m, p: Markup(f'<a href="/admin/resource/reset_pin/{m.id}" class="btn btn-sm btn-warning"><i class="fa fa-refresh"></i> Reset PIN</a>'),
+        access_pin=lambda v, c, m, p: Markup(f'<code style="font-size: 14px; background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">{m.access_pin}</code>') if m.access_pin else 'Not generated',
+        pin_expires_at=lambda v, c, m, p: m.pin_expires_at.strftime('%Y-%m-%d %H:%M:%S') if m.pin_expires_at else 'N/A',
+        pin_last_reset=lambda v, c, m, p: m.pin_last_reset.strftime('%Y-%m-%d %H:%M:%S') if m.pin_last_reset else 'N/A'
     )
     
     @expose('/reset_pin/<int:resource_id>')
@@ -568,43 +633,62 @@ class ResourceView(SecureModelView):
         flash(f'PIN reset successfully. New PIN: {resource.access_pin} (was: {old_pin})', 'success')
         return redirect(url_for('resource.index_view'))
     
-    def create_model(self, form):
-        """Override create_model to handle file upload"""
-        from werkzeug.utils import secure_filename
-        import os
-        import random
-        from flask_login import current_user
-        
-        # Handle file upload
-        file = form.file.data
-        if file:
-            # Create uploads directory if it doesn't exist
-            upload_dir = os.path.join(current_app.static_folder, 'uploads', 'resources')
-            os.makedirs(upload_dir, exist_ok=True)
+    def on_model_change(self, form, model, is_created):
+        """Handle file upload when model is created or changed"""
+        if is_created:
+            # Ensure PIN is generated for new resources
+            if not model.access_pin:
+                model.generate_new_pin()
             
-            # Generate secure filename
-            filename = secure_filename(file.filename)
-            unique_filename = f"{random.randint(1000, 9999)}_{filename}"
-            file_path = os.path.join(upload_dir, unique_filename)
-            
-            # Save file
-            file.save(file_path)
-            file_url = f'/static/uploads/resources/{unique_filename}'
-        else:
-            file_url = None
+            # Handle file upload for new models
+            file = form.file.data
+            if file:
+                from werkzeug.utils import secure_filename
+                import os
+                import random
+                from flask import flash
+                from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+                
+                try:
+                    # Create temporary directory
+                    temp_dir = os.path.join(current_app.static_folder, 'temp')
+                    os.makedirs(temp_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{random.randint(1000, 9999)}_{filename}"
+                    temp_file_path = os.path.join(temp_dir, unique_filename)
+                    
+                    # Save file temporarily
+                    file.save(temp_file_path)
+                    
+                    # Upload to Google Drive
+                    service = authenticate()
+                    if not service:
+                        flash('Failed to authenticate with Google Drive. File not uploaded.', 'error')
+                    else:
+                        drive_file_id = upload_file(service, temp_file_path, filename)
+                        if drive_file_id:
+                            # Create view-only link
+                            view_link = create_view_only_link(service, drive_file_id, is_image=False)
+                            if view_link:
+                                model.drive_file_id = drive_file_id
+                                model.drive_view_link = view_link
+                            else:
+                                flash('Failed to create view link.', 'error')
+                        else:
+                            flash('Failed to upload file to Google Drive.', 'error')
+                    
+                    # Clean up temporary file
+                    try:
+                        os.remove(temp_file_path)
+                    except:
+                        pass
+                        
+                except Exception as e:
+                    flash(f'Error uploading file: {str(e)}', 'error')
         
-        # Create model
-        model = self.model(
-            title=form.title.data,
-            description=form.description.data,
-            file_url=file_url,
-            uploaded_by=current_user.id,
-            is_active=form.is_active.data
-        )
-        
-        self.session.add(model)
-        self.session.commit()
-        return model
+        return super().on_model_change(form, model, is_created)
     
     def create_form(self):
         """Override form creation to ensure no extra fields"""

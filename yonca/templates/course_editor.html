@@ -341,7 +341,7 @@
                                             {% for sub in submissions %}
                                                 <li style="margin-bottom: 0.75rem;">
                                                     <div><b>{{ sub.user.username if sub.user else 'User' }}</b> <small class="text-muted">{{ sub.submitted_at.strftime('%b %d, %Y %I:%M %p') }}</small></div>
-                                                    <div><a href="{{ sub.file_path }}" target="_blank">Download Submission</a></div>
+                                                    <div><a href="{{ sub.drive_view_link }}" target="_blank">View Submission</a></div>
                                                     <form method="POST" style="margin-top: 0.5rem;">
                                                         <input type="hidden" name="action" value="grade_submission">
                                                         <input type="hidden" name="submission_id" value="{{ sub.id }}">
@@ -371,7 +371,7 @@
                                             {% if my_submission %}
                                                 <div class="my-assignment-submission" style="margin-top: 1rem; margin-left: 2rem;">
                                                     <strong>Your Submission:</strong>
-                                                    <div><a href="{{ my_submission.file_path }}" target="_blank">Download Submission</a></div>
+                                                    <div><a href="{{ my_submission.drive_view_link }}" target="_blank">View Submission</a></div>
                                                     <div><span class="badge badge-info">Grade: {{ my_submission.grade if my_submission.grade is not none else 'Not graded yet' }}</span></div>
                                                     {% if my_submission.comment %}<div><span class="badge badge-secondary">Comment: {{ my_submission.comment }}</span></div>{% endif %}
                                                 </div>

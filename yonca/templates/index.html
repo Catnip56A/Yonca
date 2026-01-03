@@ -646,7 +646,7 @@
     <header>
         <div class="container">
             <div class="logo">
-                <img src="/static/images/Logo.jpeg" alt="Yonca Logo">
+                <img src="{{ home_content.site_logo_url or 'https://lh3.googleusercontent.com/d/1abc123def456ghi789jkl012mno345pqr/view' }}" alt="Yonca Logo">
             </div>
             <nav>
                 <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
@@ -1149,7 +1149,7 @@
             if (isEnrolled) {
                 const actionBtn = document.createElement('a');
                 actionBtn.textContent = 'Go to Course';
-                actionBtn.href = `/course/${course.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim()}-${course.id}`;
+                actionBtn.href = `/course/${course.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim()}`;
                 actionBtn.style.background = '#10b981';
                 actionBtn.style.color = 'white';
                 actionBtn.style.textDecoration = 'none';
@@ -1172,7 +1172,7 @@
                     .replace(/^-|-$/g, '')
                     .trim();
                 if (window.currentUser && isEnrolled) {
-                    window.location.href = `/course/${courseSlug}-${course.id}`;
+                    window.location.href = `/course/${courseSlug}`;
                     return;
                 }
                 // For non-enrolled users, open dropdown instead of redirect
@@ -1219,7 +1219,7 @@
                     .trim();
                 menuItems = [
                     { text: '{{ _("Loading...") }}', icon: '⏳', url: '#' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug + '-' + course.id }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug }
                 ];
             } else if (window.currentUser) {
                 // User is logged in
@@ -1237,7 +1237,7 @@
                         .trim();
                     menuItems = [
                         { text: '{{ _("Enroll Now") }}', icon: '✅', url: 'https://epoint.az/yonca-psychological-support-and-development-center' },
-                        { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug + '-' + course.id }
+                        { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug }
                     ];
                 }
             } else {
@@ -1250,7 +1250,7 @@
                     .trim();
                 menuItems = [
                     { text: '{{ _("Login to Enroll") }}', icon: '🔐', url: '/login' },
-                    { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug + '-' + course.id }
+                    { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + courseSlug }
                 ];
             }
 
@@ -1275,7 +1275,7 @@
                                 .replace(/\s+/g, '-') // Replace spaces with hyphens
                                 .replace(/-+/g, '-') // Replace multiple hyphens with single
                                 .trim(); // Remove leading/trailing whitespace
-                            url = url.replace('{description}', `${courseSlug}-${course.id}`);
+                            url = url.replace('{description}', `${courseSlug}`);
                         }
                         window.location.href = url;
                     } else {
@@ -1300,14 +1300,14 @@
         function handleCourseAction(action, course) {
             switch (action) {
                 case 'details':
-                    // Navigate to course page
+                    // Navigate to course description page
                     const courseSlug = course.title.toLowerCase()
                         .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
                         .replace(/\s+/g, '-') // Replace spaces with hyphens
                         .replace(/-+/g, '-') // Replace multiple hyphens with single
                         .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
                         .trim();
-                    window.location.href = `/course/${courseSlug}-${course.id}`;
+                    window.location.href = `/courseDescription/${courseSlug}`;
                     break;
                 case 'enroll':
                     if (window.currentUser) {
@@ -1380,7 +1380,13 @@
                     if (resource.has_pin) {
                         // PIN-protected resource
                         let accessButton = '';
-                        if (isUploader && resource.access_pin) {
+                        if (resource.requires_login) {
+                            // User needs to log in to access PIN-protected resources
+                            accessButton = `<button onclick="window.location.href='/login'" style="background: #3b82f6; color: white; border: 1px solid #3b82f6; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Log In to Access') }}</button>`;
+                        } else if (resource.permanent_access) {
+                            // User has permanent access - show direct link
+                            accessButton = `<a href="${resource.drive_view_link}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>`;
+                        } else if (isUploader && resource.access_pin) {
                             // Show PIN to uploader with expiration info
                             const expiresAt = new Date(resource.pin_expires_at);
                             const now = new Date();
@@ -1399,7 +1405,7 @@
                                 <span style="font-family: monospace; font-size: 1.1em; color: #1e40af; background: #e0f2fe; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${resource.access_pin}</span>
                                 <br><small style="color: #64748b;">${expirationText} | {{ _('Share this PIN with others to grant access') }}</small>
                             </div>
-                            <a href="${resource.file_url}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('Download') }}</a>`;
+                            <a href="${resource.drive_view_link}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('View Resource') }}</a>`;
                         } else {
                             // Show request access button to others
                             accessButton = `<button onclick="requestResourceAccess(${resource.id}, '${resource.title}')" style="background: #abc32f; color: white; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
@@ -1421,7 +1427,7 @@
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
                                 {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
                             </p>
-                            <a href="${resource.file_url}" target="_blank" style="background: #abc32f; color: white; text-decoration: none; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('Download') }}</a>
+                            <a href="${resource.drive_view_link}" target="_blank" style="background: #abc32f; color: white; text-decoration: none; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>
                         `;
                     }
                     
@@ -1495,9 +1501,25 @@
         // Access resource by ID and PIN
         async function accessResourceById(resourceId, pin) {
             try {
-                // Use the download URL with PIN embedded for direct access
-                const downloadUrl = `${API_BASE}/api/resources/${resourceId}/download/${pin}`;
-                window.open(downloadUrl, '_blank');
+                const response = await fetch(`${API_BASE}/api/resources/${resourceId}/access`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ pin: pin })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success - open the view link and reload resources to show permanent access
+                    window.open(result.drive_view_link, '_blank');
+                    // Reload resources to update the UI with permanent access
+                    loadResources();
+                } else {
+                    alert(result.error || '{{ _("Invalid PIN or access denied.") }}');
+                }
             } catch (error) {
                 console.error('Error accessing resource:', error);
                 alert('{{ _("Error accessing resource. Please try again.") }}');
@@ -1695,6 +1717,33 @@
         async function loadForumMessages(channel = 'general') {
             try {
                 const response = await fetch(`${API_BASE}/api/forum/messages?channel=${channel}`);
+                
+                if (response.status === 403) {
+                    // Access denied - try general channel first, then show empty
+                    console.warn(`Access denied for channel '${channel}'. Trying general channel.`);
+                    if (channel !== 'general') {
+                        loadForumMessages('general');
+                        return;
+                    } else {
+                        // Even general requires auth - show empty forum
+                        const messagesContainer = document.getElementById('messages-container');
+                        messagesContainer.innerHTML = '<div class="forum-message"><div class="user">System</div><p>This forum requires authentication. Please log in to view messages.</p></div>';
+                        return;
+                    }
+                }
+                
+                if (response.status === 404) {
+                    // Channel not found - show appropriate message
+                    console.warn(`Channel '${channel}' not found.`);
+                    const messagesContainer = document.getElementById('messages-container');
+                    messagesContainer.innerHTML = '<div class="forum-message"><div class="user">System</div><p>Channel not found or no channels available.</p></div>';
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 const messagesContainer = document.getElementById('messages-container');
                 messagesContainer.innerHTML = '';

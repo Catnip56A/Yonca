@@ -16,7 +16,7 @@
                         <p class="card-text">{{ course.description[:100] }}{% if course.description|length > 100 %}...{% endif %}</p>
                         {% endif %}
                         <div class="btn-group" role="group">
-                            <a href="/course/{{ course.title|lower|replace(' ', '-') }}-{{ course.id }}" class="btn btn-primary btn-sm" target="_blank">
+                            <a href="/course/{{ course.title|lower|replace(' ', '-') }}" class="btn btn-primary btn-sm" target="_blank">
                                 <i class="fa fa-eye"></i> View Course Page
                             </a>
                         </div>

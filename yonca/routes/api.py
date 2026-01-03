@@ -98,7 +98,10 @@ def get_forum_messages():
         return jsonify({'error': 'Channel not found'}), 404
     
     # Check access permissions
-    if channel.requires_login and not current_user.is_authenticated:
+    if channel.admin_only:
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return jsonify({'error': 'Admin access required for this channel'}), 403
+    elif channel.requires_login and not current_user.is_authenticated:
         return jsonify({'error': 'Authentication required for this channel'}), 403
     
     def build_thread(message, depth=0):
@@ -270,33 +273,55 @@ def upload_resource():
     # PIN is now always auto-generated (no user input allowed)
     
     try:
-        # Create uploads directory if it doesn't exist
-        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'resources')
-        os.makedirs(upload_dir, exist_ok=True)
+        # Create temporary directory if it doesn't exist
+        temp_dir = os.path.join(current_app.static_folder, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
         
         # Generate secure filename
         filename = secure_filename(file.filename)
         unique_filename = f"{random.randint(1000, 9999)}_{filename}"
-        file_path = os.path.join(upload_dir, unique_filename)
+        temp_file_path = os.path.join(temp_dir, unique_filename)
         
-        # Save file
-        file.save(file_path)
+        # Save file temporarily
+        file.save(temp_file_path)
+        
+        # Upload to Google Drive
+        from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+        service = authenticate()
+        if not service:
+            return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
+        
+        drive_file_id = upload_file(service, temp_file_path, filename)
+        if not drive_file_id:
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
+        # Create view-only link
+        view_link = create_view_only_link(service, drive_file_id, is_image=False)
+        if not view_link:
+            return jsonify({'error': 'Failed to create view link'}), 500
         
         # Create database record
         new_resource = Resource(
             title=title,
             description=description,
-            file_url=f'/static/uploads/resources/{unique_filename}',
+            drive_file_id=drive_file_id,
+            drive_view_link=view_link,
             uploaded_by=current_user.id
         )
         db.session.add(new_resource)
         db.session.commit()
         
+        # Clean up temporary file
+        try:
+            os.remove(temp_file_path)
+        except:
+            pass
+        
         return jsonify({
             'success': True,
             'id': new_resource.id,
             'title': new_resource.title,
-            'file_url': new_resource.file_url,
+            'drive_view_link': new_resource.drive_view_link,
             'pin': new_resource.access_pin,
             'expires_at': new_resource.pin_expires_at.isoformat(),
             'message': 'Resource uploaded successfully'
@@ -304,10 +329,10 @@ def upload_resource():
         
     except Exception as e:
         db.session.rollback()
-        # Clean up file if it was saved
-        if 'file_path' in locals() and os.path.exists(file_path):
+        # Clean up temporary file if it was saved
+        if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
             try:
-                os.remove(file_path)
+                os.remove(temp_file_path)
             except:
                 pass
         return jsonify({'error': f'Upload failed: {str(e)}'}), 500
@@ -331,7 +356,7 @@ def get_resources():
             'id': r.id,
             'title': r.title,
             'description': r.description,
-            'file_url': r.file_url,
+            'drive_view_link': r.drive_view_link,
             'upload_date': r.upload_date.isoformat() if r.upload_date else None,
             'pin_expires_at': r.pin_expires_at.isoformat() if r.pin_expires_at else None,
             'pin_last_reset': r.pin_last_reset.isoformat() if r.pin_last_reset else None,
@@ -339,9 +364,23 @@ def get_resources():
             'uploaded_by': r.uploaded_by
         }
 
-        # Only show PIN to the uploader (admin)
-        if current_user.is_authenticated and r.uploaded_by == current_user.id:
-            resource_data['access_pin'] = r.access_pin
+        # Check if user has permanent access to this resource
+        has_permanent_access = current_user.is_authenticated and r in current_user.accessed_resources
+        
+        if has_permanent_access:
+            # User has already accessed this resource, show view link directly
+            resource_data['permanent_access'] = True
+            resource_data['access_granted'] = True
+        elif not current_user.is_authenticated:
+            # Non-authenticated users need to log in
+            resource_data['permanent_access'] = False
+            resource_data['requires_login'] = True
+        else:
+            # Authenticated users who don't have permanent access need PIN
+            resource_data['permanent_access'] = False
+            resource_data['requires_pin'] = True
+            if current_user.is_admin or r.uploaded_by == current_user.id:
+                resource_data['access_pin'] = r.access_pin
 
         result.append(resource_data)
 
@@ -389,7 +428,7 @@ def get_pdfs():
 @api_bp.route('/resources/<int:resource_id>/access', methods=['POST'])
 @login_required
 def access_resource(resource_id):
-    """Verify PIN and provide access to resource"""
+    """Verify PIN and provide access to resource, recording user access for permanent viewing"""
     data = request.get_json()
     
     if not data or 'pin' not in data:
@@ -402,16 +441,23 @@ def access_resource(resource_id):
     if not resource.access_pin or resource.access_pin != data['pin']:
         return jsonify({'error': 'Invalid PIN'}), 403
     
+    # Record that this user has accessed this resource
+    from flask_login import current_user
+    if resource not in current_user.accessed_resources:
+        current_user.accessed_resources.append(resource)
+        db.session.commit()
+    
     return jsonify({
         'success': True,
         'title': resource.title,
-        'file_url': resource.file_url
+        'drive_view_link': resource.drive_view_link,
+        'permanent_access': True
     })
 
 @api_bp.route('/resources/<int:resource_id>/download/<pin>')
 @login_required
 def download_resource(resource_id, pin):
-    """Download resource with PIN verification and expiration check"""
+    """Get resource view link with PIN verification and expiration check"""
     resource = Resource.query.filter_by(id=resource_id, is_active=True).first()
     if not resource:
         return jsonify({'error': 'Resource not found'}), 404
@@ -424,19 +470,12 @@ def download_resource(resource_id, pin):
     if resource.is_pin_expired():
         return jsonify({'error': 'PIN has expired. Please request a new PIN from the resource owner.'}), 403
 
-    # Return the file directly
-    import os
-    from flask import send_file
-    file_path = os.path.join(current_app.static_folder, resource.file_url.replace('/static/', ''))
-
-    if not os.path.exists(file_path):
-        return jsonify({'error': 'File not found on server'}), 404
-
-    # Include file extension in download name
-    _, ext = os.path.splitext(file_path)
-    download_name = f"{resource.title}{ext}"
-
-    return send_file(file_path, as_attachment=True, download_name=download_name)
+    # Return the view link
+    return jsonify({
+        'success': True,
+        'title': resource.title,
+        'drive_view_link': resource.drive_view_link
+    })
 
 @api_bp.route('/pdfs/upload', methods=['POST'])
 def upload_pdf():
@@ -481,17 +520,32 @@ def upload_pdf():
         return jsonify({'error': 'PIN must be 4-10 characters'}), 400
     
     try:
-        # Create uploads directory if it doesn't exist
-        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'pdfs')
-        os.makedirs(upload_dir, exist_ok=True)
+        # Create temporary directory
+        temp_dir = os.path.join(current_app.static_folder, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
         
         # Generate secure filename
         filename = secure_filename(file.filename)
         unique_filename = f"{random.randint(1000, 9999)}_{filename}"
-        file_path = os.path.join(upload_dir, unique_filename)
+        temp_file_path = os.path.join(temp_dir, unique_filename)
         
-        # Save file
-        file.save(file_path)
+        # Save file temporarily
+        file.save(temp_file_path)
+        
+        # Upload to Google Drive
+        from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+        service = authenticate()
+        if not service:
+            return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
+        
+        drive_file_id = upload_file(service, temp_file_path, filename)
+        if not drive_file_id:
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
+        # Create view-only link
+        view_link = create_view_only_link(service, drive_file_id, is_image=False)
+        if not view_link:
+            return jsonify({'error': 'Failed to create view link'}), 500
         
         # Create database record
         new_pdf = PDFDocument(
@@ -499,14 +553,21 @@ def upload_pdf():
             description=description,
             filename=unique_filename,
             original_filename=file.filename,
-            file_path=f'/static/uploads/pdfs/{unique_filename}',
-            file_size=os.path.getsize(file_path),
+            drive_file_id=drive_file_id,
+            drive_view_link=view_link,
+            file_size=os.path.getsize(temp_file_path),
             access_pin=pin,
             uploaded_by=current_user.id if current_user.is_authenticated else None
         )
         
         db.session.add(new_pdf)
         db.session.commit()
+        
+        # Clean up temporary file
+        try:
+            os.remove(temp_file_path)
+        except:
+            pass
         
         return jsonify({
             'success': True,
@@ -518,10 +579,10 @@ def upload_pdf():
         
     except Exception as e:
         db.session.rollback()
-        # Clean up file if it was saved
-        if 'file_path' in locals() and os.path.exists(file_path):
+        # Clean up temporary file if it was saved
+        if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
             try:
-                os.remove(file_path)
+                os.remove(temp_file_path)
             except:
                 pass
         return jsonify({'error': f'Upload failed: {str(e)}'}), 500
@@ -639,7 +700,7 @@ def set_user_language():
 @api_bp.route('/feature-images/upload', methods=['POST'])
 @login_required
 def upload_feature_image():
-    """Upload feature image for courses"""
+    """Upload feature image to Google Drive"""
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
 
@@ -648,32 +709,51 @@ def upload_feature_image():
         return jsonify({'error': 'No file selected'}), 400
 
     if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif', 'webp'}):
-        # Create uploads directory if it doesn't exist
-        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'features')
-        os.makedirs(upload_dir, exist_ok=True)
+        # Create temporary directory for file processing
+        temp_dir = os.path.join(current_app.static_folder, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
 
         # Generate unique filename
         filename = secure_filename(file.filename)
         name, ext = os.path.splitext(filename)
-        unique_filename = f"{name}_{int(time.time())}{ext}"
-        file_path = os.path.join(upload_dir, unique_filename)
+        unique_filename = f"feature_{int(time.time())}{ext}"
+        temp_file_path = os.path.join(temp_dir, unique_filename)
 
-        file.save(file_path)
+        # Save file temporarily
+        file.save(temp_file_path)
 
-        # Return the URL path for the uploaded image
-        image_url = f"/static/uploads/features/{unique_filename}"
+        # Upload to Google Drive
+        from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+        service = authenticate()
+        if not service:
+            return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
+
+        drive_file_id = upload_file(service, temp_file_path, filename)
+        if not drive_file_id:
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+
+        # Create view-only link
+        view_link = create_view_only_link(service, drive_file_id, is_image=True)
+        if not view_link:
+            return jsonify({'error': 'Failed to create view link'}), 500
+
+        # Clean up temporary file
+        try:
+            os.remove(temp_file_path)
+        except:
+            pass
+
+        # Return the Google Drive view link
         return jsonify({
             'success': True,
-            'image_url': image_url,
-            'filename': unique_filename
+            'image_url': view_link,
+            'filename': filename
         })
-
-    return jsonify({'error': 'Invalid file type'}), 400
 
 @api_bp.route('/logo/upload', methods=['POST'])
 @login_required
 def upload_logo():
-    """Upload site logo"""
+    """Upload site logo to Google Drive"""
     if not current_user.is_admin:
         return jsonify({'error': 'Admin access required'}), 403
 
@@ -685,24 +765,46 @@ def upload_logo():
         return jsonify({'error': 'No file selected'}), 400
 
     if file and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}):
-        # Create uploads directory if it doesn't exist
-        upload_dir = os.path.join(current_app.static_folder, 'uploads', 'logo')
-        os.makedirs(upload_dir, exist_ok=True)
+        # Create temporary directory for file processing
+        temp_dir = os.path.join(current_app.static_folder, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
 
         # Generate unique filename
         filename = secure_filename(file.filename)
         name, ext = os.path.splitext(filename)
         unique_filename = f"logo_{int(time.time())}{ext}"
-        file_path = os.path.join(upload_dir, unique_filename)
+        temp_file_path = os.path.join(temp_dir, unique_filename)
 
-        file.save(file_path)
+        # Save file temporarily
+        file.save(temp_file_path)
 
-        # Return the URL path for the uploaded logo
-        image_url = f"/static/uploads/logo/{unique_filename}"
+        # Upload to Google Drive
+        from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+        service = authenticate()
+        if not service:
+            return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
+
+        drive_file_id = upload_file(service, temp_file_path, filename)
+        if not drive_file_id:
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+
+        # Create view-only link
+        view_link = create_view_only_link(service, drive_file_id, is_image=True)
+        if not view_link:
+            return jsonify({'error': 'Failed to create view link'}), 500
+
+        # Clean up temporary file
+        try:
+            os.remove(temp_file_path)
+        except:
+            pass
+
+        # Return the Google Drive view link
         return jsonify({
             'success': True,
-            'image_url': image_url,
-            'filename': unique_filename
+            'image_url': view_link,
+            'filename': filename,
+            'drive_file_id': drive_file_id
         })
     else:
         return jsonify({'error': 'Invalid file type. Only images are allowed.'}), 400
