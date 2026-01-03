@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn instance to serve Yonca
+After=network.target
+Requires=postgresql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/yonca
+Environment="PATH=/var/www/yonca/venv/bin"
+Environment="FLASK_ENV=production"
+ExecStart=/var/www/yonca/venv/bin/gunicorn --workers 3 --bind unix:yonca.sock -m 007 wsgi:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

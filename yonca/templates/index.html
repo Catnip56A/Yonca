@@ -859,8 +859,7 @@
                         <input type="file" id="resource-file" name="file" required>
                     </div>
                     <div class="form-group">
-                        <label for="resource-pin">{{ _('Access PIN (leave empty for auto-generated):') }}</label>
-                        <input type="text" id="resource-pin" name="pin" placeholder="{{ _('Auto-generated if empty') }}">
+                        <p style="font-size: 0.9em; color: #6b7280; margin: 0;">{{ _('Access PIN will be auto-generated (6 characters, expires in 10 minutes)') }}</p>
                     </div>
                     <button type="submit" id="resource-upload-btn">{{ _('Upload Material') }}</button>
                 </form>
@@ -1382,11 +1381,23 @@
                         // PIN-protected resource
                         let accessButton = '';
                         if (isUploader && resource.access_pin) {
-                            // Show PIN to uploader
+                            // Show PIN to uploader with expiration info
+                            const expiresAt = new Date(resource.pin_expires_at);
+                            const now = new Date();
+                            const timeLeft = expiresAt - now;
+                            const minutesLeft = Math.max(0, Math.floor(timeLeft / (1000 * 60)));
+                            
+                            let expirationText = '';
+                            if (minutesLeft > 0) {
+                                expirationText = `{{ _('Expires in:') }} ${minutesLeft} {{ _('minutes') }}`;
+                            } else {
+                                expirationText = '<span style="color: #dc2626;">{{ _("PIN has expired") }}</span>';
+                            }
+                            
                             accessButton = `<div style="background: #f0f9ff; border: 1px solid #0ea5e9; padding: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">
                                 <strong style="color: #0ea5e9;">{{ _('Your Access PIN:') }}</strong> 
                                 <span style="font-family: monospace; font-size: 1.1em; color: #1e40af; background: #e0f2fe; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${resource.access_pin}</span>
-                                <br><small style="color: #64748b;">{{ _('Share this PIN with others to grant access') }}</small>
+                                <br><small style="color: #64748b;">${expirationText} | {{ _('Share this PIN with others to grant access') }}</small>
                             </div>
                             <a href="${resource.file_url}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('Download') }}</a>`;
                         } else {

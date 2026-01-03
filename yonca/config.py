@@ -15,6 +15,7 @@ class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     TESTING = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///yonca.db'
 
 class TestingConfig(Config):
     """Testing configuration"""
@@ -25,6 +26,11 @@ class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
+    SESSION_TYPE = 'filesystem'
+    SESSION_COOKIE_SECURE = True  # HTTPS required
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
 
 config = {
     'development': DevelopmentConfig,

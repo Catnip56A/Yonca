@@ -263,17 +263,11 @@ def upload_resource():
     # Get form data
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
-    pin = request.form.get('pin', '').strip()
     
     if not title:
         return jsonify({'error': 'Title is required'}), 400
     
-    # Generate PIN if requested but not provided
-    if pin and len(pin) < 4:
-        return jsonify({'error': 'PIN must be at least 4 characters'}), 400
-    elif not pin:
-        # Generate a PIN for security
-        pin = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    # PIN is now always auto-generated (no user input allowed)
     
     try:
         # Create uploads directory if it doesn't exist
@@ -293,7 +287,6 @@ def upload_resource():
             title=title,
             description=description,
             file_url=f'/static/uploads/resources/{unique_filename}',
-            access_pin=pin,
             uploaded_by=current_user.id
         )
         db.session.add(new_resource)
@@ -304,7 +297,8 @@ def upload_resource():
             'id': new_resource.id,
             'title': new_resource.title,
             'file_url': new_resource.file_url,
-            'pin': pin,
+            'pin': new_resource.access_pin,
+            'expires_at': new_resource.pin_expires_at.isoformat(),
             'message': 'Resource uploaded successfully'
         }), 201
         
@@ -322,17 +316,59 @@ def upload_resource():
 def get_resources():
     """Get all learning resources"""
     from flask_login import current_user
+    from datetime import datetime
+
     resources = Resource.query.filter_by(is_active=True).all()
-    return jsonify([{
-        'id': r.id,
-        'title': r.title,
-        'description': r.description,
-        'file_url': r.file_url,
-        'access_pin': r.access_pin if (current_user.is_authenticated and r.uploaded_by == current_user.id) else None,
-        'upload_date': r.upload_date.isoformat() if r.upload_date else None,
-        'has_pin': bool(r.access_pin),
-        'uploaded_by': r.uploaded_by
-    } for r in resources])
+    result = []
+
+    for r in resources:
+        # Check if PIN has expired and regenerate if needed
+        if r.is_pin_expired():
+            r.reset_pin()
+            db.session.commit()
+
+        resource_data = {
+            'id': r.id,
+            'title': r.title,
+            'description': r.description,
+            'file_url': r.file_url,
+            'upload_date': r.upload_date.isoformat() if r.upload_date else None,
+            'pin_expires_at': r.pin_expires_at.isoformat() if r.pin_expires_at else None,
+            'pin_last_reset': r.pin_last_reset.isoformat() if r.pin_last_reset else None,
+            'has_pin': bool(r.access_pin),
+            'uploaded_by': r.uploaded_by
+        }
+
+        # Only show PIN to the uploader (admin)
+        if current_user.is_authenticated and r.uploaded_by == current_user.id:
+            resource_data['access_pin'] = r.access_pin
+
+        result.append(resource_data)
+
+    return jsonify(result)
+
+@api_bp.route('/resources/<int:resource_id>/reset-pin', methods=['POST'])
+@login_required
+def reset_resource_pin(resource_id):
+    """Reset the PIN for a specific resource (admin only)"""
+    # Check if user is admin
+    if not current_user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+
+    resource = Resource.query.get_or_404(resource_id)
+
+    # Reset the PIN
+    old_pin = resource.access_pin
+    resource.reset_pin()
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'message': 'PIN reset successfully',
+        'new_pin': resource.access_pin,
+        'expires_at': resource.pin_expires_at.isoformat(),
+        'old_pin': old_pin
+    }), 200
 
 @api_bp.route('/pdfs')
 def get_pdfs():
@@ -375,20 +411,32 @@ def access_resource(resource_id):
 @api_bp.route('/resources/<int:resource_id>/download/<pin>')
 @login_required
 def download_resource(resource_id, pin):
-    """Download resource with PIN verification"""
+    """Download resource with PIN verification and expiration check"""
     resource = Resource.query.filter_by(id=resource_id, is_active=True).first()
-    if not resource or (resource.access_pin and resource.access_pin != pin):
-        return jsonify({'error': 'Invalid access'}), 403
-    
+    if not resource:
+        return jsonify({'error': 'Resource not found'}), 404
+
+    # Check PIN
+    if resource.access_pin != pin:
+        return jsonify({'error': 'Invalid PIN'}), 403
+
+    # Check if PIN has expired
+    if resource.is_pin_expired():
+        return jsonify({'error': 'PIN has expired. Please request a new PIN from the resource owner.'}), 403
+
     # Return the file directly
     import os
     from flask import send_file
-    file_path = os.path.join(current_app.static_folder, resource.file_url[1:])
-    
+    file_path = os.path.join(current_app.static_folder, resource.file_url.replace('/static/', ''))
+
     if not os.path.exists(file_path):
         return jsonify({'error': 'File not found on server'}), 404
-    
-    return send_file(file_path, as_attachment=True, download_name=resource.title)
+
+    # Include file extension in download name
+    _, ext = os.path.splitext(file_path)
+    download_name = f"{resource.title}{ext}"
+
+    return send_file(file_path, as_attachment=True, download_name=download_name)
 
 @api_bp.route('/pdfs/upload', methods=['POST'])
 def upload_pdf():

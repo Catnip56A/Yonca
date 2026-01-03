@@ -5,6 +5,7 @@ from flask import flash, redirect, url_for, request, current_app
 from flask_admin import Admin, AdminIndexView, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form.upload import FileUploadField
+from markupsafe import Markup
 from wtforms import Form, FileField, StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired
 from flask_login import current_user
@@ -541,10 +542,31 @@ class ResourceForm(Form):
 
 class ResourceView(SecureModelView):
     """Admin view for Resource model with file upload"""
-    column_list = ('id', 'title', 'description', 'file_url', 'access_pin', 'uploaded_by', 'upload_date', 'is_active')
+    column_list = ('id', 'title', 'description', 'file_url', 'access_pin', 'pin_expires_at', 'pin_last_reset', 'uploaded_by', 'upload_date', 'is_active', 'reset_pin_button')
     column_searchable_list = ['title', 'description']
+    column_formatters = {
+        'pin_expires_at': lambda v, c, m, p: m.pin_expires_at.strftime('%Y-%m-%d %H:%M:%S') if m.pin_expires_at else 'N/A',
+        'pin_last_reset': lambda v, c, m, p: m.pin_last_reset.strftime('%Y-%m-%d %H:%M:%S') if m.pin_last_reset else 'N/A'
+    }
     form = ResourceForm
-    form_excluded_columns = ('uploaded_by', 'upload_date', 'file_url', 'access_pin')
+    form_excluded_columns = ('uploaded_by', 'upload_date', 'file_url', 'access_pin', 'pin_expires_at', 'pin_last_reset')
+    
+    column_formatters = dict(
+        reset_pin_button=lambda v, c, m, p: Markup(f'<a href="/admin/resource/reset_pin/{m.id}" class="btn btn-sm btn-warning"><i class="fa fa-refresh"></i> Reset PIN</a>')
+    )
+    
+    @expose('/reset_pin/<int:resource_id>')
+    def reset_pin(self, resource_id):
+        """Reset the PIN for a specific resource"""
+        from flask import flash, redirect, url_for
+        
+        resource = self.model.query.get_or_404(resource_id)
+        old_pin = resource.access_pin
+        resource.reset_pin()
+        self.session.commit()
+        
+        flash(f'PIN reset successfully. New PIN: {resource.access_pin} (was: {old_pin})', 'success')
+        return redirect(url_for('resource.index_view'))
     
     def create_model(self, form):
         """Override create_model to handle file upload"""
@@ -576,7 +598,6 @@ class ResourceView(SecureModelView):
             title=form.title.data,
             description=form.description.data,
             file_url=file_url,
-            access_pin=None,  # No PIN for admin uploads
             uploaded_by=current_user.id,
             is_active=form.is_active.data
         )

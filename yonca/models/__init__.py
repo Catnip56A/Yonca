@@ -135,10 +135,37 @@ class Resource(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     file_url = db.Column(db.String(300))
-    access_pin = db.Column(db.String(10))
+    access_pin = db.Column(db.String(10), nullable=False)
+    pin_expires_at = db.Column(db.DateTime, nullable=False)
+    pin_last_reset = db.Column(db.DateTime, server_default=db.func.now())
     uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     upload_date = db.Column(db.DateTime, server_default=db.func.now())
     is_active = db.Column(db.Boolean, default=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Generate initial random PIN and expiration time
+        if not self.access_pin:
+            self.generate_new_pin()
+
+    def generate_new_pin(self):
+        """Generate a new random 6-character PIN and set expiration to 10 minutes from now"""
+        import random
+        import string
+        from datetime import datetime, timedelta
+
+        self.access_pin = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        self.pin_expires_at = datetime.utcnow() + timedelta(minutes=10)
+        self.pin_last_reset = datetime.utcnow()
+
+    def is_pin_expired(self):
+        """Check if the current PIN has expired"""
+        from datetime import datetime
+        return datetime.utcnow() > self.pin_expires_at
+
+    def reset_pin(self):
+        """Reset the PIN with a new random value and 10-minute expiration"""
+        self.generate_new_pin()
 
     def __repr__(self):
         return f'<Resource {self.title}>'

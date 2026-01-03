@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Yonca Flask App Deployment Script
+# Run this script on your Ubuntu VPS
+
+set -e
+
+echo "🚀 Starting Yonca deployment..."
+
+# Update system
+echo "📦 Updating system packages..."
+sudo apt update && sudo apt upgrade -y
+
+# Install required packages
+echo "📦 Installing required packages..."
+sudo apt install -y python3 python3-pip python3-venv postgresql postgresql-contrib nginx certbot python3-certbot-nginx
+
+# Create database and user
+echo "🗄️ Setting up PostgreSQL..."
+sudo -u postgres psql -c "CREATE DATABASE yonca_db;"
+sudo -u postgres psql -c "CREATE USER yonca_user WITH PASSWORD 'your_secure_password_here';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE yonca_db TO yonca_user;"
+
+# Create application directory
+echo "📁 Creating application directory..."
+sudo mkdir -p /var/www/yonca
+sudo chown -R $USER:www-data /var/www/yonca
+
+# Clone or copy your application code here
+echo "📋 Copy your Yonca application code to /var/www/yonca"
+echo "For example: git clone https://github.com/yourusername/yonca.git /var/www/yonca"
+read -p "Press Enter after you've copied the code..."
+
+# Set up Python virtual environment
+echo "🐍 Setting up Python virtual environment..."
+cd /var/www/yonca
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-prod.txt
+
+# Set up environment variables
+echo "🔧 Creating environment configuration..."
+cat > .env << EOF
+FLASK_ENV=production
+SECRET_KEY=your-super-secret-key-change-this-in-production
+DATABASE_URL=postgresql://yonca_user:your_secure_password_here@localhost:5432/yonca_db
+EOF
+
+# Run database migrations
+echo "🗃️ Running database migrations..."
+flask db upgrade
+
+# Copy systemd service file
+echo "⚙️ Setting up systemd service..."
+sudo cp deploy/yonca.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable yonca
+
+# Copy nginx configuration
+echo "🌐 Setting up nginx..."
+sudo cp deploy/yonca.nginx /etc/nginx/sites-available/yonca
+sudo ln -s /etc/nginx/sites-available/yonca /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Start the application
+echo "▶️ Starting the application..."
+sudo systemctl start yonca
+
+echo "✅ Deployment completed!"
+echo ""
+echo "Next steps:"
+echo "1. Update your domain DNS to point to this VPS IP"
+echo "2. Run: sudo certbot --nginx -d your-domain.com"
+echo "3. Check logs: sudo journalctl -u yonca -f"
+echo "4. Visit your domain to test the application"
