@@ -127,3 +127,4 @@ sqlite_exports/
 data/
 logs/
 *.log
+flask_session
