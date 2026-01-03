@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/rcsjkudmfy/myflaskapp
+    - /bin/cp -R * $DEPLOYPATH
+    - cd $DEPLOYPATH
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - touch tmp/restart.txt
