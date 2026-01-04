@@ -30,7 +30,11 @@ def create_app(config_name='development'):
     
     # Initialize extensions
     db.init_app(app)
-    migrate = Migrate(app, db)
+    # migrate = Migrate(app, db)  # Commented out to avoid migrations
+    
+    # Create all tables (alternative to migrations)
+    with app.app_context():
+        db.create_all()
     
     login_manager = LoginManager(app)
     login_manager.login_view = 'auth.login'
