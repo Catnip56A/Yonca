@@ -1,7 +1,14 @@
 """
 Yonca Application Entry Point
 """
+import sys
 import os
+
+# Check Python version
+if sys.version_info < (3, 6):
+    print("Error: Python 3.6 or higher is required.")
+    sys.exit(1)
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
