@@ -1,7 +1,7 @@
 """
 Authentication routes
 """
-from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template
+from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from yonca.models import User, db
 
@@ -19,6 +19,7 @@ def login():
         
         if user and user.check_password(password):
             login_user(user)
+            current_app.activity_logger.info(f"User {user.username} logged in")
             
             # Check if admin login is requested and user is admin
             if admin_login and user.is_admin:
@@ -34,5 +35,6 @@ def login():
 @login_required
 def logout():
     """Handle user logout"""
+    current_app.activity_logger.info(f"User {current_user.username} logged out")
     logout_user()
     return redirect(url_for('main.index'))

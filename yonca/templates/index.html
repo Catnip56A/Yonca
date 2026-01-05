@@ -2415,22 +2415,21 @@
 
         let stars = [];
 
-        let pointerX,
-            pointerY;
-
         let velocity = { x: 0, y: 0, tx: 0, ty: 0, z: 0.0005 };
 
-        let touchInput = false;
+        // Removed unused variables: pointerX, pointerY, touchInput
 
         generate();
         resize();
         step();
 
         window.onresize = resize;
-        document.onmousemove = onMouseMove;
-        document.ontouchmove = onTouchMove;
-        document.ontouchend = onMouseLeave;
-        document.onmouseleave = onMouseLeave;
+        // Remove mouse interaction for autonomous star movement
+        // COMMENTED OUT CODE:
+        // document.onmousemove = onMouseMove;
+        // document.ontouchmove = onTouchMove;
+        // document.ontouchend = onMouseLeave;
+        // document.onmouseleave = onMouseLeave;
 
         function generate() {
 
@@ -2530,6 +2529,11 @@
 
         function update() {
 
+          // Add autonomous slow movement instead of mouse-based velocity
+          let time = Date.now() * 0.0005; // Slow time-based movement
+          velocity.tx = Math.sin(time) * 0.1; // Gentle horizontal movement
+          velocity.ty = Math.cos(time * 0.7) * 0.08; // Slower vertical movement
+
           velocity.tx *= 0.96;
           velocity.ty *= 0.96;
 
@@ -2599,30 +2603,22 @@
 
         }
 
-        function onMouseMove( event ) {
+        // Mouse and touch functions removed - stars now move autonomously
+        // function onMouseMove( event ) {
+        //   touchInput = false;
+        //   movePointer( event.clientX, event.clientY );
+        // }
 
-          touchInput = false;
+        // function onTouchMove( event ) {
+        //   touchInput = true;
+        //   movePointer( event.touches[0].clientX, event.touches[0].clientY, true );
+        //   event.preventDefault();
+        // }
 
-          movePointer( event.clientX, event.clientY );
-
-        }
-
-        function onTouchMove( event ) {
-
-          touchInput = true;
-
-          movePointer( event.touches[0].clientX, event.touches[0].clientY, true );
-
-          event.preventDefault();
-
-        }
-
-        function onMouseLeave() {
-
-          pointerX = null;
-          pointerY = null;
-
-        }
+        // function onMouseLeave() {
+        //   pointerX = null;
+        //   pointerY = null;
+        // }
     </script>
 </body>
 </html>

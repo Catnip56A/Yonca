@@ -193,6 +193,12 @@ def post_forum_message():
     db.session.add(new_message)
     db.session.commit()
     
+    # Log the activity
+    if current_user.is_authenticated:
+        current_app.activity_logger.info(f"User {current_user.username} posted message in channel '{channel}'")
+    else:
+        current_app.activity_logger.info(f"Anonymous user '{new_message.username}' posted message in channel '{channel}'")
+    
     # Refresh to get the server-generated timestamp
     db.session.refresh(new_message)
     
@@ -223,6 +229,8 @@ def edit_forum_message(message_id):
     message.message = data['message']
     db.session.commit()
     
+    current_app.activity_logger.info(f"User {current_user.username} edited message {message_id} in channel '{message.channel}'")
+    
     return jsonify({'success': True}), 200
 
 @api_bp.route('/forum/messages/<int:message_id>', methods=['DELETE'])
@@ -237,6 +245,8 @@ def delete_forum_message(message_id):
     
     db.session.delete(message)
     db.session.commit()
+    
+    current_app.activity_logger.info(f"User {current_user.username} deleted message {message_id} in channel '{message.channel}'")
     
     return jsonify({'success': True}), 200
 

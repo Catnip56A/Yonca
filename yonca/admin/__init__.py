@@ -587,6 +587,7 @@ class CourseView(SecureModelView):
 
             db.session.add(course)
             db.session.commit()
+            current_app.activity_logger.info(f"Admin {current_user.username} created course '{course.title}'")
             flash('Course created successfully!', 'success')
             return redirect(url_for('admin.index'))
 
