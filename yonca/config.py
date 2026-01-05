@@ -1,8 +1,10 @@
 """
 Application configuration
 """
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 class Config:
     """Base configuration"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key-here'
