@@ -14,6 +14,9 @@ from yonca.routes.auth import auth_bp
 from yonca.routes.api import api_bp
 from yonca.routes import main_bp
 import os
+import logging
+from logging.handlers import RotatingFileHandler
+from werkzeug.exceptions import HTTPException
 
 def create_app(config_name='development'):
     """Create and configure Flask application"""
@@ -27,6 +30,28 @@ def create_app(config_name='development'):
     
     # Load configuration
     app.config.from_object(config[config_name])
+    
+    # Set up logging
+    logs_dir = os.path.join(project_root, 'logs')
+    os.makedirs(logs_dir, exist_ok=True)
+    
+    # Error log
+    error_handler = RotatingFileHandler(os.path.join(logs_dir, 'error.log'), maxBytes=10000000, backupCount=5)
+    error_handler.setLevel(logging.ERROR)
+    error_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+    error_handler.setFormatter(error_formatter)
+    app.logger.addHandler(error_handler)
+    
+    # Activity log
+    activity_logger = logging.getLogger('yonca.activities')
+    activity_logger.setLevel(logging.INFO)
+    activity_handler = RotatingFileHandler(os.path.join(logs_dir, 'activities.log'), maxBytes=10000000, backupCount=5)
+    activity_formatter = logging.Formatter('%(asctime)s: %(message)s')
+    activity_handler.setFormatter(activity_formatter)
+    activity_logger.addHandler(activity_handler)
+    
+    # Attach activity logger to app
+    app.activity_logger = activity_logger
     
     # Initialize extensions
     db.init_app(app)
@@ -93,6 +118,18 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(main_bp)
+    
+    # Error handler for unhandled exceptions
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        from flask import current_app
+        # Don't log 404 errors, let Flask handle them
+        if isinstance(e, HTTPException) and e.code == 404:
+            return e
+        current_app.logger.error(f"Unhandled exception: {e}", exc_info=True)
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'Internal server error'}), 500
+        return "Internal Server Error", 500
     
     # Create database tables
     # Remove db.create_all(); migrations will handle schema
