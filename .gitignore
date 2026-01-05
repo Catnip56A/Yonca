@@ -128,3 +128,5 @@ data/
 logs/
 *.log
 flask_session
+*.pyc
+*.pyc
