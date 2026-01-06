@@ -27,8 +27,11 @@ def login():
                 return redirect('/admin')
             else:
                 return redirect(url_for('main.index'))
+        elif user:
+            logging.warning(f"Failed login attempt for username: {username} - incorrect password")
+        else:
+            logging.warning(f"Failed login attempt for non-existent username: {username}")
         
-        logging.warning(f"Failed login attempt for username: {username}")
         flash('Invalid username or password')
     
     return render_template('login.html')
