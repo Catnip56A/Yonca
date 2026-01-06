@@ -59,7 +59,7 @@ def create_admin_user(app, username=None, email=None, password=None):
 def main():
     """Main function"""
     # Create Flask app
-    config_name = os.environ.get('FLASK_ENV', 'development')
+    config_name = os.environ.get('FLASK_ENV', 'production')
     app = create_app(config_name)
 
     # Check if database exists
