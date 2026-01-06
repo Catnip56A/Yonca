@@ -14,6 +14,29 @@ from yonca.routes.auth import auth_bp
 from yonca.routes.api import api_bp
 from yonca.routes import main_bp
 import os
+import psycopg2
+from urllib.parse import urlparse
+
+def create_database_if_not_exists(database_url):
+    """Create PostgreSQL database if it doesn't exist"""
+    parsed = urlparse(database_url)
+    db_name = parsed.path.lstrip('/')
+    
+    # Connect to the default postgres database
+    postgres_url = database_url.replace(f'/{db_name}', '/postgres')
+    
+    try:
+        conn = psycopg2.connect(postgres_url)
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (db_name,))
+        if not cur.fetchone():
+            cur.execute('CREATE DATABASE "%s"' % db_name)
+            print(f"Database {db_name} created.")
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Error creating database: {e}")
 
 def create_app(config_name='development'):
     """Create and configure Flask application"""
@@ -27,6 +50,10 @@ def create_app(config_name='development'):
     
     # Load configuration
     app.config.from_object(config[config_name])
+    
+    # Create PostgreSQL database if it doesn't exist
+    if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+        create_database_if_not_exists(app.config['SQLALCHEMY_DATABASE_URI'])
     
     # Initialize extensions
     db.init_app(app)
