@@ -1,0 +1,163 @@
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: 'Commit hash to rollback to (leave empty for previous commit)'
+        required: false
+        type: string
+      restore_database:
+        description: 'Restore database from backup?'
+        required: true
+        type: boolean
+        default: false
+      backup_date:
+        description: 'Backup date (YYYYMMDD_HHMMSS) - required if restoring database'
+        required: false
+        type: string
+
+jobs:
+  rollback:
+    name: Rollback Application
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Validate inputs
+        run: |
+          if [ "${{ github.event.inputs.restore_database }}" == "true" ] && [ -z "${{ github.event.inputs.backup_date }}" ]; then
+            echo "❌ Error: backup_date is required when restore_database is true"
+            exit 1
+          fi
+          echo "✅ Input validation passed"
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Perform rollback
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          COMMIT_HASH: ${{ github.event.inputs.commit_hash }}
+          RESTORE_DB: ${{ github.event.inputs.restore_database }}
+          BACKUP_DATE: ${{ github.event.inputs.backup_date }}
+        run: |
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            echo "🔍 Current status:"
+            echo "Current commit: $(git rev-parse HEAD)"
+            echo "Current branch: $(git branch --show-current)"
+            
+            # Determine rollback commit
+            if [ -n "${{ github.event.inputs.commit_hash }}" ]; then
+              ROLLBACK_COMMIT="${{ github.event.inputs.commit_hash }}"
+            else
+              ROLLBACK_COMMIT=$(git rev-parse HEAD~1)
+            fi
+            
+            echo ""
+            echo "🔄 Rolling back to commit: $ROLLBACK_COMMIT"
+            
+            # Create backup of current state before rollback
+            echo "💾 Creating safety backup..."
+            SAFETY_BACKUP="$HOME/backups/rollback_$(date +%Y%m%d_%H%M%S)"
+            mkdir -p "$SAFETY_BACKUP"
+            git rev-parse HEAD > "$SAFETY_BACKUP/commit_hash.txt"
+            docker-compose exec -T db pg_dump -U yonca_user yonca > "$SAFETY_BACKUP/database.sql"
+            echo "✅ Safety backup created at: $SAFETY_BACKUP"
+            
+            # Perform code rollback
+            echo ""
+            echo "📝 Rolling back code..."
+            git fetch origin
+            git reset --hard "$ROLLBACK_COMMIT"
+            echo "✅ Code rolled back"
+            
+            # Restore database if requested
+            if [ "${{ github.event.inputs.restore_database }}" == "true" ]; then
+              echo ""
+              echo "📊 Restoring database from backup..."
+              BACKUP_FILE="$HOME/backups/${{ github.event.inputs.backup_date }}/database.sql"
+              
+              if [ ! -f "$BACKUP_FILE" ]; then
+                echo "❌ Error: Backup file not found: $BACKUP_FILE"
+                echo "Available backups:"
+                ls -lh "$HOME/backups/"
+                exit 1
+              fi
+              
+              # Stop app before database restore
+              docker-compose stop app
+              
+              # Restore database
+              docker-compose exec -T db psql -U yonca_user yonca < "$BACKUP_FILE"
+              echo "✅ Database restored"
+            fi
+            
+            # Redeploy application
+            echo ""
+            echo "🚀 Redeploying application..."
+            ./deploy.sh
+            
+            echo ""
+            echo "⏳ Waiting for application to start..."
+            sleep 10
+            
+            # Health check
+            echo "🔍 Performing health check..."
+            if ! curl -f -s http://localhost:5001 > /dev/null; then
+              echo "❌ Health check failed!"
+              echo "Safety backup available at: $SAFETY_BACKUP"
+              exit 1
+            fi
+            
+            echo "✅ Health check passed"
+            echo ""
+            echo "🎉 Rollback completed successfully!"
+            echo "   Rolled back to: $ROLLBACK_COMMIT"
+            echo "   Safety backup: $SAFETY_BACKUP"
+          ENDSSH
+
+      - name: Rollback summary
+        if: always()
+        run: |
+          echo "## Rollback Summary 🔄" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -n "${{ github.event.inputs.commit_hash }}" ]; then
+            echo "**Target Commit:** \`${{ github.event.inputs.commit_hash }}\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Target:** Previous commit (HEAD~1)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "**Database Restored:** ${{ github.event.inputs.restore_database }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.inputs.restore_database }}" == "true" ]; then
+            echo "**Backup Date:** ${{ github.event.inputs.backup_date }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "**Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Rollback failed!"
+          echo "⚠️  A safety backup was created before rollback attempt"
+          echo "📝 Check VPS at ~/backups/rollback_* for safety backup"

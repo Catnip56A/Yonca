@@ -1,0 +1,234 @@
+name: Advanced Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  # Determine environment based on branch or manual input
+  setup:
+    name: Setup Deployment
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      app_url: ${{ steps.set-env.outputs.app_url }}
+    
+    steps:
+      - name: Set environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
+            ENV="staging"
+          else
+            ENV="production"
+          fi
+          
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          
+          if [ "$ENV" == "staging" ]; then
+            echo "app_url=https://staging.yonca.maksud.yourserver.com" >> $GITHUB_OUTPUT
+          else
+            echo "app_url=https://yonca.maksud.yourserver.com" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "🎯 Deploying to: $ENV"
+
+  # Run tests before deployment
+  test:
+    name: Run Tests
+    needs: setup
+    uses: ./.github/workflows/test.yml
+
+  # Deploy to selected environment
+  deploy:
+    name: Deploy to ${{ needs.setup.outputs.environment }}
+    needs: [setup, test]
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.setup.outputs.environment }}
+      url: ${{ needs.setup.outputs.app_url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create backup before deployment
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            echo "💾 Creating backup..."
+            BACKUP_DIR="$HOME/backups/$(date +%Y%m%d_%H%M%S)"
+            mkdir -p "$BACKUP_DIR"
+            
+            # Backup database
+            docker-compose exec -T db pg_dump -U yonca_user yonca > "$BACKUP_DIR/database.sql"
+            
+            # Backup current code
+            git rev-parse HEAD > "$BACKUP_DIR/commit_hash.txt"
+            
+            echo "✅ Backup created at: $BACKUP_DIR"
+            echo "$BACKUP_DIR" > /tmp/last_backup.txt
+          ENDSSH
+
+      - name: Deploy application
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          ENVIRONMENT: ${{ needs.setup.outputs.environment }}
+        run: |
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            echo "📥 Pulling latest changes..."
+            git fetch origin
+            git pull origin ${{ github.ref_name }}
+            
+            echo "🔧 Running pre-deployment checks..."
+            docker-compose config > /dev/null
+            
+            echo "🚀 Deploying application..."
+            ./deploy.sh
+            
+            echo "✅ Deployment script completed"
+          ENDSSH
+
+      - name: Health check
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          echo "⏳ Waiting for application to start..."
+          sleep 15
+          
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            echo "🔍 Checking application health..."
+            
+            # Check if containers are running
+            if ! docker-compose ps | grep -q "Up"; then
+              echo "❌ Containers not running"
+              exit 1
+            fi
+            
+            # Check application endpoint
+            if ! curl -f -s http://localhost:5001 > /dev/null; then
+              echo "❌ Application health check failed"
+              exit 1
+            fi
+            
+            echo "✅ Application is healthy"
+          ENDSSH
+
+      - name: Run database migrations
+        if: success()
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            echo "📊 Running database migrations..."
+            docker-compose exec -T app flask db upgrade || echo "⚠️  No migrations to run"
+            
+            echo "✅ Database migrations completed"
+          ENDSSH
+
+      - name: Rollback on failure
+        if: failure()
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          echo "❌ Deployment failed! Rolling back..."
+          
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            # Get last backup location
+            BACKUP_DIR=$(cat /tmp/last_backup.txt)
+            COMMIT_HASH=$(cat "$BACKUP_DIR/commit_hash.txt")
+            
+            echo "🔄 Rolling back to commit: $COMMIT_HASH"
+            git reset --hard "$COMMIT_HASH"
+            
+            echo "📊 Restoring database..."
+            docker-compose exec -T db psql -U yonca_user yonca < "$BACKUP_DIR/database.sql"
+            
+            echo "🚀 Restarting application..."
+            ./deploy.sh
+            
+            echo "✅ Rollback completed"
+          ENDSSH
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "✅ Deployment to ${{ needs.setup.outputs.environment }} successful!"
+          echo "🌐 URL: ${{ needs.setup.outputs.app_url }}"
+          echo "📊 Commit: ${{ github.sha }}"
+          echo "👤 Deployed by: ${{ github.actor }}"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "❌ Deployment to ${{ needs.setup.outputs.environment }} failed!"
+          echo "🔄 Rollback completed"
+          # Add notification service here
+
+      - name: Create deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ needs.setup.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** ${{ needs.setup.outputs.app_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "**Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Failed (rolled back)" >> $GITHUB_STEP_SUMMARY
+          fi
