@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: yonca_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-yonca}
+      POSTGRES_USER: ${POSTGRES_USER:-yonca_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-yonca_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: yonca_app
+    ports:
+      - "5001:5000"  # Change 5001 to your desired host port
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-yonca_user}:${POSTGRES_PASSWORD:-changeme123}@db:5432/${POSTGRES_DB:-yonca}
+      - SECRET_KEY=${SECRET_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./instance:/app/instance  # Persist instance folder if using file-based storage
+      - ./logs:/app/logs  # Persist logs
+
+volumes:
+  postgres_data:
