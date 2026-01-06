@@ -16,6 +16,7 @@ from yonca.routes import main_bp
 import os
 import psycopg2
 from urllib.parse import urlparse
+import logging
 
 def create_database_if_not_exists(database_url):
     """Create PostgreSQL database if it doesn't exist"""
@@ -47,6 +48,9 @@ def create_app(config_name='development'):
     template_dir = os.path.join(package_dir, 'templates')
     
     app = Flask(__name__, static_folder=static_dir, static_url_path='/static', template_folder=template_dir)
+    
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
     
     # Load configuration
     app.config.from_object(config[config_name])
