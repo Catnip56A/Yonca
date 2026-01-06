@@ -34,12 +34,109 @@
             padding: 1rem 0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             position: relative;
+            min-height: 80px; /* Ensure minimum height for content */
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+                position: relative; /* For absolute positioning context */
+        }
+
+        .nav-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            max-width: 600px;
+        }
+
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0 20px;
+        }
+
+        /* Mobile Menu Styles */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #374151;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-menu-toggle:hover {
+            color: #abc32f;
+        }
+
+        nav.mobile-hidden {
+            display: none !important;
+        }
+
+        /* Mobile Navigation Overlay */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+
+        .mobile-nav-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1001;
+            padding: 2rem 1rem;
+            overflow-y: auto;
+        }
+
+        .mobile-nav-menu.active {
+            right: 0;
+        }
+
+        .mobile-nav-menu .nav-link {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .mobile-nav-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
         }
 
         .white-overlay {
@@ -174,12 +271,6 @@
             padding: 2rem;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .feature-card h3 {
@@ -201,12 +292,6 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .gallery-item img {
@@ -522,23 +607,295 @@
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+            .container {
+                padding: 0 15px;
             }
 
-            nav {
+            header {
+                padding: 0.75rem 0;
+                min-height: auto; /* Allow flexible height on mobile */
+                position: relative;
+                min-height: 70px; /* Ensure adequate height for mobile toggle */
+            }
+
+            .header-content {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 0.75rem;
+                align-items: stretch;
+            }
+
+            .logo-section {
+                justify-content: center;
+                order: 1;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .logo img {
+                height: 40px;
+            }
+
+            .nav-section {
+                order: 3;
+                max-width: none;
+            }
+
+            .auth-section {
+                order: 2;
+                justify-content: center;
+                padding: 0.5rem 0;
+                border-top: 1px solid #e5e7eb;
+                border-bottom: 1px solid #e5e7eb;
+                margin: 0.5rem 0;
+                background: #f9fafb;
+                border-radius: 8px;
+            }
+
+            #user-info {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: center;
+            }
+
+            #user-info span {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+                text-align: center;
+            }
+
+            #user-info button {
+                width: auto;
+                min-width: 80px;
+            }
+
+            /* Hide desktop nav, show mobile toggle */
+            #main-nav {
+                display: none;
+            }
+
+            .mobile-menu-container {
+                display: block;
+                margin-left: auto;
+            }
+
+            .mobile-menu-toggle {
+                background: #f3f4f6;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                padding: 0.5rem;
+                color: #374151;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hamburger-icon {
+                width: 20px;
+                height: 14px;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .hamburger-icon span {
+                display: block;
+                height: 2px;
+                width: 100%;
+                background-color: #374151;
+                border-radius: 1px;
+                transition: all 0.3s ease;
+            }
+
+            .mobile-menu-toggle:hover .hamburger-icon span {
+                background-color: #abc32f;
+            }
+
+            .mobile-menu-toggle:hover {
+                background: #e5e7eb;
+                border-color: #abc32f;
+                transform: scale(1.05);
+            }
+
+            .mobile-menu-toggle:hover {
+                background: #e5e7eb;
+                color: #abc32f;
+            }
+
+            .mobile-menu-toggle:hover {
+                background: #e5e7eb;
+                color: #abc32f;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+                margin: 1rem 0;
+                border-radius: 8px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
             }
 
             .features {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 2rem 0;
             }
 
-            .message-actions {
-                position: static;
-                margin-top: 1rem;
-                justify-content: flex-end;
+            .feature-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .feature-card h3 {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+
+            .gallery-item {
+                padding: 1rem;
+            }
+
+            .gallery-caption {
+                font-size: 0.9rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .course-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .course-card {
+                padding: 1.5rem;
+            }
+
+            .course-card h3 {
+                font-size: 1.25rem;
+            }
+
+            .forum-post {
+                padding: 1rem;
+            }
+
+            .forum-post h4 {
+                font-size: 1.1rem;
+            }
+
+            .message-input {
+                margin-bottom: 1rem;
+            }
+
+            .message-input textarea {
+                min-height: 80px;
+            }
+
+            .channel-tabs {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .channel-tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .contact-info {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+
+            .contact-item {
+                padding: 1.5rem 1rem;
+            }
+
+            .contact-item h3 {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Touch-friendly buttons */
+            button, .btn, .nav-link {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Improve readability on small screens */
+            body {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+
+            .white-overlay {
+                padding: 16px;
+                border-radius: 12px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .feature-card h3, .contact-item h3 {
+                font-size: 1.1rem;
+            }
+
+            .auth-section {
+                padding: 0.75rem 0.5rem;
+            }
+
+            #user-info span {
+                font-size: 0.9rem;
+            }
+
+            #user-info button {
+                font-size: 0.85rem;
+                padding: 0.375rem 0.75rem;
+                min-width: 70px;
+            }
+
+            .mobile-nav-menu {
+                width: 100%;
+                right: -100%;
+                max-width: 320px;
+                right: -320px;
+            }
+
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .logo img {
+                height: 35px;
             }
         }
 
@@ -556,12 +913,6 @@
             padding: 2rem;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .contact-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .contact-item h3 {
@@ -645,28 +996,72 @@
     <canvas></canvas>
     <header>
         <div class="container">
-            <div class="logo">
-                <img src="{{ home_content.site_logo_url or 'https://lh3.googleusercontent.com/d/1abc123def456ghi789jkl012mno345pqr/view' }}" alt="Yonca Logo">
-            </div>
-            <nav>
-                <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
-                <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
-                <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
-                <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
-                <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
-                <a href="javascript:void(0)" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
-                <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
-            </nav>
-            <div id="auth-buttons" style="position: absolute; top: 1rem; right: 20px; display: block;">
-                <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
-            </div>
-            <div id="user-info" style="position: absolute; top: 1rem; right: 20px; display: none;">
-                <span style="color: #374151; margin-right: 1rem;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
-                <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.5rem; display: none;">{{ _('Admin') }}</button>
-                <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="{{ home_content.site_logo_url or 'https://lh3.googleusercontent.com/d/1abc123def456ghi789jkl012mno345pqr/view' }}" alt="Yonca Logo">
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <nav id="main-nav">
+                        <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
+                        <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
+                        <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
+                        <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
+                        <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
+                        <a href="javascript:void(0)" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
+                        <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
+                    </nav>
+                </div>
+
+                <div class="auth-section">
+                    <div id="auth-buttons" style="display: block;">
+                        <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
+                    </div>
+                    <div id="user-info" style="display: none; align-items: center;">
+                        <span style="color: #374151; margin-right: 0.5rem; white-space: nowrap;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
+                        <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.25rem; display: none;">{{ _('Admin') }}</button>
+                        <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
+                    </div>
+                </div>
+
+                <div class="mobile-menu-container">
+                    <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                        <span class="hamburger-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay">
+        <div class="mobile-nav-menu" id="mobile-nav-menu">
+            <button class="mobile-nav-close" id="mobile-nav-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <a href="javascript:void(0)" class="nav-link active" id="mobile-home-link">{{ _('Home') }}</a>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-courses-link">{{ _('Courses') }}</a>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-forum-link">{{ _('Forum') }}</a>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-resources-link">{{ _('Resources') }}</a>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-tavi-link">{{ _('TAVI Test') }}</a>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-contacts-link">{{ _('Contacts') }}</a>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-about-link">{{ _('About Company') }}</a>
+            <div id="mobile-auth-buttons" style="margin-top: 2rem; text-align: center;">
+                <button id="mobile-login-btn" onclick="window.location.href='/login'" style="width: 100%; margin-bottom: 0.5rem;">{{ _('Login') }}</button>
+            </div>
+            <div id="mobile-user-info" style="margin-top: 2rem; text-align: center; display: none;">
+                <p style="color: #374151; margin-bottom: 1rem;">{{ _('Welcome') }}, <span id="mobile-user-name"></span>!</p>
+                <button id="mobile-admin-btn" onclick="window.location.href='/admin'" style="width: 100%; margin-bottom: 0.5rem; display: none;">{{ _('Admin') }}</button>
+                <button onclick="window.location.href='/logout'" style="width: 100%;">{{ _('Logout') }}</button>
+            </div>
+        </div>
+    </div>
 
     <main class="container">
         <div class="white-overlay">
@@ -2393,11 +2788,85 @@
                     switchChannel(channel);
                 });
             });
+
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
+            const mobileNavMenu = document.getElementById('mobile-nav-menu');
+            const mobileNavClose = document.getElementById('mobile-nav-close');
+
+            // Mobile menu toggle
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    mobileNavOverlay.classList.add('active');
+                    mobileNavMenu.classList.add('active');
+                });
+            }
+
+            // Close mobile menu
+            if (mobileNavClose) {
+                mobileNavClose.addEventListener('click', () => {
+                    closeMobileMenu();
+                });
+            }
+
+            // Close mobile menu when clicking overlay
+            if (mobileNavOverlay) {
+                mobileNavOverlay.addEventListener('click', (e) => {
+                    if (e.target === mobileNavOverlay) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+
+            // Mobile navigation links
+            const mobileNavLinks = document.querySelectorAll('#mobile-nav-menu .nav-link');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    closeMobileMenu();
+                    const pageId = link.id.replace('mobile-', '').replace('-link', '');
+                    showPage(pageId, event);
+                });
+            });
+
+            function closeMobileMenu() {
+                mobileNavOverlay.classList.remove('active');
+                mobileNavMenu.classList.remove('active');
+            }
+
+            // Update mobile auth buttons when user status changes
+            function updateMobileAuthButtons() {
+                const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+                const mobileUserInfo = document.getElementById('mobile-user-info');
+                const mobileUserName = document.getElementById('mobile-user-name');
+                const mobileAdminBtn = document.getElementById('mobile-admin-btn');
+
+                if (window.currentUser) {
+                    mobileAuthButtons.style.display = 'none';
+                    mobileUserInfo.style.display = 'block';
+                    mobileUserName.textContent = window.currentUser.username;
+                    if (window.currentUser.is_admin) {
+                        mobileAdminBtn.style.display = 'block';
+                    }
+                } else {
+                    mobileAuthButtons.style.display = 'block';
+                    mobileUserInfo.style.display = 'none';
+                }
+            }
+
+            // Override checkUser to also update mobile auth buttons
+            const originalCheckUser = window.checkUser;
+            window.checkUser = function() {
+                originalCheckUser().then(() => {
+                    updateMobileAuthButtons();
+                });
+            };
         });
     </script>
     <script>
         /*          *     .        *  .    *    *   . 
- .  *  move your mouse to over the stars   .
+ .  *  Stars move automatically toward center  .
  *  .  .   change these values:   .  *
    .      * .        .          * .       */
         const STAR_COLOR = '#fff';
@@ -2415,22 +2884,14 @@
 
         let stars = [];
 
-        let pointerX,
-            pointerY;
-
-        let velocity = { x: 0, y: 0, tx: 0, ty: 0, z: 0.0005 };
-
-        let touchInput = false;
+        let velocity = { x: 0, y: 0, tx: 0, ty: 0, z: 0.0008 }; // Increased z for more noticeable movement
 
         generate();
         resize();
         step();
 
         window.onresize = resize;
-        document.onmousemove = onMouseMove;
-        document.ontouchmove = onTouchMove;
-        document.ontouchend = onMouseLeave;
-        document.onmouseleave = onMouseLeave;
+        // Removed mouse and touch event listeners to disable interactive movement
 
         function generate() {
 
@@ -2579,48 +3040,6 @@
             context.stroke();
 
           } );
-
-        }
-
-        function movePointer( x, y ) {
-
-          if( typeof pointerX === 'number' && typeof pointerY === 'number' ) {
-
-            let ox = x - pointerX,
-                oy = y - pointerY;
-
-            velocity.tx = velocity.tx + ( ox / 8*scale ) * ( touchInput ? 1 : -1 );
-            velocity.ty = velocity.ty + ( oy / 8*scale ) * ( touchInput ? 1 : -1 );
-
-          }
-
-          pointerX = x;
-          pointerY = y;
-
-        }
-
-        function onMouseMove( event ) {
-
-          touchInput = false;
-
-          movePointer( event.clientX, event.clientY );
-
-        }
-
-        function onTouchMove( event ) {
-
-          touchInput = true;
-
-          movePointer( event.touches[0].clientX, event.touches[0].clientY, true );
-
-          event.preventDefault();
-
-        }
-
-        function onMouseLeave() {
-
-          pointerX = null;
-          pointerY = null;
 
         }
     </script>
