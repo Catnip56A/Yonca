@@ -53,7 +53,11 @@ def authenticate():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 credentials_path, SCOPES)
-            creds = flow.run_console()
+            auth_url, _ = flow.authorization_url(prompt='consent')
+            print(f"Please go to this URL and authorize the app: {auth_url}")
+            code = input("Enter the authorization code: ")
+            flow.fetch_token(code=code)
+            creds = flow.credentials
         # Save token to database
         token_json = creds.to_json()
         setting = AppSetting.query.filter_by(key='google_drive_token').first()
