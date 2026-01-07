@@ -133,18 +133,21 @@ class TranslationService:
             print(f"LibreTranslate translation error: {str(e)}")
             return text
 
-    def get_translation(self, text, target_language, source_language='auto'):
+    def get_translation(self, text, target_language, source_language=None):
         """
-        Get translation for text, using cache if available
+        Get translation for text, using cache if available.
+        Always detects source language automatically.
 
         Args:
             text (str): Text to translate
             target_language (str): Target language code (e.g., 'es', 'fr', 'de')
-            source_language (str): Source language code or 'auto' for detection
+            source_language (str): Ignored - always uses 'auto' for detection
 
         Returns:
             str: Translated text
         """
+        # Always use 'auto' for source language detection
+        source_language = 'auto'
         if not text or not text.strip():
             return text
 
