@@ -379,6 +379,7 @@ class CourseAnnouncement(db.Model):
     def __repr__(self):
         return f'<CourseAnnouncement {self.title}>'
 
+
 class CourseAnnouncementReply(db.Model):
     """Replies/messages sent to course announcements"""
     id = db.Column(db.Integer, primary_key=True)
@@ -393,3 +394,15 @@ class CourseAnnouncementReply(db.Model):
 
     def __repr__(self):
         return f'<CourseAnnouncementReply {self.id}>'
+
+
+class AppSetting(db.Model):
+    """Application settings model for storing configuration values securely"""
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(100), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+
+    def __repr__(self):
+        return f'<AppSetting {self.key}>'
