@@ -12,7 +12,7 @@ DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'yonca_db'
 DB_USER = 'postgres'
-DB_PASSWORD = 'NewStrongPassword'  # Update this to your actual password
+DB_PASSWORD = 'ALHIKO3325!56Catnip?!'  # Update this to your actual password
 
 def reset_database():
     try:

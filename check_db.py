@@ -1,7 +1,7 @@
 import psycopg2
 
 try:
-    conn = psycopg2.connect('postgresql://postgres:NewStrongPassword@localhost:5432/postgres')
+    conn = psycopg2.connect('postgresql://postgres:ALHIKO3325!56Catnip?!@localhost:5432/postgres')
     cur = conn.cursor()
     cur.execute("SELECT datname FROM pg_database WHERE datname = 'yonca_db'")
     result = cur.fetchone()
