@@ -489,7 +489,7 @@
         }
 
         .forum-message .translate-btn {
-            color: #337a2c;
+            color: white;
         }
 
         .forum-message .translate-btn:hover {
@@ -2711,7 +2711,7 @@
                     button.style.display = 'inline-block';
                     // Reset button to default "Translate" state
                     button.textContent = '🌐 Translate';
-                    button.style.color = '#3b82f6';
+                    button.style.color = 'white';
                     button.style.backgroundColor = '';
                 });
                 // Clear any existing translations when switching languages
@@ -2790,7 +2790,7 @@
                         // Update button to "Translate Back" state
                         if (translateButton) {
                             translateButton.textContent = '🌐 Translate Back';
-                            translateButton.style.color = '#dc2626'; // Red color for "back" state
+                            translateButton.style.color = 'white'; // White color for "back" state
                             translateButton.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
                         }
                     }
@@ -2818,7 +2818,7 @@
                 messageElement.setAttribute('data-translation-shown', 'false');
                 // Reset button to "Translate" state
                 translateButton.textContent = '🌐 Translate';
-                translateButton.style.color = '#3b82f6';
+                translateButton.style.color = 'white';
                 translateButton.style.backgroundColor = '';
             } else {
                 // Show translated text
@@ -2827,7 +2827,7 @@
                     messageElement.setAttribute('data-translation-shown', 'true');
                     // Change button to "Translate Back" state
                     translateButton.textContent = '🌐 Translate Back';
-                    translateButton.style.color = '#dc2626'; // Red color for "back" state
+                    translateButton.style.color = 'white'; // White color for "back" state
                     translateButton.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
                 } else {
                     // Need to translate first
