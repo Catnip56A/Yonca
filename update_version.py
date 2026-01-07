@@ -11,7 +11,12 @@ if not database_url:
 
 conn = psycopg2.connect(database_url)
 cur = conn.cursor()
-cur.execute("UPDATE alembic_version SET version_num = 'add_assignment_drive_fields'")
+cur.execute("""
+CREATE TABLE IF NOT EXISTS alembic_version (
+    version_num VARCHAR(32) NOT NULL
+);
+""")
+cur.execute("UPDATE alembic_version SET version_num = '31192dfd100f'")
 conn.commit()
 print('Updated')
 conn.close()
