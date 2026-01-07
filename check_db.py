@@ -1,9 +1,14 @@
 import psycopg2
 import os
 from urllib.parse import urlparse
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Get database URL from environment
-database_url = os.getenv('DATABASE_URL', 'postgresql://postgres:ALHIKO3325!56Catnip?!@localhost:5432/yonca_db')
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    raise ValueError("DATABASE_URL environment variable is not set")
 parsed = urlparse(database_url)
 
 # Construct connection to postgres database

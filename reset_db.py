@@ -6,24 +6,23 @@ Script to reset the PostgreSQL database: drop all tables and recreate them empty
 import psycopg2
 import subprocess
 import os
-
-#!/usr/bin/env python3
-"""
-Script to reset the PostgreSQL database: drop all tables and recreate them empty.
-"""
-
-import psycopg2
-import subprocess
-import os
 from urllib.parse import urlparse
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Get database URL from environment
-database_url = os.getenv('DATABASE_URL', 'postgresql://postgres:ALHIKO3325!56Catnip?!@localhost:5432/yonca_db')
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    raise ValueError("DATABASE_URL environment variable is not set")
 parsed = urlparse(database_url)
 
 # Database connection details
 DB_HOST = parsed.hostname or 'localhost'
-DB_PORT = parsed.port or '5432'
+try:
+    DB_PORT = parsed.port or 5432
+except (ValueError, TypeError):
+    DB_PORT = 5432
 DB_NAME = parsed.path.lstrip('/') or 'yonca_db'
 DB_USER = parsed.username or 'postgres'
 DB_PASSWORD = parsed.password or 'ALHIKO3325!56Catnip?!'
