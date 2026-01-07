@@ -56,8 +56,8 @@ def create_app(config_name='development'):
     app.config.from_object(config[config_name])
     
     # Create PostgreSQL database if it doesn't exist
-    if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
-        create_database_if_not_exists(app.config['SQLALCHEMY_DATABASE_URI'])
+    # if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+    #     create_database_if_not_exists(app.config['SQLALCHEMY_DATABASE_URI'])
     
     # Initialize extensions
     db.init_app(app)
