@@ -123,8 +123,8 @@ def create_app(config_name='development'):
     
     # Create database tables
     # Remove db.create_all(); migrations will handle schema
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        db.create_all()
     
     return app
 
