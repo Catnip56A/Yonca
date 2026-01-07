@@ -41,25 +41,32 @@ def create_admin_user(app, username=None, email=None, password=None):
 
     # Check if user already exists
     with app.app_context():
-        existing_user = User.query.filter(
-            (User.username == username) | (User.email == email)
-        ).first()
-        if existing_user:
-            print(f"User with username '{username}' or email '{email}' already exists.")
+        try:
+            existing_user = User.query.filter(
+                (User.username == username) | (User.email == email)
+            ).first()
+            if existing_user:
+                print(f"User with username '{username}' or email '{email}' already exists.")
+                return
+        except Exception as e:
+            print(f"Error checking existing user: {e}")
             return
 
     # Create the admin user
     with app.app_context():
-        admin_user = User(
-            username=username,
-            email=email,
-            password=password,
-            is_admin=True
-        )
-        db.session.add(admin_user)
-        db.session.commit()
-
-    print(f"Admin user '{username}' created successfully!")
+        try:
+            admin_user = User(
+                username=username,
+                email=email,
+                password=password,
+                is_admin=True
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+            print(f"Admin user '{username}' created successfully!")
+        except Exception as e:
+            print(f"Error creating user: {e}")
+            db.session.rollback()
 
 def main():
     """Main function"""
@@ -69,6 +76,7 @@ def main():
 
     # Check if database exists
     db_uri = app.config['SQLALCHEMY_DATABASE_URI']
+    print(f"Using database URI: {db_uri}")
     if db_uri.startswith('sqlite:///'):
         db_path = os.path.join(app.instance_path, db_uri.replace('sqlite:///', ''))
         if not os.path.exists(db_path):
