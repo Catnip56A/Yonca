@@ -7,23 +7,32 @@ import psycopg2
 import subprocess
 import os
 
+#!/usr/bin/env python3
+"""
+Script to reset the PostgreSQL database: drop all tables and recreate them empty.
+"""
+
+import psycopg2
+import subprocess
+import os
+from urllib.parse import urlparse
+
+# Get database URL from environment
+database_url = os.getenv('DATABASE_URL', 'postgresql://postgres:ALHIKO3325!56Catnip?!@localhost:5432/yonca_db')
+parsed = urlparse(database_url)
+
 # Database connection details
-DB_HOST = 'localhost'
-DB_PORT = '5432'
-DB_NAME = 'yonca_db'
-DB_USER = 'postgres'
-DB_PASSWORD = 'ALHIKO3325!56Catnip?!'  # Update this to your actual password
+DB_HOST = parsed.hostname or 'localhost'
+DB_PORT = parsed.port or '5432'
+DB_NAME = parsed.path.lstrip('/') or 'yonca_db'
+DB_USER = parsed.username or 'postgres'
+DB_PASSWORD = parsed.password or 'ALHIKO3325!56Catnip?!'
 
 def reset_database():
     try:
         # First, connect to postgres database to drop and recreate yonca_db
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            dbname='postgres',
-            user=DB_USER,
-            password=DB_PASSWORD
-        )
+        postgres_url = f"{parsed.scheme}://{parsed.username}:{parsed.password}@{parsed.hostname}:{parsed.port}/postgres"
+        conn = psycopg2.connect(postgres_url)
         conn.autocommit = True
         cur = conn.cursor()
 
