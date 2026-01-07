@@ -144,6 +144,7 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
+    preview_image = db.Column(db.String(300))  # Preview image URL or path
     drive_file_id = db.Column(db.String(100))  # Google Drive file ID
     drive_view_link = db.Column(db.String(300))  # Google Drive view link
     access_pin = db.Column(db.String(10), nullable=False)

@@ -551,6 +551,7 @@ class ResourceForm(Form):
     """Custom form for resource creation with file upload"""
     title = StringField('Title', [DataRequired()])
     description = TextAreaField('Description')
+    preview_image = FileField('Preview Image')  # Optional preview image upload
     file = FileField('File')  # Optional file upload
     access_pin = StringField('Access PIN', render_kw={'readonly': True, 'style': 'background-color: #f8f9fa;'})
     is_active = BooleanField('Active', default=True)
@@ -560,7 +561,7 @@ class ResourceView(SecureModelView):
     column_list = ('id', 'title', 'description', 'drive_view_link', 'access_pin', 'pin_expires_at', 'pin_last_reset', 'uploaded_by', 'upload_date', 'is_active', 'reset_pin_button')
     column_searchable_list = ['title', 'description']
     form = ResourceForm
-    form_excluded_columns = ('uploaded_by', 'upload_date', 'drive_file_id', 'drive_view_link', 'pin_expires_at', 'pin_last_reset')
+    form_excluded_columns = ('uploaded_by', 'upload_date', 'drive_file_id', 'drive_view_link', 'pin_expires_at', 'pin_last_reset', 'preview_image')
     
     # Enable file uploads
     form_enctype = 'multipart/form-data'
@@ -591,6 +592,53 @@ class ResourceView(SecureModelView):
             # Ensure PIN is generated for new resources
             if not model.access_pin:
                 model.generate_new_pin()
+            
+            # Handle preview image upload
+            preview_file = form.preview_image.data
+            if preview_file:
+                from werkzeug.utils import secure_filename
+                import os
+                import random
+                from flask import flash
+                from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+                
+                try:
+                    # Create temporary directory
+                    temp_dir = os.path.join(current_app.static_folder, 'temp')
+                    os.makedirs(temp_dir, exist_ok=True)
+                    
+                    # Generate secure filename
+                    filename = secure_filename(preview_file.filename)
+                    unique_filename = f"preview_{random.randint(1000, 9999)}_{filename}"
+                    temp_file_path = os.path.join(temp_dir, unique_filename)
+                    
+                    # Save file temporarily
+                    preview_file.save(temp_file_path)
+                    
+                    # Upload to Google Drive
+                    service = authenticate()
+                    if not service:
+                        flash('Failed to authenticate with Google Drive. Preview image not uploaded.', 'error')
+                    else:
+                        drive_file_id = upload_file(service, temp_file_path, filename)
+                        if drive_file_id:
+                            # Create view-only link for image
+                            view_link = create_view_only_link(service, drive_file_id, is_image=True)
+                            if view_link:
+                                model.preview_image = view_link
+                            else:
+                                flash('Failed to create preview image view link.', 'error')
+                        else:
+                            flash('Failed to upload preview image to Google Drive.', 'error')
+                    
+                    # Clean up temporary file
+                    try:
+                        os.remove(temp_file_path)
+                    except:
+                        pass
+                        
+                except Exception as e:
+                    flash(f'Error uploading preview image: {str(e)}', 'error')
             
             # Handle file upload for new models
             file = form.file.data
@@ -653,6 +701,8 @@ class ResourceView(SecureModelView):
         # Remove file field from edit form since we don't support re-uploading
         if hasattr(form, 'file'):
             delattr(form, 'file')
+        if hasattr(form, 'preview_image'):
+            delattr(form, 'preview_image')
         return form
 
 class TaviTestView(SecureModelView):

@@ -8,6 +8,7 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_login import current_user, login_required
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
 from yonca.translation_service import translation_service
+from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -270,12 +271,43 @@ def upload_resource():
     if not title:
         return jsonify({'error': 'Title is required'}), 400
     
+    # Create temporary directory if it doesn't exist
+    temp_dir = os.path.join(current_app.static_folder, 'temp')
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    # Authenticate with Google Drive
+    service = authenticate()
+    if not service:
+        return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
+    
+    # Handle preview image upload
+    preview_image_url = None
+    if 'preview_image' in request.files:
+        preview_file = request.files['preview_image']
+        if preview_file and preview_file.filename != '':
+            # Generate secure filename for preview image
+            preview_filename = secure_filename(preview_file.filename)
+            preview_unique_filename = f"preview_{random.randint(1000, 9999)}_{preview_filename}"
+            preview_temp_path = os.path.join(temp_dir, preview_unique_filename)
+            
+            # Save preview image temporarily
+            preview_file.save(preview_temp_path)
+            
+            # Upload preview image to Google Drive
+            preview_drive_file_id = upload_file(service, preview_temp_path, preview_filename)
+            if preview_drive_file_id:
+                # Create view-only link for preview image
+                preview_image_url = create_view_only_link(service, preview_drive_file_id, is_image=True)
+            
+            # Clean up temporary preview file
+            try:
+                os.remove(preview_temp_path)
+            except:
+                pass
+    
     # PIN is now always auto-generated (no user input allowed)
     
     try:
-        # Create temporary directory if it doesn't exist
-        temp_dir = os.path.join(current_app.static_folder, 'temp')
-        os.makedirs(temp_dir, exist_ok=True)
         
         # Generate secure filename
         filename = secure_filename(file.filename)
@@ -286,11 +318,6 @@ def upload_resource():
         file.save(temp_file_path)
         
         # Upload to Google Drive
-        from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
-        service = authenticate()
-        if not service:
-            return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
-        
         drive_file_id = upload_file(service, temp_file_path, filename)
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
@@ -304,6 +331,7 @@ def upload_resource():
         new_resource = Resource(
             title=title,
             description=description,
+            preview_image=preview_image_url,
             drive_file_id=drive_file_id,
             drive_view_link=view_link,
             uploaded_by=current_user.id
@@ -356,6 +384,7 @@ def get_resources():
             'id': r.id,
             'title': r.title,
             'description': r.description,
+            'preview_image': r.preview_image,
             'drive_view_link': r.drive_view_link,
             'upload_date': r.upload_date.isoformat() if r.upload_date else None,
             'pin_expires_at': r.pin_expires_at.isoformat() if r.pin_expires_at else None,

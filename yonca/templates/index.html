@@ -726,12 +726,12 @@
             }
 
             .mobile-menu-toggle:hover .hamburger-icon span {
-                background-color: #abc32f;
+                background-color: #337a2c;
             }
 
             .mobile-menu-toggle:hover {
                 background: #e5e7eb;
-                border-color: #abc32f;
+                border-color: #337a2c;
                 transform: scale(1.05);
             }
 
@@ -1303,6 +1303,11 @@
                         <textarea id="resource-description" name="description"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="resource-preview">{{ _('Preview Image (optional):') }}</label>
+                        <input type="file" id="resource-preview" name="preview_image" accept="image/*">
+                        <small style="color: #6b7280;">{{ _('Upload an image to display as a preview for this resource') }}</small>
+                    </div>
+                    <div class="form-group">
                         <label for="resource-file">{{ _('Choose file...') }}</label>
                         <input type="file" id="resource-file" name="file" required>
                     </div>
@@ -1646,10 +1651,10 @@
                 const actionBtn = document.createElement('a');
                 actionBtn.textContent = 'Go to Course';
                 actionBtn.href = `/course/${course.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim()}`;
-                actionBtn.style.background = '#2b5a1d';
+                actionBtn.style.background = '#337a2c';
                 actionBtn.style.color = '#e8f5e8';
                 actionBtn.style.textDecoration = 'none';
-                actionBtn.style.border = '1px solid #2b5a1d';
+                actionBtn.style.border = '1px solid #337a2c';
                 actionBtn.style.padding = '0.5rem 1rem';
                 actionBtn.style.borderRadius = '4px';
                 actionBtn.style.fontWeight = '500';
@@ -1881,7 +1886,7 @@
                             accessButton = `<button onclick="window.location.href='/login'" style="background: #3b82f6; color: white; border: 1px solid #3b82f6; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Log In to Access') }}</button>`;
                         } else if (resource.permanent_access) {
                             // User has permanent access - show direct link
-                            accessButton = `<a href="${resource.drive_view_link}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>`;
+                            accessButton = `<a href="${resource.drive_view_link}" target="_blank" style="background: #337a2c; color: white; text-decoration: none; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>`;
                         } else if (isUploader && resource.access_pin) {
                             // Show PIN to uploader with expiration info
                             const expiresAt = new Date(resource.pin_expires_at);
@@ -1901,13 +1906,14 @@
                                 <span style="font-family: monospace; font-size: 1.1em; color: #1e40af; background: #e0f2fe; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${resource.access_pin}</span>
                                 <br><small style="color: #64748b;">${expirationText} | {{ _('Share this PIN with others to grant access') }}</small>
                             </div>
-                            <a href="${resource.drive_view_link}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('View Resource') }}</a>`;
+                            <a href="${resource.drive_view_link}" target="_blank" style="background: #337a2c; color: white; text-decoration: none; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('View Resource') }}</a>`;
                         } else {
                             // Show request access button to others
                             accessButton = `<button onclick="requestResourceAccess(${resource.id}, '${resource.title}')" style="background: #337a2c; color: white; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
                         }
                         
                         resourceCard.innerHTML = `
+                            ${resource.preview_image ? `<img src="${resource.preview_image}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title} 🔒</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
@@ -1918,6 +1924,7 @@
                     } else {
                         // Public resource
                         resourceCard.innerHTML = `
+                            ${resource.preview_image ? `<img src="${resource.preview_image}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title}</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
@@ -1964,10 +1971,10 @@
                             <span style="font-family: monospace; font-size: 1.1em; color: #1e40af; background: #e0f2fe; padding: 0.25rem 0.5rem; border-radius: 3px; margin-left: 0.5rem;">${pdf.access_pin}</span>
                             <br><small style="color: #64748b;">{{ _('Share this PIN with others to grant access') }}</small>
                         </div>
-                        <button onclick="requestPDFAccess(${pdf.id}, '${pdf.title}')" style="background: #059669; color: white; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; margin-top: 0.5rem;">{{ _('Access PDF') }}</button>`;
+                        <button onclick="requestPDFAccess(${pdf.id}, '${pdf.title}')" style="background: #337a2c; color: white; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; margin-top: 0.5rem;">{{ _('Access PDF') }}</button>`;
                     } else {
                         // Show request access button to others
-                        accessButton = `<button onclick="requestPDFAccess(${pdf.id}, '${pdf.title}')" style="background: #abc32f; color: white; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
+                        accessButton = `<button onclick="requestPDFAccess(${pdf.id}, '${pdf.title}')" style="background: #337a2c; color: white; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
                     }
                     
                     pdfCard.innerHTML = `
