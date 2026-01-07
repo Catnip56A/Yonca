@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{ _('Yonca - Learning Platform') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,12 +16,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #000;
-            background-image: radial-gradient(circle at top right, rgba(121, 68, 154, 0.13), transparent),
-                radial-gradient(circle at 20% 80%, rgba(41, 196, 255, 0.13), transparent);
+            font-family: 'OpenDyslexic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+            color: #212121;
+            background-color: #212121;
         }
 
         canvas {
@@ -29,7 +31,7 @@
         }
 
         header {
-            background: #ffffff;
+            background: #fff6ed;
             border-bottom: 1px solid #e0e0e0;
             padding: 1rem 0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -72,13 +74,13 @@
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: #374151;
+            color: #353e45;
             cursor: pointer;
             padding: 0.5rem;
         }
 
         .mobile-menu-toggle:hover {
-            color: #abc32f;
+            color: #337a2c;
         }
 
         nav.mobile-hidden {
@@ -140,7 +142,7 @@
         }
 
         .white-overlay {
-            background: #fff;
+            background: #fff6ed;
             min-height: 66vh; /* keep initial visual height but allow expansion */
             height: auto;
             overflow: visible;
@@ -151,7 +153,7 @@
         .logo {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #abc32f;
+            color: #337a2c;
             display: flex;
             align-items: center;
         }
@@ -169,7 +171,7 @@
         }
 
         .nav-link {
-            color: #374151;
+            color: #353e45;
             text-decoration: none;
             font-weight: 500;
             padding: 0.5rem 1rem;
@@ -179,19 +181,19 @@
         }
 
         .nav-link:hover {
-            background-color: #f3f4f6;
-            color: #abc32f;
+            background-color: #fafbed;
+            color: #337a2c;
         }
 
         .nav-link.active {
-            background-color: #abc32f;
-            color: white;
+            background-color: #337a2c;
+            color: #fafbed;
         }
 
         #auth-buttons button {
             background: white;
-            color: #667eea;
-            border: 1px solid #667eea;
+            color: #82a302;
+            border: 1px solid #82a302;
             padding: 0.5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
@@ -200,7 +202,7 @@
         }
 
         #auth-buttons button:hover {
-            background: #667eea;
+            background: #82a302;
             color: white;
         }
 
@@ -220,12 +222,12 @@
         }
 
         #admin-btn {
-            background: #abc32f !important;
-            border-color: #abc32f !important;
+            background: #337a2c !important;
+            border-color: #337a2c !important;
         }
 
         #admin-btn:hover {
-            background: #9bb92a !important;
+            background: #2a5a22 !important;
         }
 
         .page {
@@ -239,7 +241,7 @@
         .hero {
             text-align: center;
             padding: 4rem 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #337a2c 0%, #82a302 100%);
             color: white;
             border-radius: 12px;
             margin: 2rem 0;
@@ -265,7 +267,7 @@
         }
 
         .feature-card {
-            background: #ffffff;
+            background: #fff6ed;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 2rem;
@@ -274,7 +276,7 @@
         }
 
         .feature-card h3 {
-            color: #abc32f;
+            color: #337a2c;
             margin-bottom: 1rem;
             font-size: 1.5rem;
         }
@@ -287,7 +289,7 @@
         }
 
         .gallery-item {
-            background: #ffffff;
+            background: #fff6ed;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             overflow: hidden;
@@ -296,9 +298,19 @@
 
         .gallery-item img {
             width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .gallery-item video, .gallery-item iframe {
+            width: 100%;
             height: 250px;
             object-fit: cover;
             display: block;
+            border-radius: 8px 8px 0 0;
         }
 
         .gallery-caption {
@@ -306,7 +318,7 @@
             background: #f9fafb;
             text-align: center;
             font-size: 0.9rem;
-            color: #6b7280;
+            color: #353e45;
             border-top: 1px solid #e5e7eb;
         }
 
@@ -314,19 +326,19 @@
             margin-top: 4rem;
             padding-top: 2rem;
             border-top: 2px solid #e5e7eb;
-            background: #fff;
+            background: #fff6ed;
             border-radius: 15px;
             padding: 20px;
         }
 
         #about {
-            background: #fff;
+            background: #fff6ed;
             border-radius: 15px;
             padding: 20px;
         }
 
         .section-title {
-            color: #1f2937;
+            color: #212121;
             font-size: 2.5rem;
             margin-bottom: 1rem;
             text-align: center;
@@ -334,7 +346,7 @@
         }
 
         .forum-container {
-            background: #ffffff;
+            background: #fff6ed;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 2rem;
@@ -350,7 +362,7 @@
         }
 
         .message-form h3 {
-            color: #1f2937;
+            color: #212121;
             margin-bottom: 1rem;
             font-size: 1.4rem;
         }
@@ -362,7 +374,7 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #374151;
+            color: #353e45;
             font-weight: 600;
         }
 
@@ -382,7 +394,7 @@
         }
 
         button {
-            background: #abc32f;
+            background: #337a2c;
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -411,24 +423,24 @@
         }
 
         .forum-message.current-user {
-            border-color: #abc32f;
+            border-color: #337a2c;
             background: #f0fdf4;
         }
 
         .forum-message .user {
             font-weight: 600;
-            color: #1f2937;
+            color: #212121;
             margin-bottom: 0.5rem;
         }
 
         .forum-message .message-text {
-            color: #374151;
+            color: #353e45;
             line-height: 1.6;
             margin-bottom: 0.5rem;
         }
 
         .forum-message .timestamp {
-            color: #6b7280;
+            color: #353e45;
             font-size: 0.875rem;
         }
 
@@ -469,7 +481,7 @@
         }
 
         .forum-message .reply-btn {
-            color: #6b7280;
+            color: #353e45;
         }
 
         .forum-message .reply-btn:hover {
@@ -477,11 +489,11 @@
         }
 
         .forum-message .translate-btn {
-            color: #3b82f6;
+            color: #337a2c;
         }
 
         .forum-message .translate-btn:hover {
-            background-color: rgba(59, 130, 246, 0.1);
+            background-color: rgba(51, 122, 44, 0.1);
         }
 
         .auth-message {
@@ -493,7 +505,7 @@
         }
 
         .auth-message h3 {
-            color: #1f2937;
+            color: #212121;
             margin-bottom: 1rem;
         }
 
@@ -513,7 +525,7 @@
         }
 
         .resource-card {
-            background: #ffffff;
+            background: #fff6ed;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 1.5rem;
@@ -531,18 +543,18 @@
         }
 
         .resource-card.course-card:hover .dropdown-indicator {
-            color: #abc32f;
+            color: #2b5a1d;
             transform: translateY(2px);
         }
 
         .resource-card.course-card.enrolled-course {
-            border-left: 4px solid #10b981;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02));
+            border-left: 4px solid #2b5a1d;
+            background: linear-gradient(135deg, rgba(43, 90, 29, 0.08), rgba(43, 90, 29, 0.04));
         }
 
         .resource-card.course-card.enrolled-course:hover {
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.15);
-            border-left-color: #059669;
+            box-shadow: 0 6px 16px rgba(43, 90, 29, 0.15);
+            border-left-color: #1e3a0f;
         }
 
         .dropdown-indicator {
@@ -556,12 +568,12 @@
         }
 
         .resource-card h4 {
-            color: #1f2937;
+            color: #212121;
             margin-bottom: 0.5rem;
         }
 
         .resource-card p {
-            color: #6b7280;
+            color: #353e45;
             margin-bottom: 1rem;
         }
 
@@ -583,7 +595,7 @@
         }
 
         .pdf-upload-section h3 {
-            color: #1f2937;
+            color: #212121;
             margin-bottom: 1rem;
         }
 
@@ -685,7 +697,7 @@
                 border: 1px solid #d1d5db;
                 border-radius: 6px;
                 padding: 0.5rem;
-                color: #374151;
+                color: #353e45;
                 cursor: pointer;
                 transition: all 0.3s ease;
                 min-width: 44px;
@@ -708,7 +720,7 @@
                 display: block;
                 height: 2px;
                 width: 100%;
-                background-color: #374151;
+                background-color: #353e45;
                 border-radius: 1px;
                 transition: all 0.3s ease;
             }
@@ -737,6 +749,8 @@
                 padding: 2rem 1rem;
                 margin: 1rem 0;
                 border-radius: 8px;
+                background: linear-gradient(135deg, #337a2c 0%, #82a302 100%);
+                color: white;
             }
 
             .hero h1 {
@@ -835,6 +849,7 @@
             .contact-item h3 {
                 font-size: 1.25rem;
                 margin-bottom: 0.75rem;
+                color: #80a826;
             }
 
             /* Touch-friendly buttons */
@@ -907,7 +922,7 @@
         }
 
         .contact-item {
-            background: #ffffff;
+            background: #fff6ed;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 2rem;
@@ -916,7 +931,7 @@
         }
 
         .contact-item h3 {
-            color: #abc32f;
+            color: #80a826;
             margin-bottom: 1rem;
             font-size: 1.5rem;
         }
@@ -929,9 +944,9 @@
         }
 
         .channel-tab {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
+            background: #e8f5e8;
+            color: #2d5a2d;
+            border: 1px solid #c8e6c9;
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             cursor: pointer;
@@ -943,24 +958,25 @@
         }
 
         .channel-tab:hover {
-            background: #e5e7eb;
+            background: #d4edda;
+            border-color: #a8d5a2;
         }
 
         .channel-tab.active {
-            background: #abc32f;
-            color: white;
-            border-color: #abc32f;
+            background: #2b5a1d;
+            color: #e8f5e8;
+            border-color: #2b5a1d;
         }
 
         .channel-tab.locked {
-            background: #fee2e2;
-            color: #dc2626;
-            border-color: #fecaca;
+            background: #fce4ec;
+            color: #ad1457;
+            border-color: #f8bbd9;
             cursor: not-allowed;
         }
 
         .channel-tab.locked:hover {
-            background: #fecaca;
+            background: #f8bbd9;
         }
 
         /* Course dropdown styles */
@@ -1020,7 +1036,7 @@
                         <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
                     </div>
                     <div id="user-info" style="display: none; align-items: center;">
-                        <span style="color: #374151; margin-right: 0.5rem; white-space: nowrap;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
+                        <span style="color: #353e45; margin-right: 0.5rem; white-space: nowrap;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
                         <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.25rem; display: none;">{{ _('Admin') }}</button>
                         <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
                     </div>
@@ -1056,7 +1072,7 @@
                 <button id="mobile-login-btn" onclick="window.location.href='/login'" style="width: 100%; margin-bottom: 0.5rem;">{{ _('Login') }}</button>
             </div>
             <div id="mobile-user-info" style="margin-top: 2rem; text-align: center; display: none;">
-                <p style="color: #374151; margin-bottom: 1rem;">{{ _('Welcome') }}, <span id="mobile-user-name"></span>!</p>
+                <p style="color: #353e45; margin-bottom: 1rem;">{{ _('Welcome') }}, <span id="mobile-user-name"></span>!</p>
                 <button id="mobile-admin-btn" onclick="window.location.href='/admin'" style="width: 100%; margin-bottom: 0.5rem; display: none;">{{ _('Admin') }}</button>
                 <button onclick="window.location.href='/logout'" style="width: 100%;">{{ _('Logout') }}</button>
             </div>
@@ -1105,14 +1121,55 @@
 
             <!-- Gallery Section -->
             <div class="gallery-section">
-                <h2 class="section-title">{{ _('Gallery') }}</h2>
-                <p>{{ _('Explore our community and learning environment through these images.') }}</p>
+                <h2 class="section-title" style="color: #80a826;">{{ _('What\'s New') }}</h2>
+                <p>{{ _('Discover the latest updates, new features, and exciting developments in our learning platform.') }}</p>
 
                 <div class="gallery-grid">
                     {% if home_content.gallery_images %}
                     {% for image in home_content.gallery_images %}
                     <div class="gallery-item">
+                        {% if image.url %}
+                        {% if 'youtube.com' in image.url or 'youtu.be' in image.url %}
+                        {% set video_id = '' %}
+                        {% if 'youtube.com/watch?v=' in image.url %}
+                        {% set video_id = image.url.split('v=')[1].split('&')[0] %}
+                        {% elif 'youtu.be/' in image.url %}
+                        {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
+                        {% endif %}
+                        <iframe width="100%" height="250" 
+                                src="https://www.youtube.com/embed/{{ video_id }}" 
+                                frameborder="0" allowfullscreen
+                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        {% elif 'vimeo.com' in image.url %}
+                        {% set video_id = image.url.split('vimeo.com/')[1].split('?')[0] %}
+                        <iframe width="100%" height="250" 
+                                src="https://player.vimeo.com/video/{{ video_id }}" 
+                                frameborder="0" allowfullscreen
+                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        {% elif 'drive.google.com' in image.url %}
+                        {% set file_id = '' %}
+                        {% if '/d/' in image.url %}
+                        {% set file_id = image.url.split('/d/')[1].split('/')[0] %}
+                        {% elif 'id=' in image.url %}
+                        {% set file_id = image.url.split('id=')[1].split('&')[0] %}
+                        {% endif %}
+                        <iframe src="https://drive.google.com/file/d/{{ file_id }}/preview" 
+                                width="100%" height="250" frameborder="0" allowfullscreen
+                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        <div class="gallery-caption" style="background: #fff3cd; color: #856404; border-color: #ffeaa7;">
+                            <small><i class="fa fa-clock-o"></i> If video shows "still being processed," please wait 5-60 minutes for Google Drive to finish processing, then refresh the page.</small>
+                        </div>
+                        {% elif image.url.endswith(('.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.mp3', '.wav', '.ogg')) %}
+                        <video controls style="width: 100%; height: auto; max-height: 250px;">
+                            <source src="{{ image.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% else %}
                         <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
+                        {% endif %}
+                        {% else %}
+                        <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
+                        {% endif %}
                         {% if image.caption %}
                         <div class="gallery-caption">{{ image.caption }}</div>
                         {% endif %}
@@ -1143,7 +1200,7 @@
 
             <!-- Enrolled Courses Section (shown only for authenticated users) -->
             <div id="enrolled-courses-section" style="display: none;">
-                <h3 style="color: #10b981; margin-top: 2rem; margin-bottom: 1rem;">{{ _('My Enrolled Courses') }}</h3>
+                <h3 style="color: #80a826; margin-top: 2rem; margin-bottom: 1rem;">{{ _('My Enrolled Courses') }}</h3>
                 <div class="courses-grid enrolled-courses-grid">
                     <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses...') }}</p>
                 </div>
@@ -1177,24 +1234,20 @@
                 </div>
 
                 <!-- Language Selection for Translation -->
-                <div class="language-selector" style="margin-bottom: 2rem; background: #fff; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 1rem 0; color: #1f2937;">🌐 Translation Settings</h4>
+                <div class="language-selector" style="margin-bottom: 2rem; background: #fff6ed; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 1rem 0; color: #212121;">🌐 Translation Settings</h4>
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                         <div>
-                            <label for="target-language" style="font-weight: 500; color: #374151;">Translate to:</label>
+                            <label for="target-language" style="font-weight: 500; color: #353e45;">Language:</label>
                             <select id="target-language" onchange="changeTargetLanguage()" style="margin-left: 0.5rem; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 5px;">
+                                <option value="none">Don't translate</option>
                                 <option value="en">English</option>
                                 <option value="ru">Russian</option>
                                 <option value="az">Azerbaijani</option>
                             </select>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="auto-translate" onchange="toggleAutoTranslate()" checked>
-                            <label for="auto-translate" style="font-weight: 500; color: #374151;">Auto-translate messages</label>
-                        </div>
-                        <button onclick="translateAllVisibleMessages()" style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">🔄 Translate All</button>
                     </div>
-                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #6b7280;">Messages will be automatically translated to your selected language. Click individual messages to toggle translation.</p>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #6b7280;">Select a language to translate messages, or choose "Don't translate" to view messages in their original language. Click individual messages to toggle translation.</p>
                 </div>
 
                 <div class="message-form">
@@ -1231,14 +1284,14 @@
             <p>{{ _('Download educational materials, documents, and access protected files.') }}</p>
 
             <!-- Learning Materials -->
-            <h3 style="color: #1f2937; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 {{ _('Learning Materials') }}</h3>
+            <h3 style="color: #212121; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 {{ _('Learning Materials') }}</h3>
             <div class="resources-grid">
                 <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading materials...') }}</p>
             </div>
 
             <!-- Resource Upload Section (Admin Only) -->
-            <div id="resource-upload-section" style="display: none; background: #fff; border-radius: 15px; padding: 20px;">
-                <h3 style="color: #1f2937; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload Learning Material') }}</h3>
+            <div id="resource-upload-section" style="display: none; background: #fff6ed; border-radius: 15px; padding: 20px;">
+                <h3 style="color: #212121; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload Learning Material') }}</h3>
                 <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload documents, presentations, PDFs, or other materials. PIN protection will be automatically applied for security.') }}</p>
                 <form id="resource-upload-form" enctype="multipart/form-data">
                     <div class="form-group">
@@ -1278,7 +1331,7 @@
                 <div class="contact-item">
                     <h3>📱 {{ _('WhatsApp') }}</h3>
                     <p>
-                        <a href="https://wa.me/994516237394" target="_blank" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                        <a href="https://wa.me/994516237394" target="_blank" style="color: #80a826; text-decoration: none; font-weight: 500;">
                             +994 51 623 73 94
                         </a><br>
                         {{ _('Available: Mon-Fri, 9AM-6PM') }}
@@ -1288,7 +1341,7 @@
                 <div class="contact-item">
                     <h3>📧 {{ _('Email') }}</h3>
                     <p>
-                        <a href="mailto:info@yonca.az" style="color: #abc32f; text-decoration: none; font-weight: 500;">
+                        <a href="mailto:info@yonca.az" style="color: #80a826; text-decoration: none; font-weight: 500;">
                             info@yonca.az
                         </a><br>
                         {{ _('We respond within 24 hours') }}
@@ -1298,8 +1351,8 @@
                 <div class="contact-item">
                     <h3>📍 {{ _('Location') }}</h3>
                     <p>
-                        {{ _('Baku, Azerbaijan') }}<br>
-                        {{ _('Serving clients worldwide') }}
+                        <a href="https://www.google.com/maps/place/Yonca+Psixoloji+D%C9%99st%C9%99k+v%C9%99+%C4%B0nki%C5%9Faf+M%C9%99rk%C9%99zi/@40.4023792,49.8405822,17z/data=!3m1!4b1!4m6!3m5!1s0x40307dd1ada7fa99:0x8bfdd1b0bb8989bd!8m2!3d40.4023792!4d49.8405822!16s%2Fg%2F11scbknt07?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" style="color: #80a826; text-decoration: none; font-weight: 500;">52 Maqsud Əlizadə</a><br>
+                        {{ _('Baku, Azerbaijan') }}
                     </p>
                 </div>
             </div>
@@ -1307,62 +1360,110 @@
 
         <!-- About Company Page -->
         <section id="about" class="page">
-            <h2 class="section-title">{{ _('About Yonca') }}</h2>
+            <h2 class="section-title">{{ home_content.about_welcome_title or _('Welcome to Yonca') }}</h2>
+            <p>{{ home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.') }}</p>
 
-            <div class="about-content">
-                <p>
-                    {{ _('Today, Yonca Support & Development Center is one of the leading centers in Baku in the field of psychological support and correction. Our mission is to provide professional, evidence-based psychological assistance to children, adolescents and adults with developmental features (and without), as well as support for their families. The center has been operating for more than four years and during this time has become a brand of quality and reliability, associated with effectiveness, ethics and a modern approach to correction.') }}
-                </p>
+            <!-- Features Section -->
+            <div class="features-section">
+                <h2 class="section-title" style="color: #80a826;">{{ home_content.about_features_title or _('Our Features') }}</h2>
+                <p>{{ home_content.about_features_subtitle or _('Discover what makes our platform special.') }}</p>
 
-                <p>
-                    {{ _('In our work, we rely on international standards (DSM-5-TR, ICD-11, ABA, ICF) and actively cooperate with leading specialists from different countries, primarily from Israel. Our format: "correctly, effectively and with soul". We work both offline in Baku and online worldwide, ensuring accessibility and a high level of support for each family.') }}
-                </p>
+                <div class="features">
+                {% if home_content.about_features %}
+                {% for feature in home_content.about_features %}
+                <div class="feature-card">
+                    <h3>{{ feature.title }}</h3>
+                    <p>{{ feature.description }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="feature-card">
+                    <h3>{{ _('Interactive Courses') }}</h3>
+                    <p>{{ _('Engage with dynamic course content and interactive learning materials.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Study Groups') }}</h3>
+                    <p>{{ _('Collaborate with fellow learners in our vibrant study communities.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Expert Support') }}</h3>
+                    <p>{{ _('Get help from our team of educational experts and specialists.') }}</p>
+                </div>
+                {% endif %}
+            </div>
+            </div>
 
-                <h3>{{ _('International Team of Experts') }}</h3>
-                <p>
-                    {{ _('The international team of experts collaborating with Yonca includes six specialists from Israel:') }}
-                </p>
-                <ul style="margin-left: 2rem; color: #666;">
-                    <li><strong>{{ _('Ronni Edelstein') }}</strong> - {{ _('physician-therapist, physician for diagnosis and correction of ADHD') }}</li>
-                    <li><strong>{{ _('Olesia Frolova') }}</strong> - {{ _('pediatrician, nutritionist, physician for diagnosis and correction of ADHD') }}</li>
-                    <li><strong>{{ _('Albert Feigelson') }}</strong> - {{ _('psychologist, behavioral analyst. Author of books and courses on working with ADHD for parents and specialists. Specialist in PCT (parent competence training). Founder of the company "ADHD_Israel"') }}</li>
-                    <li><strong>{{ _('Elena Pinski-Volcman') }}</strong> - {{ _('behavioral analyst, instructor on sex education for people with developmental features') }}</li>
-                    <li><strong>{{ _('Svetlana Revich') }}</strong> - {{ _('occupational therapist, BOT, M.A. specialist in child development and nutrition. Founder and director of the "Visut" center in Israel. Co-author of the SEB-method. Author of the book - "Sensory perception or Sensory glasses in child upbringing"') }}</li>
-                    <li><strong>{{ _('Dan Mirdzharov') }}</strong> - {{ _('coach, specialist in working with adults with ADHD') }}</li>
-                </ul>
+            <!-- Gallery Section -->
+            <div class="gallery-section">
+                <h2 class="section-title" style="color: #80a826;">{{ home_content.about_gallery_title or _('What\'s New') }}</h2>
+                <p>{{ home_content.about_gallery_subtitle or _('Discover the latest updates, new features, and exciting developments in our learning platform.') }}</p>
 
-                <p>
-                    {{ _('As well as specialists from different countries:') }}
-                </p>
-                <ul style="margin-left: 2rem; color: #666;">
-                    <li><strong>{{ _('Dr. Aysel Mammadova') }}</strong> - {{ _('clinical psychologist, ABA specialist') }}</li>
-                    <li><strong>{{ _('Dr. Nigar Hajiyeva') }}</strong> - {{ _('psychiatrist, specialist in child and adolescent psychiatry') }}</li>
-                    <li><strong>{{ _('Dr. Aytan Mammadova') }}</strong> - {{ _('speech therapist, specialist in speech development correction') }}</li>
-                    <li><strong>{{ _('Dr. Gunel Mammadova') }}</strong> - {{ _('occupational therapist, sensory integration specialist') }}</li>
-                    <li><strong>{{ _('Dr. Leyla Aliyeva') }}</strong> - {{ _('clinical psychologist, CBT specialist') }}</li>
-                    <li><strong>{{ _('Dr. Samira Hasanova') }}</strong> - {{ _('child psychologist, play therapy specialist') }}</li>
-                </ul>
-
-                <h3>{{ _('Our Services') }}</h3>
-                <ul style="margin-left: 2rem; color: #666;">
-                    <li>{{ _('Psychological diagnostics and correction') }}</li>
-                    <li>{{ _('Speech therapy services') }}</li>
-                    <li>{{ _('Occupational therapy') }}</li>
-                    <li>{{ _('Behavioral analysis and correction (ABA)') }}</li>
-                    <li>{{ _('Parent training and support') }}</li>
-                    <li>{{ _('Online consultations worldwide') }}</li>
-                    <li>{{ _('School readiness programs') }}</li>
-                    <li>{{ _('Social skills development') }}</li>
-                </ul>
-
-                <h3>{{ _('Contact Us') }}</h3>
-                <p>
-                    {{ _('For more information about our services or to schedule a consultation, please contact us:') }}
-                </p>
-                <p>
-                    📱 <strong>{{ _('WhatsApp') }}</strong>: <a href="https://wa.me/994516237394" target="_blank" style="color: #abc32f;">+994 51 623 73 94</a><br>
-                    📧 <strong>{{ _('Email') }}</strong>: <a href="mailto:info@yonca.az" style="color: #abc32f;">info@yonca.az</a>
-                </p>
+                <div class="gallery-grid">
+                    {% if home_content.about_gallery_images %}
+                    {% for image in home_content.about_gallery_images %}
+                    <div class="gallery-item">
+                        {% if image.url %}
+                        {% if 'youtube.com' in image.url or 'youtu.be' in image.url %}
+                        {% set video_id = '' %}
+                        {% if 'youtube.com/watch?v=' in image.url %}
+                        {% set video_id = image.url.split('v=')[1].split('&')[0] %}
+                        {% elif 'youtu.be/' in image.url %}
+                        {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
+                        {% endif %}
+                        <iframe width="100%" height="250" 
+                                src="https://www.youtube.com/embed/{{ video_id }}" 
+                                frameborder="0" allowfullscreen
+                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        {% elif 'vimeo.com' in image.url %}
+                        {% set video_id = image.url.split('vimeo.com/')[1].split('?')[0] %}
+                        <iframe width="100%" height="250" 
+                                src="https://player.vimeo.com/video/{{ video_id }}" 
+                                frameborder="0" allowfullscreen
+                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        {% elif 'drive.google.com' in image.url %}
+                        {% set file_id = '' %}
+                        {% if '/d/' in image.url %}
+                        {% set file_id = image.url.split('/d/')[1].split('/')[0] %}
+                        {% elif 'id=' in image.url %}
+                        {% set file_id = image.url.split('id=')[1].split('&')[0] %}
+                        {% endif %}
+                        <iframe src="https://drive.google.com/file/d/{{ file_id }}/preview" 
+                                width="100%" height="250" frameborder="0" allowfullscreen
+                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        <div class="gallery-caption" style="background: #fff3cd; color: #856404; border-color: #ffeaa7;">
+                            <small><i class="fa fa-clock-o"></i> If video shows "still being processed," please wait 5-60 minutes for Google Drive to finish processing, then refresh the page.</small>
+                        </div>
+                        {% elif image.url.endswith(('.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.mp3', '.wav', '.ogg')) %}
+                        <video controls style="width: 100%; height: auto; max-height: 250px;">
+                            <source src="{{ image.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% else %}
+                        <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
+                        {% endif %}
+                        {% else %}
+                        <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
+                        {% endif %}
+                        {% if image.caption %}
+                        <div class="gallery-caption">{{ image.caption }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="gallery-item">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%23abc32f' width='400' height='250'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3ELearning Community%3C/text%3E%3C/svg%3E" alt="Learning Community" loading="lazy">
+                        <div class="gallery-caption">Our vibrant learning community</div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%234a90e2' width='400' height='250'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EInteractive Courses%3C/text%3E%3C/svg%3E" alt="Interactive Courses" loading="lazy">
+                        <div class="gallery-caption">Engage with interactive course content</div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect fill='%237ed321' width='400' height='250'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EStudy Groups%3C/text%3E%3C/svg%3E" alt="Study Groups" loading="lazy">
+                        <div class="gallery-caption">Collaborate in study groups</div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </section>
         </div>
@@ -1516,7 +1617,7 @@
             courseCard.className = `resource-card course-card ${isEnrolled ? 'enrolled-course' : ''}`;
             courseCard.style.cursor = 'pointer';
 
-            const enrolledBadge = isEnrolled ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">✓ ENROLLED</span>' : '';
+            const enrolledBadge = isEnrolled ? '<span style="background: #28a84e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">✓ ENROLLED</span>' : '';
 
             // Only show dropdown elements for non-enrolled users
             const dropdownElements = isEnrolled ? '' : `
@@ -1536,8 +1637,8 @@
 
             // Add special styling for enrolled courses
             if (isEnrolled) {
-                courseCard.style.borderLeft = '4px solid #10b981';
-                courseCard.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.02))';
+                courseCard.style.borderLeft = '4px solid #2b5a1d';
+                courseCard.style.background = 'linear-gradient(135deg, rgba(43, 90, 29, 0.08), rgba(43, 90, 29, 0.04))';
             }
 
             // Add action button for enrolled users
@@ -1545,10 +1646,10 @@
                 const actionBtn = document.createElement('a');
                 actionBtn.textContent = 'Go to Course';
                 actionBtn.href = `/course/${course.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim()}`;
-                actionBtn.style.background = '#10b981';
-                actionBtn.style.color = 'white';
+                actionBtn.style.background = '#2b5a1d';
+                actionBtn.style.color = '#e8f5e8';
                 actionBtn.style.textDecoration = 'none';
-                actionBtn.style.border = '1px solid #10b981';
+                actionBtn.style.border = '1px solid #2b5a1d';
                 actionBtn.style.padding = '0.5rem 1rem';
                 actionBtn.style.borderRadius = '4px';
                 actionBtn.style.fontWeight = '500';
@@ -1803,7 +1904,7 @@
                             <a href="${resource.drive_view_link}" target="_blank" style="background: #059669; color: white; text-decoration: none; border: 1px solid #059669; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block; margin-top: 0.5rem;">{{ _('View Resource') }}</a>`;
                         } else {
                             // Show request access button to others
-                            accessButton = `<button onclick="requestResourceAccess(${resource.id}, '${resource.title}')" style="background: #abc32f; color: white; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
+                            accessButton = `<button onclick="requestResourceAccess(${resource.id}, '${resource.title}')" style="background: #337a2c; color: white; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
                         }
                         
                         resourceCard.innerHTML = `
@@ -1822,7 +1923,7 @@
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
                                 {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
                             </p>
-                            <a href="${resource.drive_view_link}" target="_blank" style="background: #abc32f; color: white; text-decoration: none; border: 1px solid #abc32f; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>
+                            <a href="${resource.drive_view_link}" target="_blank" style="background: #337a2c; color: white; text-decoration: none; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>
                         `;
                     }
                     
@@ -2012,8 +2113,8 @@
         let availableChannels = [];
 
         // Translation functionality
-        let targetLanguage = 'en';
-        let autoTranslateEnabled = false; // Start with false, will be set by checkbox
+        let targetLanguage = 'none';
+        let autoTranslateEnabled = false; // Auto-translate is disabled
         let currentLanguageIndex = 0;
         const availableLanguages = [
             {code: 'en', name: 'EN', flag: '🌐'},
@@ -2165,7 +2266,7 @@
                     actionsHtml = `
                         <div class="message-actions">
                             <button onclick="replyToMessage(${message.id}, '${message.username}', '${message.channel}')" class="reply-btn">💬 Reply</button>
-                            <button onclick="toggleTranslation(${message.id})" class="translate-btn" title="Toggle translation">🌐 Translate</button>
+                            <button onclick="toggleTranslation(${message.id})" class="translate-btn" title="Toggle translation" style="display: ${targetLanguage === 'none' ? 'none' : 'inline-block'};">🌐 Translate</button>
                     `;
 
                     // Show edit/delete buttons only for message owner or admin
@@ -2197,10 +2298,7 @@
 
                 messages.forEach(message => renderMessage(message, messagesContainer));
 
-                // Apply auto-translation if enabled after messages are loaded
-                if (autoTranslateEnabled) {
-                    setTimeout(() => translateAllVisibleMessages(), 100); // Small delay to ensure DOM is ready
-                }
+                // No auto-translation applied
             } catch (error) {
                 console.error('Error loading forum messages:', error);
             }
@@ -2580,9 +2678,49 @@
             targetLanguage = select.value;
             console.log('Target language changed to:', targetLanguage);
 
-            // Re-translate all visible messages if auto-translate is enabled
-            if (autoTranslateEnabled) {
-                translateAllVisibleMessages();
+            // Show/hide translate buttons based on language selection
+            const translateButtons = document.querySelectorAll('.translate-btn');
+            if (targetLanguage === 'none') {
+                // Hide translate buttons when "Don't translate" is selected
+                translateButtons.forEach(button => {
+                    button.style.display = 'none';
+                });
+                // Show original text for all messages
+                const messageElements = document.querySelectorAll('.forum-message');
+                messageElements.forEach(element => {
+                    const messageId = element.getAttribute('data-message-id');
+                    const originalText = element.getAttribute('data-original-text');
+                    if (originalText) {
+                        const messageTextElement = document.getElementById(`message-text-${messageId}`);
+                        if (messageTextElement) {
+                            messageTextElement.textContent = originalText;
+                            element.setAttribute('data-translation-shown', 'false');
+                        }
+                    }
+                });
+            } else {
+                // Show translate buttons when a language is selected
+                translateButtons.forEach(button => {
+                    button.style.display = 'inline-block';
+                    // Reset button to default "Translate" state
+                    button.textContent = '🌐 Translate';
+                    button.style.color = '#3b82f6';
+                    button.style.backgroundColor = '';
+                });
+                // Clear any existing translations when switching languages
+                const messageElements = document.querySelectorAll('.forum-message');
+                messageElements.forEach(element => {
+                    const messageId = element.getAttribute('data-message-id');
+                    const originalText = element.getAttribute('data-original-text');
+                    if (originalText) {
+                        const messageTextElement = document.getElementById(`message-text-${messageId}`);
+                        if (messageTextElement) {
+                            messageTextElement.textContent = originalText;
+                            element.setAttribute('data-translation-shown', 'false');
+                            element.setAttribute('data-translated-text', ''); // Clear cached translation
+                        }
+                    }
+                });
             }
         }
 
@@ -2616,7 +2754,7 @@
 
 
         async function translateMessage(messageId, text) {
-            if (!text || !text.trim()) return;
+            if (!text || !text.trim() || targetLanguage === 'none') return;
 
             try {
                 const response = await fetch(`${API_BASE}/api/translate`, {
@@ -2637,9 +2775,16 @@
                         messageElement.setAttribute('data-translated-text', data.translated_text);
                         // Always update the display when called for auto-translation
                         const messageTextElement = document.getElementById(`message-text-${messageId}`);
+                        const translateButton = messageElement.querySelector('.translate-btn');
                         if (messageTextElement) {
                             messageTextElement.textContent = data.translated_text;
                             messageElement.setAttribute('data-translation-shown', 'true');
+                        }
+                        // Update button to "Translate Back" state
+                        if (translateButton) {
+                            translateButton.textContent = '🌐 Translate Back';
+                            translateButton.style.color = '#dc2626'; // Red color for "back" state
+                            translateButton.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
                         }
                     }
                 }
@@ -2656,18 +2801,27 @@
             const translatedText = messageElement.getAttribute('data-translated-text');
             const currentlyShowingTranslation = messageElement.getAttribute('data-translation-shown') === 'true';
             const messageTextElement = document.getElementById(`message-text-${messageId}`);
+            const translateButton = messageElement.querySelector('.translate-btn');
 
-            if (!messageTextElement) return;
+            if (!messageTextElement || !translateButton) return;
 
             if (currentlyShowingTranslation) {
                 // Show original text
                 messageTextElement.textContent = originalText;
                 messageElement.setAttribute('data-translation-shown', 'false');
+                // Reset button to "Translate" state
+                translateButton.textContent = '🌐 Translate';
+                translateButton.style.color = '#3b82f6';
+                translateButton.style.backgroundColor = '';
             } else {
                 // Show translated text
                 if (translatedText) {
                     messageTextElement.textContent = translatedText;
                     messageElement.setAttribute('data-translation-shown', 'true');
+                    // Change button to "Translate Back" state
+                    translateButton.textContent = '🌐 Translate Back';
+                    translateButton.style.color = '#dc2626'; // Red color for "back" state
+                    translateButton.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
                 } else {
                     // Need to translate first
                     const textToTranslate = originalText;
@@ -2731,12 +2885,14 @@
             // Initialize currentUser as undefined to indicate auth check is pending
             window.currentUser = undefined;
             
-            // Initialize auto-translate state from checkbox
-            const autoTranslateCheckbox = document.getElementById('auto-translate');
-            if (autoTranslateCheckbox) {
-                autoTranslateEnabled = autoTranslateCheckbox.checked;
+            // Initialize translate button visibility based on default language
+            const translateButtons = document.querySelectorAll('.translate-btn');
+            if (targetLanguage === 'none') {
+                translateButtons.forEach(button => {
+                    button.style.display = 'none';
+                });
             }
-
+            
             // Check if initial page is set from server
             const initialPage = '{{ initial_page|default("home") }}';
             

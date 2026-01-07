@@ -37,6 +37,7 @@ def authenticate():
             token.write(creds.to_json())
     try:
         service = build('drive', 'v3', credentials=creds)
+        print("Google Drive service authenticated successfully")
         return service
     except HttpError as error:
         print(f'An error occurred: {error}')
@@ -91,4 +92,22 @@ def delete_file(service, file_id):
         return True
     except HttpError as error:
         print(f'An error occurred: {error}')
+        return False
+
+def download_file(service, file_id, local_path):
+    """Download a file from Google Drive to local path"""
+    from googleapiclient.http import MediaIoBaseDownload
+    import io
+    
+    try:
+        request = service.files().get_media(fileId=file_id)
+        with io.FileIO(local_path, 'wb') as fh:
+            downloader = MediaIoBaseDownload(fh, request)
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
+                print(f"Download {int(status.progress() * 100)}%.")
+        return True
+    except HttpError as error:
+        print(f'An error occurred downloading file: {error}')
         return False

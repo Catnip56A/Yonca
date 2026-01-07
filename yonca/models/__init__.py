@@ -259,6 +259,20 @@ class HomeContent(db.Model):
     about_section_title = db.Column(db.String(200), default="About Yonca")
     about_section_description = db.Column(db.Text, default="Yonca is a comprehensive learning platform dedicated to providing quality education and fostering a supportive learning community.")
     
+    # About page specific content
+    about_welcome_title = db.Column(db.String(200), default="Welcome to Yonca")
+    about_subtitle = db.Column(db.String(500), default="Join our learning community and discover amazing features designed to enhance your educational experience.")
+    about_features = db.Column(db.JSON, default=[
+        {"title": "Interactive Courses", "description": "Engage with dynamic course content and interactive learning materials."},
+        {"title": "Study Groups", "description": "Collaborate with fellow learners in our vibrant study communities."},
+        {"title": "Expert Support", "description": "Get help from our team of educational experts and specialists."}
+    ])
+    about_features_title = db.Column(db.String(200), default="Our Features")
+    about_features_subtitle = db.Column(db.String(500), default="Discover what makes our platform special.")
+    about_gallery_images = db.Column(db.JSON, default=[])
+    about_gallery_title = db.Column(db.String(200), default="What's New")
+    about_gallery_subtitle = db.Column(db.String(500), default="Discover the latest updates, new features, and exciting developments in our learning platform.")
+    
     # Navigation and branding
     site_logo_url = db.Column(db.String(500), default="https://lh3.googleusercontent.com/d/1abc123def456ghi789jkl012mno345pqr/view")
     site_name = db.Column(db.String(200), default="Yonca")

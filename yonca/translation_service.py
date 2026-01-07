@@ -2,6 +2,8 @@
 AI Translation service for real-time content translation
 """
 import hashlib
+import os
+import requests
 from yonca.models import Translation, db
 from flask import current_app
 
@@ -20,6 +22,116 @@ class TranslationService:
             print("Deep Translator available")
         else:
             print("Using mock translations")
+
+    def _translate_with_libretranslate(self, text, source_language, target_language):
+        """
+        Translate text using LibreTranslate API.
+
+        Args:
+            text (str): Text to translate
+            source_language (str): Source language code or 'auto'
+            target_language (str): Target language code
+
+        Returns:
+            str: Translated text or original text if translation fails
+        """
+        # Detect environment via ENV variable
+        env = os.getenv('ENV', 'local')  # Default to local if not set
+
+        # Set the LibreTranslate endpoint based on environment
+        if env == 'local':
+            url = 'http://127.0.0.1:5000/translate'
+        elif env == 'server':
+            url = 'http://127.0.0.1:5001/translate'
+        else:
+            # Fallback to local if unknown env
+            url = 'http://127.0.0.1:5000/translate'
+
+        # Prepare the payload
+        payload = {
+            'q': text,
+            'source': source_language,
+            'target': target_language,
+            'format': 'text'
+        }
+
+        try:
+            # Send POST request to LibreTranslate API
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()  # Raise exception for bad status codes
+
+            # Parse the response
+            data = response.json()
+            translated_text = data.get('translatedText', text)
+
+            return translated_text
+
+        except requests.exceptions.RequestException as e:
+            # Log the error
+            current_app.logger.error(f"LibreTranslate request failed: {str(e)}")
+            # Return original text if translation fails
+            return text
+        except Exception as e:
+            # Catch any other errors
+            current_app.logger.error(f"LibreTranslate translation error: {str(e)}")
+            return text
+
+    def translate_with_libretranslate(text, source_language, target_language):
+        """
+        Standalone function to translate text using LibreTranslate API.
+        This function can be used independently of the TranslationService class.
+
+        Args:
+            text (str): Text to translate
+            source_language (str): Source language code or 'auto'
+            target_language (str): Target language code
+
+        Returns:
+            str: Translated text or original text if translation fails
+        """
+        import os
+        import requests
+
+        # Detect environment via ENV variable
+        env = os.getenv('ENV', 'local')  # Default to local if not set
+
+        # Set the LibreTranslate endpoint based on environment
+        if env == 'local':
+            url = 'http://127.0.0.1:5000/translate'
+        elif env == 'server':
+            url = 'http://127.0.0.1:5001/translate'
+        else:
+            # Fallback to local if unknown env
+            url = 'http://127.0.0.1:5000/translate'
+
+        # Prepare the payload
+        payload = {
+            'q': text,
+            'source': source_language,
+            'target': target_language,
+            'format': 'text'
+        }
+
+        try:
+            # Send POST request to LibreTranslate API
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()  # Raise exception for bad status codes
+
+            # Parse the response
+            data = response.json()
+            translated_text = data.get('translatedText', text)
+
+            return translated_text
+
+        except requests.exceptions.RequestException as e:
+            # Log the error (if logger available, otherwise print)
+            print(f"LibreTranslate request failed: {str(e)}")
+            # Return original text if translation fails
+            return text
+        except Exception as e:
+            # Catch any other errors
+            print(f"LibreTranslate translation error: {str(e)}")
+            return text
 
     def get_translation(self, text, target_language, source_language='auto'):
         """
@@ -48,19 +160,9 @@ class TranslationService:
             return cached.translated_text
 
         try:
-            if DEEP_TRANS_AVAILABLE:
-                # Create translator for this specific translation
-                if source_language == 'auto':
-                    translator = GoogleTranslator(source='auto', target=target_language)
-                else:
-                    translator = GoogleTranslator(source=source_language, target=target_language)
-
-                translated_text = translator.translate(text)
-                service_used = 'deep-google'
-            else:
-                # Mock translation for development
-                translated_text = self._mock_translate(text, target_language)
-                service_used = 'mock'
+            # Use LibreTranslate for translation
+            translated_text = self._translate_with_libretranslate(text, source_language, target_language)
+            service_used = 'libretranslate'
 
             # Cache the result
             new_translation = Translation(

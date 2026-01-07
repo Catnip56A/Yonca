@@ -1,6 +1,7 @@
 """
 Admin interface views and configuration
 """
+import json
 from flask import flash, redirect, url_for, request, current_app
 from flask_admin import Admin, AdminIndexView, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
@@ -106,16 +107,6 @@ class AdminIndexView(AdminIndexView):
                 home_content.logged_out_get_started_text = form.logged_out_get_started_text.data
                 
                 # Section content
-                home_content.courses_section_title = form.courses_section_title.data
-                home_content.courses_section_description = form.courses_section_description.data
-                home_content.forum_section_title = form.forum_section_title.data
-                home_content.forum_section_description = form.forum_section_description.data
-                home_content.resources_section_title = form.resources_section_title.data
-                home_content.resources_section_description = form.resources_section_description.data
-                home_content.tavi_test_section_title = form.tavi_test_section_title.data
-                home_content.tavi_test_section_description = form.tavi_test_section_description.data
-                home_content.contacts_section_title = form.contacts_section_title.data
-                home_content.contacts_section_description = form.contacts_section_description.data
                 home_content.about_section_title = form.about_section_title.data
                 home_content.about_section_description = form.about_section_description.data
                 
@@ -205,10 +196,10 @@ class AdminIndexView(AdminIndexView):
                 home_content.features = features
                 home_content.logged_out_features = logged_out_features
                 
-                # Process gallery images
+                # Process What's New media
                 gallery_images = []
                 
-                # Get all gallery indices from form data (alt and caption fields)
+                # Get all gallery indices from form data (alt, caption, and url fields)
                 gallery_indices = set()
                 for key in form_data.keys():
                     if key.startswith('gallery_alt_'):
@@ -217,18 +208,29 @@ class AdminIndexView(AdminIndexView):
                     elif key.startswith('gallery_caption_'):
                         index = key.replace('gallery_caption_', '')
                         gallery_indices.add(index)
+                    elif key.startswith('gallery_url_'):
+                        index = key.replace('gallery_url_', '')
+                        gallery_indices.add(index)
                 
-                # Also include existing gallery images that might not have form data
+                # Also include existing What's New media that might not have form data
                 existing_images = home_content.gallery_images or []
                 
                 # Process each gallery index
                 for index in sorted(gallery_indices):
                     file_key = f'gallery_file_{index}'
+                    url_key = f'gallery_url_{index}'
                     alt_key = f'gallery_alt_{index}'
                     caption_key = f'gallery_caption_{index}'
                     
                     alt = form_data.get(alt_key, '').strip()
                     caption = form_data.get(caption_key, '').strip()
+                    
+                    # Check if a URL was provided
+                    url = form_data.get(url_key, '').strip()
+                    if url:
+                        # Handle direct URL (YouTube, Vimeo, direct video/image links)
+                        gallery_images.append({'url': url, 'alt': alt, 'caption': caption})
+                        continue
                     
                     # Check if a file was uploaded for this index
                     if file_key in request.files and request.files[file_key].filename:
@@ -252,18 +254,22 @@ class AdminIndexView(AdminIndexView):
                             # Save file temporarily
                             file.save(temp_file_path)
                             
+                            # Check if file is a video
+                            video_extensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov', '.wmv', '.flv', '.mkv']
+                            is_video = any(filename.lower().endswith(ext) for ext in video_extensions)
+                            
                             # Upload to Google Drive
                             service = authenticate()
                             if service:
                                 drive_file_id = upload_file(service, temp_file_path, filename)
                                 if drive_file_id:
-                                    view_link = create_view_only_link(service, drive_file_id, is_image=True)
+                                    view_link = create_view_only_link(service, drive_file_id, is_image=not is_video)
                                     if view_link:
                                         gallery_images.append({'url': view_link, 'alt': alt, 'caption': caption, 'drive_file_id': drive_file_id})
                                     else:
-                                        flash(f'Failed to create view link for gallery image {filename}', 'error')
+                                        flash(f'Failed to create view link for What\'s New media {filename}', 'error')
                                 else:
-                                    flash(f'Failed to upload gallery image {filename} to Google Drive', 'error')
+                                    flash(f'Failed to upload What\'s New media {filename} to Google Drive', 'error')
                             else:
                                 flash('Failed to authenticate with Google Drive for gallery upload', 'error')
                             
@@ -290,39 +296,10 @@ class AdminIndexView(AdminIndexView):
                 
                 home_content.gallery_images = gallery_images
                 
-                # Process navigation items
-                navigation_items = []
-                
-                # Get all navigation indices from form data (title and url fields)
-                nav_indices = set()
-                for key in form_data.keys():
-                    if key.startswith('nav_title_'):
-                        index = key.replace('nav_title_', '')
-                        nav_indices.add(index)
-                    elif key.startswith('nav_url_'):
-                        index = key.replace('nav_url_', '')
-                        nav_indices.add(index)
-                
-                # Process each navigation index
-                for index in sorted(nav_indices):
-                    title_key = f'nav_title_{index}'
-                    url_key = f'nav_url_{index}'
-                    
-                    title = form_data.get(title_key, '').strip()
-                    url = form_data.get(url_key, '').strip()
-                    
-                    if title and url:  # Only add if both title and url are provided
-                        navigation_items.append({'name': title, 'url': url})
-                
-                # If no navigation items were provided, keep the existing ones
-                if navigation_items:
-                    home_content.navigation_items = navigation_items
-                
                 print(f"DEBUG: About to commit changes to database")
                 print(f"DEBUG: home_content.features: {home_content.features}")
                 print(f"DEBUG: home_content.logged_out_features: {home_content.logged_out_features}")
                 print(f"DEBUG: home_content.gallery_images: {home_content.gallery_images}")
-                print(f"DEBUG: home_content.navigation_items: {home_content.navigation_items}")
                 
                 db.session.commit()
                 print(f"DEBUG: Database commit successful")
@@ -353,16 +330,6 @@ class AdminIndexView(AdminIndexView):
         form.logged_out_get_started_text.data = home_content.logged_out_get_started_text
         
         # Section content
-        form.courses_section_title.data = home_content.courses_section_title
-        form.courses_section_description.data = home_content.courses_section_description
-        form.forum_section_title.data = home_content.forum_section_title
-        form.forum_section_description.data = home_content.forum_section_description
-        form.resources_section_title.data = home_content.resources_section_title
-        form.resources_section_description.data = home_content.resources_section_description
-        form.tavi_test_section_title.data = home_content.tavi_test_section_title
-        form.tavi_test_section_description.data = home_content.tavi_test_section_description
-        form.contacts_section_title.data = home_content.contacts_section_title
-        form.contacts_section_description.data = home_content.contacts_section_description
         form.about_section_title.data = home_content.about_section_title
         form.about_section_description.data = home_content.about_section_description
         
@@ -424,21 +391,6 @@ class HomeContentForm(FlaskForm):
     logged_out_get_started_text = StringField('Get Started Text (Logged Out)', [Optional()], default="Sign Up Now")
     
     # Section content
-    courses_section_title = StringField('Courses Section Title', [Optional()], default="Our Courses")
-    courses_section_description = TextAreaField('Courses Section Description', [Optional()], default="Explore our comprehensive collection of educational courses.")
-    
-    forum_section_title = StringField('Forum Section Title', [Optional()], default="Community Forum")
-    forum_section_description = TextAreaField('Forum Section Description', [Optional()], default="Connect with fellow learners and share knowledge.")
-    
-    resources_section_title = StringField('Resources Section Title', [Optional()], default="Learning Resources")
-    resources_section_description = TextAreaField('Resources Section Description', [Optional()], default="Access learning materials and educational resources.")
-    
-    tavi_test_section_title = StringField('TAVI Test Section Title', [Optional()], default="TAVI Test")
-    tavi_test_section_description = TextAreaField('TAVI Test Section Description', [Optional()], default="Take our interactive assessment.")
-    
-    contacts_section_title = StringField('Contacts Section Title', [Optional()], default="Contact Us")
-    contacts_section_description = TextAreaField('Contacts Section Description', [Optional()], default="Get in touch with us.")
-    
     about_section_title = StringField('About Section Title', [Optional()], default="About Yonca")
     about_section_description = TextAreaField('About Section Description', [Optional()], default="Learn about our mission and vision.")
     
@@ -739,6 +691,164 @@ class ForumChannelView(SecureModelView):
         # Proceed with deletion
         return super().delete_model(model)
 
+class AboutCompanyView(BaseView):
+    """About Company configuration view"""
+    
+    @expose('/', methods=['GET', 'POST'])
+    def index(self):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return redirect(url_for('auth.login'))
+        
+        # Handle about company content editing
+        home_content = HomeContent.query.filter_by(is_active=True).first()
+        if not home_content:
+            home_content = HomeContent(
+                about_welcome_title="Welcome to Yonca",
+                about_subtitle="Join our learning community and discover amazing features designed to enhance your educational experience.",
+                about_features=[{"title": "Interactive Courses", "description": "Engage with dynamic course content and interactive learning materials."}, {"title": "Study Groups", "description": "Collaborate with fellow learners in our vibrant study communities."}, {"title": "Expert Support", "description": "Get help from our team of educational experts and specialists."}]
+            )
+            db.session.add(home_content)
+            db.session.commit()
+        
+        form = AboutCompanyForm()
+        
+        if request.method == 'POST' and form.validate_on_submit():
+            try:
+                # About page content
+                home_content.about_welcome_title = form.about_welcome_title.data
+                home_content.about_subtitle = form.about_subtitle.data
+                
+                # About features section
+                home_content.about_features_title = form.about_features_title.data
+                home_content.about_features_subtitle = form.about_features_subtitle.data
+                
+                # About gallery section
+                home_content.about_gallery_title = form.about_gallery_title.data
+                home_content.about_gallery_subtitle = form.about_gallery_subtitle.data
+                
+                # Process about features dynamically
+                about_features = []
+                form_data = request.form
+                
+                # Process about features
+                about_feature_titles = [key for key in form_data.keys() if key.startswith('about_feature_title_')]
+                for i in range(len(about_feature_titles)):
+                    title_key = f'about_feature_title_{i}'
+                    desc_key = f'about_feature_desc_{i}'
+                    if title_key in form_data and desc_key in form_data:
+                        title = form_data[title_key].strip()
+                        desc = form_data[desc_key].strip()
+                        if title or desc:  # Only add if there's content
+                            about_features.append({'title': title, 'description': desc})
+                
+                home_content.about_features = about_features
+                
+                # Process About Company gallery
+                about_gallery_images = []
+                
+                # Get all gallery indices from form data (alt, caption, and url fields)
+                gallery_indices = set()
+                for key in form_data.keys():
+                    if key.startswith('about_gallery_alt_'):
+                        index = key.replace('about_gallery_alt_', '')
+                        gallery_indices.add(index)
+                    elif key.startswith('about_gallery_caption_'):
+                        index = key.replace('about_gallery_caption_', '')
+                        gallery_indices.add(index)
+                    elif key.startswith('about_gallery_url_'):
+                        index = key.replace('about_gallery_url_', '')
+                        gallery_indices.add(index)
+                
+                # Process each gallery index
+                for index in sorted(gallery_indices):
+                    file_key = f'about_gallery_file_{index}'
+                    url_key = f'about_gallery_url_{index}'
+                    alt_key = f'about_gallery_alt_{index}'
+                    caption_key = f'about_gallery_caption_{index}'
+                    
+                    alt = form_data.get(alt_key, '').strip()
+                    caption = form_data.get(caption_key, '').strip()
+                    
+                    # Check if a URL was provided
+                    url = form_data.get(url_key, '').strip()
+                    if url:
+                        # Handle direct URL (YouTube, Vimeo, direct video/image links)
+                        about_gallery_images.append({'url': url, 'alt': alt, 'caption': caption})
+                        continue
+                    
+                    # Check if a file was uploaded for this index
+                    if file_key in request.files and request.files[file_key].filename:
+                        file = request.files[file_key]
+                        if file and file.filename:
+                            # Handle file upload to Google Drive
+                            from werkzeug.utils import secure_filename
+                            import os
+                            import random
+                            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+                            
+                            # Create temporary directory for file processing
+                            temp_dir = os.path.join(current_app.static_folder, 'temp')
+                            os.makedirs(temp_dir, exist_ok=True)
+                            
+                            # Generate secure filename
+                            filename = secure_filename(file.filename)
+                            temp_path = os.path.join(temp_dir, f"{random.randint(1000, 9999)}_{filename}")
+                            
+                            # Save file temporarily
+                            file.save(temp_path)
+                            
+                            try:
+                                # Upload to Google Drive
+                                drive_service = authenticate()
+                                file_id = upload_file(drive_service, temp_path, filename)
+                                
+                                # Determine if it's an image or video for link generation
+                                is_image_file = filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'))
+                                view_link = create_view_only_link(drive_service, file_id, is_image=is_image_file)
+                                
+                                about_gallery_images.append({'url': view_link, 'alt': alt, 'caption': caption})
+                                
+                                # Clean up temp file
+                                os.remove(temp_path)
+                                
+                            except Exception as upload_error:
+                                flash(f'Error uploading file {filename}: {str(upload_error)}', 'error')
+                                continue
+                
+                home_content.about_gallery_images = about_gallery_images
+                
+                db.session.commit()
+                flash('About Company content updated successfully!', 'success')
+                return redirect(url_for('about_company.index'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error updating content: {str(e)}', 'error')
+        
+        # Populate form with existing data
+        form.about_welcome_title.data = home_content.about_welcome_title
+        form.about_subtitle.data = home_content.about_subtitle
+        form.about_features_title.data = home_content.about_features_title
+        form.about_features_subtitle.data = home_content.about_features_subtitle
+        form.about_gallery_title.data = home_content.about_gallery_title
+        form.about_gallery_subtitle.data = home_content.about_gallery_subtitle
+        
+        return self.render('admin/about_company.html', form=form, home_content=home_content)
+
+class AboutCompanyForm(FlaskForm):
+    """Form for About Company configuration"""
+    
+    # About page content
+    about_welcome_title = StringField('About Page Welcome Title', [Optional()], default="Welcome to Yonca")
+    about_subtitle = TextAreaField('About Page Subtitle', [Optional()], default="Join our learning community and discover amazing features designed to enhance your educational experience.")
+    
+    # About features section
+    about_features_title = StringField('About Features Title', [Optional()], default="Our Features")
+    about_features_subtitle = TextAreaField('About Features Subtitle', [Optional()], default="Discover what makes our platform special.")
+    
+    # About gallery section
+    about_gallery_title = StringField('About Gallery Title', [Optional()], default="What's New")
+    about_gallery_subtitle = TextAreaField('About Gallery Subtitle', [Optional()], default="Discover the latest updates, new features, and exciting developments in our learning platform.")
+
 def init_admin(app):
     """Initialize admin interface with all views"""
     admin = Admin(app, name='Yonca Admin', index_view=AdminIndexView())
@@ -749,5 +859,6 @@ def init_admin(app):
     admin.add_view(SecureModelView(ForumMessage, db.session))
     admin.add_view(ResourceView(Resource, db.session))
     admin.add_view(TaviTestView(TaviTest, db.session))
+    admin.add_view(AboutCompanyView(name='About Company', endpoint='about_company'))
     admin.add_view(LogoutView(name='Logout', endpoint='logout'))
     return admin
