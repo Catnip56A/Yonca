@@ -53,7 +53,7 @@ def authenticate():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 credentials_path, SCOPES)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_console()
         # Save token to database
         token_json = creds.to_json()
         setting = AppSetting.query.filter_by(key='google_drive_token').first()
