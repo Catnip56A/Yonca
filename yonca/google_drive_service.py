@@ -11,7 +11,8 @@ from googleapiclient.errors import HttpError
 from yonca.models import db, AppSetting
 
 # If modifying these scopes, delete the token.json file
-SCOPES = ['https://drive.google.com/drive/folders/1QvMWVJFOJpA2DLf1uxHQy8h8kHY4hmT4']  # Access only files created by this app
+SCOPES = ['https://www.googleapis.com/auth/drive']  
+FOLDER_ID = '1QvMWVJFOJpA2DLf1uxHQy8h8kHY4hmT4'  # Default Google Drive folder ID for uploads
 
 def authenticate():
     """Authenticate and return the Google Drive service using service account"""
@@ -32,11 +33,15 @@ def authenticate():
         print(f'An error occurred: {error}')
         return None
 
-def upload_file(service, file_path, file_name=None):
+def upload_file(service, file_path, file_name=None, folder_id=None):
     """Upload a file and return its file ID"""
     if file_name is None:
         file_name = os.path.basename(file_path)
     file_metadata = {'name': file_name}
+    if folder_id is None:
+        folder_id = FOLDER_ID
+    if folder_id:
+        file_metadata['parents'] = [folder_id]
     media = MediaFileUpload(file_path, resumable=True)
     try:
         uploaded_file = service.files().create(
