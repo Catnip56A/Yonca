@@ -4,7 +4,7 @@ Google Drive service for file uploads and sharing
 from __future__ import print_function
 import os.path
 import json
-from google.auth import service_account
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from googleapiclient.errors import HttpError
