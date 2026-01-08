@@ -47,7 +47,8 @@ def upload_file(service, file_path, file_name=None, folder_id=None):
         uploaded_file = service.files().create(
             body=file_metadata,
             media_body=media,
-            fields='id'
+            fields='id',
+            supportsAllDrives=True  # required for Shared Drives
         ).execute()
         return uploaded_file['id']
     except HttpError as error:
