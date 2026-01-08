@@ -4,77 +4,31 @@ Google Drive service for file uploads and sharing
 from __future__ import print_function
 import os.path
 import json
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from googleapiclient.errors import HttpError
-from google.auth.transport.requests import Request
 from yonca.models import db, AppSetting
 
 # If modifying these scopes, delete the token.json file
-SCOPES = ['https://www.googleapis.com/auth/drive.file']  # Access only files created by this app
+SCOPES = ['https://drive.google.com/drive/folders/1QvMWVJFOJpA2DLf1uxHQy8h8kHY4hmT4']  # Access only files created by this app
 
 def authenticate():
-    """Authenticate and return the Google Drive service"""
+    """Authenticate and return the Google Drive service using service account"""
     creds = None
-    token_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'token.json')
-    credentials_path = os.path.join(os.path.dirname(__file__), '..', 'credentials.json')
+    credentials_path = os.path.join(os.path.dirname(__file__), '..', 'service-account-key.json')
     
-    # Check if credentials.json exists
+    # Check if service account key file exists
     if not os.path.exists(credentials_path):
-        print(f'Google Drive credentials not found at: {credentials_path}')
+        print(f'Google Drive service account key not found at: {credentials_path}')
         return None
 
-    # Try to load from environment variable first
-    token_json = os.getenv('GOOGLE_DRIVE_TOKEN_JSON')
-    if token_json:
-        try:
-            creds = Credentials.from_authorized_user_info(json.loads(token_json), SCOPES)
-        except Exception as e:
-            print(f'Error loading token from environment: {e}')
-            creds = None
-    else:
-        # Try to load from database
-        setting = AppSetting.query.filter_by(key='google_drive_token').first()
-        if setting:
-            try:
-                creds = Credentials.from_authorized_user_info(json.loads(setting.value), SCOPES)
-            except Exception as e:
-                print(f'Error loading token from database: {e}')
-                creds = None
-
-    # Fallback to file if not in DB or failed
-    if not creds and os.path.exists(token_path):
-        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_path, SCOPES)
-            auth_url, _ = flow.authorization_url(prompt='consent')
-            print(f"Please go to this URL and authorize the app: {auth_url}")
-            code = input("Enter the authorization code: ")
-            flow.fetch_token(code=code)
-            creds = flow.credentials
-        # Save token to database
-        token_json = creds.to_json()
-        setting = AppSetting.query.filter_by(key='google_drive_token').first()
-        if setting:
-            setting.value = token_json
-        else:
-            setting = AppSetting(key='google_drive_token', value=token_json)
-            db.session.add(setting)
-        db.session.commit()
-        # Also save to file as backup
-        with open(token_path, 'w') as token:
-            token.write(token_json)
     try:
+        creds = service_account.Credentials.from_service_account_file(credentials_path, scopes=SCOPES)
         service = build('drive', 'v3', credentials=creds)
-        print("Google Drive service authenticated successfully")
+        print("Google Drive service authenticated successfully using service account")
         return service
-    except HttpError as error:
+    except Exception as error:
         print(f'An error occurred: {error}')
         return None
 

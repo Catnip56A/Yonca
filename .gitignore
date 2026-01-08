@@ -128,3 +128,4 @@ data/
 logs/
 *.log
 flask_session
+service-account-key.json
