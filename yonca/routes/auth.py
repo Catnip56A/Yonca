@@ -7,6 +7,7 @@ from yonca.models import User, db
 import logging
 import requests
 import secrets
+import os
 from datetime import datetime, timedelta
 
 auth_bp = Blueprint('auth', __name__)
@@ -55,7 +56,13 @@ def login_google():
         flash('Google OAuth not configured')
         return redirect(url_for('auth.login'))
     
-    redirect_uri = url_for('auth.google_callback', _external=True)
+    # Use different redirect URIs for local development vs production
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    if flask_env == 'development':
+        redirect_uri = "http://127.0.0.1:5000/auth/google/callback"
+    else:
+        redirect_uri = "http://magsud.yonca-sdc.com/auth/google/callback"
+    
     scope = 'openid email profile https://www.googleapis.com/auth/drive'
     state = secrets.token_urlsafe(32)  # Generate a secure state
     # Store state in session for verification
@@ -98,7 +105,13 @@ def google_callback():
     
     client_id = current_app.config.get('GOOGLE_CLIENT_ID')
     client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
-    redirect_uri = url_for('auth.google_callback', _external=True)
+    
+    # Use the same redirect URI logic as in login_google
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    if flask_env == 'development':
+        redirect_uri = "http://127.0.0.1:5000/auth/google/callback"
+    else:
+        redirect_uri = "http://magsud.yonca-sdc.com/auth/google/callback"
     
     # Exchange code for access token
     token_url = 'https://oauth2.googleapis.com/token'
