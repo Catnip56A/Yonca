@@ -403,12 +403,14 @@ class GoogleLoginView(BaseView):
         
         try:
             # Redirect to Google OAuth with next parameter to return to admin
-            # Use localhost for local development, production domain otherwise
-            flask_env = os.environ.get('FLASK_ENV', 'development')
-            is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-            redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+            # Use configurable redirect URI
+            redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+            if not redirect_uri:
+                flask_env = os.environ.get('FLASK_ENV', 'development')
+                is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+                redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
             
-            print(f"DEBUG: Request host={request.host}, FLASK_ENV={flask_env}, is_local={is_local}, redirect_uri={redirect_uri}")
+            print(f"DEBUG: Admin OAuth - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
             
             # Build the OAuth URL manually to ensure correct redirect URI
             client_id = current_app.config.get('GOOGLE_CLIENT_ID')

@@ -56,11 +56,15 @@ def login_google():
         flash('Google OAuth not configured')
         return redirect(url_for('auth.login'))
     
-    # Use different redirect URIs for local development vs production
-    # Check both FLASK_ENV and request host for robustness
-    flask_env = os.environ.get('FLASK_ENV', 'development')
-    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-    redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    # Use configurable redirect URIs
+    # Check environment variable first, then fallback to detection logic
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+    if not redirect_uri:
+        flask_env = os.environ.get('FLASK_ENV', 'development')
+        is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+        redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    
+    print(f"DEBUG: OAuth login - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
     
     scope = 'openid email profile https://www.googleapis.com/auth/drive'
     state = secrets.token_urlsafe(32)  # Generate a secure state
@@ -106,9 +110,11 @@ def google_callback():
     client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
     
     # Use the same redirect URI logic as in login_google
-    flask_env = os.environ.get('FLASK_ENV', 'development')
-    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-    redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+    if not redirect_uri:
+        flask_env = os.environ.get('FLASK_ENV', 'development')
+        is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+        redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
     
     # Exchange code for access token
     token_url = 'https://oauth2.googleapis.com/token'
