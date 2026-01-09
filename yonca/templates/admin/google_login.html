@@ -1,0 +1,46 @@
+{% extends 'admin/base.html' %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Connect to Google Drive</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="fa fa-info-circle"></i> Google Drive Access Required</h5>
+                        <p>To upload files (logos, images, PDFs, etc.) to the system, you need to connect your Google account and grant access to Google Drive.</p>
+                        <p>This allows the system to store uploaded files securely in the cloud.</p>
+                    </div>
+
+                    <div class="text-center">
+                        <p><strong>What you'll be asked to authorize:</strong></p>
+                        <ul class="list-unstyled">
+                            <li>✅ View and manage Google Drive files</li>
+                            <li>✅ Upload files to Google Drive</li>
+                            <li>✅ Create shareable links for uploaded files</li>
+                        </ul>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+                        <a href="{{ url_for('google_login.connect') }}" class="btn btn-primary btn-lg">
+                            <i class="fa fa-google"></i> Connect with Google
+                        </a>
+                    </div>
+
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            <strong>Privacy Note:</strong> Your Google account credentials are never stored.
+                            Only access tokens for file operations are temporarily cached.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

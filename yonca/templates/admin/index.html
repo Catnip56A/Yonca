@@ -298,6 +298,20 @@
         <div class="unsaved-changes" id="unsaved-indicator">
             <i class="fa fa-exclamation-triangle"></i> You have unsaved changes
         </div>
+        <div class="google-drive-status" id="google-drive-status">
+            {% if current_user.google_access_token %}
+                <div class="alert alert-success" style="display: inline-block; padding: 8px 16px; margin: 0;">
+                    <i class="fa fa-google"></i> Google Drive Connected
+                </div>
+            {% else %}
+                <div class="alert alert-warning" style="display: inline-block; padding: 8px 16px; margin: 0;">
+                    <i class="fa fa-google"></i> Google Drive Not Connected
+                    <a href="{{ url_for('google_login.index') }}" class="btn btn-sm btn-primary" style="margin-left: 10px;">
+                        Connect Now
+                    </a>
+                </div>
+            {% endif %}
+        </div>
         <div style="margin-left: auto;">
             <button type="button" class="btn btn-outline-info" id="show-shortcuts" title="Keyboard Shortcuts">
                 <i class="fa fa-keyboard-o"></i>
@@ -423,8 +437,6 @@
                         <label for="site_logo_file">Site Logo:</label>
                         <div class="file-upload-group">
                             <input type="file" id="site_logo_file" name="site_logo_file" class="form-control-file" accept="image/*">
-                            <button type="button" class="btn btn-sm btn-primary" onclick="uploadLogo()" id="upload_logo_btn">Upload Logo</button>
-                            <span id="logo_upload_status" class="ml-2"></span>
                             {% if home_content.site_logo_url %}
                             <div class="mt-2">
                                 <small class="text-success">✓ Current logo:</small><br>
@@ -1100,70 +1112,6 @@ function updatePreviewFeatures() {
     });
 }
 
-// Logo upload function
-function uploadLogo() {
-    const fileInput = document.getElementById('site_logo_file');
-    const uploadBtn = document.getElementById('upload_logo_btn');
-    const statusSpan = document.getElementById('logo_upload_status');
-    const fileUploadGroup = fileInput.closest('.file-upload-group');
 
-    if (!fileInput.files[0]) {
-        statusSpan.textContent = 'Please select a file first';
-        statusSpan.className = 'ml-2 text-warning';
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-
-    uploadBtn.disabled = true;
-    statusSpan.textContent = 'Uploading...';
-    statusSpan.className = 'ml-2 text-info';
-
-    fetch('/api/logo/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update or create hidden input to store the logo URL
-            let hiddenInput = fileUploadGroup.querySelector('input[type="hidden"][name="site_logo_url"]');
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'site_logo_url';
-                fileUploadGroup.appendChild(hiddenInput);
-            }
-            hiddenInput.value = data.image_url;
-
-            // Update status and show preview
-            statusSpan.textContent = 'Upload successful!';
-            statusSpan.className = 'ml-2 text-success';
-
-            // Update the status div
-            const statusDiv = fileUploadGroup.querySelector('.mt-2');
-            statusDiv.innerHTML = `
-                <small class="text-success">✓ Logo uploaded</small>
-                <br>
-                <img src="${data.image_url}" alt="Site logo" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd;">
-            `;
-
-            // Clear file input
-            fileInput.value = '';
-        } else {
-            statusSpan.textContent = 'Upload failed: ' + data.error;
-            statusSpan.className = 'ml-2 text-danger';
-        }
-    })
-    .catch(error => {
-        console.error('Upload error:', error);
-        statusSpan.textContent = 'Upload failed';
-        statusSpan.className = 'ml-2 text-danger';
-    })
-    .finally(() => {
-        uploadBtn.disabled = false;
-    });
-}
 </script>
 {% endblock %}

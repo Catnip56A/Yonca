@@ -269,7 +269,19 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401) {
+                return response.json().then(data => {
+                    if (data.error === 'login_required') {
+                        // Redirect to Google login
+                        window.location.href = data.login_url;
+                        return;
+                    }
+                    throw new Error(data.error || 'Authentication required');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 // Update or create hidden input to store the image URL

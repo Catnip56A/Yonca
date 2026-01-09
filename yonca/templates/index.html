@@ -2050,7 +2050,17 @@
                     credentials: 'same-origin',
                 });
 
-                const result = await response.json();
+                let result;
+                if (response.status === 401) {
+                    result = await response.json();
+                    if (result.error === 'login_required') {
+                        // Redirect to Google login
+                        window.location.href = result.login_url;
+                        return;
+                    }
+                } else {
+                    result = await response.json();
+                }
 
                 if (response.ok) {
                     statusDiv.innerHTML = `<span style="color: #059669;">✅ {{ _("PDF uploaded successfully! Access PIN:") }} <strong>${result.pin}</strong></span>`;
@@ -2061,7 +2071,7 @@
                     // Reload PDFs
                     loadPDFs();
                 } else {
-                    statusDiv.innerHTML = `<span style="color: #dc2626;">❌ {{ _("Error uploading PDF. Please try again.") }}</span>`;
+                    statusDiv.innerHTML = `<span style="color: #dc2626;">❌ ${result.error || '{{ _("Error uploading PDF. Please try again.") }}'}</span>`;
                 }
             } catch (error) {
                 console.error('Error uploading PDF:', error);
@@ -2093,7 +2103,17 @@
                     credentials: 'same-origin',
                 });
 
-                const result = await response.json();
+                let result;
+                if (response.status === 401) {
+                    result = await response.json();
+                    if (result.error === 'login_required') {
+                        // Redirect to Google login
+                        window.location.href = result.login_url;
+                        return;
+                    }
+                } else {
+                    result = await response.json();
+                }
 
                 if (response.ok) {
                     statusDiv.innerHTML = `<span style="color: #059669;">✅ {{ _("Material uploaded successfully! Access PIN:") }} <strong>${result.pin}</strong></span>`;

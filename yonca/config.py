@@ -2,6 +2,7 @@
 Application configuration
 """
 import os
+import json
 
 class Config:
     """Base configuration"""
@@ -12,6 +13,17 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'filesystem'
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    
+    # Load Google OAuth credentials from JSON file
+    google_creds_path = os.path.join(os.path.dirname(__file__), '..', 'client_secret_860511395930-3eojlbffavnl47upo580avedqa49lq3f.apps.googleusercontent.com.json')
+    if os.path.exists(google_creds_path):
+        with open(google_creds_path, 'r') as f:
+            google_creds = json.load(f)
+            GOOGLE_CLIENT_ID = google_creds['web']['client_id']
+            GOOGLE_CLIENT_SECRET = google_creds['web']['client_secret']
+    else:
+        GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+        GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 class DevelopmentConfig(Config):
     """Development configuration"""

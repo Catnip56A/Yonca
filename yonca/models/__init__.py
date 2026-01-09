@@ -29,6 +29,9 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     is_teacher = db.Column(db.Boolean, default=False)
     preferred_language = db.Column(db.String(10), default='en')  # User's preferred language for translations
+    google_access_token = db.Column(db.Text)
+    google_refresh_token = db.Column(db.Text)
+    google_token_expiry = db.Column(db.DateTime)
     courses = db.relationship('Course', secondary=user_courses, backref=db.backref('users', lazy='select'))
     accessed_resources = db.relationship('Resource', secondary=user_resource_access, backref=db.backref('accessed_users', lazy='select'))
 

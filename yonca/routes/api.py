@@ -4,7 +4,7 @@ API routes for courses, forum, and resources
 import os
 import time
 from werkzeug.utils import secure_filename
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from flask_login import current_user, login_required
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
 from yonca.translation_service import translation_service
@@ -255,6 +255,14 @@ def upload_resource():
     # Check if user is authenticated and is admin
     if not current_user.is_authenticated or not current_user.is_admin:
         return jsonify({'error': 'Admin access required'}), 403
+    
+    # Check if user has Google OAuth tokens
+    if not current_user.google_access_token:
+        return jsonify({
+            'error': 'Google Drive access required. Please login with Google first.',
+            'login_required': True,
+            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+        }), 403
     
     # Check if file is present
     if 'file' not in request.files:
@@ -520,6 +528,14 @@ def upload_pdf():
     if not current_user.is_authenticated or not current_user.is_admin:
         return jsonify({'error': 'Admin access required'}), 403
     
+    # Check if user has Google OAuth tokens
+    if not current_user.google_access_token:
+        return jsonify({
+            'error': 'Google Drive access required. Please login with Google first.',
+            'login_required': True,
+            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+        }), 403
+    
     # Check if file is present
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -730,6 +746,14 @@ def set_user_language():
 @login_required
 def upload_feature_image():
     """Upload feature image to Google Drive"""
+    # Check if user has Google OAuth tokens
+    if not current_user.google_access_token:
+        return jsonify({
+            'error': 'Google Drive access required. Please login with Google first.',
+            'login_required': True,
+            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+        }), 403
+    
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
 
@@ -785,7 +809,15 @@ def upload_logo():
     """Upload site logo to Google Drive"""
     if not current_user.is_admin:
         return jsonify({'error': 'Admin access required'}), 403
-
+    
+    # Check if user has Google OAuth tokens
+    if not current_user.google_access_token:
+        return jsonify({
+            'error': 'Google Drive access required. Please login with Google first.',
+            'login_required': True,
+            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+        }), 403
+    
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
 
@@ -837,3 +869,34 @@ def upload_logo():
         })
     else:
         return jsonify({'error': 'Invalid file type. Only images are allowed.'}), 400
+
+@api_bp.route('/file/<file_id>')
+@login_required
+def serve_file(file_id):
+    """Serve a Google Drive file after authentication"""
+    service = authenticate()
+    if not service:
+        return jsonify({'error': 'Google Drive service unavailable'}), 500
+    
+    try:
+        # Get file metadata
+        from googleapiclient.http import MediaIoBaseDownload
+        import io
+        from flask import send_file
+        
+        file_metadata = service.files().get(fileId=file_id, fields='name,mimeType').execute()
+        filename = file_metadata['name']
+        mime_type = file_metadata.get('mimeType', 'application/octet-stream')
+        
+        # Download file to memory
+        request = service.files().get_media(fileId=file_id)
+        file_data = io.BytesIO()
+        downloader = MediaIoBaseDownload(file_data, request)
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
+        file_data.seek(0)
+        
+        return send_file(file_data, mimetype=mime_type, as_attachment=True, download_name=filename)
+    except Exception as e:
+        return jsonify({'error': f'Failed to serve file: {str(e)}'}), 500

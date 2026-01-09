@@ -117,6 +117,9 @@ class AdminIndexView(AdminIndexView):
                 logo_file = request.files.get('site_logo_file')
                 logo_url = request.form.get('site_logo_url')
                 
+                print(f"DEBUG: logo_file = {logo_file}, filename = {logo_file.filename if logo_file else 'None'}")
+                print(f"DEBUG: logo_url = {logo_url}")
+                
                 if logo_file and logo_file.filename:
                     # Upload logo to Google Drive
                     from werkzeug.utils import secure_filename
@@ -127,23 +130,30 @@ class AdminIndexView(AdminIndexView):
                     # Create temporary directory for file processing
                     temp_dir = os.path.join(current_app.static_folder, 'temp')
                     os.makedirs(temp_dir, exist_ok=True)
+                    print(f"DEBUG: temp_dir = {temp_dir}, exists = {os.path.exists(temp_dir)}")
                     
                     # Generate secure filename
                     filename = secure_filename(logo_file.filename)
                     unique_filename = f"logo_{random.randint(1000, 9999)}_{filename}"
                     temp_file_path = os.path.join(temp_dir, unique_filename)
+                    print(f"DEBUG: temp_file_path = {temp_file_path}")
                     
                     # Save file temporarily
                     logo_file.save(temp_file_path)
+                    print(f"DEBUG: file saved, exists = {os.path.exists(temp_file_path)}")
                     
                     # Upload to Google Drive
                     service = authenticate()
+                    print(f"DEBUG: Google Drive service = {service}")
                     if service:
                         drive_file_id = upload_file(service, temp_file_path, filename)
+                        print(f"DEBUG: drive_file_id = {drive_file_id}")
                         if drive_file_id:
                             view_link = create_view_only_link(service, drive_file_id, is_image=True)
+                            print(f"DEBUG: view_link = {view_link}")
                             if view_link:
                                 home_content.site_logo_url = view_link
+                                print(f"DEBUG: Logo URL set to: {home_content.site_logo_url}")
                                 flash('Logo uploaded successfully to Google Drive', 'success')
                             else:
                                 flash('Failed to create view link for logo', 'error')
@@ -300,6 +310,7 @@ class AdminIndexView(AdminIndexView):
                 print(f"DEBUG: home_content.features: {home_content.features}")
                 print(f"DEBUG: home_content.logged_out_features: {home_content.logged_out_features}")
                 print(f"DEBUG: home_content.gallery_images: {home_content.gallery_images}")
+                print(f"DEBUG: home_content.site_logo_url: {home_content.site_logo_url}")
                 
                 db.session.commit()
                 print(f"DEBUG: Database commit successful")
@@ -309,6 +320,7 @@ class AdminIndexView(AdminIndexView):
                 print(f"DEBUG: After commit - record ID: {home_content.id}")
                 print(f"DEBUG: After commit - welcome_title: {home_content.welcome_title}")
                 print(f"DEBUG: After commit - features: {home_content.features}")
+                print(f"DEBUG: After commit - site_logo_url: {home_content.site_logo_url}")
                 print(f"DEBUG: After commit - logged_out_features: {home_content.logged_out_features}")
                 
                 print(f"ADMIN ACTION: Home content updated by {current_user.username} (ID: {current_user.id})")
@@ -359,6 +371,33 @@ class LogoutView(BaseView):
         logout_user()
         flash('You have been logged out successfully.')
         return redirect(url_for('auth.login'))
+    
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
+
+class GoogleLoginView(BaseView):
+    """Custom view for Google OAuth login to get Drive access tokens"""
+    
+    @expose('/')
+    def index(self):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return redirect(url_for('auth.login'))
+        
+        # Check if user already has Google tokens
+        if current_user.google_access_token:
+            flash('You are already connected to Google Drive.', 'info')
+            return redirect(url_for('admin.index'))
+        
+        # Show Google login page
+        return self.render('admin/google_login.html')
+    
+    @expose('/connect')
+    def connect(self):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return redirect(url_for('auth.login'))
+        
+        # Redirect to Google OAuth with next parameter to return to admin
+        return redirect(url_for('auth.login_google', next=url_for('admin.index', _external=True)))
     
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
@@ -910,5 +949,6 @@ def init_admin(app):
     admin.add_view(ResourceView(Resource, db.session))
     admin.add_view(TaviTestView(TaviTest, db.session))
     admin.add_view(AboutCompanyView(name='About Company', endpoint='about_company'))
+    admin.add_view(GoogleLoginView(name='Google Login', endpoint='google_login'))
     admin.add_view(LogoutView(name='Logout', endpoint='logout'))
     return admin
