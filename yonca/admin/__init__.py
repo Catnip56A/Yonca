@@ -396,34 +396,49 @@ class GoogleLoginView(BaseView):
     @expose('/connect')
     def connect(self):
         if not current_user.is_authenticated or not current_user.is_admin:
+            print("DEBUG: User not authenticated or not admin, redirecting to login")
             return redirect(url_for('auth.login'))
         
-        # Redirect to Google OAuth with next parameter to return to admin
-        # Use the same redirect URI logic as regular OAuth flow
-        import os
-        flask_env = os.environ.get('FLASK_ENV', 'development')
-        if flask_env == 'development':
-            redirect_uri = "http://127.0.0.1:5000/auth/google/callback"
-        else:
-            redirect_uri = "http://magsud.yonca-sdc.com/auth/google/callback"
+        print(f"DEBUG: Admin Google connect called for user {current_user.username}")
         
-        # Build the OAuth URL manually to ensure correct redirect URI
-        client_id = current_app.config.get('GOOGLE_CLIENT_ID')
-        scope = 'openid email profile https://www.googleapis.com/auth/drive'
-        state = secrets.token_urlsafe(32)
-        session['oauth_state'] = state
-        session['next_url'] = url_for('admin.index')
-        
-        auth_url = (
-            f"https://accounts.google.com/o/oauth2/auth?"
-            f"response_type=code&"
-            f"client_id={client_id}&"
-            f"redirect_uri={redirect_uri}&"
-            f"scope={scope}&"
-            f"state={state}&"
-            f"access_type=offline&prompt=consent"
-        )
-        return redirect(auth_url)
+        try:
+            # Redirect to Google OAuth with next parameter to return to admin
+            # Use localhost for local development, production domain otherwise
+            flask_env = os.environ.get('FLASK_ENV', 'development')
+            is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+            redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+            
+            print(f"DEBUG: Request host={request.host}, FLASK_ENV={flask_env}, is_local={is_local}, redirect_uri={redirect_uri}")
+            
+            # Build the OAuth URL manually to ensure correct redirect URI
+            client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+            if not client_id:
+                print("DEBUG: No GOOGLE_CLIENT_ID configured")
+                flash('Google OAuth not configured')
+                return redirect(url_for('admin.index'))
+                
+            scope = 'openid email profile https://www.googleapis.com/auth/drive'
+            state = secrets.token_urlsafe(32)
+            session['oauth_state'] = state
+            session['next_url'] = url_for('admin.index')
+            
+            auth_url = (
+                f"https://accounts.google.com/o/oauth2/auth?"
+                f"response_type=code&"
+                f"client_id={client_id}&"
+                f"redirect_uri={redirect_uri}&"
+                f"scope={scope}&"
+                f"state={state}&"
+                f"access_type=offline&prompt=consent"
+            )
+            
+            print(f"DEBUG: Redirecting to Google OAuth: {auth_url}")
+            return redirect(auth_url)
+            
+        except Exception as e:
+            print(f"DEBUG: Error in admin Google connect: {e}")
+            flash(f'Error connecting to Google: {str(e)}')
+            return redirect(url_for('google_login.index'))
     
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
