@@ -4,6 +4,8 @@ Admin interface views and configuration
 import json
 import os
 import secrets
+import requests
+from datetime import datetime, timedelta
 from flask import flash, redirect, url_for, request, current_app, session
 from flask_admin import Admin, AdminIndexView, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
@@ -18,8 +20,11 @@ from wtforms.validators import Optional, DataRequired
 import os
 import secrets
 
-def get_google_redirect_uri():
+def get_google_redirect_uri(redirect_uri=None):
     """Get the correct Google OAuth redirect URI based on configuration and environment"""
+    if redirect_uri:
+        return redirect_uri
+    
     # Check for explicit configuration first
     redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
     if redirect_uri:
@@ -50,6 +55,64 @@ class AdminIndexView(AdminIndexView):
     def index(self):
         if not current_user.is_authenticated or not current_user.is_admin:
             return redirect(url_for('auth.login'))
+        
+        # Handle Google OAuth callback if code is present
+        code = request.args.get('code')
+        state = request.args.get('state')
+        error = request.args.get('error')
+        
+        if code or error:
+            stored_state = session.pop('oauth_state', None)
+            
+            if error:
+                flash(f'OAuth error: {error}')
+                return redirect(url_for('admin.index'))
+            
+            if not code or state != stored_state:
+                flash('Invalid OAuth callback')
+                return redirect(url_for('admin.index'))
+            
+            client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+            client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
+            
+            # Use the same redirect URI as used in connect
+            redirect_uri = get_google_redirect_uri('https://magsud.yonca-sdc.com/admin/')
+            
+            # Exchange code for access token
+            token_url = 'https://oauth2.googleapis.com/token'
+            token_data = {
+                'code': code,
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'redirect_uri': redirect_uri,
+                'grant_type': 'authorization_code'
+            }
+            
+            try:
+                token_response = requests.post(token_url, data=token_data)
+                token_response.raise_for_status()
+                token_json = token_response.json()
+                access_token = token_json.get('access_token')
+                refresh_token = token_json.get('refresh_token')
+                expires_in = token_json.get('expires_in', 3600)
+                
+                if not access_token:
+                    flash('Failed to obtain access token')
+                    return redirect(url_for('admin.index'))
+                
+                # Store Google tokens for the current user
+                current_user.google_access_token = access_token
+                current_user.google_refresh_token = refresh_token
+                current_user.google_token_expiry = datetime.utcnow() + timedelta(seconds=expires_in)
+                db.session.commit()
+                
+                flash('Google Drive connected successfully!', 'success')
+                return redirect(url_for('admin.index'))
+            
+            except requests.RequestException as e:
+                print(f'OAuth token exchange failed: {e}')
+                flash('OAuth authentication failed')
+                return redirect(url_for('admin.index'))
         
         print(f"ADMIN ACCESS: {current_user.username} (ID: {current_user.id}) accessed home page editor")
         
@@ -418,7 +481,7 @@ class GoogleLoginView(BaseView):
         try:
             # Redirect to Google OAuth with next parameter to return to admin
             # Use configurable redirect URI
-            redirect_uri = get_google_redirect_uri()
+            redirect_uri = get_google_redirect_uri('https://magsud.yonca-sdc.com/admin/')
             
             print(f"DEBUG: Admin OAuth - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
             
