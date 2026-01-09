@@ -2,7 +2,9 @@
 Admin interface views and configuration
 """
 import json
-from flask import flash, redirect, url_for, request, current_app
+import os
+import secrets
+from flask import flash, redirect, url_for, request, current_app, session
 from flask_admin import Admin, AdminIndexView, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form.upload import FileUploadField
@@ -397,7 +399,31 @@ class GoogleLoginView(BaseView):
             return redirect(url_for('auth.login'))
         
         # Redirect to Google OAuth with next parameter to return to admin
-        return redirect(url_for('auth.login_google', next=url_for('admin.index', _external=True)))
+        # Use the same redirect URI logic as regular OAuth flow
+        import os
+        flask_env = os.environ.get('FLASK_ENV', 'development')
+        if flask_env == 'development':
+            redirect_uri = "http://127.0.0.1:5000/auth/google/callback"
+        else:
+            redirect_uri = "http://magsud.yonca-sdc.com/auth/google/callback"
+        
+        # Build the OAuth URL manually to ensure correct redirect URI
+        client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+        scope = 'openid email profile https://www.googleapis.com/auth/drive'
+        state = secrets.token_urlsafe(32)
+        session['oauth_state'] = state
+        session['next_url'] = url_for('admin.index')
+        
+        auth_url = (
+            f"https://accounts.google.com/o/oauth2/auth?"
+            f"response_type=code&"
+            f"client_id={client_id}&"
+            f"redirect_uri={redirect_uri}&"
+            f"scope={scope}&"
+            f"state={state}&"
+            f"access_type=offline&prompt=consent"
+        )
+        return redirect(auth_url)
     
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
