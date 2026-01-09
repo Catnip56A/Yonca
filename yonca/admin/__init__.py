@@ -15,6 +15,20 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField
 from wtforms.validators import Optional, DataRequired
+import os
+import secrets
+
+def get_google_redirect_uri():
+    """Get the correct Google OAuth redirect URI based on configuration and environment"""
+    # Check for explicit configuration first
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+    if redirect_uri:
+        return redirect_uri
+    
+    # Fallback to automatic detection
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
 from yonca.models import User, Course, ForumMessage, ForumChannel, TaviTest, Resource, db, HomeContent
 
 class AdminIndexView(AdminIndexView):
@@ -404,11 +418,7 @@ class GoogleLoginView(BaseView):
         try:
             # Redirect to Google OAuth with next parameter to return to admin
             # Use configurable redirect URI
-            redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
-            if not redirect_uri:
-                flask_env = os.environ.get('FLASK_ENV', 'development')
-                is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-                redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+            redirect_uri = get_google_redirect_uri()
             
             print(f"DEBUG: Admin OAuth - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
             

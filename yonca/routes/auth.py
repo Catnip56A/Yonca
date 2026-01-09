@@ -10,6 +10,18 @@ import secrets
 import os
 from datetime import datetime, timedelta
 
+def get_google_redirect_uri():
+    """Get the correct Google OAuth redirect URI based on configuration and environment"""
+    # Check for explicit configuration first
+    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+    if redirect_uri:
+        return redirect_uri
+    
+    # Fallback to automatic detection
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -57,12 +69,7 @@ def login_google():
         return redirect(url_for('auth.login'))
     
     # Use configurable redirect URIs
-    # Check environment variable first, then fallback to detection logic
-    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
-    if not redirect_uri:
-        flask_env = os.environ.get('FLASK_ENV', 'development')
-        is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-        redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    redirect_uri = get_google_redirect_uri()
     
     print(f"DEBUG: OAuth login - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
     
@@ -110,11 +117,7 @@ def google_callback():
     client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
     
     # Use the same redirect URI logic as in login_google
-    redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI')
-    if not redirect_uri:
-        flask_env = os.environ.get('FLASK_ENV', 'development')
-        is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-        redirect_uri = "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    redirect_uri = get_google_redirect_uri()
     
     # Exchange code for access token
     token_url = 'https://oauth2.googleapis.com/token'
