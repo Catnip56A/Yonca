@@ -33,7 +33,7 @@ def get_google_redirect_uri(redirect_uri=None):
     # Fallback to automatic detection
     flask_env = os.environ.get('FLASK_ENV', 'development')
     is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "https://magsud.yonca-sdc.com/auth/google/callback"
 from yonca.models import User, Course, ForumMessage, ForumChannel, TaviTest, Resource, db, HomeContent
 
 class AdminIndexView(AdminIndexView):
@@ -423,8 +423,8 @@ class GoogleLoginView(BaseView):
             client_id = current_app.config.get('GOOGLE_CLIENT_ID')
             client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
             
-            # Use the same redirect URI as used in connect
-            redirect_uri = get_google_redirect_uri('https://magsud.yonca-sdc.com/admin/google_login/')
+            # Use the same redirect URI as used in connect (stored in session)
+            redirect_uri = session.pop('oauth_redirect_uri', get_google_redirect_uri('https://magsud.yonca-sdc.com/admin/google_login/'))
             
             # Exchange code for access token
             token_url = 'https://oauth2.googleapis.com/token'
@@ -495,6 +495,7 @@ class GoogleLoginView(BaseView):
             scope = 'openid email profile https://www.googleapis.com/auth/drive'
             state = secrets.token_urlsafe(32)
             session['oauth_state'] = state
+            session['oauth_redirect_uri'] = redirect_uri  # Store redirect URI for callback
             session['next_url'] = url_for('admin.index')
             
             auth_url = (

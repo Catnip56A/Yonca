@@ -23,7 +23,7 @@ def get_google_redirect_uri(redirect_uri=None):
     # Fallback to automatic detection
     flask_env = os.environ.get('FLASK_ENV', 'development')
     is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "http://magsud.yonca-sdc.com/auth/google/callback"
+    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "https://magsud.yonca-sdc.com/auth/google/callback"
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -50,8 +50,10 @@ def login():
         client_id = current_app.config.get('GOOGLE_CLIENT_ID')
         client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
         
-        # Use the same redirect URI as used in login_google
-        redirect_uri = get_google_redirect_uri('https://magsud.yonca-sdc.com/login')
+        # Use the same redirect URI as used in login_google (stored in session)
+        redirect_uri = session.pop('oauth_redirect_uri', get_google_redirect_uri())
+        
+        # Exchange code for access token
         
         # Exchange code for access token
         token_url = 'https://oauth2.googleapis.com/token'
@@ -216,6 +218,7 @@ def login_google():
     # Store state in session for verification
     from flask import session
     session['oauth_state'] = state
+    session['oauth_redirect_uri'] = redirect_uri  # Store redirect URI for callback
     
     # Store next URL if provided
     next_url = request.args.get('next')
@@ -257,6 +260,7 @@ def link_google_account():
     # Store state in session for verification
     from flask import session
     session['oauth_state'] = state
+    session['oauth_redirect_uri'] = redirect_uri  # Store redirect URI for callback
     session['oauth_action'] = 'link'  # Mark this as a linking action
     
     auth_url = (
@@ -292,14 +296,13 @@ def google_link_callback():
     client_id = current_app.config.get('GOOGLE_CLIENT_ID')
     client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
     
-    # Determine redirect URI based on environment (must match the one used in link_google_account)
-    flask_env = os.environ.get('FLASK_ENV', 'development')
-    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-    
-    if is_local:
-        redirect_uri = 'http://127.0.0.1:5000/auth/google/link'
-    else:
-        redirect_uri = 'https://magsud.yonca-sdc.com/auth/google/link'
+    # Use the same redirect URI as used in link_google_account (stored in session)
+    redirect_uri = session.pop('oauth_redirect_uri', None)
+    if not redirect_uri:
+        # Fallback if redirect_uri not stored
+        flask_env = os.environ.get('FLASK_ENV', 'development')
+        is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+        redirect_uri = 'http://127.0.0.1:5000/auth/google/link' if is_local else 'https://magsud.yonca-sdc.com/auth/google/link'
     
     # Exchange code for access token
     token_url = 'https://oauth2.googleapis.com/token'
