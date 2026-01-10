@@ -11,10 +11,79 @@ main_bp = Blueprint('main', __name__)
 
 
 
-@main_bp.route('/')
+@main_bp.route('/', methods=['GET', 'POST'])
 def index():
     """Serve main index page"""
-    from yonca.models import HomeContent
+    from yonca.models import HomeContent, Resource, PDFDocument, db
+    
+    # Handle POST requests for deletions
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        # Delete resource
+        if action == 'delete_resource' and current_user.is_authenticated:
+            from yonca.google_drive_service import authenticate, delete_file
+            
+            resource_id = request.form.get('resource_id')
+            resource = Resource.query.get(resource_id)
+            
+            if not resource:
+                flash('Resource not found.', 'error')
+                return redirect(url_for('main.index'))
+            
+            # Check permission: must be the uploader or an admin
+            if resource.uploaded_by != current_user.id and not current_user.is_admin:
+                flash('You do not have permission to delete this resource.', 'error')
+                return redirect(url_for('main.index'))
+            
+            # Delete from Google Drive
+            if resource.drive_file_id:
+                service = authenticate()
+                if service:
+                    try:
+                        delete_file(service, resource.drive_file_id)
+                    except Exception as e:
+                        print(f"Error deleting resource from Google Drive: {e}")
+            
+            # Note: preview_image is a URL string, not a Drive file ID, so we don't delete it
+            
+            # Delete from database
+            db.session.delete(resource)
+            db.session.commit()
+            flash('Resource deleted successfully!', 'success')
+            return redirect(url_for('main.index'))
+        
+        # Delete PDF
+        elif action == 'delete_pdf' and current_user.is_authenticated:
+            from yonca.google_drive_service import authenticate, delete_file
+            
+            pdf_id = request.form.get('pdf_id')
+            pdf = PDFDocument.query.get(pdf_id)
+            
+            if not pdf:
+                flash('PDF not found.', 'error')
+                return redirect(url_for('main.index'))
+            
+            # Check permission: must be the uploader or an admin
+            if pdf.uploaded_by != current_user.id and not current_user.is_admin:
+                flash('You do not have permission to delete this PDF.', 'error')
+                return redirect(url_for('main.index'))
+            
+            # Delete from Google Drive
+            if pdf.drive_file_id:
+                service = authenticate()
+                if service:
+                    try:
+                        delete_file(service, pdf.drive_file_id)
+                    except Exception as e:
+                        print(f"Error deleting PDF from Google Drive: {e}")
+            
+            # Delete from database
+            db.session.delete(pdf)
+            db.session.commit()
+            flash('PDF deleted successfully!', 'success')
+            return redirect(url_for('main.index'))
+    
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     return render_template('index.html', current_locale=get_locale(), is_authenticated=current_user.is_authenticated, home_content=home_content)
 
@@ -149,6 +218,7 @@ def course_page_enrolled(course_slug):
         elif action == 'submit_assignment' and current_user.is_authenticated:
             assignment_id = request.form.get('assignment_id')
             uploaded_file = request.files.get('submission_file')
+            allow_others_to_view = True  # Always allow viewing for submissions
             
             if not uploaded_file:
                 flash('Please select a file to upload.', 'error')
@@ -168,16 +238,44 @@ def course_page_enrolled(course_slug):
             uploaded_file.save(temp_file_path)
             
             # Upload to Google Drive
-            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive.', 'error')
+                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
-            drive_file_id = upload_file(service, temp_file_path, filename)
-            if not drive_file_id:
-                flash('Failed to upload file to Google Drive.', 'error')
+            try:
+                drive_file_id = upload_file(service, temp_file_path, filename)
+            except Exception as e:
+                print(f"Error uploading to Drive: {e}")
+                if "insufficientPermissions" in str(e) or "403" in str(e):
+                    from markupsafe import Markup
+                    flash(Markup('Your Google account does not have sufficient Drive permissions. Please <a href="/auth/link-google-account" class="alert-link">re-link your Google account</a> to grant full Drive access.'), 'error')
+                else:
+                    flash('Failed to upload file to Google Drive. Please try again.', 'error')
+                # Clean up temporary file
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            if not drive_file_id:
+                flash('Failed to upload file to Google Drive. Please try again.', 'error')
+                # Clean up temporary file
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Try to set permissions, but don't fail if this doesn't work
+            if allow_others_to_view:
+                try:
+                    set_file_permissions(service, drive_file_id, make_public=True)
+                except Exception as e:
+                    print(f"Warning: Could not set file permissions: {e}")
+                    # Continue anyway - file is uploaded, just might have restricted permissions
             
             # Create view-only link
             view_link = create_view_only_link(service, drive_file_id, is_image=False)
@@ -191,7 +289,8 @@ def course_page_enrolled(course_slug):
                 user_id=current_user.id,
                 drive_file_id=drive_file_id,
                 drive_view_link=view_link,
-                submitted_at=datetime.now()
+                submitted_at=datetime.now(),
+                allow_others_to_view=allow_others_to_view
             )
             db.session.add(new_submission)
             db.session.commit()
@@ -260,6 +359,7 @@ def course_page_enrolled(course_slug):
             file_title = request.form.get('file_title')
             file_description = request.form.get('file_description')
             is_published = request.form.get('file_published') == 'on'
+            allow_others_to_view = request.form.get('allow_others_to_view') == 'on'
             uploaded_file = request.files.get('content_file')
             
             # Debugging logs for upload_file
@@ -287,16 +387,43 @@ def course_page_enrolled(course_slug):
             uploaded_file.save(temp_file_path)
             
             # Upload to Google Drive
-            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive.', 'error')
+                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
-            drive_file_id = upload_file(service, temp_file_path, filename)
-            if not drive_file_id:
-                flash('Failed to upload file to Google Drive.', 'error')
+            try:
+                drive_file_id = upload_file(service, temp_file_path, filename)
+            except Exception as e:
+                print(f"Error uploading to Drive: {e}")
+                if "insufficientPermissions" in str(e) or "403" in str(e):
+                    flash('Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.', 'error')
+                else:
+                    flash('Failed to upload file to Google Drive. Please try again.', 'error')
+                # Clean up temporary file
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            if not drive_file_id:
+                flash('Failed to upload file to Google Drive. Please try again.', 'error')
+                # Clean up temporary file
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Try to set permissions, but don't fail if this doesn't work
+            if allow_others_to_view:
+                try:
+                    set_file_permissions(service, drive_file_id, make_public=True)
+                except Exception as e:
+                    print(f"Warning: Could not set file permissions: {e}")
+                    # Continue anyway - file is uploaded, just might have restricted permissions
             
             # Create view-only link
             view_link = create_view_only_link(service, drive_file_id, is_image=False)
@@ -312,6 +439,7 @@ def course_page_enrolled(course_slug):
                 description=file_description,
                 content_type='file',
                 content_data='',  # Not used for file content
+                allow_others_to_view=allow_others_to_view,
                 drive_file_id=drive_file_id,
                 drive_view_link=view_link,
                 is_published=is_published,
@@ -328,6 +456,126 @@ def course_page_enrolled(course_slug):
                 pass
             
             flash('File uploaded successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Delete course content
+        elif action == 'delete_content' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            from yonca.google_drive_service import authenticate, delete_file
+            
+            content_id = request.form.get('content_id')
+            content = CourseContent.query.get(content_id)
+            
+            if not content:
+                flash('Content not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Delete from Google Drive
+            if content.drive_file_id:
+                service = authenticate()
+                if service:
+                    try:
+                        delete_file(service, content.drive_file_id)
+                    except Exception as e:
+                        print(f"Error deleting file from Google Drive: {e}")
+            
+            # Delete from database
+            db.session.delete(content)
+            db.session.commit()
+            flash('Content deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Delete assignment submission
+        elif action == 'delete_submission' and current_user.is_authenticated:
+            from yonca.models import CourseAssignmentSubmission
+            from yonca.google_drive_service import authenticate, delete_file
+            
+            submission_id = request.form.get('submission_id')
+            submission = CourseAssignmentSubmission.query.get(submission_id)
+            
+            if not submission:
+                flash('Submission not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Check permission: must be the owner or an admin
+            if submission.user_id != current_user.id and not current_user.is_admin:
+                flash('You do not have permission to delete this submission.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Delete from Google Drive
+            if submission.drive_file_id:
+                service = authenticate()
+                if service:
+                    try:
+                        delete_file(service, submission.drive_file_id)
+                    except Exception as e:
+                        print(f"Error deleting file from Google Drive: {e}")
+            
+            # Delete from database
+            db.session.delete(submission)
+            db.session.commit()
+            flash('Submission deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Toggle content visibility
+        elif action == 'toggle_content_visibility' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            from yonca.google_drive_service import authenticate, set_file_permissions
+            
+            content_id = request.form.get('content_id')
+            content = CourseContent.query.get(content_id)
+            
+            if not content:
+                flash('Content not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Toggle visibility
+            content.allow_others_to_view = not content.allow_others_to_view
+            
+            # Update Google Drive permissions
+            if content.drive_file_id:
+                service = authenticate()
+                if service:
+                    try:
+                        set_file_permissions(service, content.drive_file_id, make_public=content.allow_others_to_view)
+                    except Exception as e:
+                        print(f"Error updating Drive permissions: {e}")
+            
+            db.session.commit()
+            flash(f"File visibility updated: {'Visible to students' if content.allow_others_to_view else 'Private'}", 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Toggle submission visibility
+        elif action == 'toggle_submission_visibility' and current_user.is_authenticated:
+            from yonca.models import CourseAssignmentSubmission
+            from yonca.google_drive_service import authenticate, set_file_permissions
+            
+            submission_id = request.form.get('submission_id')
+            submission = CourseAssignmentSubmission.query.get(submission_id)
+            
+            if not submission:
+                flash('Submission not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Check permission: must be the owner or an admin
+            if submission.user_id != current_user.id and not current_user.is_admin:
+                flash('You do not have permission to change this submission visibility.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Toggle visibility
+            submission.allow_others_to_view = not submission.allow_others_to_view
+            
+            # Update Google Drive permissions
+            if submission.drive_file_id:
+                service = authenticate()
+                if service:
+                    try:
+                        set_file_permissions(service, submission.drive_file_id, make_public=submission.allow_others_to_view)
+                    except Exception as e:
+                        print(f"Error updating Drive permissions: {e}")
+            
+            db.session.commit()
+            flash(f"Submission visibility updated: {'Visible to others' if submission.allow_others_to_view else 'Private'}", 'success')
             return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
 
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
@@ -491,12 +739,31 @@ def edit_course_page(slug):
             from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive.', 'error')
+                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
                 return redirect(request.url, code=303)
             
-            drive_file_id = upload_file(service, temp_file_path, filename)
+            try:
+                drive_file_id = upload_file(service, temp_file_path, filename)
+            except Exception as e:
+                print(f"Error uploading to Drive: {e}")
+                if "insufficientPermissions" in str(e) or "403" in str(e):
+                    flash('Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.', 'error')
+                else:
+                    flash('Failed to upload file to Google Drive. Please try again.', 'error')
+                # Clean up temporary file
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
+                return redirect(request.url, code=303)
+            
             if not drive_file_id:
-                flash('Failed to upload file to Google Drive.', 'error')
+                flash('Failed to upload file to Google Drive. Please try again.', 'error')
+                # Clean up temporary file
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
                 return redirect(request.url, code=303)
             
             # Create view-only link
@@ -613,30 +880,6 @@ def edit_course_page(slug):
                 flash('Content moved successfully!', 'success')
             else:
                 flash('Content not found or permission denied.', 'error')
-
-        elif action == 'delete_content':
-            content_id = request.form.get('content_id')
-            content = CourseContent.query.get(content_id)
-            if content and content.course_id == course.id:
-                db.session.delete(content)
-                db.session.commit()
-                flash('Content deleted successfully!', 'success')
-                
-        elif action == 'delete_assignment':
-            assignment_id = request.form.get('assignment_id')
-            assignment = CourseAssignment.query.get(assignment_id)
-            if assignment and assignment.course_id == course.id:
-                db.session.delete(assignment)
-                db.session.commit()
-                flash('Assignment deleted successfully!', 'success')
-                
-        elif action == 'delete_announcement':
-            announcement_id = request.form.get('announcement_id')
-            announcement = CourseAnnouncement.query.get(announcement_id)
-            if announcement and announcement.course_id == course.id:
-                db.session.delete(announcement)
-                db.session.commit()
-                flash('Announcement deleted successfully!', 'success')
         
         return redirect(request.url, code=303)
     

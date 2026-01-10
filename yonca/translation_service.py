@@ -163,9 +163,20 @@ class TranslationService:
             return cached.translated_text
 
         try:
-            # Use LibreTranslate for translation
-            translated_text = self._translate_with_libretranslate(text, source_language, target_language)
-            service_used = 'libretranslate'
+            # Try Deep Translator first if available
+            if DEEP_TRANS_AVAILABLE:
+                try:
+                    translated_text = GoogleTranslator(source='auto', target=target_language).translate(text)
+                    service_used = 'deep_translator'
+                except Exception as e:
+                    current_app.logger.warning(f"Deep Translator failed: {str(e)}, trying LibreTranslate")
+                    # Fallback to LibreTranslate
+                    translated_text = self._translate_with_libretranslate(text, source_language, target_language)
+                    service_used = 'libretranslate'
+            else:
+                # Use LibreTranslate if Deep Translator not available
+                translated_text = self._translate_with_libretranslate(text, source_language, target_language)
+                service_used = 'libretranslate'
 
             # Cache the result
             new_translation = Translation(

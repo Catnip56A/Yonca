@@ -136,6 +136,7 @@ class CourseAssignmentSubmission(db.Model):
     submitted_at = db.Column(db.DateTime, server_default=db.func.now())
     grade = db.Column(db.Integer, nullable=True)
     comment = db.Column(db.Text, nullable=True)
+    allow_others_to_view = db.Column(db.Boolean, default=False)  # Allow other users to view this file
     assignment = db.relationship('CourseAssignment', backref=db.backref('submissions', lazy='dynamic'))
     user = db.relationship('User')
 
@@ -156,6 +157,7 @@ class Resource(db.Model):
     uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     upload_date = db.Column(db.DateTime, server_default=db.func.now())
     is_active = db.Column(db.Boolean, default=True)
+    allow_others_to_view = db.Column(db.Boolean, default=True)  # Allow other users to view this file
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -209,6 +211,7 @@ class PDFDocument(db.Model):
     uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     upload_date = db.Column(db.DateTime, server_default=db.func.now())
     is_active = db.Column(db.Boolean, default=True)
+    allow_others_to_view = db.Column(db.Boolean, default=True)  # Allow other users to view this file
 
     def __repr__(self):
         return f'<PDFDocument {self.title}>'
@@ -326,6 +329,7 @@ class CourseContent(db.Model):
     order = db.Column(db.Integer, default=0)
     is_published = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+    allow_others_to_view = db.Column(db.Boolean, default=True)  # Allow other users to view this file
     
     course = db.relationship('Course', backref=db.backref('contents', lazy='dynamic'))
     folder_id = db.Column(db.Integer, db.ForeignKey('course_content_folder.id'), nullable=True)

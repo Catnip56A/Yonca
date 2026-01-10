@@ -117,36 +117,58 @@ def upload_file(service, file_path, file_name=None, folder_id=None):
         return None
 
 def create_view_only_link(service, file_id, is_image=False):
-    """Create a view-only link for files - public for images, protected for others"""
+    """Create a view-only link for files - returns direct Google Drive link"""
     print(f"DEBUG: create_view_only_link called with file_id={file_id}, is_image={is_image}")
+    
     if is_image:
-        # For images, make them publicly viewable and return direct Google Drive link
-        try:
-            print(f"DEBUG: Making image {file_id} public")
-            # Make the file publicly viewable
+        # For images, return direct Google Drive image link
+        view_link = f"https://lh3.googleusercontent.com/d/{file_id}"
+        print(f"DEBUG: Returning image view_link: {view_link}")
+        return view_link
+    else:
+        # For non-images (PDFs, documents), return direct Google Drive viewer link
+        view_link = f"https://drive.google.com/file/d/{file_id}/view"
+        print(f"DEBUG: Returning file view_link: {view_link}")
+        return view_link
+
+def set_file_permissions(service, file_id, make_public=False):
+    """Set file permissions on Google Drive file"""
+    try:
+        if make_public:
+            # Make file publicly viewable
             permission = {
                 'type': 'anyone',
                 'role': 'reader'
             }
-            result = service.permissions().create(
+            service.permissions().create(
                 fileId=file_id,
                 body=permission,
                 fields='id'
             ).execute()
-            print(f"DEBUG: Permission created: {result}")
-            
-            # Return the direct Google Drive view link
-            view_link = f"https://lh3.googleusercontent.com/d/{file_id}"
-            print(f"DEBUG: Returning view_link: {view_link}")
-            return view_link
-        except HttpError as error:
-            print(f'An error occurred making image public: {error}')
-            return None
-    else:
-        # For non-images (PDFs, documents), return protected app URL
-        from flask import url_for
-        app_link = url_for('api.serve_file', file_id=file_id, _external=True)
-        return app_link
+            print(f"DEBUG: File {file_id} made public")
+            return True
+        else:
+            # Remove public permissions to make file private
+            try:
+                # Get all permissions for the file
+                permissions = service.permissions().list(fileId=file_id, fields='permissions(id,type)').execute()
+                
+                # Delete all 'anyone' permissions
+                for permission in permissions.get('permissions', []):
+                    if permission.get('type') == 'anyone':
+                        service.permissions().delete(fileId=file_id, permissionId=permission['id']).execute()
+                        print(f"DEBUG: Removed public permission from file {file_id}")
+                
+                print(f"DEBUG: File {file_id} made private")
+                return True
+            except HttpError as error:
+                print(f'Error removing public permissions: {error}')
+                # If removing fails, still return True to not break the flow
+                print(f"DEBUG: File {file_id} kept as is (may already be private)")
+                return True
+    except HttpError as error:
+        print(f'An error occurred setting permissions: {error}')
+        return False
 
 def delete_file(service, file_id):
     """Delete a file from Google Drive"""

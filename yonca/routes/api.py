@@ -302,10 +302,15 @@ def upload_resource():
             preview_file.save(preview_temp_path)
             
             # Upload preview image to Google Drive
-            preview_drive_file_id = upload_file(service, preview_temp_path, preview_filename)
-            if preview_drive_file_id:
-                # Create view-only link for preview image
-                preview_image_url = create_view_only_link(service, preview_drive_file_id, is_image=True)
+            try:
+                preview_drive_file_id = upload_file(service, preview_temp_path, preview_filename)
+                if preview_drive_file_id:
+                    # Create view-only link for preview image
+                    preview_image_url = create_view_only_link(service, preview_drive_file_id, is_image=True)
+            except Exception as e:
+                print(f"Error uploading preview to Drive: {e}")
+                if "insufficientPermissions" in str(e) or "403" in str(e):
+                    return jsonify({'error': 'Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.'}), 403
             
             # Clean up temporary preview file
             try:
@@ -326,7 +331,14 @@ def upload_resource():
         file.save(temp_file_path)
         
         # Upload to Google Drive
-        drive_file_id = upload_file(service, temp_file_path, filename)
+        try:
+            drive_file_id = upload_file(service, temp_file_path, filename)
+        except Exception as e:
+            print(f"Error uploading to Drive: {e}")
+            if "insufficientPermissions" in str(e) or "403" in str(e):
+                return jsonify({'error': 'Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.'}), 403
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
         
@@ -583,7 +595,14 @@ def upload_pdf():
         if not service:
             return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
         
-        drive_file_id = upload_file(service, temp_file_path, filename)
+        try:
+            drive_file_id = upload_file(service, temp_file_path, filename)
+        except Exception as e:
+            print(f"Error uploading to Drive: {e}")
+            if "insufficientPermissions" in str(e) or "403" in str(e):
+                return jsonify({'error': 'Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.'}), 403
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
         
@@ -781,7 +800,14 @@ def upload_feature_image():
         if not service:
             return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
 
-        drive_file_id = upload_file(service, temp_file_path, filename)
+        try:
+            drive_file_id = upload_file(service, temp_file_path, filename)
+        except Exception as e:
+            print(f"Error uploading to Drive: {e}")
+            if "insufficientPermissions" in str(e) or "403" in str(e):
+                return jsonify({'error': 'Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.'}), 403
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
 
@@ -845,7 +871,14 @@ def upload_logo():
         if not service:
             return jsonify({'error': 'Failed to authenticate with Google Drive'}), 500
 
-        drive_file_id = upload_file(service, temp_file_path, filename)
+        try:
+            drive_file_id = upload_file(service, temp_file_path, filename)
+        except Exception as e:
+            print(f"Error uploading to Drive: {e}")
+            if "insufficientPermissions" in str(e) or "403" in str(e):
+                return jsonify({'error': 'Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.'}), 403
+            return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
 
@@ -874,29 +907,58 @@ def upload_logo():
 @login_required
 def serve_file(file_id):
     """Serve a Google Drive file after authentication"""
-    service = authenticate()
-    if not service:
-        return jsonify({'error': 'Google Drive service unavailable'}), 500
+    from yonca.models import CourseAssignmentSubmission, CourseContent, Resource, PDFDocument
+    from flask_login import current_user
+    from flask import redirect
     
-    try:
-        # Get file metadata
-        from googleapiclient.http import MediaIoBaseDownload
-        import io
-        from flask import send_file
-        
-        file_metadata = service.files().get(fileId=file_id, fields='name,mimeType').execute()
-        filename = file_metadata['name']
-        mime_type = file_metadata.get('mimeType', 'application/octet-stream')
-        
-        # Download file to memory
-        request = service.files().get_media(fileId=file_id)
-        file_data = io.BytesIO()
-        downloader = MediaIoBaseDownload(file_data, request)
-        done = False
-        while not done:
-            status, done = downloader.next_chunk()
-        file_data.seek(0)
-        
-        return send_file(file_data, mimetype=mime_type, as_attachment=True, download_name=filename)
-    except Exception as e:
-        return jsonify({'error': f'Failed to serve file: {str(e)}'}), 500
+    # Find the file in any of the models that store files
+    submission = CourseAssignmentSubmission.query.filter_by(drive_file_id=file_id).first()
+    course_content = CourseContent.query.filter_by(drive_file_id=file_id).first()
+    resource = Resource.query.filter_by(drive_file_id=file_id).first()
+    pdf_doc = PDFDocument.query.filter_by(drive_file_id=file_id).first()
+    
+    file_record = submission or course_content or resource or pdf_doc
+    
+    if not file_record:
+        return jsonify({'error': 'File not found'}), 404
+    
+    # Determine ownership and permissions
+    is_owner = False
+    is_admin = current_user.is_authenticated and current_user.is_admin
+    is_teacher = current_user.is_authenticated and current_user.is_teacher
+    is_public = getattr(file_record, 'allow_others_to_view', True)  # Default to True if field doesn't exist
+    
+    # Check ownership based on file type
+    if hasattr(file_record, 'user_id'):
+        is_owner = current_user.is_authenticated and file_record.user_id == current_user.id
+    elif hasattr(file_record, 'uploaded_by'):
+        is_owner = current_user.is_authenticated and file_record.uploaded_by == current_user.id
+    
+    # Permission logic:
+    # 1. Owner, admin, and teacher always have access
+    # 2. For private files (allow_others_to_view=False), only owner/admin/teacher can access
+    # 3. For public files, enrolled students (for course content) or anyone can access
+    
+    # If file is private, only owner/admin/teacher can view
+    if not is_public:
+        if not (is_owner or is_admin or is_teacher):
+            return jsonify({'error': 'This file is private and you do not have permission to view it'}), 403
+    else:
+        # For public course content, check enrollment
+        if course_content:
+            if current_user.is_authenticated:
+                from yonca.models import Course
+                course = Course.query.get(course_content.course_id)
+                is_enrolled = course and current_user in course.users
+                
+                if not (is_owner or is_admin or is_teacher or is_enrolled):
+                    return jsonify({'error': 'You must be enrolled in this course to view this file'}), 403
+            else:
+                return jsonify({'error': 'You must be logged in to view course content'}), 403
+    
+    # For public files or files the user owns/can access, redirect to the drive_view_link
+    if hasattr(file_record, 'drive_view_link') and file_record.drive_view_link:
+        return redirect(file_record.drive_view_link)
+    
+    # If no view link exists, try to construct a direct Google Drive link
+    return redirect(f'https://drive.google.com/file/d/{file_id}/view')

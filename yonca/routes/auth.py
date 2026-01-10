@@ -135,6 +135,38 @@ def login():
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
+            # Check if there's a pending Google account link
+            from flask import session
+            pending_link = session.pop('pending_google_link', None)
+            
+            if pending_link:
+                # Check if this Google account is already linked to another user
+                google_email = pending_link['email']
+                existing_linked_user = User.query.filter(
+                    User.google_access_token.isnot(None),
+                    User.email == google_email
+                ).first()
+                
+                if existing_linked_user and existing_linked_user.id != user.id:
+                    flash(f'Google account ({google_email}) is already linked to another user account.')
+                    logging.warning(f"Attempted to link Google account {google_email} to {username}, but already linked to user ID {existing_linked_user.id}")
+                else:
+                    # Link the Google account to this user
+                    user.google_access_token = pending_link['access_token']
+                    user.google_refresh_token = pending_link['refresh_token']
+                    user.google_token_expiry = datetime.utcnow() + timedelta(seconds=pending_link['expires_in'])
+                    
+                    # Update email if not set or different
+                    if not user.email or user.email != pending_link['email']:
+                        # Check if email is already used by another user
+                        existing_user = User.query.filter_by(email=pending_link['email']).first()
+                        if not existing_user or existing_user.id == user.id:
+                            user.email = pending_link['email']
+                    
+                    db.session.commit()
+                    logging.info(f"Google account linked for user: {username}")
+                    flash(f'Google account ({pending_link["email"]}) successfully linked!')
+            
             login_user(user)
             logging.info(f"User {username} logged in successfully")
             
@@ -168,10 +200,16 @@ def login_google():
         flash('Google OAuth not configured')
         return redirect(url_for('auth.login'))
     
-    # Use configurable redirect URIs
-    redirect_uri = get_google_redirect_uri('https://magsud.yonca-sdc.com/login')
+    # Determine redirect URI based on environment
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
     
-    print(f"DEBUG: OAuth login - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
+    if is_local:
+        redirect_uri = 'http://127.0.0.1:5000/auth/google/callback'
+    else:
+        redirect_uri = 'https://magsud.yonca-sdc.com/auth/google/callback'
+    
+    print(f"DEBUG: OAuth login - request.host={request.host}, redirect_uri={redirect_uri}")
     
     scope = 'openid email profile https://www.googleapis.com/auth/drive'
     state = secrets.token_urlsafe(32)  # Generate a secure state
@@ -195,6 +233,136 @@ def login_google():
     )
     return redirect(auth_url)
 
+@auth_bp.route('/link-google-account')
+def link_google_account():
+    """Initiate Google OAuth flow to link existing account"""
+    client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+    if not client_id:
+        flash('Google OAuth not configured')
+        return redirect(url_for('auth.login'))
+    
+    # Determine redirect URI based on environment
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+    
+    if is_local:
+        redirect_uri = 'http://127.0.0.1:5000/auth/google/link'
+    else:
+        redirect_uri = 'https://magsud.yonca-sdc.com/auth/google/link'
+    
+    print(f"DEBUG: Link account - request.host={request.host}, redirect_uri={redirect_uri}")
+    
+    scope = 'openid email profile https://www.googleapis.com/auth/drive'
+    state = secrets.token_urlsafe(32)  # Generate a secure state
+    # Store state in session for verification
+    from flask import session
+    session['oauth_state'] = state
+    session['oauth_action'] = 'link'  # Mark this as a linking action
+    
+    auth_url = (
+        f"https://accounts.google.com/o/oauth2/auth?"
+        f"response_type=code&"
+        f"client_id={client_id}&"
+        f"redirect_uri={redirect_uri}&"
+        f"scope={scope}&"
+        f"state={state}&"
+        f"access_type=offline&prompt=consent"
+    )
+    return redirect(auth_url)
+
+@auth_bp.route('/auth/google/link')
+def google_link_callback():
+    """Handle Google OAuth callback for account linking"""
+    code = request.args.get('code')
+    state = request.args.get('state')
+    error = request.args.get('error')
+    
+    from flask import session
+    stored_state = session.pop('oauth_state', None)
+    oauth_action = session.pop('oauth_action', None)
+    
+    if error:
+        flash(f'OAuth error: {error}')
+        return redirect(url_for('auth.login'))
+    
+    if not code or state != stored_state or oauth_action != 'link':
+        flash('Invalid OAuth callback')
+        return redirect(url_for('auth.login'))
+    
+    client_id = current_app.config.get('GOOGLE_CLIENT_ID')
+    client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
+    
+    # Determine redirect URI based on environment (must match the one used in link_google_account)
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+    
+    if is_local:
+        redirect_uri = 'http://127.0.0.1:5000/auth/google/link'
+    else:
+        redirect_uri = 'https://magsud.yonca-sdc.com/auth/google/link'
+    
+    # Exchange code for access token
+    token_url = 'https://oauth2.googleapis.com/token'
+    token_data = {
+        'code': code,
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code'
+    }
+    
+    try:
+        token_response = requests.post(token_url, data=token_data)
+        token_response.raise_for_status()
+        token_json = token_response.json()
+        access_token = token_json.get('access_token')
+        refresh_token = token_json.get('refresh_token')
+        expires_in = token_json.get('expires_in', 3600)
+        
+        if not access_token:
+            flash('Failed to obtain access token')
+            return redirect(url_for('auth.login'))
+        
+        # Get user info
+        userinfo_url = 'https://www.googleapis.com/oauth2/v2/userinfo'
+        headers = {'Authorization': f'Bearer {access_token}'}
+        userinfo_response = requests.get(userinfo_url, headers=headers)
+        userinfo_response.raise_for_status()
+        userinfo = userinfo_response.json()
+        
+        google_email = userinfo.get('email')
+        
+        if not google_email:
+            flash('Failed to get user email from Google')
+            return redirect(url_for('auth.login'))
+        
+        # Check if this Google account is already linked to another user
+        existing_linked_user = User.query.filter(
+            User.google_access_token.isnot(None),
+            User.email == google_email
+        ).first()
+        
+        if existing_linked_user:
+            flash(f'This Google account ({google_email}) is already linked to another user. Please use a different Google account.')
+            logging.warning(f"Attempted to link Google account {google_email} which is already linked to user ID {existing_linked_user.id}")
+            return redirect(url_for('auth.login'))
+        
+        # Store credentials temporarily in session for linking
+        session['pending_google_link'] = {
+            'email': google_email,
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'expires_in': expires_in
+        }
+        
+        flash(f'Google account ({google_email}) is ready to link. Please login with your existing account.')
+        return redirect(url_for('auth.login'))
+    
+    except requests.RequestException as e:
+        logging.error(f'OAuth token exchange failed: {e}')
+        flash('OAuth authentication failed')
+        return redirect(url_for('auth.login'))
+
 @auth_bp.route('/auth/google/callback')
 def google_callback():
     """Handle Google OAuth callback"""
@@ -216,8 +384,14 @@ def google_callback():
     client_id = current_app.config.get('GOOGLE_CLIENT_ID')
     client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
     
-    # Use the same redirect URI logic as in login_google
-    redirect_uri = get_google_redirect_uri()
+    # Determine redirect URI based on environment (must match the one used in login_google)
+    flask_env = os.environ.get('FLASK_ENV', 'development')
+    is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
+    
+    if is_local:
+        redirect_uri = 'http://127.0.0.1:5000/auth/google/callback'
+    else:
+        redirect_uri = 'https://magsud.yonca-sdc.com/auth/google/callback'
     
     # Exchange code for access token
     token_url = 'https://oauth2.googleapis.com/token'
