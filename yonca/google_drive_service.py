@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timedelta
 import requests
 
 # If modifying these scopes, delete the token.json file
-SCOPES = ['https://www.googleapis.com/auth/drive']
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 FOLDER_ID = None  # Upload to root directory for OAuth users
 
 def authenticate(user=None):

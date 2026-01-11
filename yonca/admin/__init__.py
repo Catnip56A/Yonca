@@ -492,7 +492,7 @@ class GoogleLoginView(BaseView):
                 flash('Google OAuth not configured')
                 return redirect(url_for('admin.index'))
                 
-            scope = 'openid email profile https://www.googleapis.com/auth/drive'
+            scope = 'openid email profile https://www.googleapis.com/auth/drive.file'
             state = secrets.token_urlsafe(32)
             session['oauth_state'] = state
             session['oauth_redirect_uri'] = redirect_uri  # Store redirect URI for callback
