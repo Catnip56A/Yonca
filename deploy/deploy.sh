@@ -17,8 +17,26 @@ sudo apt install -y python3 python3-pip python3-venv postgresql postgresql-contr
 
 # Create database and user
 echo "🗄️ Setting up PostgreSQL..."
-sudo -u postgres psql -c "CREATE DATABASE IF NOT EXISTS yonca_db;"
-sudo -u postgres psql -c "CREATE USER IF NOT EXISTS yonca_user WITH PASSWORD 'ALHIKO3325!56Catnip?!';"
+
+# Check and create database if it doesn't exist
+DB_EXISTS=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='yonca_db'" 2>/dev/null || echo "0")
+if [ "$DB_EXISTS" != "1" ]; then
+    sudo -u postgres psql -c "CREATE DATABASE yonca_db;"
+    echo "Database yonca_db created."
+else
+    echo "Database yonca_db already exists, skipping creation."
+fi
+
+# Check and create user if it doesn't exist
+USER_EXISTS=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='yonca_user'" 2>/dev/null || echo "0")
+if [ "$USER_EXISTS" != "1" ]; then
+    sudo -u postgres psql -c "CREATE USER yonca_user WITH PASSWORD 'ALHIKO3325!56Catnip?!';"
+    echo "User yonca_user created."
+else
+    echo "User yonca_user already exists, skipping creation."
+fi
+
+# Grant privileges (safe to run even if already granted)
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE yonca_db TO yonca_user;"
 
 # Create application directory
