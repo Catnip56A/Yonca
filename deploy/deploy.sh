@@ -87,7 +87,7 @@ sudo systemctl enable yonca
 # Copy nginx configuration
 echo "🌐 Setting up nginx..."
 sudo cp deploy/yonca.nginx /etc/nginx/sites-available/yonca
-sudo ln -s /etc/nginx/sites-available/yonca /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/yonca /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 
