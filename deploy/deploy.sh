@@ -41,17 +41,17 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE yonca_db TO yonca_use
 
 # Create application directory
 echo "📁 Creating application directory..."
-sudo mkdir -p /var/www/yonca
-sudo chown -R $USER:www-data /var/www/yonca
+sudo mkdir -p /home/magsud/work/Yonca
+sudo chown -R magsud:magsud /home/magsud/work/Yonca
 
 # Clone or copy your application code here
-echo "📋 Copy your Yonca application code to /var/www/yonca"
-echo "For example: git clone https://github.com/yourusername/yonca.git /var/www/yonca"
-read -p "Press Enter after you've copied the code..."
+echo "📋 Your Yonca application code should be in /home/magsud/work/Yonca"
+echo "Since you mentioned the files are already there, we'll proceed..."
+# read -p "Press Enter after you've copied the code..."
 
 # Set up Python virtual environment
 echo "🐍 Setting up Python virtual environment..."
-cd /var/www/yonca
+cd /home/magsud/work/Yonca
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements-prod.txt

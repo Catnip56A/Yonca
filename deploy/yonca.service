@@ -4,9 +4,9 @@ After=network.target
 Requires=postgresql.service
 
 [Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/var/www/yonca
+User=magsud
+Group=magsud
+WorkingDirectory=/home/magsud/work/Yonca
 Environment="PATH=/var/www/yonca/venv/bin"
 Environment="FLASK_ENV=production"
 Environment="FLASK_ENV=testing"
