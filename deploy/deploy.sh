@@ -40,6 +40,9 @@ fi
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE yonca_db TO yonca_user;"
 sudo -u postgres psql -d yonca_db -c "GRANT ALL ON SCHEMA public TO yonca_user;"
 
+# Reassign ownership of existing objects to yonca_user
+sudo -u postgres psql -d yonca_db -c "REASSIGN OWNED BY postgres TO yonca_user;"
+
 # Reset migration state if needed
 sudo -u postgres psql -d yonca_db -c "DROP TABLE IF EXISTS alembic_version;"
 
