@@ -73,7 +73,7 @@ EOF
 
 # Run database migrations
 echo "🗃️ Running database migrations..."
-flask db upgrade
+flask db stamp head
 
 # Revoke superuser privileges
 sudo -u postgres psql -c "ALTER USER yonca_user NOSUPERUSER;"
