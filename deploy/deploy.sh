@@ -89,7 +89,7 @@ echo "🌐 Setting up nginx..."
 sudo cp deploy/yonca.nginx /etc/nginx/sites-available/yonca
 sudo ln -sf /etc/nginx/sites-available/yonca /etc/nginx/sites-enabled/
 sudo nginx -t
-sudo systemctl reload nginx
+sudo systemctl restart nginx
 
 # Start the application
 echo "▶️ Starting the application..."
