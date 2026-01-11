@@ -61,7 +61,7 @@ echo "🔧 Creating environment configuration..."
 cat > .env << EOF
 FLASK_ENV=production
 SECRET_KEY=your-super-secret-key-change-this-in-production
-DATABASE_URL=postgresql://yonca_user:your_secure_password_here@localhost:5432/yonca_db
+DATABASE_URL=postgresql://yonca_user:ALHIKO3325!56Catnip?!@localhost:5432/yonca_db
 EOF
 
 # Run database migrations
