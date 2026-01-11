@@ -9,6 +9,9 @@ Group=www-data
 WorkingDirectory=/var/www/yonca
 Environment="PATH=/var/www/yonca/venv/bin"
 Environment="FLASK_ENV=production"
+Environment="FLASK_ENV=testing"
+Environment="DATABASE_URL=postgresql://postgres:ALHIKO3325%2156Catnip%3F%21@localhost:5432/yonca_db"
+Environment="GOOGLE_REDIRECT_URI=http://magsud.yonca-sdc.com/auth/google/callback"
 ExecStart=/var/www/yonca/venv/bin/gunicorn --workers 3 --bind unix:yonca.sock -m 007 wsgi:app
 Restart=always
 
