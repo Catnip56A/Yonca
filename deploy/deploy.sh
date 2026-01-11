@@ -40,8 +40,8 @@ fi
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE yonca_db TO yonca_user;"
 sudo -u postgres psql -d yonca_db -c "GRANT ALL ON SCHEMA public TO yonca_user;"
 
-# Reassign ownership of existing objects to yonca_user
-sudo -u postgres psql -d yonca_db -c "REASSIGN OWNED BY postgres TO yonca_user;"
+# Temporarily grant superuser privileges to allow altering existing tables
+sudo -u postgres psql -c "ALTER USER yonca_user SUPERUSER;"
 
 # Reset migration state if needed
 sudo -u postgres psql -d yonca_db -c "DROP TABLE IF EXISTS alembic_version;"
@@ -74,6 +74,9 @@ EOF
 # Run database migrations
 echo "🗃️ Running database migrations..."
 flask db upgrade
+
+# Revoke superuser privileges
+sudo -u postgres psql -c "ALTER USER yonca_user NOSUPERUSER;"
 
 # Copy systemd service file
 echo "⚙️ Setting up systemd service..."
