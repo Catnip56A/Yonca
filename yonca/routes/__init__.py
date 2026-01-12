@@ -84,7 +84,14 @@ def index():
             flash('PDF deleted successfully!', 'success')
             return redirect(url_for('main.index'))
     
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    # Always return a response, even if database is unavailable
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        # Log the error but don't crash - return empty HomeContent
+        print(f"Database error in index route: {e}")
+        home_content = HomeContent()
+    
     return render_template('index.html', current_locale=get_locale(), is_authenticated=current_user.is_authenticated, home_content=home_content)
 
 # Public course description/marketing page
@@ -636,7 +643,11 @@ def serve_site():
 def courses():
     """Serve courses page"""
     from yonca.models import HomeContent
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        print(f"Database error in courses route: {e}")
+        home_content = HomeContent()
     return render_template('index.html', current_locale=get_locale(), 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='courses')
@@ -645,7 +656,11 @@ def courses():
 def forum():
     """Serve forum page"""
     from yonca.models import HomeContent
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        print(f"Database error in forum route: {e}")
+        home_content = HomeContent()
     return render_template('index.html', current_locale=get_locale(), 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='forum')
@@ -654,7 +669,11 @@ def forum():
 def resources():
     """Serve resources page"""
     from yonca.models import HomeContent
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        print(f"Database error in resources route: {e}")
+        home_content = HomeContent()
     return render_template('index.html', current_locale=get_locale(), 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='resources')
@@ -663,7 +682,11 @@ def resources():
 def tavi_test():
     """Serve TAVI test page"""
     from yonca.models import HomeContent
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        print(f"Database error in tavi-test route: {e}")
+        home_content = HomeContent()
     return render_template('index.html', current_locale=get_locale(), 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='tavi-test')
@@ -672,7 +695,11 @@ def tavi_test():
 def contacts():
     """Serve contacts page"""
     from yonca.models import HomeContent
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        print(f"Database error in contacts route: {e}")
+        home_content = HomeContent()
     return render_template('index.html', current_locale=get_locale(), 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='contact')
@@ -681,7 +708,11 @@ def contacts():
 def about():
     """Serve about page"""
     from yonca.models import HomeContent
-    home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    try:
+        home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    except Exception as e:
+        print(f"Database error in about route: {e}")
+        home_content = HomeContent()
     return render_template('index.html', current_locale=get_locale(), 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='about')
