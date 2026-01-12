@@ -84,6 +84,17 @@
             transform: translateY(-1px);
         }
 
+        button:disabled {
+            background: #cccccc !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+
+        button:disabled:hover {
+            background: #cccccc !important;
+            transform: none !important;
+        }
+
         .back-link {
             text-align: center;
             margin-top: 2rem;
@@ -222,7 +233,14 @@
                 <input type="checkbox" id="admin_login" name="admin_login" style="width: auto; margin: 0;">
                 <label for="admin_login" style="margin: 0; font-weight: normal;">{{ _('Login as Administrator') }}</label>
             </div>
-            <button type="submit">{{ _('Login') }}</button>
+            <div class="form-group" style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                <input type="checkbox" id="terms_acknowledgment" name="terms_acknowledgment" style="width: auto; margin: 0; margin-top: 0.25rem;" required>
+                <label for="terms_acknowledgment" style="margin: 0; font-weight: normal; font-size: 0.9rem; line-height: 1.4;">
+                    {{ _('I acknowledge that I have read and agree to the') }} 
+                    <a href="{{ url_for('main.terms') }}" target="_blank" style="color: #abc32f; text-decoration: underline;">{{ _('Terms of Service') }}</a>
+                </label>
+            </div>
+            <button type="submit" id="login-button" disabled>{{ _('Login') }}</button>
         </form>
         <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
             <a href="{{ url_for('auth.login_google') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #4285f4; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s ease; margin-bottom: 0.75rem;">
@@ -237,5 +255,35 @@
             <a href="/">{{ _('Back to Yonca') }}</a>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const termsCheckbox = document.getElementById('terms_acknowledgment');
+            const loginButton = document.getElementById('login-button');
+            
+            // Initially disable the login button
+            loginButton.disabled = true;
+            loginButton.style.opacity = '0.6';
+            loginButton.style.cursor = 'not-allowed';
+            
+            // Function to update button state
+            function updateButtonState() {
+                if (termsCheckbox.checked) {
+                    loginButton.disabled = false;
+                    loginButton.style.opacity = '1';
+                    loginButton.style.cursor = 'pointer';
+                } else {
+                    loginButton.disabled = true;
+                    loginButton.style.opacity = '0.6';
+                    loginButton.style.cursor = 'not-allowed';
+                }
+            }
+            
+            // Listen for checkbox changes
+            termsCheckbox.addEventListener('change', updateButtonState);
+            
+            // Also check on page load in case checkbox is pre-checked
+            updateButtonState();
+        });
+    </script>
 </body>
 </html>

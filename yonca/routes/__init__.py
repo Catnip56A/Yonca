@@ -686,6 +686,11 @@ def about():
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='about')
 
+@main_bp.route('/terms')
+def terms():
+    """Serve terms of service page"""
+    return render_template('terms.html', current_locale=get_locale())
+
 @main_bp.route('/course/<slug>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_course_page(slug):
