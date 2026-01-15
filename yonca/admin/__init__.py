@@ -267,48 +267,27 @@ class AdminIndexView(AdminIndexView):
                     if file_key in request.files and request.files[file_key].filename:
                         file = request.files[file_key]
                         if file and file.filename:
-                            # Handle file upload to Google Drive
+                            # Handle local file upload to server
                             from werkzeug.utils import secure_filename
                             import os
                             import random
-                            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
                             
-                            # Create temporary directory for file processing
-                            temp_dir = os.path.join(current_app.static_folder, 'temp')
-                            os.makedirs(temp_dir, exist_ok=True)
+                            # Create gallery directory if it doesn't exist
+                            gallery_dir = os.path.join(current_app.static_folder, 'gallery')
+                            os.makedirs(gallery_dir, exist_ok=True)
                             
                             # Generate secure filename
                             filename = secure_filename(file.filename)
                             unique_filename = f"gallery_{random.randint(1000, 9999)}_{filename}"
-                            temp_file_path = os.path.join(temp_dir, unique_filename)
+                            file_path = os.path.join(gallery_dir, unique_filename)
                             
-                            # Save file temporarily
-                            file.save(temp_file_path)
+                            # Save file to local gallery folder
+                            file.save(file_path)
                             
-                            # Check if file is a video
-                            video_extensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov', '.wmv', '.flv', '.mkv']
-                            is_video = any(filename.lower().endswith(ext) for ext in video_extensions)
+                            # Create URL for the saved file
+                            file_url = f"/static/gallery/{unique_filename}"
                             
-                            # Upload to Google Drive
-                            service = authenticate()
-                            if service:
-                                drive_file_id = upload_file(service, temp_file_path, filename)
-                                if drive_file_id:
-                                    view_link = create_view_only_link(service, drive_file_id, is_image=not is_video)
-                                    if view_link:
-                                        gallery_images.append({'url': view_link, 'alt': alt, 'caption': caption, 'drive_file_id': drive_file_id})
-                                    else:
-                                        flash(f'Failed to create view link for What\'s New media {filename}', 'error')
-                                else:
-                                    flash(f'Failed to upload What\'s New media {filename} to Google Drive', 'error')
-                            else:
-                                flash('Failed to authenticate with Google Drive for gallery upload', 'error')
-                            
-                            # Clean up temporary file
-                            try:
-                                os.remove(temp_file_path)
-                            except:
-                                pass
+                            gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
                     else:
                         # No new file uploaded - check if this corresponds to an existing image
                         # by checking if the index is within the range of existing images
@@ -986,39 +965,27 @@ class AboutCompanyView(BaseView):
                     if file_key in request.files and request.files[file_key].filename:
                         file = request.files[file_key]
                         if file and file.filename:
-                            # Handle file upload to Google Drive
+                            # Handle local file upload to server
                             from werkzeug.utils import secure_filename
                             import os
                             import random
-                            from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
                             
-                            # Create temporary directory for file processing
-                            temp_dir = os.path.join(current_app.static_folder, 'temp')
-                            os.makedirs(temp_dir, exist_ok=True)
+                            # Create gallery directory if it doesn't exist
+                            gallery_dir = os.path.join(current_app.static_folder, 'gallery')
+                            os.makedirs(gallery_dir, exist_ok=True)
                             
                             # Generate secure filename
                             filename = secure_filename(file.filename)
-                            temp_path = os.path.join(temp_dir, f"{random.randint(1000, 9999)}_{filename}")
+                            unique_filename = f"about_gallery_{random.randint(1000, 9999)}_{filename}"
+                            file_path = os.path.join(gallery_dir, unique_filename)
                             
-                            # Save file temporarily
-                            file.save(temp_path)
+                            # Save file to local gallery folder
+                            file.save(file_path)
                             
-                            try:
-                                # Upload to Google Drive
-                                drive_service = authenticate()
-                                file_id = upload_file(drive_service, temp_path, filename)
-                                
-                                # Determine if it's an image or video for link generation
-                                is_image_file = filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'))
-                                view_link = create_view_only_link(drive_service, file_id, is_image=is_image_file)
-                                
-                                about_gallery_images.append({'url': view_link, 'alt': alt, 'caption': caption})
-                                
-                                # Clean up temp file
-                                os.remove(temp_path)
-                                
-                            except Exception as upload_error:
-                                flash(f'Error uploading file {filename}: {str(upload_error)}', 'error')
+                            # Create URL for the saved file
+                            file_url = f"/static/gallery/{unique_filename}"
+                            
+                            about_gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
                                 continue
                 
                 home_content.about_gallery_images = about_gallery_images
