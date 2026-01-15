@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize with existing description
-    const initialDescription = '{{ course.page_description if course and course.page_description else '' }}';
+    const initialDescription = {{ (course.page_description if course and course.page_description else '') | tojson }};
     if (initialDescription.trim()) {
         const paragraphs = initialDescription.split('\n\n');
         paragraphs.forEach(p => createParagraphTextarea(p));
