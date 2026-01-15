@@ -95,50 +95,28 @@ def index():
     return render_template('index.html', current_locale=get_locale(), is_authenticated=current_user.is_authenticated, home_content=home_content)
 
 # Public course description/marketing page
-@main_bp.route('/courseDescription/<path:course_slug>')
-def course_description_page(course_slug):
+@main_bp.route('/courseDescription/<int:course_id>')
+def course_description_page(course_id):
     from yonca.models import Course, HomeContent, CourseReview
-    from slugify import slugify
 
-    # Debug logging
-    print(f"DEBUG: Received course_slug: {course_slug}")
-    courses = Course.query.all()
-    print(f"DEBUG: All courses: {[{'title': c.title, 'slug': slugify(c.title), 'id': c.id} for c in courses]}")
-    course = next((c for c in courses if slugify(c.title) == course_slug), None)
-    print(f"DEBUG: Course found by slug: {course}")
-    if not course and course_slug:
-        parts = course_slug.split('-')
-        print(f"DEBUG: Slug parts: {parts}")
-        if parts and parts[-1].isdigit():
-            course_id = int(parts[-1])
-            print(f"DEBUG: Looking up course by ID: {course_id}")
-            course = Course.query.get(course_id)
-            print(f"DEBUG: Course found by ID: {course}")
+    # Find course by id
+    course = Course.query.get(course_id)
     if not course:
-        print("DEBUG: No course found, aborting 404")
         abort(404)
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()
-    print(f"DEBUG: Rendering course_description.html for course: {course}")
     return render_template('course_description.html', course=course, home_content=home_content, reviews=reviews, current_locale=get_locale())
 
 
 
 # Enrolled-only course page
-@main_bp.route('/course/<path:course_slug>', methods=['GET', 'POST'])
-def course_page_enrolled(course_slug):
+@main_bp.route('/course/<int:course_id>', methods=['GET', 'POST'])
+def course_page_enrolled(course_id):
     from yonca.models import Course, HomeContent, CourseContent, CourseAssignment, CourseAnnouncement, CourseContentFolder, CourseAssignmentSubmission, CourseAnnouncementReply, CourseReview, db
-    from slugify import slugify
     from datetime import datetime
 
-    # Find course by slug or id
-    courses = Course.query.all()
-    course = next((c for c in courses if slugify(c.title) == course_slug), None)
-    if not course and course_slug:
-        parts = course_slug.split('-')
-        if parts and parts[-1].isdigit():
-            course_id = int(parts[-1])
-            course = Course.query.get(course_id)
+    # Find course by id
+    course = Course.query.get(course_id)
     if not course:
         abort(404)
 
@@ -152,7 +130,7 @@ def course_page_enrolled(course_slug):
     # Only allow access if enrolled or teacher
     if not current_user.is_authenticated or (current_user not in course.users and not current_user.is_teacher):
         print("DEBUG: Not enrolled or not teacher, redirecting to course_description_page")
-        return redirect(url_for('main.course_description_page', course_slug=course_slug))
+        return redirect(url_for('main.course_description_page', course_id=course.id))
 
     # Handle POST requests
     if request.method == 'POST':
@@ -174,7 +152,7 @@ def course_page_enrolled(course_slug):
             db.session.add(new_announcement)
             db.session.commit()
             flash('Announcement added successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Add assignment
         elif action == 'add_assignment' and (current_user.is_teacher or current_user.is_admin):
@@ -203,7 +181,7 @@ def course_page_enrolled(course_slug):
             db.session.add(new_assignment)
             db.session.commit()
             flash('Assignment created successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Grade and comment on submission
         elif action == 'grade_submission' and (current_user.is_teacher or current_user.is_admin):
@@ -220,7 +198,7 @@ def course_page_enrolled(course_slug):
                     submission.comment = comment
                 db.session.commit()
                 flash('Grade and comment saved successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Submit assignment (student)
         elif action == 'submit_assignment' and current_user.is_authenticated:
@@ -230,7 +208,7 @@ def course_page_enrolled(course_slug):
             
             if not uploaded_file:
                 flash('Please select a file to upload.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Create temporary directory
             temp_dir = os.path.join('static', 'temp')
@@ -250,7 +228,7 @@ def course_page_enrolled(course_slug):
             service = authenticate()
             if not service:
                 flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             try:
                 drive_file_id = upload_file(service, temp_file_path, filename)
@@ -266,7 +244,7 @@ def course_page_enrolled(course_slug):
                     os.remove(temp_file_path)
                 except:
                     pass
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             if not drive_file_id:
                 flash('Failed to upload file to Google Drive. Please try again.', 'error')
@@ -275,7 +253,7 @@ def course_page_enrolled(course_slug):
                     os.remove(temp_file_path)
                 except:
                     pass
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Try to set permissions, but don't fail if this doesn't work
             if allow_others_to_view:
@@ -289,7 +267,7 @@ def course_page_enrolled(course_slug):
             view_link = create_view_only_link(service, drive_file_id, is_image=False)
             if not view_link:
                 flash('Failed to create view link.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Create submission record
             new_submission = CourseAssignmentSubmission(
@@ -310,7 +288,7 @@ def course_page_enrolled(course_slug):
                 pass
             
             flash('Assignment submitted successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Add reply to announcement
         elif action == 'add_reply' and current_user.is_authenticated:
@@ -320,7 +298,7 @@ def course_page_enrolled(course_slug):
             
             if not message:
                 flash('Reply message cannot be empty.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             new_reply = CourseAnnouncementReply(
                 announcement_id=int(announcement_id),
@@ -332,7 +310,7 @@ def course_page_enrolled(course_slug):
             db.session.add(new_reply)
             db.session.commit()
             flash('Reply added successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Create folder
         elif action == 'create_folder' and (current_user.is_teacher or current_user.is_admin):
@@ -358,7 +336,7 @@ def course_page_enrolled(course_slug):
             db.session.add(new_folder)
             db.session.commit()
             flash('Folder created successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Upload file to folder
         elif action == 'upload_file' and (current_user.is_teacher or current_user.is_admin):
@@ -379,7 +357,7 @@ def course_page_enrolled(course_slug):
             
             if not uploaded_file:
                 flash('Please select a file to upload.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Create temporary directory
             temp_dir = os.path.join('static', 'temp')
@@ -399,7 +377,7 @@ def course_page_enrolled(course_slug):
             service = authenticate()
             if not service:
                 flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             try:
                 drive_file_id = upload_file(service, temp_file_path, filename)
@@ -414,7 +392,7 @@ def course_page_enrolled(course_slug):
                     os.remove(temp_file_path)
                 except:
                     pass
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             if not drive_file_id:
                 flash('Failed to upload file to Google Drive. Please try again.', 'error')
@@ -423,7 +401,7 @@ def course_page_enrolled(course_slug):
                     os.remove(temp_file_path)
                 except:
                     pass
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Try to set permissions, but don't fail if this doesn't work
             if allow_others_to_view:
@@ -437,7 +415,7 @@ def course_page_enrolled(course_slug):
             view_link = create_view_only_link(service, drive_file_id, is_image=False)
             if not view_link:
                 flash('Failed to create view link.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Create content record
             new_content = CourseContent(
@@ -464,7 +442,7 @@ def course_page_enrolled(course_slug):
                 pass
             
             flash('File uploaded successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Delete course content
         elif action == 'delete_content' and (current_user.is_teacher or current_user.is_admin):
@@ -476,7 +454,7 @@ def course_page_enrolled(course_slug):
             
             if not content:
                 flash('Content not found.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Delete from Google Drive
             if content.drive_file_id:
@@ -491,7 +469,7 @@ def course_page_enrolled(course_slug):
             db.session.delete(content)
             db.session.commit()
             flash('Content deleted successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Delete assignment submission
         elif action == 'delete_submission' and current_user.is_authenticated:
@@ -503,12 +481,12 @@ def course_page_enrolled(course_slug):
             
             if not submission:
                 flash('Submission not found.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Check permission: must be the owner or an admin
             if submission.user_id != current_user.id and not current_user.is_admin:
                 flash('You do not have permission to delete this submission.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Delete from Google Drive
             if submission.drive_file_id:
@@ -523,7 +501,7 @@ def course_page_enrolled(course_slug):
             db.session.delete(submission)
             db.session.commit()
             flash('Submission deleted successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Toggle content visibility
         elif action == 'toggle_content_visibility' and (current_user.is_teacher or current_user.is_admin):
@@ -535,7 +513,7 @@ def course_page_enrolled(course_slug):
             
             if not content:
                 flash('Content not found.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Toggle visibility
             content.allow_others_to_view = not content.allow_others_to_view
@@ -551,7 +529,7 @@ def course_page_enrolled(course_slug):
             
             db.session.commit()
             flash(f"File visibility updated: {'Visible to students' if content.allow_others_to_view else 'Private'}", 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Toggle submission visibility
         elif action == 'toggle_submission_visibility' and current_user.is_authenticated:
@@ -563,12 +541,12 @@ def course_page_enrolled(course_slug):
             
             if not submission:
                 flash('Submission not found.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Check permission: must be the owner or an admin
             if submission.user_id != current_user.id and not current_user.is_admin:
                 flash('You do not have permission to change this submission visibility.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Toggle visibility
             submission.allow_others_to_view = not submission.allow_others_to_view
@@ -584,7 +562,7 @@ def course_page_enrolled(course_slug):
             
             db.session.commit()
             flash(f"Submission visibility updated: {'Visible to others' if submission.allow_others_to_view else 'Private'}", 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Add review
         elif action == 'add_review' and current_user.is_authenticated:
@@ -594,13 +572,13 @@ def course_page_enrolled(course_slug):
             
             if not rating or not review_title or not review_text:
                 flash('Please fill in all required fields.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Check if user already reviewed this course
             existing_review = CourseReview.query.filter_by(course_id=course.id, user_id=current_user.id).first()
             if existing_review:
                 flash('You have already reviewed this course. You can edit your existing review.', 'warning')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             new_review = CourseReview(
                 course_id=course.id,
@@ -612,7 +590,7 @@ def course_page_enrolled(course_slug):
             db.session.add(new_review)
             db.session.commit()
             flash('Review submitted successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Edit review
         elif action == 'edit_review' and current_user.is_authenticated:
@@ -624,12 +602,12 @@ def course_page_enrolled(course_slug):
             review = CourseReview.query.get(review_id)
             if not review:
                 flash('Review not found.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Check permission: must be the owner or an admin/teacher
             if review.user_id != current_user.id and not (current_user.is_teacher or current_user.is_admin):
                 flash('You do not have permission to edit this review.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Update only the fields that should change, preserve course_id and user_id
             review.rating = int(rating)
@@ -639,7 +617,7 @@ def course_page_enrolled(course_slug):
             db.session.add(review)
             db.session.commit()
             flash('Review updated successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Delete review
         elif action == 'delete_review' and current_user.is_authenticated:
@@ -648,17 +626,17 @@ def course_page_enrolled(course_slug):
             
             if not review:
                 flash('Review not found.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             # Check permission: must be the owner or an admin/teacher
             if review.user_id != current_user.id and not (current_user.is_teacher or current_user.is_admin):
                 flash('You do not have permission to delete this review.', 'error')
-                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             db.session.delete(review)
             db.session.commit()
             flash('Review deleted successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
 
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     contents = CourseContent.query.filter_by(course_id=course.id, is_published=True).order_by(CourseContent.order).all()
