@@ -631,9 +631,12 @@ def course_page_enrolled(course_slug):
                 flash('You do not have permission to edit this review.', 'error')
                 return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
             
+            # Update only the fields that should change, preserve course_id and user_id
             review.rating = int(rating)
             review.title = review_title
             review.review_text = review_text
+            # Explicitly preserve relationships
+            db.session.add(review)
             db.session.commit()
             flash('Review updated successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
