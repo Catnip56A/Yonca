@@ -722,11 +722,6 @@ def terms():
     """Serve terms of service page"""
     return render_template('terms.html', current_locale=get_locale())
 
-@main_bp.route('/privacy')
-def privacy():
-    """Serve privacy policy page"""
-    return render_template('privacy.html', current_locale=get_locale())
-
 @main_bp.route('/course/<slug>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_course_page(slug):
