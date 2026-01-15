@@ -986,7 +986,7 @@ class AboutCompanyView(BaseView):
                             file_url = f"/static/gallery/{unique_filename}"
                             
                             about_gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
-                                continue
+                        continue
                 
                 home_content.about_gallery_images = about_gallery_images
                 
