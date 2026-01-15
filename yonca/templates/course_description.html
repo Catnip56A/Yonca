@@ -53,7 +53,7 @@
     <div style="margin-top:1.2rem; font-size:1.1rem; color:#444; font-family: 'Georgia', serif; line-height:1.6;">
         {% set normalized_desc = course.page_description.replace('\r\n', '\n') %}
         {% for paragraph in normalized_desc.split('\n\n') %}
-        <p style="margin-bottom:1rem;">{{ paragraph.replace('<bold>', '<span style="font-weight: bold; font-size: 1.2em;">').replace('</bold>', '</span>') | safe }}</p>
+        <p style="margin-bottom:1rem;">{{ paragraph | safe }}</p>
         {% endfor %}
     </div>
     {% endif %}

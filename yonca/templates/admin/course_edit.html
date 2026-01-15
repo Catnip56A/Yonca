@@ -95,7 +95,7 @@
             <label for="page_description">Page Description</label>
             <textarea class="form-control" id="page_description" name="page_description" rows="8"
                       placeholder="Detailed description of what students will learn in this course. Use double line breaks (press Enter twice) to create separate paragraphs.">{{ course.page_description if course and course.page_description else '' }}</textarea>
-            <small class="form-text text-muted">Press Enter twice between paragraphs to create separate paragraphs on the course page. Use &lt;bold&gt;text&lt;/bold&gt; to make text bold and larger.</small>
+            <small class="form-text text-muted">Press Enter twice between paragraphs. You can use standard HTML tags for formatting (e.g., &lt;strong&gt;, &lt;em&gt;, &lt;u&gt;).</small>
         </div>
 
         <h4>Course Features</h4>
