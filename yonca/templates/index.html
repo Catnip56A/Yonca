@@ -283,10 +283,33 @@
 
         .gallery-grid {
             display: grid;
-            grid-template-columns: 300px;
+            grid-template-columns: repeat(auto-fit, 300px);
+            grid-template-rows: 300px;
             gap: 2rem;
             margin: 3rem 0;
-            justify-content: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: #e5e7eb #f9fafb;
+        }
+
+        .gallery-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .gallery-grid::-webkit-scrollbar-track {
+            background: #f9fafb;
+            border-radius: 4px;
+        }
+
+        .gallery-grid::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+
+        .gallery-grid::-webkit-scrollbar-thumb:hover {
+            background: #d1d5db;
         }
 
         .gallery-item {
@@ -806,9 +829,13 @@
             }
 
             .gallery-grid {
-                grid-template-columns: 300px;
+                grid-template-columns: repeat(auto-fit, 300px);
+                grid-template-rows: 300px;
                 gap: 1rem;
                 margin: 2rem 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding-bottom: 1rem;
             }
 
             .gallery-item {
