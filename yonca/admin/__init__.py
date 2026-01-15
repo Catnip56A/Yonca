@@ -287,7 +287,18 @@ class AdminIndexView(AdminIndexView):
                             # Create URL for the saved file
                             file_url = f"/static/gallery/{unique_filename}"
                             
-                            gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                            # Check if this index corresponds to an existing image
+                            try:
+                                index_num = int(index)
+                                if index_num < len(existing_images):
+                                    # Replace existing image at this index
+                                    gallery_images[index_num] = {'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename}
+                                else:
+                                    # Add as new image
+                                    gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                            except (ValueError, IndexError):
+                                # Add as new image if index is invalid
+                                gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
                     else:
                         # No new file uploaded - check if this corresponds to an existing image
                         # by checking if the index is within the range of existing images
@@ -944,6 +955,9 @@ class AboutCompanyView(BaseView):
                         index = key.replace('about_gallery_url_', '')
                         gallery_indices.add(index)
                 
+                # Also include existing About Company gallery that might not have form data
+                existing_about_images = home_content.about_gallery_images or []
+                
                 # Process each gallery index
                 for index in sorted(gallery_indices):
                     file_key = f'about_gallery_file_{index}'
@@ -985,7 +999,33 @@ class AboutCompanyView(BaseView):
                             # Create URL for the saved file
                             file_url = f"/static/gallery/{unique_filename}"
                             
-                            about_gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                            # Check if this index corresponds to an existing image
+                            try:
+                                index_num = int(index)
+                                if index_num < len(existing_about_images):
+                                    # Replace existing image at this index
+                                    about_gallery_images[index_num] = {'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename}
+                                else:
+                                    # Add as new image
+                                    about_gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                            except (ValueError, IndexError):
+                                # Add as new image if index is invalid
+                                about_gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                    else:
+                        # No new file uploaded - check if this corresponds to an existing image
+                        # by checking if the index is within the range of existing images
+                        try:
+                            index_num = int(index)
+                            if index_num < len(existing_about_images):
+                                # Update existing image with new alt/caption
+                                existing_image = existing_about_images[index_num].copy()
+                                if alt:
+                                    existing_image['alt'] = alt
+                                if caption:
+                                    existing_image['caption'] = caption
+                                about_gallery_images.append(existing_image)
+                        except (ValueError, IndexError):
+                            pass  # Skip invalid indices
                         continue
                 
                 home_content.about_gallery_images = about_gallery_images
