@@ -349,16 +349,15 @@
         }
 
         .gallery-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            position: static;
+            margin-top: 0.5rem;
             padding: 0.5rem;
             background: rgba(249, 250, 251, 0.9);
             text-align: center;
             font-size: 0.8rem;
             color: #353e45;
             backdrop-filter: blur(4px);
+            border-radius: 8px;
         }
 
         .gallery-caption[style*="background: #fff3cd"] {
@@ -857,13 +856,12 @@
             }
 
             .gallery-caption {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
+                position: static;
+                margin-top: 0.5rem;
                 padding: 0.5rem;
                 background: rgba(249, 250, 251, 0.9);
                 backdrop-filter: blur(4px);
+                border-radius: 8px;
             }
 
             .gallery-caption[style*="background: #fff3cd"] {
