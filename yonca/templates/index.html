@@ -294,8 +294,7 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
+            position: relative;
         }
 
         .gallery-item img {
@@ -303,8 +302,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            border-radius: 8px 8px 0 0;
-            flex: 1;
+            border-radius: 12px;
         }
 
         .gallery-item video, .gallery-item iframe {
@@ -312,17 +310,20 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            border-radius: 8px 8px 0 0;
-            flex: 1;
+            border-radius: 12px;
         }
 
         .gallery-caption {
-            padding: 1rem;
-            background: #f9fafb;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.5rem;
+            background: rgba(249, 250, 251, 0.9);
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #353e45;
-            border-top: 1px solid #e5e7eb;
+            backdrop-filter: blur(4px);
         }
 
         .gallery-section {
@@ -788,10 +789,10 @@
             }
 
             .gallery-item {
-                padding: 1rem;
+                padding: 0;
                 aspect-ratio: auto;
                 height: auto;
-                display: block;
+                position: static;
             }
 
             .gallery-item img,
@@ -799,7 +800,15 @@
             .gallery-item iframe {
                 height: auto;
                 max-height: 250px;
-                flex: none;
+                border-radius: 8px;
+            }
+
+            .gallery-caption {
+                position: static;
+                padding: 1rem;
+                background: #f9fafb;
+                border-top: 1px solid #e5e7eb;
+                backdrop-filter: none;
             }
 
             .gallery-caption {
