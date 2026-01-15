@@ -50,6 +50,10 @@
         <div class="row">
             <div class="col-12 text-center">
                 <p class="text-muted mb-0">&copy; 2025 {{ home_content.site_name or 'Yonca' }}. All rights reserved.</p>
+                <p class="text-muted mt-2">
+                    <a href="{{ url_for('main.terms') }}" class="text-muted" style="text-decoration: underline;">{{ _('Terms of Service') }}</a> | 
+                    <a href="{{ url_for('main.privacy') }}" class="text-muted" style="text-decoration: underline;">{{ _('Privacy Policy') }}</a>
+                </p>
             </div>
         </div>
     </div>

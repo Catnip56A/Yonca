@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="{{ current_locale.language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('Privacy Policy - Yonca') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'OpenDyslexic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+            color: #212121;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            color: #388e3c;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            color: #4caf50;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.2em;
+        }
+
+        p, li {
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #388e3c;
+        }
+
+        hr {
+            margin: 2rem 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        strong {
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ _('Privacy Policy') }}</h1>
+        <p><em>{{ _('Effective Date: January 15, 2025') }}</em></p>
+
+        <p>{{ _('At Yonca, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.') }}</p>
+
+        <h2>{{ _('1. Information We Collect') }}</h2>
+        <h3>{{ _('Personal Information') }}</h3>
+        <ul>
+            <li>{{ _('Account information (name, email, password)') }}</li>
+            <li>{{ _('Profile information you choose to provide') }}</li>
+            <li>{{ _('Google account information when you log in with Google') }}</li>
+        </ul>
+
+        <h3>{{ _('Usage Information') }}</h3>
+        <ul>
+            <li>{{ _('How you interact with our platform') }}</li>
+            <li>{{ _('Courses you enroll in and complete') }}</li>
+            <li>{{ _('Files you upload or access') }}</li>
+            <li>{{ _('Forum posts and messages') }}</li>
+        </ul>
+
+        <h2>{{ _('2. How We Use Your Information') }}</h2>
+        <ul>
+            <li>{{ _('To provide and maintain our services') }}</li>
+            <li>{{ _('To personalize your learning experience') }}</li>
+            <li>{{ _('To communicate with you about your account and courses') }}</li>
+            <li>{{ _('To improve our platform and develop new features') }}</li>
+            <li>{{ _('To ensure platform security and prevent abuse') }}</li>
+        </ul>
+
+        <h2>{{ _('3. Information Sharing') }}</h2>
+        <p>{{ _('We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:') }}</p>
+        <ul>
+            <li>{{ _('With your consent') }}</li>
+            <li>{{ _('To comply with legal obligations') }}</li>
+            <li>{{ _('To protect our rights and prevent harm') }}</li>
+            <li>{{ _('With service providers who help us operate the platform (under strict confidentiality agreements)') }}</li>
+        </ul>
+
+        <h2>{{ _('4. Data Security') }}</h2>
+        <p>{{ _('We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.') }}</p>
+
+        <h2>{{ _('5. Your Rights') }}</h2>
+        <ul>
+            <li>{{ _('Access your personal information') }}</li>
+            <li>{{ _('Correct inaccurate information') }}</li>
+            <li>{{ _('Delete your account and associated data') }}</li>
+            <li>{{ _('Object to or restrict certain processing') }}</li>
+            <li>{{ _('Data portability') }}</li>
+        </ul>
+
+        <h2>{{ _('6. Cookies and Tracking') }}</h2>
+        <p>{{ _('We use cookies and similar technologies to enhance your experience, analyze usage, and provide personalized content. You can control cookie settings through your browser.') }}</p>
+
+        <h2>{{ _('7. Third-Party Services') }}</h2>
+        <p>{{ _('Yonca integrates with Google Drive for file storage and Google authentication. These services have their own privacy policies, and we encourage you to review them.') }}</p>
+
+        <h2>{{ _('8. Data Retention') }}</h2>
+        <p>{{ _('We retain your information for as long as necessary to provide our services and comply with legal obligations. You can request deletion of your account at any time.') }}</p>
+
+        <h2>{{ _('9. Children\'s Privacy') }}</h2>
+        <p>{{ _('Yonca is not intended for children under 13. We do not knowingly collect personal information from children under 13.') }}</p>
+
+        <h2>{{ _('10. Changes to This Policy') }}</h2>
+        <p>{{ _('We may update this Privacy Policy from time to time. We will notify you of significant changes via email or platform notification.') }}</p>
+
+        <h2>{{ _('11. Contact Us') }}</h2>
+        <p>{{ _('If you have questions about this Privacy Policy or our data practices, please contact us through the Yonca platform.') }}</p>
+
+        <hr>
+
+        <p><em>{{ _('This Privacy Policy is part of our Terms of Service. By using Yonca, you agree to the collection and use of information in accordance with this policy.') }}</em></p>
+
+        <a href="{{ url_for('main.index') }}" class="back-link">{{ _('Back to Home') }}</a>
+    </div>
+</body>
+</html>
