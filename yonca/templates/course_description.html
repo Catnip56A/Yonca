@@ -45,7 +45,7 @@
 
 {% block content %}
 <section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
-    <h1 style="font-size:2.2rem; font-weight:700; color:#abc32f;">{{ course.page_welcome_title or course.title }}</h1>
+    <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ course.page_welcome_title or course.title }}</h1>
     {% if course.page_subtitle %}
     <h2 style="font-size:1.3rem; color:#374151; margin-top:0.5rem;">{{ course.page_subtitle }}</h2>
     {% endif %}
@@ -60,7 +60,7 @@
                 {% if feature.image %}
                 <img src="{{ feature.image }}" alt="{{ feature.title }}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:1rem;" />
                 {% endif %}
-                <h4 style="color:#abc32f; font-size:1.1rem; font-weight:600;">{{ feature.title }}</h4>
+                <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">{{ feature.title }}</h4>
                 <p style="color:#555;">{{ feature.description }}</p>
             </div>
         </div>
