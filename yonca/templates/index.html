@@ -1885,7 +1885,7 @@
             if (isEnrolled) {
                 const actionBtn = document.createElement('a');
                 actionBtn.textContent = 'Go to Course';
-                actionBtn.href = `/course/${course.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').trim()}`;
+                actionBtn.href = `/course/${course.id}`;
                 actionBtn.style.background = '#337a2c';
                 actionBtn.style.color = '#e8f5e8';
                 actionBtn.style.textDecoration = 'none';
