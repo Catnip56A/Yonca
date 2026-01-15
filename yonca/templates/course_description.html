@@ -13,6 +13,33 @@
         height: 32px;
         width: auto;
     }
+    .star-display {
+        font-size: 1.2rem;
+        color: #ffc107;
+    }
+    .star-display .star {
+        color: #ddd;
+    }
+    .star-display .star.filled {
+        color: #ffc107;
+    }
+    .review-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+    .review-meta {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
 </style>
 {% endblock %}
 
@@ -51,6 +78,58 @@
         </div>
     </div>
     {% endif %}
+    
+    <!-- Reviews Section -->
+    {% if reviews and reviews|length > 0 %}
+    <div style="margin-top:3rem; border-top: 2px solid #e5e7eb; padding-top: 2rem;">
+        <h3 style="font-size:1.8rem; font-weight:600; color:#374151; margin-bottom:1.5rem;">
+            <i class="fa fa-star" style="color:#ffc107;"></i> Student Reviews
+            <span style="font-size:1rem; color:#6c757d; font-weight:400;">({{ reviews|length }} review{{ 's' if reviews|length != 1 else '' }})</span>
+        </h3>
+        
+        {% if reviews|length > 0 %}
+        <!-- Average Rating -->
+        {% set total_rating = namespace(value=0) %}
+        {% for review in reviews %}
+            {% set total_rating.value = total_rating.value + review.rating %}
+        {% endfor %}
+        {% set avg_rating = (total_rating.value / reviews|length)|round(1) %}
+        <div style="background:#fff3cd; border-radius:8px; padding:1rem; margin-bottom:1.5rem; display:inline-block;">
+            <div style="font-size:2rem; font-weight:700; color:#856404;">{{ avg_rating }}/5</div>
+            <div class="star-display">
+                {% for i in range(1, 6) %}
+                    <span class="star {% if i <= avg_rating|round %}filled{% endif %}">★</span>
+                {% endfor %}
+            </div>
+            <small style="color:#856404;">Average Rating</small>
+        </div>
+        {% endif %}
+        
+        <!-- Reviews List -->
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <div>
+                        <div class="star-display" style="font-size:1rem; margin-bottom:0.5rem;">
+                            {% for i in range(1, 6) %}
+                                <span class="star {% if i <= review.rating %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        <h5 style="margin:0; color:#374151; font-weight:600;">{{ review.title }}</h5>
+                        <div class="review-meta">
+                            By {{ review.user.display_name or review.user.email.split('@')[0] }} • 
+                            {{ review.created_at.strftime('%b %d, %Y') }}
+                        </div>
+                    </div>
+                </div>
+                <p style="color:#555; margin:0; line-height:1.6;">{{ review.review_text }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
     <div style="margin-top:2rem;">
         {% if not current_user.is_authenticated %}
             <a href="/login" class="btn btn-success">Login to Enroll</a>
