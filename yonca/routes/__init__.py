@@ -127,13 +127,15 @@ def course_page_enrolled(course_id):
     print(f"DEBUG: course.users: {[getattr(u, 'id', None) for u in getattr(course, 'users', [])]}")
     print(f"DEBUG: current_user in course.users: {current_user in getattr(course, 'users', [])}")
 
-    # Only allow access if enrolled or teacher
-    if not current_user.is_authenticated or (current_user not in course.users and not current_user.is_teacher):
-        print("DEBUG: Not enrolled or not teacher, redirecting to course_description_page")
-        return redirect(url_for('main.course_description_page', course_id=course.id))
+    # Check enrollment status
+    enrolled = current_user.is_authenticated and (current_user in course.users or current_user.is_teacher)
 
-    # Handle POST requests
+    # Handle POST requests only if enrolled
     if request.method == 'POST':
+        if not enrolled:
+            flash('You must be enrolled in this course to perform this action.', 'error')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
         action = request.form.get('action')
         
         # Add announcement
@@ -679,6 +681,7 @@ def course_page_enrolled(course_id):
                           reviews=reviews,
                           is_teacher_or_admin=is_teacher_or_admin,
                           folder_paths=folder_paths,
+                          enrolled=enrolled,
                           datetime=dt)
     if user:
         user.is_teacher = is_teacher
