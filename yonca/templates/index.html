@@ -1742,6 +1742,14 @@
             if (linkElement) {
                 linkElement.classList.add('active');
                 console.log('Activated link:', pageId + '-link');
+                
+                // If this is a dropdown item, also highlight the parent dropdown toggle
+                if (linkElement.classList.contains('dropdown-item') || linkElement.classList.contains('mobile-dropdown-item')) {
+                    const dropdownToggle = linkElement.closest('.dropdown, .mobile-dropdown').querySelector('.dropdown-toggle, .mobile-dropdown-toggle');
+                    if (dropdownToggle) {
+                        dropdownToggle.classList.add('active');
+                    }
+                }
             } else {
                 console.error('Link element not found:', pageId + '-link');
             }
@@ -3193,8 +3201,8 @@
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status
 
-            // Add navigation event listeners (exclude dropdown toggles)
-            const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle):not(.mobile-dropdown-toggle)');
+            // Add navigation event listeners (include dropdown items but exclude dropdown toggles)
+            const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle):not(.mobile-dropdown-toggle), .dropdown-item');
             navLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
