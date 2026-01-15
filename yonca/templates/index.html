@@ -190,6 +190,92 @@
             color: #fafbed;
         }
 
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle::after {
+            content: " ▼";
+            font-size: 0.8em;
+            margin-left: 0.25rem;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            z-index: 1000;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dropdown-menu .dropdown-item {
+            display: block;
+            color: #353e45;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #fafbed;
+            color: #337a2c;
+        }
+
+        .dropdown-menu .dropdown-item:first-child {
+            border-radius: 6px 6px 0 0;
+        }
+
+        .dropdown-menu .dropdown-item:last-child {
+            border-radius: 0 0 6px 6px;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Mobile Dropdown Styles */
+        .mobile-dropdown {
+            position: relative;
+        }
+
+        .mobile-dropdown-menu {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .mobile-dropdown-menu .mobile-dropdown-item {
+            display: block;
+            padding: 1rem;
+            color: #353e45;
+            text-decoration: none;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-dropdown-menu .mobile-dropdown-item:hover {
+            background-color: #fafbed;
+            color: #337a2c;
+        }
+
+        .mobile-dropdown-menu .mobile-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-dropdown-toggle.active + .mobile-dropdown-menu {
+            display: block;
+        }
+
         #auth-buttons button {
             background: white;
             color: #82a302;
@@ -1118,7 +1204,14 @@
                 <div class="nav-section">
                     <nav id="main-nav">
                         <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
+                        <div class="dropdown">
+                            <a href="javascript:void(0)" class="nav-link dropdown-toggle" id="education-link">{{ _('Education') }}</a>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" class="dropdown-item" id="courses-link">{{ _('Courses') }}</a>
+                                <a href="javascript:void(0)" class="dropdown-item" id="webinars-link">{{ _('Webinars') }}</a>
+                                <a href="javascript:void(0)" class="dropdown-item" id="conferences-link">{{ _('Conferences') }}</a>
+                            </div>
+                        </div>
                         <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
@@ -1158,7 +1251,14 @@
                 <i class="fas fa-times"></i>
             </button>
             <a href="javascript:void(0)" class="nav-link active" id="mobile-home-link">{{ _('Home') }}</a>
-            <a href="javascript:void(0)" class="nav-link" id="mobile-courses-link">{{ _('Courses') }}</a>
+            <div class="mobile-dropdown">
+                <a href="javascript:void(0)" class="nav-link mobile-dropdown-toggle" id="mobile-education-link">{{ _('Education') }} ▼</a>
+                <div class="mobile-dropdown-menu">
+                    <a href="javascript:void(0)" class="nav-link mobile-dropdown-item" id="mobile-courses-link">{{ _('Courses') }}</a>
+                    <a href="javascript:void(0)" class="nav-link mobile-dropdown-item" id="mobile-webinars-link">{{ _('Webinars') }}</a>
+                    <a href="javascript:void(0)" class="nav-link mobile-dropdown-item" id="mobile-conferences-link">{{ _('Conferences') }}</a>
+                </div>
+            </div>
             <a href="javascript:void(0)" class="nav-link" id="mobile-forum-link">{{ _('Forum') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-resources-link">{{ _('Resources') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-tavi-link">{{ _('TAVI Test') }}</a>
@@ -1574,6 +1674,24 @@
                 </div>
             </div>
         </section>
+
+        <!-- Webinars Page -->
+        <section id="webinars" class="page">
+            <h2 class="section-title">{{ _('Webinars') }}</h2>
+            <p>{{ _('Join our live and recorded webinars to learn from experts in various fields.') }}</p>
+            <div class="webinars-content">
+                <p>{{ _('Webinars section coming soon...') }}</p>
+            </div>
+        </section>
+
+        <!-- Conferences Page -->
+        <section id="conferences" class="page">
+            <h2 class="section-title">{{ _('Conferences') }}</h2>
+            <p>{{ _('Participate in our educational conferences and networking events.') }}</p>
+            <div class="conferences-content">
+                <p>{{ _('Conferences section coming soon...') }}</p>
+            </div>
+        </section>
         </div>
     </main>
 
@@ -1640,6 +1758,12 @@
             } else if (pageId === 'resources') {
                 console.log('Loading resources...');
                 loadResources();
+            } else if (pageId === 'webinars') {
+                console.log('Loading webinars...');
+                // Add webinars loading logic here when implemented
+            } else if (pageId === 'conferences') {
+                console.log('Loading conferences...');
+                // Add conferences loading logic here when implemented
             }
             
             console.log('showPage completed for:', pageId);
@@ -3069,8 +3193,8 @@
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status
 
-            // Add navigation event listeners
-            const navLinks = document.querySelectorAll('.nav-link');
+            // Add navigation event listeners (exclude dropdown toggles)
+            const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle):not(.mobile-dropdown-toggle)');
             navLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -3130,8 +3254,8 @@
                 });
             }
 
-            // Mobile navigation links
-            const mobileNavLinks = document.querySelectorAll('#mobile-nav-menu .nav-link');
+            // Mobile navigation links (including dropdown items)
+            const mobileNavLinks = document.querySelectorAll('#mobile-nav-menu .nav-link:not(.mobile-dropdown-toggle)');
             mobileNavLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -3144,6 +3268,15 @@
             function closeMobileMenu() {
                 mobileNavOverlay.classList.remove('active');
                 mobileNavMenu.classList.remove('active');
+            }
+
+            // Mobile dropdown functionality
+            const mobileDropdownToggle = document.getElementById('mobile-education-link');
+            if (mobileDropdownToggle) {
+                mobileDropdownToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    mobileDropdownToggle.classList.toggle('active');
+                });
             }
 
             // Update mobile auth buttons when user status changes
