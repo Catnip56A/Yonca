@@ -318,7 +318,6 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             width: 300px;
-            min-height: 300px;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -326,7 +325,7 @@
 
         .gallery-item img {
             width: 100%;
-            flex: 1;
+            max-height: 250px;
             object-fit: cover;
             display: block;
             border-radius: 12px 12px 0 0;
@@ -344,7 +343,7 @@
 
         .gallery-item video, .gallery-item iframe {
             width: 100%;
-            flex: 1;
+            max-height: 250px;
             object-fit: cover;
             display: block;
             border-radius: 12px 12px 0 0;
@@ -841,7 +840,6 @@
 
             .gallery-item {
                 width: 300px;
-                min-height: 300px;
                 position: relative;
                 display: flex;
                 flex-direction: column;
@@ -850,7 +848,7 @@
             .gallery-item img,
             .gallery-item video,
             .gallery-item iframe {
-                flex: 1;
+                max-height: 250px;
                 border-radius: 12px 12px 0 0;
             }
 
