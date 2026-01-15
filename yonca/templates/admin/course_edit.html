@@ -93,13 +93,9 @@
 
         <div class="form-group">
             <label for="page_description">Page Description</label>
-            <div id="description-container">
-                <!-- Paragraph textareas will be added here -->
-            </div>
-            <button type="button" id="add-paragraph-btn" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
-                <i class="fa fa-plus"></i> Add Paragraph
-            </button>
-            <input type="hidden" id="page_description_hidden" name="page_description">
+            <textarea class="form-control" id="page_description" name="page_description" rows="8"
+                      placeholder="Detailed description of what students will learn in this course. Use double line breaks (press Enter twice) to create separate paragraphs.">{{ course.page_description if course and course.page_description else '' }}</textarea>
+            <small class="form-text text-muted">Press Enter twice between paragraphs to create separate paragraphs on the course page.</small>
         </div>
 
         <h4>Course Features</h4>
@@ -327,59 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadBtn.disabled = false;
         });
     };
-
-    // Description paragraphs management
-    const descriptionContainer = document.getElementById('description-container');
-    const addParagraphBtn = document.getElementById('add-paragraph-btn');
-    const hiddenDescription = document.getElementById('page_description_hidden');
-    let paragraphCount = 0;
-
-    function createParagraphTextarea(value = '') {
-        paragraphCount++;
-        const div = document.createElement('div');
-        div.className = 'paragraph-item';
-        div.style.marginBottom = '10px';
-        div.innerHTML = `
-            <div class="d-flex">
-                <textarea class="form-control paragraph-textarea" rows="3" placeholder="Enter paragraph text">${value}</textarea>
-                <button type="button" class="btn btn-danger btn-sm remove-paragraph-btn" style="margin-left: 10px;">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>
-        `;
-        descriptionContainer.appendChild(div);
-        
-        // Add event listeners
-        const textarea = div.querySelector('.paragraph-textarea');
-        const removeBtn = div.querySelector('.remove-paragraph-btn');
-        
-        textarea.addEventListener('input', updateHiddenDescription);
-        removeBtn.addEventListener('click', () => {
-            div.remove();
-            updateHiddenDescription();
-        });
-        
-        return textarea;
-    }
-
-    function updateHiddenDescription() {
-        const textareas = descriptionContainer.querySelectorAll('.paragraph-textarea');
-        const paragraphs = Array.from(textareas).map(ta => ta.value.trim()).filter(p => p.length > 0);
-        hiddenDescription.value = paragraphs.join('\n\n');
-    }
-
-    // Initialize with existing description
-    const initialDescription = {{ (course.page_description if course and course.page_description else '') | tojson }};
-    if (initialDescription.trim()) {
-        const paragraphs = initialDescription.split('\n\n');
-        paragraphs.forEach(p => createParagraphTextarea(p));
-    } else {
-        createParagraphTextarea(); // At least one empty paragraph
-    }
-
-    addParagraphBtn.addEventListener('click', () => {
-        createParagraphTextarea();
-    });
 });
 </script>
 {% endblock %}
