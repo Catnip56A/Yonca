@@ -97,7 +97,7 @@ def index():
 # Public course description/marketing page
 @main_bp.route('/courseDescription/<path:course_slug>')
 def course_description_page(course_slug):
-    from yonca.models import Course, HomeContent
+    from yonca.models import Course, HomeContent, CourseReview
     from slugify import slugify
 
     # Debug logging
@@ -118,15 +118,16 @@ def course_description_page(course_slug):
         print("DEBUG: No course found, aborting 404")
         abort(404)
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
+    reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()
     print(f"DEBUG: Rendering course_description.html for course: {course}")
-    return render_template('course_description.html', course=course, home_content=home_content, current_locale=get_locale())
+    return render_template('course_description.html', course=course, home_content=home_content, reviews=reviews, current_locale=get_locale())
 
 
 
 # Enrolled-only course page
 @main_bp.route('/course/<path:course_slug>', methods=['GET', 'POST'])
 def course_page_enrolled(course_slug):
-    from yonca.models import Course, HomeContent, CourseContent, CourseAssignment, CourseAnnouncement, CourseContentFolder, CourseAssignmentSubmission, CourseAnnouncementReply, db
+    from yonca.models import Course, HomeContent, CourseContent, CourseAssignment, CourseAnnouncement, CourseContentFolder, CourseAssignmentSubmission, CourseAnnouncementReply, CourseReview, db
     from slugify import slugify
     from datetime import datetime
 
@@ -584,12 +585,84 @@ def course_page_enrolled(course_slug):
             db.session.commit()
             flash(f"Submission visibility updated: {'Visible to others' if submission.allow_others_to_view else 'Private'}", 'success')
             return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Add review
+        elif action == 'add_review' and current_user.is_authenticated:
+            rating = request.form.get('rating')
+            review_title = request.form.get('review_title')
+            review_text = request.form.get('review_text')
+            
+            if not rating or not review_title or not review_text:
+                flash('Please fill in all required fields.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Check if user already reviewed this course
+            existing_review = CourseReview.query.filter_by(course_id=course.id, user_id=current_user.id).first()
+            if existing_review:
+                flash('You have already reviewed this course. You can edit your existing review.', 'warning')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            new_review = CourseReview(
+                course_id=course.id,
+                user_id=current_user.id,
+                rating=int(rating),
+                title=review_title,
+                review_text=review_text
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            flash('Review submitted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Edit review
+        elif action == 'edit_review' and current_user.is_authenticated:
+            review_id = request.form.get('review_id')
+            rating = request.form.get('rating')
+            review_title = request.form.get('review_title')
+            review_text = request.form.get('review_text')
+            
+            review = CourseReview.query.get(review_id)
+            if not review:
+                flash('Review not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Check permission: must be the owner or an admin/teacher
+            if review.user_id != current_user.id and not (current_user.is_teacher or current_user.is_admin):
+                flash('You do not have permission to edit this review.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            review.rating = int(rating)
+            review.title = review_title
+            review.review_text = review_text
+            db.session.commit()
+            flash('Review updated successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+        
+        # Delete review
+        elif action == 'delete_review' and current_user.is_authenticated:
+            review_id = request.form.get('review_id')
+            review = CourseReview.query.get(review_id)
+            
+            if not review:
+                flash('Review not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            # Check permission: must be the owner or an admin/teacher
+            if review.user_id != current_user.id and not (current_user.is_teacher or current_user.is_admin):
+                flash('You do not have permission to delete this review.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
+            
+            db.session.delete(review)
+            db.session.commit()
+            flash('Review deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_slug=course_slug))
 
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     contents = CourseContent.query.filter_by(course_id=course.id, is_published=True).order_by(CourseContent.order).all()
     content_folders = CourseContentFolder.query.filter_by(course_id=course.id).order_by(CourseContentFolder.order)
     assignments = CourseAssignment.query.filter_by(course_id=course.id, is_published=True).order_by(CourseAssignment.due_date).all()
     announcements = CourseAnnouncement.query.filter_by(course_id=course.id, is_published=True).order_by(CourseAnnouncement.created_at.desc()).all()
+    reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()
 
     is_teacher_or_admin = getattr(current_user, 'is_teacher', False) or getattr(current_user, 'is_admin', False)
     
@@ -622,6 +695,7 @@ def course_page_enrolled(course_slug):
                           content_folders=content_folders,
                           assignments=assignments,
                           announcements=announcements,
+                          reviews=reviews,
                           is_teacher_or_admin=is_teacher_or_admin,
                           folder_paths=folder_paths,
                           datetime=dt)

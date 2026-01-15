@@ -403,6 +403,24 @@ class CourseAnnouncementReply(db.Model):
         return f'<CourseAnnouncementReply {self.id}>'
 
 
+class CourseReview(db.Model):
+    """Course reviews submitted by enrolled students"""
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
+    title = db.Column(db.String(200), nullable=False)
+    review_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    
+    course = db.relationship('Course', backref=db.backref('reviews', lazy='dynamic'))
+    user = db.relationship('User', backref=db.backref('reviews', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<CourseReview {self.id} - {self.title}>'
+
+
 class AppSetting(db.Model):
     """Application settings model for storing configuration values securely"""
     id = db.Column(db.Integer, primary_key=True)
