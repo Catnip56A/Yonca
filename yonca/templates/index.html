@@ -304,6 +304,16 @@
             object-fit: cover;
             display: block;
             border-radius: 12px 12px 0 0;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .gallery-item img::-webkit-media-controls {
+            display: none !important;
+        }
+
+        .gallery-item img::-webkit-media-controls-panel {
+            display: none !important;
         }
 
         .gallery-item video, .gallery-item iframe {
@@ -812,6 +822,11 @@
                 max-height: 200px;
                 border-radius: 8px;
                 flex: none;
+            }
+
+            .gallery-item img {
+                pointer-events: none;
+                user-select: none;
             }
 
             .gallery-caption {
@@ -3302,6 +3317,18 @@
           } );
 
         }
+    </script>
+    <script>
+        // Prevent context menu on gallery images
+        document.addEventListener('DOMContentLoaded', function() {
+            const galleryImages = document.querySelectorAll('.gallery-item img');
+            galleryImages.forEach(img => {
+                img.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+        });
     </script>
     <footer style="width: 100%; background: #fff6ed; border-top: 1px solid #e0e0e0; padding: 1rem; text-align: center; margin-top: 2rem;">
         <a href="{{ url_for('main.terms') }}" style="color: #2e7d32; text-decoration: none;">{{ _('Terms of Service') }}</a>
