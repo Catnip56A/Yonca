@@ -354,13 +354,15 @@ def upload_resource():
         
         # Set file permissions to make it publicly accessible
         try:
-            set_file_permissions(service, drive_file_id, make_public=True)
+            success = set_file_permissions(service, drive_file_id, make_public=True)
+            print(f"DEBUG: set_file_permissions for resource {drive_file_id} returned: {success}")
         except Exception as e:
             print(f"Error setting file permissions: {e}")
             # Continue anyway - view link creation might still work
         
         # Create view-only link - check if file is an image
         is_image = is_image_file(file.filename)
+        print(f"DEBUG: File {file.filename} detected as image: {is_image}")
         view_link = create_view_only_link(service, drive_file_id, is_image=is_image)
         if not view_link:
             return jsonify({'error': 'Failed to create view link'}), 500

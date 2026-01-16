@@ -52,7 +52,11 @@ def upload_gallery_image_to_drive(file, filename):
                 return None
 
             # Set file permissions to make it publicly accessible
-            set_file_permissions(service, drive_file_id, make_public=True)
+            success = set_file_permissions(service, drive_file_id, make_public=True)
+            print(f"DEBUG: set_file_permissions for gallery {drive_file_id} returned: {success}")
+            if not success:
+                print("Failed to set gallery image permissions")
+                return None
 
             # Create view-only link (always treat gallery images as images)
             view_link = create_view_only_link(service, drive_file_id, is_image=True)
