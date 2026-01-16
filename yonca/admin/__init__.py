@@ -18,7 +18,68 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField
 from wtforms.validators import Optional, DataRequired
 import os
+from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
 import secrets
+
+def upload_gallery_image_to_drive(file, filename):
+    """Upload a gallery image to Google Drive and return the public URL"""
+    try:
+        # Authenticate with Google Drive
+        service = authenticate()
+        if not service:
+            print("Failed to authenticate with Google Drive for gallery upload")
+            return None
+
+        # Create temporary directory if it doesn't exist
+        temp_dir = os.path.join(current_app.static_folder, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+
+        # Generate secure filename
+        from werkzeug.utils import secure_filename
+        import random
+        secure_filename_str = secure_filename(filename)
+        unique_filename = f"gallery_{random.randint(1000, 9999)}_{secure_filename_str}"
+        temp_file_path = os.path.join(temp_dir, unique_filename)
+
+        # Save file temporarily
+        file.save(temp_file_path)
+
+        try:
+            # Upload to Google Drive
+            drive_file_id = upload_file(service, temp_file_path, secure_filename_str)
+            if not drive_file_id:
+                print("Failed to upload gallery image to Google Drive")
+                return None
+
+            # Set file permissions to make it publicly accessible
+            set_file_permissions(service, drive_file_id, make_public=True)
+
+            # Create view-only link (always treat gallery images as images)
+            view_link = create_view_only_link(service, drive_file_id, is_image=True)
+            if not view_link:
+                print("Failed to create view link for gallery image")
+                return None
+
+            # Clean up temporary file
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass
+
+            return view_link
+
+        except Exception as e:
+            print(f"Error uploading gallery image to Drive: {e}")
+            # Clean up temporary file on error
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass
+            return None
+
+    except Exception as e:
+        print(f"Error in gallery image upload: {e}")
+        return None
 
 def get_google_redirect_uri(redirect_uri=None):
     """Get the correct Google OAuth redirect URI based on configuration and environment"""
@@ -274,32 +335,17 @@ class AdminIndexView(AdminIndexView):
                     if file_key in request.files and request.files[file_key].filename:
                         file = request.files[file_key]
                         if file and file.filename:
-                            # Handle local file upload to server
-                            from werkzeug.utils import secure_filename
-                            import os
-                            import random
-                            
-                            # Create gallery directory if it doesn't exist
-                            gallery_dir = os.path.join(current_app.static_folder, 'gallery')
-                            os.makedirs(gallery_dir, exist_ok=True)
-                            
-                            # Generate secure filename
-                            filename = secure_filename(file.filename)
-                            unique_filename = f"gallery_{random.randint(1000, 9999)}_{filename}"
-                            file_path = os.path.join(gallery_dir, unique_filename)
-                            
-                            # Save file to local gallery folder
-                            file.save(file_path)
-                            
-                            # Create URL for the saved file
-                            file_url = f"/static/gallery/{unique_filename}"
-                            
-                            # Replace or add image at this index
-                            try:
-                                index_num = int(index)
-                                gallery_images[index_num] = {'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename}
-                            except (ValueError, IndexError):
-                                gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                            # Upload to Google Drive instead of local storage
+                            drive_url = upload_gallery_image_to_drive(file, file.filename)
+                            if drive_url:
+                                # Replace or add image at this index
+                                try:
+                                    index_num = int(index)
+                                    gallery_images[index_num] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
+                                except (ValueError, IndexError):
+                                    gallery_images.append({'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None})
+                            else:
+                                flash(f'Failed to upload gallery image {file.filename} to Google Drive', 'error')
                     else:
                         # No new file uploaded - update existing image alt/caption if provided
                         try:
@@ -985,32 +1031,17 @@ class AboutCompanyView(BaseView):
                     if file_key in request.files and request.files[file_key].filename:
                         file = request.files[file_key]
                         if file and file.filename:
-                            # Handle local file upload to server
-                            from werkzeug.utils import secure_filename
-                            import os
-                            import random
-                            
-                            # Create gallery directory if it doesn't exist
-                            gallery_dir = os.path.join(current_app.static_folder, 'gallery')
-                            os.makedirs(gallery_dir, exist_ok=True)
-                            
-                            # Generate secure filename
-                            filename = secure_filename(file.filename)
-                            unique_filename = f"about_gallery_{random.randint(1000, 9999)}_{filename}"
-                            file_path = os.path.join(gallery_dir, unique_filename)
-                            
-                            # Save file to local gallery folder
-                            file.save(file_path)
-                            
-                            # Create URL for the saved file
-                            file_url = f"/static/gallery/{unique_filename}"
-                            
-                            # Replace or add image at this index
-                            try:
-                                index_num = int(index)
-                                about_gallery_images[index_num] = {'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename}
-                            except (ValueError, IndexError):
-                                about_gallery_images.append({'url': file_url, 'alt': alt, 'caption': caption, 'filename': unique_filename})
+                            # Upload to Google Drive instead of local storage
+                            drive_url = upload_gallery_image_to_drive(file, file.filename)
+                            if drive_url:
+                                # Replace or add image at this index
+                                try:
+                                    index_num = int(index)
+                                    about_gallery_images[index_num] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
+                                except (ValueError, IndexError):
+                                    about_gallery_images.append({'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None})
+                            else:
+                                flash(f'Failed to upload about gallery image {file.filename} to Google Drive', 'error')
                     else:
                         # No new file uploaded - update existing image alt/caption if provided
                         try:
