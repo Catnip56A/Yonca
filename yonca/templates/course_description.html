@@ -23,27 +23,13 @@
     .star-display .star.filled {
         color: #ffc107;
     }
-    .review-card {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .review-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 1rem;
-    }
-    .review-meta {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
+{% if course.page_show_navigation %}
+{% include 'components/navbar.html' %}
+{% endif %}
 <section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
     <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ course.page_welcome_title or course.title }}</h1>
     {% if course.page_subtitle %}
@@ -174,4 +160,7 @@
         {% endif %}
     </div>
 </section>
+{% if course.page_show_footer %}
+{% include 'components/footer.html' %}
+{% endif %}
 {% endblock %}

@@ -98,6 +98,7 @@ def index():
 @main_bp.route('/courseDescription/<int:course_id>')
 def course_description_page(course_id):
     from yonca.models import Course, HomeContent, CourseReview
+    from flask_login import current_user
 
     # Find course by id
     course = Course.query.get(course_id)
@@ -105,7 +106,7 @@ def course_description_page(course_id):
         abort(404)
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()
-    return render_template('course_description.html', course=course, home_content=home_content, reviews=reviews, current_locale=get_locale())
+    return render_template('course_description.html', course=course, home_content=home_content, reviews=reviews, current_locale=get_locale(), is_authenticated=current_user.is_authenticated, current_user=current_user)
 
 
 
