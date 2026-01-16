@@ -52,7 +52,12 @@
                 <img src="{{ feature.image }}" alt="{{ feature.title }}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:1rem;" />
                 {% endif %}
                 <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">{{ feature.title | parse_buttons | safe }}</h4>
-                <p style="color:#555;">{{ feature.description | parse_buttons | safe }}</p>
+                <div style="color:#555;">
+                    {% set normalized_feature_desc = feature.description.replace('\r\n', '\n') %}
+                    {% for paragraph in normalized_feature_desc.split('\n\n') %}
+                    <p style="margin-bottom:0.5rem;">{{ paragraph | parse_buttons | safe }}</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         {% endfor %}
