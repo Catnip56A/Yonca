@@ -2119,8 +2119,10 @@
                             accessButton = `<button onclick="requestResourceAccess(${resource.id}, '${resource.title}')" style="background: #337a2c; color: white; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">{{ _('Request Access') }}</button>`;
                         }
                         
+                        const previewSrc = resource.preview_drive_file_id ? `/api/file/${resource.preview_drive_file_id}` : resource.preview_image;
+                        
                         resourceCard.innerHTML = `
-                            ${resource.preview_image ? `<img src="${resource.preview_image}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
+                            ${resource.preview_image ? `<img src="${previewSrc}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title} 🔒</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
@@ -2137,8 +2139,10 @@
                         `;
                     } else {
                         // Public resource
+                        const previewSrc = resource.preview_drive_file_id ? `/api/file/${resource.preview_drive_file_id}` : resource.preview_image;
+                        
                         resourceCard.innerHTML = `
-                            ${resource.preview_image ? `<img src="${resource.preview_image}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
+                            ${resource.preview_image ? `<img src="${previewSrc}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title}</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">

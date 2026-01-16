@@ -352,6 +352,7 @@ def upload_resource():
             title=title,
             description=description,
             preview_image=preview_image_url,
+            preview_drive_file_id=preview_drive_file_id if 'preview_drive_file_id' in locals() and preview_drive_file_id else None,
             drive_file_id=drive_file_id,
             drive_view_link=view_link,
             uploaded_by=current_user.id
@@ -405,6 +406,7 @@ def get_resources():
             'title': r.title,
             'description': r.description,
             'preview_image': r.preview_image,
+            'preview_drive_file_id': r.preview_drive_file_id,
             'drive_view_link': r.drive_view_link,
             'upload_date': r.upload_date.isoformat() if r.upload_date else None,
             'pin_expires_at': r.pin_expires_at.isoformat() if r.pin_expires_at else None,
@@ -915,9 +917,10 @@ def serve_file(file_id):
     submission = CourseAssignmentSubmission.query.filter_by(drive_file_id=file_id).first()
     course_content = CourseContent.query.filter_by(drive_file_id=file_id).first()
     resource = Resource.query.filter_by(drive_file_id=file_id).first()
+    resource_preview = Resource.query.filter_by(preview_drive_file_id=file_id).first()
     pdf_doc = PDFDocument.query.filter_by(drive_file_id=file_id).first()
     
-    file_record = submission or course_content or resource or pdf_doc
+    file_record = submission or course_content or resource or resource_preview or pdf_doc
     
     if not file_record:
         return jsonify({'error': 'File not found'}), 404
@@ -926,6 +929,7 @@ def serve_file(file_id):
     is_owner = False
     is_admin = current_user.is_authenticated and current_user.is_admin
     is_teacher = current_user.is_authenticated and current_user.is_teacher
+    is_preview = resource_preview is not None  # Preview images are always public
     is_public = getattr(file_record, 'allow_others_to_view', True)  # Default to True if field doesn't exist
     
     # Check ownership based on file type
@@ -935,12 +939,15 @@ def serve_file(file_id):
         is_owner = current_user.is_authenticated and file_record.uploaded_by == current_user.id
     
     # Permission logic:
-    # 1. Owner, admin, and teacher always have access
-    # 2. For private files (allow_others_to_view=False), only owner/admin/teacher can access
-    # 3. For public files, enrolled students (for course content) or anyone can access
+    # 1. Preview images are always public
+    # 2. Owner, admin, and teacher always have access
+    # 3. For private files (allow_others_to_view=False), only owner/admin/teacher can access
+    # 4. For public files, enrolled students (for course content) or anyone can access
     
-    # If file is private, only owner/admin/teacher can view
-    if not is_public:
+    if is_preview:
+        # Preview images are always accessible
+        pass
+    elif not is_public:
         if not (is_owner or is_admin or is_teacher):
             return jsonify({'error': 'This file is private and you do not have permission to view it'}), 403
     else:
