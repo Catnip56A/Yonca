@@ -121,6 +121,28 @@ def create_app(config_name='development'):
     app.register_blueprint(api_bp)
     app.register_blueprint(main_bp)
     
+    # Add custom Jinja2 filter for button syntax in course descriptions
+    import re
+    from markupsafe import Markup
+    
+    @app.template_filter('parse_buttons')
+    def parse_buttons(text):
+        """Convert <button: [text]> url </button> syntax to HTML buttons"""
+        if not text:
+            return text
+        
+        # Regex to match <button: [text]> url </button>
+        pattern = r'<button:\s*\[([^\]]+)\]\s*>\s*([^<\s]+)\s*</button>'
+        
+        def replace_button(match):
+            button_text = match.group(1).strip()
+            url = match.group(2).strip()
+            return f'<a href="{url}" target="_blank" class="btn btn-primary btn-sm me-2 mb-2">{button_text}</a>'
+        
+        # Replace all button syntax with HTML buttons
+        result = re.sub(pattern, replace_button, text, flags=re.IGNORECASE)
+        return Markup(result)
+    
     # Create database tables
     # Remove db.create_all(); migrations will handle schema
     with app.app_context():

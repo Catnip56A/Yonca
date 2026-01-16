@@ -39,7 +39,7 @@
     <div style="margin-top:1.2rem; font-size:1.1rem; color:#444; font-family: 'Georgia', serif; line-height:1.6;">
         {% set normalized_desc = course.page_description.replace('\r\n', '\n') %}
         {% for paragraph in normalized_desc.split('\n\n') %}
-        <p style="margin-bottom:1rem;">{{ paragraph | safe }}</p>
+        <p style="margin-bottom:1rem;">{{ paragraph | parse_buttons | safe }}</p>
         {% endfor %}
     </div>
     {% endif %}
