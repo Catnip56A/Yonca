@@ -150,6 +150,7 @@ class Resource(db.Model):
     description = db.Column(db.Text)
     preview_image = db.Column(db.String(300))  # Preview image URL or path
     preview_drive_file_id = db.Column(db.String(100))  # Google Drive file ID for preview image
+    preview_drive_view_link = db.Column(db.String(300))  # Google Drive view link for preview image
     drive_file_id = db.Column(db.String(100))  # Google Drive file ID
     drive_view_link = db.Column(db.String(300))  # Google Drive view link
     is_image_file = db.Column(db.Boolean, default=False)  # Whether the main file is an image

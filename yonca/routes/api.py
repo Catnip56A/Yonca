@@ -317,6 +317,7 @@ def upload_resource():
                         print(f"Error setting preview permissions: {e}")
                     # Create view-only link for preview image
                     preview_image_url = create_view_only_link(service, preview_drive_file_id, is_image=True)
+                    preview_drive_view_link = preview_image_url  # Store the view link
             except Exception as e:
                 print(f"Error uploading preview to Drive: {e}")
                 if "insufficientPermissions" in str(e) or "403" in str(e):
@@ -373,6 +374,7 @@ def upload_resource():
             description=description,
             preview_image=preview_image_url,
             preview_drive_file_id=preview_drive_file_id if 'preview_drive_file_id' in locals() and preview_drive_file_id else None,
+            preview_drive_view_link=preview_drive_view_link if 'preview_drive_view_link' in locals() and preview_drive_view_link else None,
             drive_file_id=drive_file_id,
             drive_view_link=view_link,
             is_image_file=is_image,
@@ -428,6 +430,7 @@ def get_resources():
             'description': r.description,
             'preview_image': r.preview_image,
             'preview_drive_file_id': r.preview_drive_file_id,
+            'preview_drive_view_link': r.preview_drive_view_link,
             'drive_view_link': r.drive_view_link,
             'upload_date': r.upload_date.isoformat() if r.upload_date else None,
             'pin_expires_at': r.pin_expires_at.isoformat() if r.pin_expires_at else None,
