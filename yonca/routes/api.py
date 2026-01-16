@@ -836,7 +836,11 @@ def upload_feature_image():
         
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
-
+        # Set file permissions to make it publicly accessible
+        from yonca.google_drive_service import set_file_permissions
+        success = set_file_permissions(service, drive_file_id, make_public=True)
+        if not success:
+            return jsonify({'error': 'Failed to set file permissions'}), 500
         # Create view-only link
         view_link = create_view_only_link(service, drive_file_id, is_image=True)
         if not view_link:
