@@ -794,9 +794,9 @@ def upload_feature_image():
     # Check if user has Google OAuth tokens
     if not current_user.google_access_token:
         return jsonify({
-            'error': 'Google Drive access required. Please login with Google first.',
+            'error': 'Google Drive access required. Please connect your Google account in the admin panel first.',
             'login_required': True,
-            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+            'login_url': url_for('admin.google_login', _external=True)
         }), 403
     
     if 'file' not in request.files:
@@ -869,9 +869,9 @@ def upload_logo():
     # Check if user has Google OAuth tokens
     if not current_user.google_access_token:
         return jsonify({
-            'error': 'Google Drive access required. Please login with Google first.',
+            'error': 'Google Drive access required. Please connect your Google account in the admin panel first.',
             'login_required': True,
-            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+            'login_url': url_for('admin.google_login', _external=True)
         }), 403
     
     if 'file' not in request.files:

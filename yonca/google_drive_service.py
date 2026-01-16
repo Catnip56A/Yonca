@@ -12,8 +12,8 @@ from flask import url_for, current_app
 from datetime import datetime, timedelta, timedelta
 import requests
 
-# Google Drive API scopes - need full drive access to set public permissions on files
-SCOPES = ['https://www.googleapis.com/auth/drive']
+# Google Drive API scopes - need file access for uploads
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 FOLDER_ID = None  # Upload to root directory for OAuth users
 
 def authenticate(user=None):
@@ -32,8 +32,23 @@ def authenticate(user=None):
     if user.google_token_expiry and datetime.utcnow() >= user.google_token_expiry:
         if user.google_refresh_token:
             creds = refresh_credentials(user)
+            if not creds:
+                # Refresh failed, clear tokens
+                print('Token refresh failed, clearing tokens')
+                user.google_access_token = None
+                user.google_refresh_token = None
+                user.google_token_expiry = None
+                from yonca.models import db
+                db.session.commit()
+                return None
         else:
             print('Access token expired and no refresh token available')
+            # Clear expired token
+            user.google_access_token = None
+            user.google_refresh_token = None
+            user.google_token_expiry = None
+            from yonca.models import db
+            db.session.commit()
             return None
     else:
         creds = Credentials(
@@ -46,9 +61,19 @@ def authenticate(user=None):
         )
     
     if creds:
-        service = build('drive', 'v3', credentials=creds)
-        print("Google Drive service authenticated successfully using OAuth")
-        return service
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            print("Google Drive service authenticated successfully using OAuth")
+            return service
+        except Exception as e:
+            print(f'Failed to build Google Drive service: {e}')
+            # Clear invalid tokens so user can re-authenticate
+            user.google_access_token = None
+            user.google_refresh_token = None
+            user.google_token_expiry = None
+            from yonca.models import db
+            db.session.commit()
+            return None
     else:
         print('Failed to authenticate with Google Drive')
         return None

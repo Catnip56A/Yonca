@@ -503,8 +503,19 @@ class GoogleLoginView(BaseView):
         
         # Check if user already has Google tokens
         if current_user.google_access_token:
-            flash('You are already connected to Google Drive.', 'info')
-            return redirect(url_for('admin.index'))
+            # Test if the tokens actually work
+            from yonca.google_drive_service import authenticate
+            test_service = authenticate(current_user)
+            if test_service:
+                flash('You are already connected to Google Drive.', 'info')
+                return redirect(url_for('admin.index'))
+            else:
+                # Tokens are invalid, clear them and allow re-connection
+                current_user.google_access_token = None
+                current_user.google_refresh_token = None
+                current_user.google_token_expiry = None
+                db.session.commit()
+                flash('Your Google Drive connection was invalid. Please reconnect.', 'warning')
         
         # Show Google login page
         return self.render('admin/google_login.html')
