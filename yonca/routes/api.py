@@ -8,7 +8,7 @@ from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from flask_login import current_user, login_required
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
 from yonca.translation_service import translation_service
-from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
+from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -305,6 +305,11 @@ def upload_resource():
             try:
                 preview_drive_file_id = upload_file(service, preview_temp_path, preview_filename)
                 if preview_drive_file_id:
+                    # Set permissions for preview image
+                    try:
+                        set_file_permissions(service, preview_drive_file_id, make_public=True)
+                    except Exception as e:
+                        print(f"Error setting preview permissions: {e}")
                     # Create view-only link for preview image
                     preview_image_url = create_view_only_link(service, preview_drive_file_id, is_image=True)
             except Exception as e:
@@ -341,6 +346,13 @@ def upload_resource():
         
         if not drive_file_id:
             return jsonify({'error': 'Failed to upload file to Google Drive'}), 500
+        
+        # Set file permissions to make it publicly accessible
+        try:
+            set_file_permissions(service, drive_file_id, make_public=True)
+        except Exception as e:
+            print(f"Error setting file permissions: {e}")
+            # Continue anyway - view link creation might still work
         
         # Create view-only link
         view_link = create_view_only_link(service, drive_file_id, is_image=False)
