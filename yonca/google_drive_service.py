@@ -12,8 +12,8 @@ from flask import url_for, current_app
 from datetime import datetime, timedelta, timedelta
 import requests
 
-# If modifying these scopes, delete the token.json file
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+# Google Drive API scopes - need full drive access to set public permissions on files
+SCOPES = ['https://www.googleapis.com/auth/drive']
 FOLDER_ID = None  # Upload to root directory for OAuth users
 
 def authenticate(user=None):

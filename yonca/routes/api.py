@@ -373,6 +373,7 @@ def upload_resource():
             preview_drive_file_id=preview_drive_file_id if 'preview_drive_file_id' in locals() and preview_drive_file_id else None,
             drive_file_id=drive_file_id,
             drive_view_link=view_link,
+            is_image_file=is_image,
             uploaded_by=current_user.id
         )
         db.session.add(new_resource)

@@ -152,6 +152,7 @@ class Resource(db.Model):
     preview_drive_file_id = db.Column(db.String(100))  # Google Drive file ID for preview image
     drive_file_id = db.Column(db.String(100))  # Google Drive file ID
     drive_view_link = db.Column(db.String(300))  # Google Drive view link
+    is_image_file = db.Column(db.Boolean, default=False)  # Whether the main file is an image
     access_pin = db.Column(db.String(10), nullable=False)
     pin_expires_at = db.Column(db.DateTime, nullable=False)
     pin_last_reset = db.Column(db.DateTime, server_default=db.func.now())
