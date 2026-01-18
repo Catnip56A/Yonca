@@ -1,0 +1,1263 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-18 20:47+0400\n"
+"PO-Revision-Date: 2026-01-18 12:52+0400\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/course_description.html:90
+msgid "Course Features"
+msgstr ""
+
+#: templates/components/navbar.html:24 templates/course_description.html:95
+#: templates/index.html:1215 templates/index.html:1267
+msgid "Forum"
+msgstr ""
+
+#: templates/course_description.html:96
+msgid "Connect with fellow learners and get help from instructors."
+msgstr ""
+
+#: templates/course_description.html:97 templates/course_page_enrolled.html:339
+msgid "Access Forum"
+msgstr ""
+
+#: templates/components/navbar.html:27 templates/course_description.html:103
+#: templates/index.html:1216 templates/index.html:1268
+#: templates/index.html:1496
+msgid "Resources"
+msgstr ""
+
+#: templates/course_description.html:104
+msgid "Access course materials, documents, and additional resources."
+msgstr ""
+
+#: templates/course_description.html:105
+#: templates/course_page_enrolled.html:347
+msgid "Access Resources"
+msgstr ""
+
+#: templates/course_description.html:111
+#: templates/course_page_enrolled.html:212
+msgid "Reviews"
+msgstr ""
+
+#: templates/course_description.html:112
+msgid "Read reviews from other students and share your experience."
+msgstr ""
+
+#: templates/course_description.html:113
+#: templates/course_page_enrolled.html:355
+msgid "View Reviews"
+msgstr ""
+
+#: templates/course_description.html:123
+#: templates/course_page_enrolled.html:793
+msgid "Student Reviews"
+msgstr ""
+
+#: templates/course_description.html:124
+msgid "review"
+msgstr ""
+
+#: templates/course_description.html:124
+msgid "reviews"
+msgstr ""
+
+#: templates/course_description.html:141
+msgid "Average Rating"
+msgstr ""
+
+#: templates/course_description.html:158
+msgid "By"
+msgstr ""
+
+#: templates/course_description.html:172
+#: templates/course_page_enrolled.html:490
+#: templates/course_page_enrolled.html:653 templates/index.html:2005
+msgid "Login to Enroll"
+msgstr ""
+
+#: templates/course_description.html:174
+msgid "You are not enrolled in this course."
+msgstr ""
+
+#: templates/course_page_enrolled.html:190
+msgid "Teacher/Admin Mode:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:190
+msgid "You have editing privileges for this course."
+msgstr ""
+
+#: templates/course_page_enrolled.html:195
+msgid "Back to Courses"
+msgstr ""
+
+#: templates/course_page_enrolled.html:200
+msgid "Content"
+msgstr ""
+
+#: templates/course_page_enrolled.html:206
+msgid "Assignments"
+msgstr ""
+
+#: templates/course_page_enrolled.html:209
+#: templates/course_page_enrolled.html:697
+msgid "Announcements"
+msgstr ""
+
+#: templates/course_page_enrolled.html:243
+msgid "View File"
+msgstr ""
+
+#: templates/course_page_enrolled.html:245
+msgid "View/Download"
+msgstr ""
+
+#: templates/course_page_enrolled.html:256
+#: templates/course_page_enrolled.html:604
+msgid "Visible"
+msgstr ""
+
+#: templates/course_page_enrolled.html:256
+#: templates/course_page_enrolled.html:536
+#: templates/course_page_enrolled.html:604
+msgid "Private"
+msgstr ""
+
+#: templates/course_page_enrolled.html:259
+msgid "Are you sure you want to delete this file?"
+msgstr ""
+
+#: templates/course_page_enrolled.html:262 templates/index.html:2192
+#: templates/index.html:2212 templates/index.html:2280
+msgid "Delete"
+msgstr ""
+
+#: templates/course_page_enrolled.html:488
+msgid "Enroll to Access Course Content"
+msgstr ""
+
+#: templates/course_page_enrolled.html:489
+msgid ""
+"You need to be enrolled in this course to view the content, materials, "
+"and participate in activities."
+msgstr ""
+
+#: templates/course_page_enrolled.html:501
+msgid "Create Assignment"
+msgstr ""
+
+#: templates/course_page_enrolled.html:509
+msgid "pts"
+msgstr ""
+
+#: templates/course_page_enrolled.html:511
+msgid "Due:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:511
+msgid "N/A"
+msgstr ""
+
+#: templates/course_page_enrolled.html:518
+#: templates/course_page_enrolled.html:584
+msgid "On Time"
+msgstr ""
+
+#: templates/course_page_enrolled.html:522
+#: templates/course_page_enrolled.html:588
+msgid "Late"
+msgstr ""
+
+#: templates/course_page_enrolled.html:525
+#: templates/course_page_enrolled.html:591
+msgid "Early"
+msgstr ""
+
+#: templates/course_page_enrolled.html:530
+msgid "View Your Submission"
+msgstr ""
+
+#: templates/course_page_enrolled.html:536
+msgid "Visible to Others"
+msgstr ""
+
+#: templates/course_page_enrolled.html:539
+msgid "Are you sure you want to delete your submission?"
+msgstr ""
+
+#: templates/course_page_enrolled.html:542
+msgid "Delete My Submission"
+msgstr ""
+
+#: templates/course_page_enrolled.html:545
+#: templates/course_page_enrolled.html:629
+msgid "Grade:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:548
+msgid "Feedback:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:553
+msgid "Not Submitted"
+msgstr ""
+
+#: templates/course_page_enrolled.html:556
+msgid "Overdue"
+msgstr ""
+
+#: templates/course_page_enrolled.html:565
+msgid "Upload Your Work:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:568
+msgid "Submit Assignment"
+msgstr ""
+
+#: templates/course_page_enrolled.html:575
+msgid "View Submissions"
+msgstr ""
+
+#: templates/course_page_enrolled.html:596
+msgid "Submitted:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:597
+msgid "View Submission"
+msgstr ""
+
+#: templates/course_page_enrolled.html:607
+msgid "Are you sure you want to delete this submission?"
+msgstr ""
+
+#: templates/course_page_enrolled.html:618
+msgid "Grade"
+msgstr ""
+
+#: templates/course_page_enrolled.html:621
+msgid "Comment"
+msgstr ""
+
+#: templates/course_page_enrolled.html:624
+msgid "Save Grade"
+msgstr ""
+
+#: templates/course_page_enrolled.html:632
+msgid "Comment:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:638
+msgid "No submissions yet."
+msgstr ""
+
+#: templates/course_page_enrolled.html:646
+msgid "No assignments available."
+msgstr ""
+
+#: templates/course_page_enrolled.html:651
+msgid "Enroll to Access Assignments"
+msgstr ""
+
+#: templates/course_page_enrolled.html:652
+msgid "You need to be enrolled in this course to view and submit assignments."
+msgstr ""
+
+#: templates/course_page_enrolled.html:666
+#: templates/course_page_enrolled.html:714
+msgid "Reply"
+msgstr ""
+
+#: templates/course_page_enrolled.html:676
+#: templates/course_page_enrolled.html:723
+msgid "Write a reply..."
+msgstr ""
+
+#: templates/course_page_enrolled.html:678
+msgid "Post Reply"
+msgstr ""
+
+#: templates/course_page_enrolled.html:700
+msgid "Add Announcement"
+msgstr ""
+
+#: templates/course_page_enrolled.html:710
+msgid "Posted:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:742
+msgid "No announcements yet."
+msgstr ""
+
+#: templates/course_page_enrolled.html:749
+msgid "Course Reviews"
+msgstr ""
+
+#: templates/course_page_enrolled.html:755
+msgid "Write Your Review"
+msgstr ""
+
+#: templates/course_page_enrolled.html:762
+msgid "Rating"
+msgstr ""
+
+#: templates/course_page_enrolled.html:771
+msgid "Click on a star to rate (1-5)"
+msgstr ""
+
+#: templates/course_page_enrolled.html:775
+msgid "Review Title"
+msgstr ""
+
+#: templates/course_page_enrolled.html:776
+msgid "Summarize your experience"
+msgstr ""
+
+#: templates/course_page_enrolled.html:780
+msgid "Your Review"
+msgstr ""
+
+#: templates/course_page_enrolled.html:781
+msgid "Share your thoughts about this course..."
+msgstr ""
+
+#: templates/course_page_enrolled.html:785
+msgid "Submit Review"
+msgstr ""
+
+#: templates/course_page_enrolled.html:816
+msgid "Are you sure you want to delete this review?"
+msgstr ""
+
+#: templates/index.html:7
+msgid "Yonca - Learning Platform"
+msgstr ""
+
+#: templates/components/navbar.html:18 templates/index.html:1206
+#: templates/index.html:1258
+msgid "Home"
+msgstr ""
+
+#: templates/index.html:1208 templates/index.html:1260
+msgid "Education"
+msgstr ""
+
+#: templates/components/navbar.html:21 templates/index.html:1210
+#: templates/index.html:1262 templates/index.html:1411
+msgid "Courses"
+msgstr ""
+
+#: templates/index.html:1211 templates/index.html:1263
+#: templates/index.html:1690
+msgid "Webinars"
+msgstr ""
+
+#: templates/index.html:1212 templates/index.html:1264
+#: templates/index.html:1699
+msgid "Conferences"
+msgstr ""
+
+#: templates/components/navbar.html:30 templates/index.html:1217
+#: templates/index.html:1269 templates/index.html:1538
+msgid "TAVI Test"
+msgstr ""
+
+#: templates/components/navbar.html:33 templates/index.html:1218
+#: templates/index.html:1270
+msgid "Contacts"
+msgstr ""
+
+#: templates/index.html:1219 templates/index.html:1271
+msgid "About Company"
+msgstr ""
+
+#: templates/components/navbar.html:61 templates/index.html:1230
+#: templates/index.html:1278 templates/login.html:248
+msgid "Login"
+msgstr ""
+
+#: templates/index.html:1233 templates/index.html:1281
+msgid "Welcome"
+msgstr ""
+
+#: templates/index.html:1234 templates/index.html:1282
+msgid "Admin"
+msgstr ""
+
+#: templates/components/navbar.html:56 templates/index.html:1235
+#: templates/index.html:1283
+msgid "Logout"
+msgstr ""
+
+#: templates/index.html:1294 templates/index.html:1318
+#: templates/index.html:1581
+msgid "Welcome to Yonca"
+msgstr ""
+
+#: templates/index.html:1295
+msgid "Your gateway to knowledge and community learning."
+msgstr ""
+
+#: templates/index.html:1296
+msgid "Get Started"
+msgstr ""
+
+#: templates/index.html:1300 templates/login.html:256
+msgid "Link Google Account"
+msgstr ""
+
+#: templates/index.html:1319
+msgid "Join our learning community today!"
+msgstr ""
+
+#: templates/index.html:1320
+msgid "Sign Up Now"
+msgstr ""
+
+#: templates/index.html:1337 templates/index.html:1616
+msgid "What's New"
+msgstr ""
+
+#: templates/index.html:1338 templates/index.html:1617
+msgid ""
+"Discover the latest updates, new features, and exciting developments in "
+"our learning platform."
+msgstr ""
+
+#: templates/index.html:1412
+msgid "Explore our available courses and start your learning journey."
+msgstr ""
+
+#: templates/index.html:1416
+msgid "My Enrolled Courses"
+msgstr ""
+
+#: templates/index.html:1418
+msgid "Loading enrolled courses..."
+msgstr ""
+
+#: templates/index.html:1424 templates/index.html:1816
+#: templates/index.html:1855
+msgid "Available Courses"
+msgstr ""
+
+#: templates/index.html:1426
+msgid "Loading courses..."
+msgstr ""
+
+#: templates/index.html:1433
+msgid "Community Forum"
+msgstr ""
+
+#: templates/index.html:1437
+msgid "Authentication Required"
+msgstr ""
+
+#: templates/index.html:1438
+msgid "Please log in to participate in the community forum."
+msgstr ""
+
+#: templates/index.html:1439
+msgid "You can still view messages without logging in."
+msgstr ""
+
+#: templates/index.html:1467
+msgid "Post a New Message"
+msgstr ""
+
+#: templates/index.html:1470 templates/login.html:230
+msgid "Username:"
+msgstr ""
+
+#: templates/index.html:1474
+msgid "Message:"
+msgstr ""
+
+#: templates/index.html:1475
+msgid "Share your thoughts, ask questions, or help others..."
+msgstr ""
+
+#: templates/index.html:1477
+msgid "Post Message"
+msgstr ""
+
+#: templates/index.html:1482
+msgid "General Discussion"
+msgstr ""
+
+#: templates/index.html:1485
+msgid "Welcome to Yonca Forum!"
+msgstr ""
+
+#: templates/index.html:1486
+msgid ""
+"This is where community members can connect, ask questions, and share "
+"knowledge."
+msgstr ""
+
+#: templates/index.html:1487
+msgid "Posted on December 8, 2025"
+msgstr ""
+
+#: templates/index.html:1497
+msgid "Download educational materials, documents, and access protected files."
+msgstr ""
+
+#: templates/index.html:1500
+msgid "Learning Materials"
+msgstr ""
+
+#: templates/index.html:1502
+msgid "Loading materials..."
+msgstr ""
+
+#: templates/index.html:1507
+msgid "Upload Learning Material"
+msgstr ""
+
+#: templates/index.html:1508
+msgid ""
+"Upload documents, presentations, PDFs, or other materials. PIN protection"
+" will be automatically applied for security."
+msgstr ""
+
+#: templates/index.html:1511
+msgid "Title:"
+msgstr ""
+
+#: templates/index.html:1515
+msgid "Description:"
+msgstr ""
+
+#: templates/index.html:1519
+msgid "Preview Image (optional):"
+msgstr ""
+
+#: templates/index.html:1521
+msgid "Upload an image to display as a preview for this resource"
+msgstr ""
+
+#: templates/index.html:1524
+msgid "Choose file..."
+msgstr ""
+
+#: templates/index.html:1528
+msgid "Access PIN will be auto-generated (6 characters, expires in 10 minutes)"
+msgstr ""
+
+#: templates/index.html:1530 templates/index.html:2430
+msgid "Upload Material"
+msgstr ""
+
+#: templates/index.html:1540
+msgid "TAVI Test section is coming soon."
+msgstr ""
+
+#: templates/index.html:1546
+msgid "Contact Us"
+msgstr ""
+
+#: templates/index.html:1550
+msgid "WhatsApp"
+msgstr ""
+
+#: templates/index.html:1555
+msgid "Available: Mon-Fri, 9AM-6PM"
+msgstr ""
+
+#: templates/index.html:1560
+msgid "Email"
+msgstr ""
+
+#: templates/index.html:1565
+msgid "We respond within 24 hours"
+msgstr ""
+
+#: templates/index.html:1570
+msgid "Location"
+msgstr ""
+
+#: templates/index.html:1573
+msgid "Baku, Azerbaijan"
+msgstr ""
+
+#: templates/index.html:1582
+msgid ""
+"Join our learning community and discover amazing features designed to "
+"enhance your educational experience."
+msgstr ""
+
+#: templates/index.html:1586
+msgid "Our Features"
+msgstr ""
+
+#: templates/index.html:1587
+msgid "Discover what makes our platform special."
+msgstr ""
+
+#: templates/index.html:1599
+msgid "Interactive Courses"
+msgstr ""
+
+#: templates/index.html:1600
+msgid "Engage with dynamic course content and interactive learning materials."
+msgstr ""
+
+#: templates/index.html:1603
+msgid "Study Groups"
+msgstr ""
+
+#: templates/index.html:1604
+msgid "Collaborate with fellow learners in our vibrant study communities."
+msgstr ""
+
+#: templates/index.html:1607
+msgid "Expert Support"
+msgstr ""
+
+#: templates/index.html:1608
+msgid "Get help from our team of educational experts and specialists."
+msgstr ""
+
+#: templates/index.html:1691
+msgid ""
+"Join our live and recorded webinars to learn from experts in various "
+"fields."
+msgstr ""
+
+#: templates/index.html:1693
+msgid "Webinars section coming soon..."
+msgstr ""
+
+#: templates/index.html:1700
+msgid "Participate in our educational conferences and networking events."
+msgstr ""
+
+#: templates/index.html:1702
+msgid "Conferences section coming soon..."
+msgstr ""
+
+#: templates/index.html:1814
+msgid "You're enrolled in all available courses!"
+msgstr ""
+
+#: templates/index.html:1815
+msgid "Error loading courses. Please try again."
+msgstr ""
+
+#: templates/index.html:1836
+msgid "No courses available at the moment."
+msgstr ""
+
+#: templates/index.html:1852
+msgid "Other Available Courses"
+msgstr ""
+
+#: templates/index.html:1986
+msgid "Loading..."
+msgstr ""
+
+#: templates/index.html:1987 templates/index.html:1999
+#: templates/index.html:2006
+msgid "View Details"
+msgstr ""
+
+#: templates/index.html:1998
+msgid "Enroll Now"
+msgstr ""
+
+#: templates/index.html:2061
+msgid "Enrolling in"
+msgstr ""
+
+#: templates/index.html:2131
+msgid "No materials available at the moment."
+msgstr ""
+
+#: templates/index.html:2149
+msgid "Log In to Access"
+msgstr ""
+
+#: templates/index.html:2152 templates/index.html:2172
+#: templates/index.html:2207
+msgid "View Resource"
+msgstr ""
+
+#: templates/index.html:2162
+msgid "Expires in:"
+msgstr ""
+
+#: templates/index.html:2162
+msgid "minutes"
+msgstr ""
+
+#: templates/index.html:2164
+msgid "PIN has expired"
+msgstr ""
+
+#: templates/index.html:2168 templates/index.html:2259
+msgid "Your Access PIN:"
+msgstr ""
+
+#: templates/index.html:2170 templates/index.html:2261
+msgid "Share this PIN with others to grant access"
+msgstr ""
+
+#: templates/index.html:2175 templates/index.html:2266
+msgid "Request Access"
+msgstr ""
+
+#: templates/index.html:2183 templates/index.html:2203
+#: templates/index.html:2271
+msgid "No description available"
+msgstr ""
+
+#: templates/index.html:2185 templates/index.html:2205
+#: templates/index.html:2273
+msgid "Uploaded:"
+msgstr ""
+
+#: templates/index.html:2189 templates/index.html:2209
+msgid "Are you sure you want to delete this resource?"
+msgstr ""
+
+#: templates/index.html:2226
+msgid "Error loading materials. Please try again."
+msgstr ""
+
+#: templates/index.html:2242
+msgid "No PDF documents available at the moment."
+msgstr ""
+
+#: templates/index.html:2263
+msgid "Access PDF"
+msgstr ""
+
+#: templates/index.html:2277
+msgid "Are you sure you want to delete this PDF?"
+msgstr ""
+
+#: templates/index.html:2288
+msgid "Error loading PDFs. Please try again."
+msgstr ""
+
+#: templates/index.html:2294
+msgid "Enter access PIN for:"
+msgstr ""
+
+#: templates/index.html:2320
+msgid "Invalid PIN or access denied."
+msgstr ""
+
+#: templates/index.html:2324
+msgid "Error accessing resource. Please try again."
+msgstr ""
+
+#: templates/index.html:2338 templates/index.html:2340
+msgid "Uploading PDF..."
+msgstr ""
+
+#: templates/index.html:2362
+msgid "PDF uploaded successfully! Access PIN:"
+msgstr ""
+
+#: templates/index.html:2370 templates/index.html:2374
+msgid "Error uploading PDF. Please try again."
+msgstr ""
+
+#: templates/index.html:2377
+msgid "Upload PDF"
+msgstr ""
+
+#: templates/index.html:2391
+msgid "Uploading..."
+msgstr ""
+
+#: templates/index.html:2393
+msgid "Uploading resource..."
+msgstr ""
+
+#: templates/index.html:2415
+msgid "Material uploaded successfully! Access PIN:"
+msgstr ""
+
+#: templates/index.html:2423
+msgid "Error uploading material. Please try again."
+msgstr ""
+
+#: templates/index.html:2427
+msgid "Error uploading resource. Please try again."
+msgstr ""
+
+#: templates/index.html:3633 templates/login.html:245 templates/terms.html:80
+msgid "Terms of Service"
+msgstr ""
+
+#: templates/login.html:218
+msgid "Login to Your Account"
+msgstr ""
+
+#: templates/login.html:234
+msgid "Password:"
+msgstr ""
+
+#: templates/login.html:239
+msgid "Login as Administrator"
+msgstr ""
+
+#: templates/login.html:244
+msgid "I acknowledge that I have read and agree to the"
+msgstr ""
+
+#: templates/login.html:252
+msgid "Login with Google"
+msgstr ""
+
+#: templates/login.html:260
+msgid "Back to Yonca"
+msgstr ""
+
+#: templates/terms.html:6
+msgid "Terms of Service - Yonca"
+msgstr ""
+
+#: templates/terms.html:82
+msgid "Last updated:"
+msgstr ""
+
+#: templates/terms.html:82
+msgid "January 2026"
+msgstr ""
+
+#: templates/terms.html:84
+msgid "Welcome to"
+msgstr ""
+
+#: templates/terms.html:84
+msgid "(the \"Service\", \"Platform\", \"Website\"), operated by"
+msgstr ""
+
+#: templates/terms.html:84
+msgid ""
+"(\"we\", \"us\", \"our\"). By accessing or using Yonca, you agree to be "
+"bound by these Terms of Service (\"Terms\"). If you do not agree with any"
+" part of these Terms, you must not use the Service."
+msgstr ""
+
+#: templates/terms.html:88
+msgid "1. Eligibility"
+msgstr ""
+
+#: templates/terms.html:90
+msgid "You must be at least"
+msgstr ""
+
+#: templates/terms.html:90
+msgid "years old"
+msgstr ""
+
+#: templates/terms.html:90
+msgid ""
+"to use Yonca. If you are under the age of 18, you confirm that you have "
+"permission from a parent or legal guardian."
+msgstr ""
+
+#: templates/terms.html:91
+msgid "You represent that the information you provide is accurate and complete."
+msgstr ""
+
+#: templates/terms.html:94
+msgid "2. Accounts and Authentication"
+msgstr ""
+
+#: templates/terms.html:96
+msgid "Some features require creating an account."
+msgstr ""
+
+#: templates/terms.html:97
+msgid ""
+"You are responsible for maintaining the confidentiality of your login "
+"credentials and for all activities that occur under your account."
+msgstr ""
+
+#: templates/terms.html:98
+msgid ""
+"You agree not to share your account or use another user's account without"
+" permission."
+msgstr ""
+
+#: templates/terms.html:99
+msgid ""
+"We reserve the right to suspend or terminate accounts that violate these "
+"Terms."
+msgstr ""
+
+#: templates/terms.html:102
+msgid "3. User Content"
+msgstr ""
+
+#: templates/terms.html:104
+msgid "3.1 Content You Provide"
+msgstr ""
+
+#: templates/terms.html:105
+msgid ""
+"Yonca may allow you to submit, upload, store, or share content such as "
+"text, images, files, or messages (\"User Content\")."
+msgstr ""
+
+#: templates/terms.html:106
+msgid ""
+"You retain ownership of your User Content. However, by submitting "
+"content, you grant Yonca a"
+msgstr ""
+
+#: templates/terms.html:106
+msgid "non-exclusive, worldwide, royalty-free license"
+msgstr ""
+
+#: templates/terms.html:106
+msgid ""
+"to host, store, process, and display the content solely for operating and"
+" improving the Service."
+msgstr ""
+
+#: templates/terms.html:108
+msgid "3.2 Responsibility for Content"
+msgstr ""
+
+#: templates/terms.html:109
+msgid ""
+"You are solely responsible for your User Content. You agree not to upload"
+" or share content that:"
+msgstr ""
+
+#: templates/terms.html:111
+msgid "Is illegal, fraudulent, or misleading"
+msgstr ""
+
+#: templates/terms.html:112
+msgid "Infringes intellectual property or privacy rights"
+msgstr ""
+
+#: templates/terms.html:113
+msgid "Contains malware, viruses, or harmful code"
+msgstr ""
+
+#: templates/terms.html:114
+msgid "Is abusive, hateful, or harassing"
+msgstr ""
+
+#: templates/terms.html:116
+msgid "We may remove content that violates these Terms or applicable laws."
+msgstr ""
+
+#: templates/terms.html:118
+msgid "4. File Storage and Third-Party Services"
+msgstr ""
+
+#: templates/terms.html:120
+msgid "Yonca may use"
+msgstr ""
+
+#: templates/terms.html:120
+msgid "third-party services"
+msgstr ""
+
+#: templates/terms.html:120
+msgid ""
+"(such as cloud storage, APIs, or translation services) to operate "
+"features like file uploads, backups, or content processing."
+msgstr ""
+
+#: templates/terms.html:121
+msgid ""
+"Your content may be processed or stored through these services strictly "
+"for functionality."
+msgstr ""
+
+#: templates/terms.html:122
+msgid ""
+"Yonca is not responsible for outages, data loss, or changes caused by "
+"third-party providers, to the extent permitted by law."
+msgstr ""
+
+#: templates/terms.html:125
+msgid "4.1 Google Drive Integration"
+msgstr ""
+
+#: templates/terms.html:127
+msgid "Yonca may allow users to connect their"
+msgstr ""
+
+#: templates/terms.html:127
+msgid "account"
+msgstr ""
+
+#: templates/terms.html:127
+msgid ""
+"using Google OAuth 2.0 for purposes such as uploading, storing, "
+"accessing, or managing files."
+msgstr ""
+
+#: templates/terms.html:128
+msgid "When you connect Google Drive, Yonca accesses only the"
+msgstr ""
+
+#: templates/terms.html:128
+msgid "minimum permissions required"
+msgstr ""
+
+#: templates/terms.html:128
+msgid ""
+"to provide the requested functionality, as disclosed during the Google "
+"authorization process."
+msgstr ""
+
+#: templates/terms.html:129
+msgid "Yonca"
+msgstr ""
+
+#: templates/terms.html:129
+msgid "does not access, read, or modify"
+msgstr ""
+
+#: templates/terms.html:129
+msgid "files outside the scope explicitly permitted by you."
+msgstr ""
+
+#: templates/terms.html:130
+msgid ""
+"Files uploaded or managed via Google Drive remain under your control and "
+"subject to"
+msgstr ""
+
+#: templates/terms.html:130
+msgid "Google's own Terms of Service and Privacy Policy"
+msgstr ""
+
+#: templates/terms.html:131
+msgid ""
+"You may revoke Yonca's access to your Google Drive at any time through "
+"your Google Account security settings."
+msgstr ""
+
+#: templates/terms.html:134
+msgid "5. Translations and Automated Features"
+msgstr ""
+
+#: templates/terms.html:136
+msgid "Yonca may provide automated features such as"
+msgstr ""
+
+#: templates/terms.html:136
+msgid "machine translations or AI-assisted tools"
+msgstr ""
+
+#: templates/terms.html:137
+msgid ""
+"These features are provided \"as is\" and may contain errors or "
+"inaccuracies."
+msgstr ""
+
+#: templates/terms.html:138
+msgid ""
+"Yonca does not guarantee the correctness, completeness, or suitability of"
+" automatically generated results."
+msgstr ""
+
+#: templates/terms.html:141
+msgid "6. Acceptable Use"
+msgstr ""
+
+#: templates/terms.html:142
+msgid "You agree not to:"
+msgstr ""
+
+#: templates/terms.html:144
+msgid "Abuse, overload, or attempt to disrupt the Service or its infrastructure"
+msgstr ""
+
+#: templates/terms.html:145
+msgid "Attempt unauthorized access to systems, accounts, or data"
+msgstr ""
+
+#: templates/terms.html:146
+msgid "Use Yonca for spam, scraping, or automated misuse"
+msgstr ""
+
+#: templates/terms.html:147
+msgid "Circumvent security or access controls"
+msgstr ""
+
+#: templates/terms.html:150
+msgid "7. Intellectual Property"
+msgstr ""
+
+#: templates/terms.html:152
+msgid ""
+"The Yonca name, logo, design, and all platform-related content (excluding"
+" User Content) are owned by Yonca or its licensors."
+msgstr ""
+
+#: templates/terms.html:153
+msgid ""
+"You may not copy, modify, distribute, or reverse-engineer any part of the"
+" Service without written permission."
+msgstr ""
+
+#: templates/terms.html:156
+msgid "8. Privacy"
+msgstr ""
+
+#: templates/terms.html:157
+msgid "Your use of Yonca is also governed by our"
+msgstr ""
+
+#: templates/terms.html:157
+msgid "Privacy Policy"
+msgstr ""
+
+#: templates/terms.html:157
+msgid "which explains how we collect, use, and protect your data."
+msgstr ""
+
+#: templates/terms.html:159
+msgid "9. Termination"
+msgstr ""
+
+#: templates/terms.html:161
+msgid "You may stop using Yonca at any time."
+msgstr ""
+
+#: templates/terms.html:162
+msgid ""
+"We may suspend or terminate your access immediately if you violate these "
+"Terms or if required by law."
+msgstr ""
+
+#: templates/terms.html:163
+msgid ""
+"Upon termination, access to your account and stored content may be "
+"removed."
+msgstr ""
+
+#: templates/terms.html:166
+msgid "10. Disclaimer of Warranties"
+msgstr ""
+
+#: templates/terms.html:167
+msgid "Yonca is provided"
+msgstr ""
+
+#: templates/terms.html:167
+msgid "as is"
+msgstr ""
+
+#: templates/terms.html:167
+msgid "and"
+msgstr ""
+
+#: templates/terms.html:167
+msgid "as available"
+msgstr ""
+
+#: templates/terms.html:167
+msgid "To the maximum extent permitted by law:"
+msgstr ""
+
+#: templates/terms.html:169
+msgid "We make no warranties regarding availability, reliability, or accuracy"
+msgstr ""
+
+#: templates/terms.html:170
+msgid "We do not guarantee uninterrupted or error-free operation"
+msgstr ""
+
+#: templates/terms.html:173
+msgid "11. Limitation of Liability"
+msgstr ""
+
+#: templates/terms.html:174
+msgid "To the extent permitted by law, Yonca shall not be liable for:"
+msgstr ""
+
+#: templates/terms.html:176
+msgid "Indirect, incidental, or consequential damages"
+msgstr ""
+
+#: templates/terms.html:177
+msgid "Loss of data, profits, or business opportunities"
+msgstr ""
+
+#: templates/terms.html:178
+msgid "Issues caused by third-party services or user actions"
+msgstr ""
+
+#: templates/terms.html:181
+msgid "12. Changes to the Terms"
+msgstr ""
+
+#: templates/terms.html:182
+msgid ""
+"We may update these Terms from time to time. Continued use of Yonca after"
+" changes become effective constitutes acceptance of the revised Terms."
+msgstr ""
+
+#: templates/terms.html:184
+msgid "13. Governing Law"
+msgstr ""
+
+#: templates/terms.html:185
+msgid ""
+"These Terms are governed by and construed in accordance with applicable "
+"laws, without regard to conflict of law principles."
+msgstr ""
+
+#: templates/terms.html:187
+msgid "14. Contact"
+msgstr ""
+
+#: templates/terms.html:188
+msgid ""
+"If you have questions about these Terms, please contact us through the "
+"Yonca website."
+msgstr ""
+
+#: templates/terms.html:192
+msgid ""
+"By using Yonca, you acknowledge that you have read, understood, and agree"
+" to these Terms of Service."
+msgstr ""
+
+#: templates/terms.html:194
+msgid "Back to Home"
+msgstr ""
+
+#: templates/components/navbar.html:36
+msgid "About"
+msgstr ""
+
+#: templates/components/navbar.html:51
+msgid "Profile"
+msgstr ""
+
+#: templates/components/navbar.html:53
+msgid "Admin Panel"
+msgstr ""
+

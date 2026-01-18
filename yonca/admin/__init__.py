@@ -95,10 +95,14 @@ def get_google_redirect_uri(redirect_uri=None):
     if redirect_uri:
         return redirect_uri
     
-    # Fallback to automatic detection
+    # Auto-detect based on request host
     flask_env = os.environ.get('FLASK_ENV', 'development')
     is_local = request.host in ['127.0.0.1:5000', 'localhost:5000'] or flask_env == 'development'
-    return "http://127.0.0.1:5000/auth/google/callback" if is_local else "https://magsud.yonca-sdc.com/auth/google/callback"
+    
+    if is_local:
+        return "http://127.0.0.1:5000/admin/google_login/"
+    else:
+        return "https://magsud.yonca-sdc.com/admin/google_login/"
 from yonca.models import User, Course, ForumMessage, ForumChannel, TaviTest, Resource, db, HomeContent
 
 class AdminIndexView(AdminIndexView):
@@ -434,6 +438,9 @@ class LogoutView(BaseView):
     
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+    
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.login'))
 
 class GoogleLoginView(BaseView):
     """Custom view for Google OAuth login to get Drive access tokens"""
@@ -463,7 +470,7 @@ class GoogleLoginView(BaseView):
             client_secret = current_app.config.get('GOOGLE_CLIENT_SECRET')
             
             # Use the same redirect URI as used in connect (stored in session)
-            redirect_uri = session.pop('oauth_redirect_uri', get_google_redirect_uri('https://magsud.yonca-sdc.com/admin/google_login/'))
+            redirect_uri = session.pop('oauth_redirect_uri', get_google_redirect_uri())
             
             # Exchange code for access token
             token_url = 'https://oauth2.googleapis.com/token'
@@ -531,7 +538,7 @@ class GoogleLoginView(BaseView):
         try:
             # Redirect to Google OAuth with next parameter to return to admin
             # Use configurable redirect URI
-            redirect_uri = get_google_redirect_uri('https://magsud.yonca-sdc.com/admin/google_login/')
+            redirect_uri = get_google_redirect_uri()
             
             print(f"DEBUG: Admin OAuth - request.host={request.host}, GOOGLE_REDIRECT_URI={os.environ.get('GOOGLE_REDIRECT_URI')}, redirect_uri={redirect_uri}")
             
@@ -568,6 +575,9 @@ class GoogleLoginView(BaseView):
     
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+    
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.login'))
 
 class CourseManagementView(BaseView):
     """Custom view for managing course pages"""
@@ -583,6 +593,9 @@ class CourseManagementView(BaseView):
     
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
+    
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.login'))
 
 class HomeContentForm(FlaskForm):
     """Form for editing home content"""
@@ -1106,6 +1119,133 @@ class AboutCompanyForm(FlaskForm):
     about_gallery_title = StringField('About Gallery Title', [Optional()], default="What's New")
     about_gallery_subtitle = TextAreaField('About Gallery Subtitle', [Optional()], default="Discover the latest updates, new features, and exciting developments in our learning platform.")
 
+class TranslateContentView(BaseView):
+    """View for translating all content with one click"""
+    
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
+    
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.login'))
+    
+    @expose('/')
+    def index(self):
+        """Default view - redirect to home"""
+        return redirect(url_for('admin.index'))
+    
+    @expose('/translate-content', methods=['POST'])
+    def translate_content(self):
+        """Run translation script for all content"""
+        from flask import jsonify
+        
+        if not self.is_accessible():
+            return jsonify({'success': False, 'error': 'Admin access required'}), 403
+        
+        try:
+            from yonca.content_translator import (
+                auto_translate_course,
+                auto_translate_resource,
+                auto_translate_home_content,
+                auto_translate_course_content,
+                auto_translate_course_content_folder
+            )
+            from yonca.models import Course, Resource, HomeContent, CourseContent, CourseContentFolder
+            
+            stats = {
+                'courses': 0,
+                'resources': 0,
+                'home_content': 0,
+                'course_content': 0,
+                'folders': 0
+            }
+            
+            # Translate courses
+            courses = Course.query.all()
+            for course in courses:
+                auto_translate_course(course)
+                stats['courses'] += 1
+            
+            # Translate resources
+            resources = Resource.query.all()
+            for resource in resources:
+                auto_translate_resource(resource)
+                stats['resources'] += 1
+            
+            # Translate home content
+            home_contents = HomeContent.query.all()
+            for home in home_contents:
+                auto_translate_home_content(home)
+                stats['home_content'] += 1
+            
+            # Translate course content
+            course_contents = CourseContent.query.all()
+            for content in course_contents:
+                auto_translate_course_content(content)
+                stats['course_content'] += 1
+            
+            # Translate folders
+            folders = CourseContentFolder.query.all()
+            for folder in folders:
+                auto_translate_course_content_folder(folder)
+                stats['folders'] += 1
+            
+            db.session.commit()
+            
+            message = f"Translated {stats['courses']} courses, {stats['resources']} resources, {stats['home_content']} home pages, {stats['course_content']} course items, and {stats['folders']} folders to Azerbaijani and Russian."
+            
+            return jsonify({'success': True, 'message': message, 'stats': stats})
+            
+        except Exception as e:
+            from flask import jsonify
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Translation error: {error_details}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+    
+    @expose('/delete-translations', methods=['POST'])
+    def delete_translations(self):
+        """Delete all translations for Azerbaijani and Russian"""
+        from flask import jsonify
+        
+        if not self.is_accessible():
+            return jsonify({'success': False, 'error': 'Admin access required'}), 403
+        
+        try:
+            from yonca.models import ContentTranslation, Translation
+            
+            # Count translations before deletion
+            az_content_count = ContentTranslation.query.filter_by(target_language='az').count()
+            ru_content_count = ContentTranslation.query.filter_by(target_language='ru').count()
+            az_cache_count = Translation.query.filter_by(target_language='az').count()
+            ru_cache_count = Translation.query.filter_by(target_language='ru').count()
+            
+            total_before = az_content_count + ru_content_count + az_cache_count + ru_cache_count
+            
+            # Delete from ContentTranslation table
+            ContentTranslation.query.filter(ContentTranslation.target_language.in_(['az', 'ru'])).delete()
+            
+            # Delete from Translation cache table
+            Translation.query.filter(Translation.target_language.in_(['az', 'ru'])).delete()
+            
+            db.session.commit()
+            
+            message = f"Deleted {total_before} total translations ({az_content_count + az_cache_count} Azerbaijani, {ru_content_count + ru_cache_count} Russian)."
+            
+            return jsonify({'success': True, 'message': message, 'stats': {
+                'az_content_translations': az_content_count,
+                'ru_content_translations': ru_content_count,
+                'az_cache_translations': az_cache_count,
+                'ru_cache_translations': ru_cache_count,
+                'total_deleted': total_before
+            }})
+            
+        except Exception as e:
+            from flask import jsonify
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Delete translations error: {error_details}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
 def init_admin(app):
     """Initialize admin interface with all views"""
     admin = Admin(app, name='Yonca Admin', index_view=AdminIndexView())
@@ -1118,5 +1258,6 @@ def init_admin(app):
     admin.add_view(TaviTestView(TaviTest, db.session))
     admin.add_view(AboutCompanyView(name='About Company', endpoint='about_company'))
     admin.add_view(GoogleLoginView(name='Google Login', endpoint='google_login'))
+    admin.add_view(TranslateContentView(name='Translate', endpoint='translate'))
     admin.add_view(LogoutView(name='Logout', endpoint='logout'))
     return admin

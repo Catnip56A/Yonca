@@ -78,33 +78,33 @@ def create_app(config_name='development'):
         return db.session.get(User, int(user_id))
     
     # Initialize Babel for internationalization
-    babel = Babel()
-    babel.init_app(app)
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(package_dir, 'translations')
+    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+    
+    babel = Babel(app)
     
     def get_locale():
         """Select the language for the current request"""
-        from flask import request
+        from flask import request, session
         
         # Check URL parameter first
         lang = request.args.get('lang')
         if lang and lang in ['en', 'az', 'ru']:
-            print(f"DEBUG: Detected language from URL: {lang}")
+            print(f"DEBUG: Babel get_locale from URL: {lang}")
             return lang
         
         # Check if language is set in session
-        from flask import session
         lang = session.get('language')
         if lang and lang in ['en', 'az', 'ru']:
-            print(f"DEBUG: Using session language: {lang}")
+            print(f"DEBUG: Babel get_locale from session: {lang}")
             return lang
         
         # Default to English
-        print("DEBUG: Defaulting to English")
+        print("DEBUG: Babel get_locale defaulting to English")
         return 'en'
     
-    babel.locale_selector_func = get_locale
-    app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'az', 'ru']
-    app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(package_dir, 'translations')
+    # Set locale selector using the correct attribute
+    babel.init_app(app, locale_selector=get_locale)
     
     # Enable CORS with credentials support
     CORS(app, supports_credentials=True)
@@ -120,6 +120,37 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(main_bp)
+    
+    # Add context processor to inject current_locale into all templates
+    @app.context_processor
+    def inject_locale():
+        """Make current_locale available in all templates"""
+        locale = get_locale()
+        # Ensure it's always a string, not a Locale object
+        locale_str = str(locale) if locale else 'en'
+        print(f"DEBUG: inject_locale() returning: {locale_str} (original: {locale}, type: {type(locale)})")
+        return {'current_locale': locale_str}
+    
+    # Add template helper for content translation
+    @app.context_processor
+    def inject_translation_helpers():
+        """Make translation helpers available in all templates"""
+        from yonca.content_translator import get_translated_content, get_translated_json_array
+        
+        def translate_field(content_type, content_id, field_name, original_text):
+            """Get translated content based on current locale"""
+            locale = get_locale()
+            return get_translated_content(content_type, content_id, field_name, original_text, locale)
+        
+        def translate_json(content_type, content_id, field_name, json_array):
+            """Get translated JSON array based on current locale"""
+            locale = get_locale()
+            return get_translated_json_array(content_type, content_id, field_name, json_array, locale)
+        
+        return {
+            'translate_field': translate_field,
+            'translate_json': translate_json
+        }
     
     # Add custom Jinja2 filter for button syntax in course descriptions
     import re

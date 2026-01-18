@@ -92,7 +92,7 @@ def index():
         print(f"Database error in index route: {e}")
         home_content = HomeContent()
     
-    return render_template('index.html', current_locale=get_locale(), is_authenticated=current_user.is_authenticated, home_content=home_content)
+    return render_template('index.html', is_authenticated=current_user.is_authenticated, home_content=home_content)
 
 # Public course description/marketing page
 @main_bp.route('/courseDescription/<int:course_id>')
@@ -106,7 +106,7 @@ def course_description_page(course_id):
         abort(404)
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()
-    return render_template('course_description.html', course=course, home_content=home_content, reviews=reviews, current_locale=get_locale(), is_authenticated=current_user.is_authenticated, current_user=current_user)
+    return render_template('course_description.html', course=course, home_content=home_content, reviews=reviews, is_authenticated=current_user.is_authenticated, current_user=current_user)
 
 
 
@@ -674,7 +674,6 @@ def course_page_enrolled(course_id):
     return render_template('course_page_enrolled.html',
                           course=course,
                           home_content=home_content,
-                          current_locale=get_locale(),
                           contents=contents,
                           content_folders=content_folders,
                           assignments=assignments,
@@ -707,7 +706,7 @@ def courses():
     except Exception as e:
         print(f"Database error in courses route: {e}")
         home_content = HomeContent()
-    return render_template('index.html', current_locale=get_locale(), 
+    return render_template('index.html', 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='courses')
 
@@ -720,7 +719,7 @@ def forum():
     except Exception as e:
         print(f"Database error in forum route: {e}")
         home_content = HomeContent()
-    return render_template('index.html', current_locale=get_locale(), 
+    return render_template('index.html', 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='forum')
 
@@ -733,7 +732,7 @@ def resources():
     except Exception as e:
         print(f"Database error in resources route: {e}")
         home_content = HomeContent()
-    return render_template('index.html', current_locale=get_locale(), 
+    return render_template('index.html', 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='resources')
 
@@ -746,7 +745,7 @@ def tavi_test():
     except Exception as e:
         print(f"Database error in tavi-test route: {e}")
         home_content = HomeContent()
-    return render_template('index.html', current_locale=get_locale(), 
+    return render_template('index.html', 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='tavi-test')
 
@@ -759,7 +758,7 @@ def contacts():
     except Exception as e:
         print(f"Database error in contacts route: {e}")
         home_content = HomeContent()
-    return render_template('index.html', current_locale=get_locale(), 
+    return render_template('index.html', 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='contact')
 
@@ -772,14 +771,14 @@ def about():
     except Exception as e:
         print(f"Database error in about route: {e}")
         home_content = HomeContent()
-    return render_template('index.html', current_locale=get_locale(), 
+    return render_template('index.html', 
                          is_authenticated=current_user.is_authenticated, 
                          home_content=home_content, initial_page='about')
 
 @main_bp.route('/terms')
 def terms():
     """Serve terms of service page"""
-    return render_template('terms.html', current_locale=get_locale())
+    return render_template('terms.html')
 
 @main_bp.route('/course/<slug>/edit', methods=['GET', 'POST'])
 @login_required
@@ -1064,11 +1063,50 @@ def move_folder():
 @main_bp.route('/set_language/<lang>')
 def set_language(lang):
     """Set the language for the current session"""
-    from flask import session, redirect, request
+    from flask import session, redirect, request, make_response
+    
+    print(f"DEBUG: Attempting to set language to: {lang}")
+    print(f"DEBUG: Session before: {dict(session)}")
     
     if lang in ['en', 'az', 'ru']:
         session['language'] = lang
         session.modified = True
+        session.permanent = True
+        print(f"DEBUG: Language set to: {lang}")
+        print(f"DEBUG: Session after: {dict(session)}")
+    else:
+        print(f"DEBUG: Invalid language: {lang}")
     
     # Redirect back to the referring page or home
-    return redirect(request.referrer or url_for('main.index'))
+    redirect_url = request.referrer or url_for('main.index')
+    print(f"DEBUG: Redirecting to: {redirect_url}")
+    return redirect(redirect_url)
+
+
+@main_bp.route('/debug/locale')
+def debug_locale():
+    """Debug endpoint to check locale settings"""
+    from flask import session, jsonify
+    from flask_babel import get_locale as babel_get_locale
+    
+    try:
+        babel_locale = babel_get_locale()
+        babel_locale_str = str(babel_locale)
+        babel_locale_type = str(type(babel_locale))
+    except Exception as e:
+        babel_locale_str = f"Error: {e}"
+        babel_locale_type = "Error"
+    
+    session_lang = session.get('language')
+    our_locale = get_locale()
+    
+    result = {
+        'session_language': str(session_lang) if session_lang else None,
+        'session_language_type': str(type(session_lang)),
+        'babel_locale': babel_locale_str,
+        'babel_locale_type': babel_locale_type,
+        'our_get_locale': str(our_locale) if our_locale else None,
+        'our_get_locale_type': str(type(our_locale)),
+    }
+    return jsonify(result)
+

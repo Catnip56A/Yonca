@@ -313,6 +313,12 @@
             {% endif %}
         </div>
         <div style="margin-left: auto;">
+            <button type="button" class="btn btn-outline-success" id="translate-all" title="Translate All Content">
+                <i class="fa fa-language"></i> Translate Content
+            </button>
+            <button type="button" class="btn btn-outline-danger" id="delete-translations" title="Delete All Translations">
+                <i class="fa fa-trash"></i> Delete Translations
+            </button>
             <button type="button" class="btn btn-outline-info" id="show-shortcuts" title="Keyboard Shortcuts">
                 <i class="fa fa-keyboard-o"></i>
             </button>
@@ -1111,6 +1117,81 @@ function updatePreviewFeatures() {
         }
     });
 }
+
+// Translation button handler
+document.getElementById('translate-all').addEventListener('click', async function() {
+    const button = this;
+    const originalHtml = button.innerHTML;
+    
+    if (!confirm('This will translate all courses, resources, and home content to Azerbaijani and Russian. This may take a few minutes. Continue?')) {
+        return;
+    }
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Translating...';
+    
+    try {
+        const response = await fetch('/admin/translate/translate-content', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✓ Translation completed successfully!\n\n${result.message}\n\nRefresh the page to see translated content when changing languages.`);
+        } else {
+            alert(`✗ Translation failed: ${result.error}`);
+        }
+    } catch (error) {
+        alert(`✗ Error: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+    }
+});
+
+// Delete translations button handler
+document.getElementById('delete-translations').addEventListener('click', async function() {
+    const button = this;
+    const originalHtml = button.innerHTML;
+    
+    if (!confirm('⚠️ WARNING: This will permanently delete ALL translations for Azerbaijani and Russian languages!\n\nThis action cannot be undone. Are you sure you want to continue?')) {
+        return;
+    }
+    
+    // Double confirmation for destructive action
+    if (!confirm('🔴 FINAL WARNING: All translations will be lost and content will display in English only until re-translated.\n\nClick OK to proceed with deletion.')) {
+        return;
+    }
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Deleting...';
+    
+    try {
+        const response = await fetch('/admin/translate/delete-translations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`✓ Translations deleted successfully!\n\n${result.message}\n\nContent will now display in English. Use "Translate Content" to re-create translations.`);
+        } else {
+            alert(`✗ Deletion failed: ${result.error}`);
+        }
+    } catch (error) {
+        alert(`✗ Error: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+    }
+});
 
 
 </script>

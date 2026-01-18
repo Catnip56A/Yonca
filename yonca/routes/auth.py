@@ -185,7 +185,7 @@ def login():
         
         flash('Invalid username or password')
     
-    return render_template('login.html', current_locale=get_locale())
+    return render_template('login.html')
 
 @auth_bp.route('/logout')
 @login_required

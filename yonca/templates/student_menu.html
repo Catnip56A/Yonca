@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ course.title }} - Student Menu{% endblock %}
+{% block title %}{{ translate_field('course', course.id, 'title', course.title) }} - Student Menu{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -116,7 +116,7 @@
     <a href="/" class="back-button">← Back to Home</a>
 
     <div class="course-header">
-        <div class="course-title">{{ course.title }}</div>
+        <div class="course-title">{{ translate_field('course', course.id, 'title', course.title) }}</div>
         <div class="course-description">{{ course.description or 'Welcome to this course!' }}</div>
         {% if course.time_slot %}
         <div style="font-size: 1rem; opacity: 0.8;">🕐 {{ course.time_slot }}</div>

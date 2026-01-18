@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="{{ current_locale.language }}">
+﻿<!DOCTYPE html>
+<html lang="{{ current_locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{{ _('Yonca - Learning Platform') }}</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%270.9em%27 font-size=%2790%27%3E%F0%9F%8D%80%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=OpenDyslexic:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
         body {
             font-family: 'OpenDyslexic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.8;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
             color: #212121;
             background-color: #212121;
         }
@@ -1217,6 +1217,11 @@
                         <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
+                        {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+                        {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+                        <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="nav-link" id="lang-toggle-btn" title="Switch to {{ lang_names.get(lang_cycle.get(current_locale, 'az'), 'English') }}">
+                            🌐 {{ lang_names.get(current_locale, 'English') }}
+                        </a>
                     </nav>
                 </div>
 
@@ -1264,6 +1269,11 @@
             <a href="javascript:void(0)" class="nav-link" id="mobile-tavi-link">{{ _('TAVI Test') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-contacts-link">{{ _('Contacts') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-about-link">{{ _('About Company') }}</a>
+            {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+            {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+            <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="nav-link" title="Switch to {{ lang_names.get(lang_cycle.get(current_locale, 'az'), 'English') }}">
+                🌐 {{ lang_names.get(current_locale, 'English') }}
+            </a>
             <div id="mobile-auth-buttons" style="margin-top: 2rem; text-align: center;">
                 <button id="mobile-login-btn" onclick="window.location.href='/login'" style="width: 100%; margin-bottom: 0.5rem;">{{ _('Login') }}</button>
             </div>
@@ -1281,9 +1291,9 @@
         <section id="home" class="page active">
             {% if is_authenticated %}
             <div class="hero">
-                <h1>{{ home_content.welcome_title or _('Welcome to Yonca') }}</h1>
-                <p>{{ home_content.subtitle or _('Your gateway to knowledge and community learning.') }}</p>
-                <p>{{ home_content.get_started_text or _('Get Started') }}</p>
+                <h1>{{ translate_field('home_content', home_content.id, 'welcome_title', home_content.welcome_title or _('Welcome to Yonca')) }}</h1>
+                <p>{{ translate_field('home_content', home_content.id, 'subtitle', home_content.subtitle or _('Your gateway to knowledge and community learning.')) }}</p>
+                <p>{{ translate_field('home_content', home_content.id, 'get_started_text', home_content.get_started_text or _('Get Started')) }}</p>
                 {% if current_user.is_authenticated and not current_user.google_access_token %}
                 <div style="margin-top: 1.5rem;">
                     <a href="{{ url_for('auth.link_google_account') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #34a853; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s ease;">
@@ -1295,7 +1305,7 @@
 
             <div class="features">
                 {% if home_content.features %}
-                {% for feature in home_content.features %}
+                {% for feature in translate_json('home_content', home_content.id, 'features', home_content.features) %}
                 <div class="feature-card">
                     <h3>{{ feature.title }}</h3>
                     <p>{{ feature.description }}</p>
@@ -1305,14 +1315,14 @@
             </div>
             {% else %}
             <div class="hero">
-                <h1>{{ home_content.logged_out_welcome_title or _('Welcome to Yonca') }}</h1>
-                <p>{{ home_content.logged_out_subtitle or _('Join our learning community today!') }}</p>
-                <p>{{ home_content.logged_out_get_started_text or _('Sign Up Now') }}</p>
+                <h1>{{ translate_field('home_content', home_content.id, 'logged_out_welcome_title', home_content.logged_out_welcome_title or _('Welcome to Yonca')) }}</h1>
+                <p>{{ translate_field('home_content', home_content.id, 'logged_out_subtitle', home_content.logged_out_subtitle or _('Join our learning community today!')) }}</p>
+                <p>{{ translate_field('home_content', home_content.id, 'logged_out_get_started_text', home_content.logged_out_get_started_text or _('Sign Up Now')) }}</p>
             </div>
 
             <div class="features">
                 {% if home_content.logged_out_features %}
-                {% for feature in home_content.logged_out_features %}
+                {% for feature in translate_json('home_content', home_content.id, 'logged_out_features', home_content.logged_out_features) %}
                 <div class="feature-card">
                     <h3>{{ feature.title }}</h3>
                     <p>{{ feature.description }}</p>
@@ -1329,7 +1339,7 @@
 
                 <div class="gallery-grid">
                     {% if home_content.gallery_images %}
-                    {% for image in home_content.gallery_images %}
+                    {% for image in translate_json('home_content', home_content.id, 'gallery_images', home_content.gallery_images) %}
                     <div class="gallery-item">
                         {% if image.url %}
                         {% if 'youtube.com' in image.url or 'youtu.be' in image.url %}
@@ -1458,7 +1468,7 @@
                     <form onsubmit="postMessage(event)">
                         <div class="form-group" id="username-group" style="display: none;">
                             <label for="username">{{ _('Username:') }}</label>
-                            <input type="text" id="username" name="username">
+                            <input type="text" id="username" name="username" autocomplete="username">
                         </div>
                         <div class="form-group">
                             <label for="message">{{ _('Message:') }}</label>
@@ -1568,17 +1578,17 @@
 
         <!-- About Company Page -->
         <section id="about" class="page">
-            <h2 class="section-title">{{ home_content.about_welcome_title or _('Welcome to Yonca') }}</h2>
-            <p>{{ home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.') }}</p>
+            <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
+            <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
 
             <!-- Features Section -->
             <div class="features-section">
-                <h2 class="section-title" style="color: #337a2c;">{{ home_content.about_features_title or _('Our Features') }}</h2>
-                <p>{{ home_content.about_features_subtitle or _('Discover what makes our platform special.') }}</p>
+                <h2 class="section-title" style="color: #337a2c;">{{ translate_field('home_content', home_content.id, 'about_features_title', home_content.about_features_title or _('Our Features')) }}</h2>
+                <p>{{ translate_field('home_content', home_content.id, 'about_features_subtitle', home_content.about_features_subtitle or _('Discover what makes our platform special.')) }}</p>
 
                 <div class="features">
                 {% if home_content.about_features %}
-                {% for feature in home_content.about_features %}
+                {% for feature in translate_json('home_content', home_content.id, 'about_features', home_content.about_features) %}
                 <div class="feature-card">
                     <h3>{{ feature.title }}</h3>
                     <p>{{ feature.description }}</p>
@@ -1603,12 +1613,12 @@
 
             <!-- Gallery Section -->
             <div class="gallery-section">
-                <h2 class="section-title" style="color: #337a2c;">{{ home_content.about_gallery_title or _('What\'s New') }}</h2>
-                <p>{{ home_content.about_gallery_subtitle or _('Discover the latest updates, new features, and exciting developments in our learning platform.') }}</p>
+                <h2 class="section-title" style="color: #337a2c;">{{ translate_field('home_content', home_content.id, 'about_gallery_title', home_content.about_gallery_title or _('What\'s New')) }}</h2>
+                <p>{{ translate_field('home_content', home_content.id, 'about_gallery_subtitle', home_content.about_gallery_subtitle or _('Discover the latest updates, new features, and exciting developments in our learning platform.')) }}</p>
 
                 <div class="gallery-grid">
                     {% if home_content.about_gallery_images %}
-                    {% for image in home_content.about_gallery_images %}
+                    {% for image in translate_json('home_content', home_content.id, 'about_gallery_images', home_content.about_gallery_images) %}
                     <div class="gallery-item">
                         {% if image.url %}
                         {% if 'youtube.com' in image.url or 'youtu.be' in image.url %}
@@ -1703,10 +1713,28 @@
         function showPage(pageId, event) {
             console.log('showPage called with pageId:', pageId, 'event:', event);
             
+            // Ensure pageId is valid
+            if (!pageId || pageId.trim() === '') {
+                console.warn('Empty pageId provided, defaulting to home');
+                pageId = 'home';
+            }
+            
             // Prevent default if event is provided
             if (event && typeof event.preventDefault === 'function') {
                 event.preventDefault();
                 console.log('Prevented default event');
+            }
+
+            // Show selected page first to check if it exists
+            const pageElement = document.getElementById(pageId);
+            
+            if (!pageElement) {
+                console.error('Page element not found:', pageId, '- defaulting to home');
+                // If page not found, try to show home page instead
+                if (pageId !== 'home') {
+                    showPage('home');
+                }
+                return;
             }
 
             console.log('Hiding all pages...');
@@ -1727,17 +1755,11 @@
                 console.log('Removed active from link:', link.id);
             });
 
-            // Show selected page
-            const pageElement = document.getElementById(pageId);
-            const linkElement = document.getElementById(pageId + '-link');
+            // Activate the page element
+            pageElement.classList.add('active');
+            console.log('Activated page:', pageId);
             
-            if (pageElement) {
-                pageElement.classList.add('active');
-                console.log('Activated page:', pageId);
-            } else {
-                console.error('Page element not found:', pageId);
-                return;
-            }
+            const linkElement = document.getElementById(pageId + '-link');
             
             if (linkElement) {
                 linkElement.classList.add('active');
@@ -1778,14 +1800,27 @@
         }
 
         // Load courses
+        // Add abort controller for fetch requests to prevent message channel errors
+        let currentAbortController = null;
+
         async function loadCourses() {
+            // Cancel any previous request
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            
             // Define translated strings to avoid Jinja2 conflicts in JavaScript
             const enrolledAllCoursesText = "{{ _('You\'re enrolled in all available courses!') }}";
             const errorLoadingCoursesText = "{{ _('Error loading courses. Please try again.') }}";
             const availableCoursesText = "{{ _('Available Courses') }}";
             
             try {
-                const response = await fetch(`${API_BASE}/api/courses`, { cache: 'no-store', credentials: 'include' });
+                const response = await fetch(`${API_BASE}/api/courses`, { 
+                    cache: 'no-store', 
+                    credentials: 'include',
+                    signal: currentAbortController.signal
+                });
                 const courses = await response.json();
 
                 // Clear both grids
@@ -1846,8 +1881,14 @@
                 }
 
             } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Courses loading was cancelled');
+                    return;
+                }
                 console.error('Error loading courses:', error);
                 document.querySelector('.available-courses-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">' + errorLoadingCoursesText + '</p>';
+            } finally {
+                currentAbortController = null;
             }
         }
 
@@ -2048,6 +2089,13 @@
                 });
             }
         });
+        // Cancel any ongoing requests when page unloads
+        window.addEventListener('beforeunload', () => {
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+        });
+
         // Ensure we re-check auth and reload courses when the page is shown (covers reload and bfcache restores)
         window.addEventListener('pageshow', (event) => {
             // If the page was persisted in bfcache or it's a manual reload, re-fetch user and courses
@@ -2065,8 +2113,16 @@
 
         // Load resources
         async function loadResources() {
+            // Cancel any previous request
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            
             try {
-                const response = await fetch(`${API_BASE}/api/resources`);
+                const response = await fetch(`${API_BASE}/api/resources`, {
+                    signal: currentAbortController.signal
+                });
                 const resources = await response.json();
                 const resourcesGrid = document.querySelector('.resources-grid');
                 resourcesGrid.innerHTML = '';
@@ -2162,8 +2218,14 @@
                     resourcesGrid.appendChild(resourceCard);
                 });
             } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Resources loading was cancelled');
+                    return;
+                }
                 console.error('Error loading resources:', error);
                 document.querySelector('.resources-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading materials. Please try again.") }}</p>';
+            } finally {
+                currentAbortController = null;
             }
         }
 
@@ -2386,8 +2448,16 @@
         // Forum translation variables only
 
         async function loadForumChannels() {
+            // Cancel any previous request
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            
             try {
-                const response = await fetch(`${API_BASE}/api/forum/channels`);
+                const response = await fetch(`${API_BASE}/api/forum/channels`, {
+                    signal: currentAbortController.signal
+                });
                 const channels = await response.json();
                 availableChannels = channels;
                 
@@ -2434,9 +2504,15 @@
                     loadForumMessages(currentChannel);
                 }
             } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Forum channels loading was cancelled');
+                    return;
+                }
                 console.error('Error loading forum channels:', error);
                 // Fallback to default behavior
                 loadForumMessages(currentChannel);
+            } finally {
+                currentAbortController = null;
             }
         }
 
@@ -2472,8 +2548,16 @@
         }
 
         async function loadForumMessages(channel = 'general') {
+            // Cancel any previous request
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            
             try {
-                const response = await fetch(`${API_BASE}/api/forum/messages?channel=${channel}`);
+                const response = await fetch(`${API_BASE}/api/forum/messages?channel=${channel}`, {
+                    signal: currentAbortController.signal
+                });
                 
                 if (response.status === 403) {
                     // Access denied - try general channel first, then show empty
@@ -2561,7 +2645,13 @@
 
                 // No auto-translation applied
             } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Forum messages loading was cancelled');
+                    return;
+                }
                 console.error('Error loading forum messages:', error);
+            } finally {
+                currentAbortController = null;
             }
         }
 
@@ -2633,6 +2723,38 @@
             } finally {
                 postBtn.textContent = originalText;
                 postBtn.disabled = false;
+            }
+        }
+
+        async function switchLanguage(targetLang) {
+            try {
+                console.log('Switching language to:', targetLang);
+                
+                // Cancel any ongoing requests before language switch
+                if (currentAbortController) {
+                    currentAbortController.abort();
+                }
+                
+                const response = await fetch(`/set_language/${targetLang}`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                
+                if (response.redirected) {
+                    // If the server redirects, reload the page
+                    window.location.reload();
+                } else {
+                    // If successful, reload the page to apply new language
+                    window.location.reload();
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Language switch was cancelled');
+                    return;
+                }
+                console.error('Error switching language:', error);
+                // Fallback to direct navigation
+                window.location.href = `/set_language/${targetLang}`;
             }
         }
 
@@ -3155,7 +3277,8 @@
             }
             
             // Check if initial page is set from server
-            const initialPage = '{{ initial_page|default("home") }}';
+            const initialPage = '{{ initial_page|default("home") }}' || 'home';
+            console.log('Initial page from server:', initialPage);
             
             // Check URL hash and show appropriate page
             const hash = window.location.hash.substring(1); // Remove the '#'
@@ -3163,22 +3286,42 @@
                 // Valid page hashes - must match section IDs in HTML
                 const validPages = ['courses', 'forum', 'resources', 'tavi', 'contacts', 'about'];
                 if (validPages.includes(hash)) {
+                    console.log('Loading page from URL hash:', hash);
                     showPage(hash);
                 } else {
+                    console.log('Invalid hash, loading initial page:', initialPage);
                     showPage(initialPage);
                 }
             } else {
                 // Show initial page from server or default to home
-                showPage(initialPage);
+                console.log('No hash, loading initial page:', initialPage);
+                showPage(initialPage || 'home');
             }
 
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status
 
-            // Add navigation event listeners (include dropdown items but exclude dropdown toggles)
+            // Add navigation event listeners (include dropdown items but exclude dropdown toggles and language button)
+            console.log('Initializing nav links - language button should be excluded');
             const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle):not(.mobile-dropdown-toggle), .dropdown-item');
+            console.log('Nav links found:', navLinks.length);
             navLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
+                    console.log('Click captured - link.id:', link.id, 'link.href:', link.href);
+                    console.log('Checking conditions: id===lang-toggle-btn?', link.id === 'lang-toggle-btn', 'href.includes(/set_language/)?', link.href?.includes('/set_language/'));
+                    // Handle language button with AJAX to avoid page reload
+                    if (link.id === 'lang-toggle-btn' || link.href?.includes('/set_language/')) {
+                        console.log('Language button clicked - using AJAX');
+                        event.preventDefault();
+                        const url = link.href || link.getAttribute('href');
+                        const langMatch = url.match(/\/set_language\/(\w+)/);
+                        if (langMatch) {
+                            const targetLang = langMatch[1];
+                            switchLanguage(targetLang);
+                        }
+                        return;
+                    }
+                    console.log('Nav link clicked:', link.id, link.href);
                     event.preventDefault();
                     const pageId = link.id.replace('-link', '');
                     showPage(pageId, event);
@@ -3236,10 +3379,15 @@
                 });
             }
 
-            // Mobile navigation links (including dropdown items)
+            // Mobile navigation links (including dropdown items, excluding language button)
             const mobileNavLinks = document.querySelectorAll('#mobile-nav-menu .nav-link:not(.mobile-dropdown-toggle)');
             mobileNavLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
+                    // Skip language button - let it navigate normally
+                    if (link.href?.includes('/set_language/')) {
+                        console.log('Mobile language button clicked - allowing navigation');
+                        return; // Don't preventDefault
+                    }
                     event.preventDefault();
                     closeMobileMenu();
                     const pageId = link.id.replace('mobile-', '').replace('-link', '');

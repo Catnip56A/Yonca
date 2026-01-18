@@ -4,7 +4,7 @@
             {% if home_content.site_logo_url %}
                 <img src="{{ home_content.site_logo_url }}" alt="{{ home_content.site_name or 'Yonca' }}" height="40">
             {% else %}
-                {{ home_content.site_name or 'Yonca' }}
+                <span translate="no">{{ home_content.site_name or 'Yonca' }}</span>
             {% endif %}
         </a>
 
@@ -15,31 +15,31 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">{{ _('Home') }}</a>
+                    <a class="nav-link" href="/" data-nav="home">{{ _('Home') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/#courses">{{ _('Courses') }}</a>
+                    <a class="nav-link" href="/#courses" data-nav="courses">{{ _('Courses') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/#forum">{{ _('Forum') }}</a>
+                    <a class="nav-link" href="/#forum" data-nav="forum">{{ _('Forum') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/#resources">{{ _('Resources') }}</a>
+                    <a class="nav-link" href="/#resources" data-nav="resources">{{ _('Resources') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/#tavi-test">{{ _('TAVI Test') }}</a>
+                    <a class="nav-link" href="/#tavi-test" data-nav="tavi-test">{{ _('TAVI Test') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/#contact">{{ _('Contacts') }}</a>
+                    <a class="nav-link" href="/#contact" data-nav="contact">{{ _('Contacts') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/#about">{{ _('About') }}</a>
+                    <a class="nav-link" href="/#about" data-nav="about">{{ _('About') }}</a>
                 </li>
 
                 <li class="nav-item">
                     {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
                     {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
-                    <a class="nav-link" href="/set_language/{{ lang_cycle[current_locale] }}">{{ lang_names[current_locale] }}</a>
+                    <a class="nav-link" href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" onclick="sessionStorage.setItem('scrollPosition', window.scrollY);">🌐 {{ lang_names.get(current_locale, 'English') }}</a>
                 </li>
 
                 {% if is_authenticated %}

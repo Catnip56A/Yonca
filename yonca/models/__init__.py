@@ -319,6 +319,26 @@ class Translation(db.Model):
     def __repr__(self):
         return f'<Translation {self.source_language}->{self.target_language}: {self.source_text[:50]}>'
 
+class ContentTranslation(db.Model):
+    """Content translation model for dynamic content (courses, resources, gallery, etc.)"""
+    id = db.Column(db.Integer, primary_key=True)
+    content_type = db.Column(db.String(50), nullable=False)  # 'course', 'resource', 'home_content', 'gallery_item'
+    content_id = db.Column(db.Integer, nullable=False)  # ID of the content item
+    field_name = db.Column(db.String(100), nullable=False)  # Field being translated (e.g., 'title', 'description')
+    source_language = db.Column(db.String(10), default='en')  # Source language
+    target_language = db.Column(db.String(10), nullable=False)  # Target language ('az', 'ru')
+    translated_text = db.Column(db.Text, nullable=False)  # Translated content
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    
+    # Index for fast lookups
+    __table_args__ = (
+        db.Index('idx_content_translation_lookup', 'content_type', 'content_id', 'field_name', 'target_language'),
+    )
+
+    def __repr__(self):
+        return f'<ContentTranslation {self.content_type}:{self.content_id}.{self.field_name} -> {self.target_language}>'
+
 class CourseContent(db.Model):
     """Course content modules/sections"""
     id = db.Column(db.Integer, primary_key=True)

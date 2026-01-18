@@ -31,6 +31,12 @@ api_bp.unauthorized = api_unauthorized
 @api_bp.route('/courses')
 def get_courses():
     """Get all courses with enrollment status for authenticated users"""
+    from flask import session
+    from yonca.content_translator import get_translated_content
+    
+    # Get user's current locale
+    user_locale = session.get('language', 'en')
+    
     if current_user.is_authenticated:
         # Get all courses
         all_courses = Course.query.all()
@@ -39,8 +45,8 @@ def get_courses():
 
         return jsonify([{
             'id': c.id,
-            'title': c.title,
-            'description': c.description,
+            'title': get_translated_content('course', c.id, 'title', c.title, user_locale),
+            'description': get_translated_content('course', c.id, 'description', c.description, user_locale),
             'time_slot': c.time_slot,
             'profile_emoji': c.profile_emoji,
             'dropdown_menu': c.dropdown_menu,
@@ -52,8 +58,8 @@ def get_courses():
 
         return jsonify([{
             'id': c.id,
-            'title': c.title,
-            'description': c.description,
+            'title': get_translated_content('course', c.id, 'title', c.title, user_locale),
+            'description': get_translated_content('course', c.id, 'description', c.description, user_locale),
             'time_slot': c.time_slot,
             'profile_emoji': c.profile_emoji,
             'dropdown_menu': c.dropdown_menu
@@ -62,6 +68,12 @@ def get_courses():
 @api_bp.route('/user')
 def get_current_user():
     """Get current user information"""
+    from flask import session
+    from yonca.content_translator import get_translated_content
+    
+    # Get user's current locale
+    user_locale = session.get('language', 'en')
+    
     if current_user.is_authenticated:
         return jsonify({
             'id': current_user.id,
@@ -69,8 +81,8 @@ def get_current_user():
             'is_admin': current_user.is_admin,
             'courses': [{
                 'id': c.id,
-                'title': c.title,
-                'description': c.description,
+                'title': get_translated_content('course', c.id, 'title', c.title, user_locale),
+                'description': get_translated_content('course', c.id, 'description', c.description, user_locale),
                 'time_slot': c.time_slot,
                 'profile_emoji': c.profile_emoji,
                 'dropdown_menu': c.dropdown_menu
@@ -414,6 +426,11 @@ def get_resources():
     """Get all learning resources"""
     from flask_login import current_user
     from datetime import datetime
+    from flask import session
+    from yonca.content_translator import get_translated_content
+
+    # Get user's current locale from session
+    user_locale = session.get('language', 'en')
 
     resources = Resource.query.filter_by(is_active=True).all()
     result = []
@@ -424,10 +441,14 @@ def get_resources():
             r.reset_pin()
             db.session.commit()
 
+        # Get translated title and description
+        translated_title = get_translated_content('resource', r.id, 'title', r.title, user_locale)
+        translated_description = get_translated_content('resource', r.id, 'description', r.description, user_locale)
+
         resource_data = {
             'id': r.id,
-            'title': r.title,
-            'description': r.description,
+            'title': translated_title,
+            'description': translated_description,
             'preview_image': r.preview_image,
             'preview_drive_file_id': r.preview_drive_file_id,
             'preview_drive_view_link': r.preview_drive_view_link,

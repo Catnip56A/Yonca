@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ course.title }} - {{ home_content.site_name }}{% endblock %}
+{% block title %}{{ translate_field('course', course.id, 'title', course.title) }} - {{ home_content.site_name }}{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -30,14 +30,24 @@
 {% if course.page_show_navigation %}
 {% include 'components/navbar.html' %}
 {% endif %}
+{% if not course.page_show_navigation %}
+<div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+    {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+    {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+    <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="btn btn-sm btn-outline-primary">
+        🌐 {{ lang_names.get(current_locale, 'English') }}
+    </a>
+</div>
+{% endif %}
 <section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
-    <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ course.page_welcome_title or course.title }}</h1>
+    <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ translate_field('course', course.id, 'page_welcome_title', course.page_welcome_title or course.title) }}</h1>
     {% if course.page_subtitle %}
-    <h2 style="font-size:1.3rem; color:#374151; margin-top:0.5rem;">{{ course.page_subtitle }}</h2>
+    <h2 style="font-size:1.3rem; color:#374151; margin-top:0.5rem;">{{ translate_field('course', course.id, 'page_subtitle', course.page_subtitle) }}</h2>
     {% endif %}
 {% if course.page_description %}
     <div style="margin-top:1.2rem; font-size:1.1rem; color:#444; font-family: 'Georgia', serif; line-height:1.6;">
-        {% set normalized_desc = course.page_description.replace('\r\n', '\n') %}
+        {% set translated_desc = translate_field('course', course.id, 'page_description', course.page_description) %}
+        {% set normalized_desc = translated_desc.replace('\r\n', '\n') %}
         {% for paragraph in normalized_desc.split('\n\n') %}
         <p style="margin-bottom:1rem;">{{ paragraph | parse_buttons | safe }}</p>
         {% endfor %}
@@ -45,7 +55,7 @@
     {% endif %}
     {% if course.page_features %}
     <div class="row" style="margin-top:2rem;">
-        {% for feature in course.page_features %}
+        {% for feature in translate_json('course', course.id, 'page_features', course.page_features) %}
         <div class="col-md-4" style="margin-bottom:1.5rem;">
             <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%;">
                 {% if feature.image %}
@@ -77,30 +87,30 @@
     
     <!-- Course Features Section -->
     <div style="margin-top:3rem; border-top: 2px solid #e5e7eb; padding-top: 2rem;">
-        <h3 style="font-size:1.8rem; font-weight:600; color:#374151; margin-bottom:1.5rem;">Course Features</h3>
+        <h3 style="font-size:1.8rem; font-weight:600; color:#374151; margin-bottom:1.5rem;">{{ _('Course Features') }}</h3>
         <div class="row">
             <div class="col-md-4" style="margin-bottom:1.5rem;">
                 <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%; text-align:center;">
                     <i class="fa fa-comments" style="font-size:2rem; color:#337a2c; margin-bottom:1rem;"></i>
-                    <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">Forum</h4>
-                    <p style="color:#555;">Connect with fellow learners and get help from instructors.</p>
-                    <a href="/course/{{course.id}}" class="btn btn-outline-success btn-sm">Access Forum</a>
+                    <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">{{ _('Forum') }}</h4>
+                    <p style="color:#555;">{{ _('Connect with fellow learners and get help from instructors.') }}</p>
+                    <a href="/course/{{course.id}}" class="btn btn-outline-success btn-sm">{{ _('Access Forum') }}</a>
                 </div>
             </div>
             <div class="col-md-4" style="margin-bottom:1.5rem;">
                 <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%; text-align:center;">
                     <i class="fa fa-folder" style="font-size:2rem; color:#337a2c; margin-bottom:1rem;"></i>
-                    <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">Resources</h4>
-                    <p style="color:#555;">Access course materials, documents, and additional resources.</p>
-                    <a href="/course/{{course.id}}" class="btn btn-outline-success btn-sm">Access Resources</a>
+                    <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">{{ _('Resources') }}</h4>
+                    <p style="color:#555;">{{ _('Access course materials, documents, and additional resources.') }}</p>
+                    <a href="/course/{{course.id}}" class="btn btn-outline-success btn-sm">{{ _('Access Resources') }}</a>
                 </div>
             </div>
             <div class="col-md-4" style="margin-bottom:1.5rem;">
                 <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%; text-align:center;">
                     <i class="fa fa-star" style="font-size:2rem; color:#337a2c; margin-bottom:1rem;"></i>
-                    <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">Reviews</h4>
-                    <p style="color:#555;">Read reviews from other students and share your experience.</p>
-                    <a href="#reviews" class="btn btn-outline-success btn-sm">View Reviews</a>
+                    <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">{{ _('Reviews') }}</h4>
+                    <p style="color:#555;">{{ _('Read reviews from other students and share your experience.') }}</p>
+                    <a href="#reviews" class="btn btn-outline-success btn-sm">{{ _('View Reviews') }}</a>
                 </div>
             </div>
         </div>
@@ -110,8 +120,8 @@
     {% if reviews and reviews|length > 0 %}
     <div id="reviews" style="margin-top:3rem; border-top: 2px solid #e5e7eb; padding-top: 2rem;">
         <h3 style="font-size:1.8rem; font-weight:600; color:#374151; margin-bottom:1.5rem;">
-            <i class="fa fa-star" style="color:#ffc107;"></i> Student Reviews
-            <span style="font-size:1rem; color:#6c757d; font-weight:400;">({{ reviews|length }} review{{ 's' if reviews|length != 1 else '' }})</span>
+            <i class="fa fa-star" style="color:#ffc107;"></i> {{ _('Student Reviews') }}
+            <span style="font-size:1rem; color:#6c757d; font-weight:400;">({{ reviews|length }} {{ _('review') if reviews|length == 1 else _('reviews') }})</span>
         </h3>
         
         {% if reviews|length > 0 %}
@@ -128,7 +138,7 @@
                     <span class="star {% if i <= avg_rating|round %}filled{% endif %}">★</span>
                 {% endfor %}
             </div>
-            <small style="color:#856404;">Average Rating</small>
+            <small style="color:#856404;">{{ _('Average Rating') }}</small>
         </div>
         {% endif %}
         
@@ -145,7 +155,7 @@
                         </div>
                         <h5 style="margin:0; color:#374151; font-weight:600;">{{ review.title }}</h5>
                         <div class="review-meta">
-                            By {{ review.user.display_name or review.user.email.split('@')[0] }} • 
+                            {{ _('By') }} {{ review.user.display_name or review.user.email.split('@')[0] }} • 
                             {{ review.created_at.strftime('%b %d, %Y') }}
                         </div>
                     </div>
@@ -159,9 +169,9 @@
     
     <div style="margin-top:2rem;">
         {% if not current_user.is_authenticated %}
-            <a href="/login" class="btn btn-success">Login to Enroll</a>
+            <a href="/login" class="btn btn-success">{{ _('Login to Enroll') }}</a>
         {% else %}
-            <span class="badge badge-info">You are not enrolled in this course.</span>
+            <span class="badge badge-info">{{ _('You are not enrolled in this course.') }}</span>
         {% endif %}
     </div>
 </section>

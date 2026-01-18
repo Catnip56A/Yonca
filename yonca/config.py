@@ -12,7 +12,14 @@ class Config:
         raise ValueError("DATABASE_URL environment variable is not set")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'filesystem'
+    SESSION_FILE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'flask_session')
+    SESSION_COOKIE_NAME = 'yonca_session'
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_HTTPONLY = False  # Allow JavaScript to see cookie for debugging
+    SESSION_COOKIE_DOMAIN = None  # Works with localhost
+    SESSION_COOKIE_PATH = '/'
+    PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
     
     # Load Google OAuth credentials from JSON file
     google_creds_path = os.path.join(os.path.dirname(__file__), '..', 'client_secret_860511395930-3eojlbffavnl47upo580avedqa49lq3f.apps.googleusercontent.com.json')

@@ -1,8 +1,9 @@
 """
-AI Translation service for real-time content translation
+AI Translation service for real-time content translation with protected terms
 """
 import hashlib
 import os
+import re
 import requests
 from yonca.models import Translation, db
 from flask import current_app
@@ -12,16 +13,53 @@ try:
     DEEP_TRANS_AVAILABLE = True
 except ImportError:
     DEEP_TRANS_AVAILABLE = False
-    print("Warning: deep-translator not available, using mock translations")
+    print("Warning: deep-translator not available, using LibreTranslate only")
+
+# Protected terms that should never be translated
+PROTECTED_TERMS = [
+    'Yonca',
+    'YONCA',
+    'yonca'
+]
 
 class TranslationService:
-    """Service for handling AI-powered translations with caching"""
+    """Service for handling AI-powered translations with caching and protected terms"""
 
     def __init__(self):
         if DEEP_TRANS_AVAILABLE:
             print("Deep Translator available")
         else:
-            print("Using mock translations")
+            print("Using LibreTranslate only")
+        self.protected_terms = PROTECTED_TERMS
+    
+    def _protect_terms(self, text):
+        """
+        Replace protected terms with placeholders before translation.
+        Returns tuple of (protected_text, replacements_dict)
+        """
+        replacements = {}
+        protected_text = text
+        
+        for i, term in enumerate(self.protected_terms):
+            placeholder = f"__PROTECTED_{i}__"
+            # Case-insensitive replacement that preserves original case
+            pattern = re.compile(re.escape(term), re.IGNORECASE)
+            matches = pattern.finditer(protected_text)
+            
+            for match in matches:
+                original_term = match.group()
+                if placeholder not in replacements:
+                    replacements[placeholder] = original_term
+                    protected_text = protected_text.replace(original_term, placeholder, 1)
+        
+        return protected_text, replacements
+    
+    def _restore_terms(self, text, replacements):
+        """Restore protected terms from placeholders after translation."""
+        restored_text = text
+        for placeholder, original_term in replacements.items():
+            restored_text = restored_text.replace(placeholder, original_term)
+        return restored_text
 
     def _translate_with_libretranslate(self, text, source_language, target_language):
         """
@@ -136,15 +174,16 @@ class TranslationService:
     def get_translation(self, text, target_language, source_language=None):
         """
         Get translation for text, using cache if available.
+        Protects specified terms from translation.
         Always detects source language automatically.
 
         Args:
             text (str): Text to translate
-            target_language (str): Target language code (e.g., 'es', 'fr', 'de')
+            target_language (str): Target language code (e.g., 'az', 'ru')
             source_language (str): Ignored - always uses 'auto' for detection
 
         Returns:
-            str: Translated text
+            str: Translated text with protected terms preserved
         """
         # Always use 'auto' for source language detection
         source_language = 'auto'
@@ -163,20 +202,26 @@ class TranslationService:
             return cached.translated_text
 
         try:
-            # Try Deep Translator first if available
+            # Protect terms before translation
+            protected_text, replacements = self._protect_terms(text)
+            
+            # Use GoogleTranslator if available, otherwise fall back to LibreTranslate
             if DEEP_TRANS_AVAILABLE:
                 try:
-                    translated_text = GoogleTranslator(source='auto', target=target_language).translate(text)
+                    translated_text = GoogleTranslator(source='auto', target=target_language).translate(protected_text)
                     service_used = 'deep_translator'
                 except Exception as e:
                     current_app.logger.warning(f"Deep Translator failed: {str(e)}, trying LibreTranslate")
                     # Fallback to LibreTranslate
-                    translated_text = self._translate_with_libretranslate(text, source_language, target_language)
+                    translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
                     service_used = 'libretranslate'
             else:
                 # Use LibreTranslate if Deep Translator not available
-                translated_text = self._translate_with_libretranslate(text, source_language, target_language)
+                translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
                 service_used = 'libretranslate'
+            
+            # Restore protected terms
+            translated_text = self._restore_terms(translated_text, replacements)
 
             # Cache the result
             new_translation = Translation(

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ course.title }} - Course Management</title>
+    <title>{{ translate_field('course', course.id, 'title', course.title) }} - Course Management</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
@@ -118,11 +118,11 @@
     <!-- Navigation Bar -->
     <div class="navbar-custom">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4><i class="fas fa-graduation-cap"></i> {{ course.title }}</h4>
+            <h4><i class="fas fa-graduation-cap"></i> {{ translate_field('course', course.id, 'title', course.title) }}</h4>
             <div>
                 {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
                 {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
-                <a class="btn btn-sm btn-outline-light mr-2" href="/set_language/{{ lang_cycle[current_locale] }}">{{ lang_names[current_locale] }}</a>
+                <a class="btn btn-sm btn-outline-light mr-2" href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}">🌐 {{ lang_names.get(current_locale, 'English') }}</a>
                 {% if current_user.is_authenticated and current_user.is_admin %}
                 <a href="/admin/course_management/" class="btn btn-sm btn-outline-light">
                     <i class="fa fa-arrow-left"></i> Back
@@ -349,12 +349,12 @@
                                                         <input type="hidden" name="action" value="grade_submission">
                                                         <input type="hidden" name="submission_id" value="{{ sub.id }}">
                                                         <div class="form-group">
-                                                            <label>Grade:</label>
-                                                            <input type="number" name="grade" class="form-control" value="{{ sub.grade if sub.grade is not none else '' }}" min="0" max="100" style="width: 100px; display: inline-block;">
+                                                            <label for="grade_{{ sub.id }}">Grade:</label>
+                                                            <input type="number" id="grade_{{ sub.id }}" name="grade" class="form-control" value="{{ sub.grade if sub.grade is not none else '' }}" min="0" max="100" style="width: 100px; display: inline-block;">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label>Comment:</label>
-                                                            <textarea name="comment" class="form-control" rows="2">{{ sub.comment if sub.comment else '' }}</textarea>
+                                                            <label for="comment_{{ sub.id }}">Comment:</label>
+                                                            <textarea id="comment_{{ sub.id }}" name="comment" class="form-control" rows="2">{{ sub.comment if sub.comment else '' }}</textarea>
                                                         </div>
                                                         <button type="submit" class="btn btn-sm btn-success">Save</button>
                                                     </form>
@@ -465,24 +465,24 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" class="form-control" name="content_title" required>
+                            <label for="content_title">Title *</label>
+                            <input type="text" id="content_title" class="form-control" name="content_title" required>
                         </div>
                         <div class="form-group">
-                            <label>Description</label>
-                            <textarea class="form-control" name="content_description" rows="3"></textarea>
+                            <label for="content_description">Description</label>
+                            <textarea id="content_description" class="form-control" name="content_description" rows="3"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Content Type *</label>
-                            <select class="form-control" name="content_type" required>
+                            <label for="content_type">Content Type *</label>
+                            <select id="content_type" class="form-control" name="content_type" required>
                                 <option value="document">Document (PDF, DOCX, etc.)</option>
                                 <option value="video">Video (MP4, etc.)</option>
                                 <option value="file">Other File</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Folder (optional)</label>
-                            <select class="form-control" name="content_folder_id">
+                            <label for="content_folder_id">Folder (optional)</label>
+                            <select id="content_folder_id" class="form-control" name="content_folder_id">
                                 <option value="">-- No Folder --</option>
                                 {% if content_folders %}
                                     {% for folder in content_folders %}
@@ -493,8 +493,8 @@
                             <small class="form-text text-muted">Choose a folder to store this content under.</small>
                         </div>
                         <div class="form-group">
-                            <label>Upload File *</label>
-                            <input type="file" class="form-control-file" name="content_file" required>
+                            <label for="content_file">Upload File *</label>
+                            <input type="file" id="content_file" class="form-control-file" name="content_file" required>
                             <small class="form-text text-muted">Upload your document, video, or file</small>
                         </div>
                         <div class="form-check">
@@ -523,12 +523,12 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    <label>Folder Title *</label>
-                                    <input type="text" class="form-control" name="folder_title" required>
+                                    <label for="folder_title">Folder Title *</label>
+                                    <input type="text" id="folder_title" class="form-control" name="folder_title" required>
                                 </div>
                                 <div class="form-group">
-                                    <label>Description</label>
-                                    <textarea class="form-control" name="folder_description" rows="3"></textarea>
+                                    <label for="folder_description">Description</label>
+                                    <textarea id="folder_description" class="form-control" name="folder_description" rows="3"></textarea>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -552,24 +552,24 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" class="form-control" name="assignment_title" required>
+                            <label for="assignment_title">Title *</label>
+                            <input type="text" id="assignment_title" class="form-control" name="assignment_title" required>
                         </div>
                         <div class="form-group">
-                            <label>Description</label>
-                            <textarea class="form-control" name="assignment_description" rows="4"></textarea>
+                            <label for="assignment_description">Description</label>
+                            <textarea id="assignment_description" class="form-control" name="assignment_description" rows="4"></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Due Date</label>
-                                    <input type="datetime-local" class="form-control" name="assignment_due_date">
+                                    <label for="assignment_due_date">Due Date</label>
+                                    <input type="datetime-local" id="assignment_due_date" class="form-control" name="assignment_due_date">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Points</label>
-                                    <input type="number" class="form-control" name="assignment_points" value="100" required>
+                                    <label for="assignment_points">Points</label>
+                                    <input type="number" id="assignment_points" class="form-control" name="assignment_points" value="100" required>
                                 </div>
                             </div>
                         </div>
@@ -599,12 +599,12 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" class="form-control" name="announcement_title" required>
+                            <label for="announcement_title">Title *</label>
+                            <input type="text" id="announcement_title" class="form-control" name="announcement_title" required>
                         </div>
                         <div class="form-group">
-                            <label>Message *</label>
-                            <textarea class="form-control" name="announcement_message" rows="6" required></textarea>
+                            <label for="announcement_message">Message *</label>
+                            <textarea id="announcement_message" class="form-control" name="announcement_message" rows="6" required></textarea>
                         </div>
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" name="announcement_published" id="announcementPublished" checked>
