@@ -52,6 +52,11 @@
                     </li>
                 {% else %}
                     <li class="nav-item">
+                        {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+                        {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+                        <a class="nav-link" href="/set_language/{{ lang_cycle[current_locale] }}">{{ lang_names[current_locale] }}</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/login">{{ _('Login') }}</a>
                     </li>
                 {% endif %}

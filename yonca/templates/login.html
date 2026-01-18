@@ -206,6 +206,11 @@
     </style>
 </head>
 <body>
+    <div style="position: absolute; top: 20px; right: 20px;">
+        {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+        {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+        <a href="/set_language/{{ lang_cycle[current_locale] }}" style="color: #337a2c; text-decoration: none; font-weight: bold;">{{ lang_names[current_locale] }}</a>
+    </div>
     <div class="login-container">
         <div class="logo">
             <img src="https://lh3.googleusercontent.com/d/14J5AjDFB4jkBZZRlETtThphQtihmKCfY" alt="Yonca Logo">

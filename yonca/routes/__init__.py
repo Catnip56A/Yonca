@@ -1059,3 +1059,16 @@ def move_folder():
 
     flash('Folder moved successfully!', 'success')
     return redirect(request.referrer or url_for('main.index'))
+
+
+@main_bp.route('/set_language/<lang>')
+def set_language(lang):
+    """Set the language for the current session"""
+    from flask import session, redirect, request
+    
+    if lang in ['en', 'az', 'ru']:
+        session['language'] = lang
+        session.modified = True
+    
+    # Redirect back to the referring page or home
+    return redirect(request.referrer or url_for('main.index'))

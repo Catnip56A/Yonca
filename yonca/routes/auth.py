@@ -3,6 +3,7 @@ Authentication routes
 """
 from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template, current_app
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_babel import get_locale
 from yonca.models import User, db
 import logging
 import requests
@@ -184,7 +185,7 @@ def login():
         
         flash('Invalid username or password')
     
-    return render_template('login.html')
+    return render_template('login.html', current_locale=get_locale())
 
 @auth_bp.route('/logout')
 @login_required
