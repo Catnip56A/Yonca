@@ -10,7 +10,6 @@ try:
     LANGDETECT_AVAILABLE = True
 except ImportError:
     LANGDETECT_AVAILABLE = False
-    LangDetectException = Exception  # Fallback for exception handling
     print("Warning: langdetect not available. Install with: pip install langdetect")
 
 # Languages to automatically translate to
@@ -59,7 +58,7 @@ def detect_language(text):
             'en': 'en',  # English
         }
         return lang_map.get(detected, detected)
-    except Exception:
+    except (LangDetectException, Exception):
         return 'en'  # Default to English if detection fails
 
 def translate_content(content_type, content_id, field_name, text, source_language=None, session=None):
