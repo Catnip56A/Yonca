@@ -179,5 +179,9 @@ def create_app(config_name='development'):
     with app.app_context():
         db.create_all()
     
+    # Start background job worker
+    from yonca.job_manager import job_manager
+    job_manager.start_worker()
+    
     return app
 
