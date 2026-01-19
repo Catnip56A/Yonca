@@ -1118,36 +1118,65 @@ function updatePreviewFeatures() {
     });
 }
 
-// Translation button handler
+// Translation button handler with batch processing
 document.getElementById('translate-all').addEventListener('click', async function() {
     const button = this;
     const originalHtml = button.innerHTML;
-    
-    if (!confirm('This will translate all courses, resources, and home content to Azerbaijani and Russian. This may take a few minutes. Continue?')) {
+
+    if (!confirm('This will translate all courses, resources, and home content to Azerbaijani and Russian. This process works in batches to avoid timeouts. Continue?')) {
         return;
     }
-    
+
     button.disabled = true;
-    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Translating...';
-    
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Starting translation...';
+
+    let totalProcessed = 0;
+    let continueProcessing = true;
+    let nextOffset = 0;
+    let nextType = 'all';
+
     try {
-        const response = await fetch('/admin/translate/translate-content', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+        while (continueProcessing) {
+            const url = nextType === 'all'
+                ? `/admin/translate-content?offset=${nextOffset}&batch_size=5`
+                : `/admin/translate-content?offset=${nextOffset}&batch_size=5&type=${nextType}`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                if (result.continue) {
+                    // Update progress
+                    totalProcessed = result.stats.total_processed;
+                    nextOffset = result.next_offset;
+                    nextType = result.next_type;
+                    button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Processed ${totalProcessed} items...`;
+
+                    // Small delay to prevent overwhelming the server
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } else {
+                    // Completed
+                    continueProcessing = false;
+                    alert(`✓ Translation completed successfully!\n\n${result.message}\n\nRefresh the page to see translated content when changing languages.`);
+                }
+            } else {
+                alert(`✗ Translation failed: ${result.error}`);
+                continueProcessing = false;
             }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert(`✓ Translation completed successfully!\n\n${result.message}\n\nRefresh the page to see translated content when changing languages.`);
-        } else {
-            alert(`✗ Translation failed: ${result.error}`);
         }
     } catch (error) {
         alert(`✗ Error: ${error.message}`);
     } finally {
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+    }
+});
         button.disabled = false;
         button.innerHTML = originalHtml;
     }

@@ -1173,12 +1173,12 @@ class TranslateContentView(BaseView):
     
     @expose('/translate-content', methods=['POST'])
     def translate_content(self):
-        """Run translation script for all content"""
-        from flask import jsonify
-        
+        """Run translation script for content in batches to avoid timeouts"""
+        from flask import jsonify, request
+
         if not self.is_accessible():
             return jsonify({'success': False, 'error': 'Admin access required'}), 403
-        
+
         try:
             from yonca.content_translator import (
                 auto_translate_course,
@@ -1188,57 +1188,204 @@ class TranslateContentView(BaseView):
                 auto_translate_course_content_folder
             )
             from yonca.models import Course, Resource, HomeContent, CourseContent, CourseContentFolder
-            
+
+            # Get batch parameters from request
+            batch_size = int(request.args.get('batch_size', 5))  # Process 5 items at a time by default
+            offset = int(request.args.get('offset', 0))  # Starting offset
+            content_type = request.args.get('type', 'all')  # 'courses', 'resources', 'home', 'course_content', 'folders', or 'all'
+
             stats = {
                 'courses': 0,
                 'resources': 0,
                 'home_content': 0,
                 'course_content': 0,
-                'folders': 0
+                'folders': 0,
+                'processed': 0,
+                'total_processed': offset
             }
-            
-            # Translate courses
-            courses = Course.query.all()
-            for course in courses:
-                auto_translate_course(course)
-                stats['courses'] += 1
-            
-            # Translate resources
-            resources = Resource.query.all()
-            for resource in resources:
-                auto_translate_resource(resource)
-                stats['resources'] += 1
-            
-            # Translate home content
-            home_contents = HomeContent.query.all()
-            for home in home_contents:
-                auto_translate_home_content(home)
-                stats['home_content'] += 1
-            
-            # Translate course content
-            course_contents = CourseContent.query.all()
-            for content in course_contents:
-                auto_translate_course_content(content)
-                stats['course_content'] += 1
-            
-            # Translate folders
-            folders = CourseContentFolder.query.all()
-            for folder in folders:
-                auto_translate_course_content_folder(folder)
-                stats['folders'] += 1
-            
+
+            items_processed = 0
+            next_offset = offset
+
+            # Process courses in batches
+            if content_type in ['all', 'courses']:
+                courses = Course.query.offset(offset).limit(batch_size).all()
+                for course in courses:
+                    if items_processed >= batch_size:
+                        break
+                    try:
+                        auto_translate_course(course)
+                        stats['courses'] += 1
+                        items_processed += 1
+                        stats['processed'] += 1
+                        stats['total_processed'] += 1
+                    except Exception as e:
+                        print(f"Failed to translate course {course.id}: {e}")
+                        continue
+
+                if len(courses) == batch_size:
+                    next_offset = offset + len(courses)
+                    db.session.commit()
+                    return jsonify({
+                        'success': True,
+                        'message': f'Processed {items_processed} courses. Continue with offset {next_offset}',
+                        'stats': stats,
+                        'continue': True,
+                        'next_offset': next_offset,
+                        'next_type': 'courses'
+                    })
+
+            # Reset for next content type
+            offset = 0 if content_type != 'courses' else next_offset
+            items_processed = 0
+
+            # Process resources in batches
+            if content_type in ['all', 'resources']:
+                resources = Resource.query.offset(offset).limit(batch_size).all()
+                for resource in resources:
+                    if items_processed >= batch_size:
+                        break
+                    try:
+                        auto_translate_resource(resource)
+                        stats['resources'] += 1
+                        items_processed += 1
+                        stats['processed'] += 1
+                        stats['total_processed'] += 1
+                    except Exception as e:
+                        print(f"Failed to translate resource {resource.id}: {e}")
+                        continue
+
+                if len(resources) == batch_size:
+                    next_offset = offset + len(resources)
+                    db.session.commit()
+                    return jsonify({
+                        'success': True,
+                        'message': f'Processed {items_processed} resources. Continue with offset {next_offset}',
+                        'stats': stats,
+                        'continue': True,
+                        'next_offset': next_offset,
+                        'next_type': 'resources'
+                    })
+
+            # Reset for next content type
+            offset = 0 if content_type != 'resources' else next_offset
+            items_processed = 0
+
+            # Process home content in batches
+            if content_type in ['all', 'home']:
+                home_contents = HomeContent.query.offset(offset).limit(batch_size).all()
+                for home in home_contents:
+                    if items_processed >= batch_size:
+                        break
+                    try:
+                        auto_translate_home_content(home)
+                        stats['home_content'] += 1
+                        items_processed += 1
+                        stats['processed'] += 1
+                        stats['total_processed'] += 1
+                    except Exception as e:
+                        print(f"Failed to translate home content {home.id}: {e}")
+                        continue
+
+                if len(home_contents) == batch_size:
+                    next_offset = offset + len(home_contents)
+                    db.session.commit()
+                    return jsonify({
+                        'success': True,
+                        'message': f'Processed {items_processed} home content items. Continue with offset {next_offset}',
+                        'stats': stats,
+                        'continue': True,
+                        'next_offset': next_offset,
+                        'next_type': 'home'
+                    })
+
+            # Reset for next content type
+            offset = 0 if content_type != 'home' else next_offset
+            items_processed = 0
+
+            # Process course content in batches
+            if content_type in ['all', 'course_content']:
+                course_contents = CourseContent.query.offset(offset).limit(batch_size).all()
+                for content in course_contents:
+                    if items_processed >= batch_size:
+                        break
+                    try:
+                        auto_translate_course_content(content)
+                        stats['course_content'] += 1
+                        items_processed += 1
+                        stats['processed'] += 1
+                        stats['total_processed'] += 1
+                    except Exception as e:
+                        print(f"Failed to translate course content {content.id}: {e}")
+                        continue
+
+                if len(course_contents) == batch_size:
+                    next_offset = offset + len(course_contents)
+                    db.session.commit()
+                    return jsonify({
+                        'success': True,
+                        'message': f'Processed {items_processed} course content items. Continue with offset {next_offset}',
+                        'stats': stats,
+                        'continue': True,
+                        'next_offset': next_offset,
+                        'next_type': 'course_content'
+                    })
+
+            # Reset for next content type
+            offset = 0 if content_type != 'course_content' else next_offset
+            items_processed = 0
+
+            # Process folders in batches
+            if content_type in ['all', 'folders']:
+                folders = CourseContentFolder.query.offset(offset).limit(batch_size).all()
+                for folder in folders:
+                    if items_processed >= batch_size:
+                        break
+                    try:
+                        auto_translate_course_content_folder(folder)
+                        stats['folders'] += 1
+                        items_processed += 1
+                        stats['processed'] += 1
+                        stats['total_processed'] += 1
+                    except Exception as e:
+                        print(f"Failed to translate folder {folder.id}: {e}")
+                        continue
+
+                if len(folders) == batch_size:
+                    next_offset = offset + len(folders)
+                    db.session.commit()
+                    return jsonify({
+                        'success': True,
+                        'message': f'Processed {items_processed} folders. Continue with offset {next_offset}',
+                        'stats': stats,
+                        'continue': True,
+                        'next_offset': next_offset,
+                        'next_type': 'folders'
+                    })
+
+            # If we get here, all content has been processed
             db.session.commit()
-            
-            message = f"Translated {stats['courses']} courses, {stats['resources']} resources, {stats['home_content']} home pages, {stats['course_content']} course items, and {stats['folders']} folders to Azerbaijani and Russian."
-            
-            return jsonify({'success': True, 'message': message, 'stats': stats})
-            
+
+            message = f"Translation completed! Processed {stats['total_processed']} total items: {stats['courses']} courses, {stats['resources']} resources, {stats['home_content']} home pages, {stats['course_content']} course items, and {stats['folders']} folders."
+
+            return jsonify({
+                'success': True,
+                'message': message,
+                'stats': stats,
+                'continue': False,
+                'completed': True
+            })
+
         except Exception as e:
             from flask import jsonify
             import traceback
             error_details = traceback.format_exc()
             print(f"Translation error: {error_details}")
-            return jsonify({'success': False, 'error': str(e)}), 500
+            return jsonify({
+                'success': False,
+                'error': str(e),
+                'details': error_details
+            }), 500
     
     @expose('/delete-translations', methods=['POST'])
     def delete_translations(self):
