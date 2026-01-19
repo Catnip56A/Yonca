@@ -1448,19 +1448,19 @@
 
                 <!-- Language Selection for Translation -->
                 <div class="language-selector" style="margin-bottom: 2rem; background: #fff6ed; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 1rem 0; color: #212121;">🌐 Translation Settings</h4>
+                    <h4 style="margin: 0 0 1rem 0; color: #212121;">🌐 {{ _("Translation Settings") }}</h4>
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                         <div>
-                            <label for="target-language" style="font-weight: 500; color: #353e45;">Language:</label>
+                            <label for="target-language" style="font-weight: 500; color: #353e45;">{{ _("Language:") }}</label>
                             <select id="target-language" onchange="changeTargetLanguage()" style="margin-left: 0.5rem; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 5px;">
-                                <option value="none">Don't translate</option>
-                                <option value="en">English</option>
-                                <option value="ru">Russian</option>
-                                <option value="az">Azerbaijani</option>
+                                <option value="none">{{ _("Don't translate") }}</option>
+                                <option value="en">{{ _("English") }}</option>
+                                <option value="ru">{{ _("Russian") }}</option>
+                                <option value="az">{{ _("Azerbaijani") }}</option>
                             </select>
                         </div>
                     </div>
-                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #6b7280;">Select a language to translate messages, or choose "Don't translate" to view messages in their original language. Click individual messages to toggle translation.</p>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #6b7280;">{{ _("Select a language to translate messages, or choose 'Don't translate' to view messages in their original language. Click individual messages to toggle translation.") }}</p>
                 </div>
 
                 <div class="message-form">

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-18 20:47+0400\n"
+"POT-Creation-Date: 2026-01-19 19:56+0400\n"
 "PO-Revision-Date: 2026-01-18 12:33+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: az\n"
@@ -18,153 +18,228 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: templates/course_description.html:90
+#: templates/course_description.html:128
+#: templates/course_page_enrolled.html:373
 #, fuzzy
 msgid "Course Features"
 msgstr "Xüsusiyyətlərimiz"
 
-#: templates/components/navbar.html:24 templates/course_description.html:95
-#: templates/index.html:1215 templates/index.html:1267
+#: templates/components/navbar.html:24 templates/course_description.html:133
+#: templates/course_page_enrolled.html:378 templates/index.html:1215
+#: templates/index.html:1267
 msgid "Forum"
 msgstr "Forum"
 
-#: templates/course_description.html:96
+#: templates/course_description.html:134
+#: templates/course_page_enrolled.html:379
 msgid "Connect with fellow learners and get help from instructors."
 msgstr ""
 
-#: templates/course_description.html:97 templates/course_page_enrolled.html:339
+#: templates/course_description.html:135
+#: templates/course_page_enrolled.html:380
 #, fuzzy
 msgid "Access Forum"
 msgstr "PDF-ə daxil olun"
 
-#: templates/components/navbar.html:27 templates/course_description.html:103
-#: templates/index.html:1216 templates/index.html:1268
-#: templates/index.html:1496
+#: templates/components/navbar.html:27 templates/course_description.html:141
+#: templates/course_page_enrolled.html:386 templates/index.html:1216
+#: templates/index.html:1268 templates/index.html:1496
 msgid "Resources"
 msgstr "Resources"
 
-#: templates/course_description.html:104
+#: templates/course_description.html:142
+#: templates/course_page_enrolled.html:387
 msgid "Access course materials, documents, and additional resources."
 msgstr "Kurs materiallarına, sənədlərinə və əlavə resurslara daxil olun."
 
-#: templates/course_description.html:105
-#: templates/course_page_enrolled.html:347
+#: templates/course_description.html:143
+#: templates/course_page_enrolled.html:388
 #, fuzzy
 msgid "Access Resources"
 msgstr "Resources"
 
-#: templates/course_description.html:111
-#: templates/course_page_enrolled.html:212
+#: templates/course_description.html:149
+#: templates/course_page_enrolled.html:246
+#: templates/course_page_enrolled.html:394
 msgid "Reviews"
 msgstr "Rəylər"
 
-#: templates/course_description.html:112
+#: templates/course_description.html:150
+#: templates/course_page_enrolled.html:395
 msgid "Read reviews from other students and share your experience."
 msgstr "Digər tələbələrin rəylərini oxuyun və öz təcrübənizi paylaşın."
 
-#: templates/course_description.html:113
-#: templates/course_page_enrolled.html:355
+#: templates/course_description.html:151
+#: templates/course_page_enrolled.html:396
 #, fuzzy
 msgid "View Reviews"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_description.html:123
-#: templates/course_page_enrolled.html:793
+#: templates/course_description.html:161
+#: templates/course_page_enrolled.html:406
+#: templates/course_page_enrolled.html:847
 #, fuzzy
 msgid "Student Reviews"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_description.html:124
+#: templates/course_description.html:162
+#: templates/course_page_enrolled.html:407
 #, fuzzy
 msgid "review"
-msgstr "Rəylər"
+msgid_plural "reviews"
+msgstr[0] "Rəylər"
+msgstr[1] ""
 
-#: templates/course_description.html:124
+#: templates/course_description.html:162
 #, fuzzy
 msgid "reviews"
 msgstr "Rəylər"
 
-#: templates/course_description.html:141
+#: templates/course_description.html:179
+#: templates/course_page_enrolled.html:424
 msgid "Average Rating"
 msgstr "Orta Reytinq"
 
-#: templates/course_description.html:158
+#: templates/course_description.html:196
 msgid "By"
 msgstr "Tərəfindən"
 
-#: templates/course_description.html:172
-#: templates/course_page_enrolled.html:490
-#: templates/course_page_enrolled.html:653 templates/index.html:2005
+#: templates/course_description.html:210
+#: templates/course_page_enrolled.html:531
+#: templates/course_page_enrolled.html:699 templates/index.html:2017
 msgid "Login to Enroll"
 msgstr "Qeydiyyatdan keçmək üçün daxil olun"
 
-#: templates/course_description.html:174
+#: templates/course_description.html:212
 #, fuzzy
 msgid "You are not enrolled in this course."
 msgstr "Siz bütün mövcud kurslara yazılmısınız!"
 
-#: templates/course_page_enrolled.html:190
+#: templates/course_page_enrolled.html:224
 msgid "Teacher/Admin Mode:"
 msgstr "Müəllim/Admin Rejimi:"
 
-#: templates/course_page_enrolled.html:190
+#: templates/course_page_enrolled.html:224
 msgid "You have editing privileges for this course."
 msgstr "Siz bu kurs üçün redaktə hüquqlarına maliksiniz."
 
-#: templates/course_page_enrolled.html:195
+#: templates/course_page_enrolled.html:229
 #, fuzzy
 msgid "Back to Courses"
 msgstr "Evə qayıt"
 
-#: templates/course_page_enrolled.html:200
+#: templates/course_page_enrolled.html:234
 msgid "Content"
 msgstr "Məzmun"
 
-#: templates/course_page_enrolled.html:206
+#: templates/course_page_enrolled.html:237
+#: templates/course_page_enrolled.html:996
+#: templates/course_page_enrolled.html:1035
+#: templates/course_page_enrolled.html:1074
+#, fuzzy
+msgid "Description"
+msgstr "Description:"
+
+#: templates/course_page_enrolled.html:240
+#: templates/course_page_enrolled.html:539
 msgid "Assignments"
 msgstr "Tapşırıqlar"
 
-#: templates/course_page_enrolled.html:209
-#: templates/course_page_enrolled.html:697
+#: templates/course_page_enrolled.html:243
+#: templates/course_page_enrolled.html:743
 msgid "Announcements"
 msgstr "Elanlar"
 
-#: templates/course_page_enrolled.html:243
+#: templates/course_page_enrolled.html:257
+#: templates/course_page_enrolled.html:1136
+#: templates/course_page_enrolled.html:1156
+#, fuzzy
+msgid "Move Folder"
+msgstr "Ətraflı Baxın"
+
+#: templates/course_page_enrolled.html:259
+#, fuzzy
+msgid ""
+"Are you sure you want to delete this folder? This will only work if the "
+"folder is empty."
+msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
+
+#: templates/course_page_enrolled.html:262
+#, fuzzy
+msgid "Delete Folder"
+msgstr "Delete"
+
+#: templates/course_page_enrolled.html:282
+#: templates/course_page_enrolled.html:493
 #, fuzzy
 msgid "View File"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_page_enrolled.html:245
+#: templates/course_page_enrolled.html:284
+#: templates/course_page_enrolled.html:495
 msgid "View/Download"
 msgstr "Bax/Yüklə"
 
-#: templates/course_page_enrolled.html:256
-#: templates/course_page_enrolled.html:604
+#: templates/course_page_enrolled.html:288
+#: templates/course_page_enrolled.html:499
+#: templates/course_page_enrolled.html:1104
+#, fuzzy
+msgid "Move File"
+msgstr "Ətraflı Baxın"
+
+#: templates/course_page_enrolled.html:295
+#: templates/course_page_enrolled.html:650
 #, fuzzy
 msgid "Visible"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_page_enrolled.html:256
-#: templates/course_page_enrolled.html:536
-#: templates/course_page_enrolled.html:604
+#: templates/course_page_enrolled.html:295
+#: templates/course_page_enrolled.html:577
+#: templates/course_page_enrolled.html:650
 msgid "Private"
 msgstr "Şəxsi"
 
-#: templates/course_page_enrolled.html:259
+#: templates/course_page_enrolled.html:298
+#: templates/course_page_enrolled.html:509
 #, fuzzy
 msgid "Are you sure you want to delete this file?"
 msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
 
-#: templates/course_page_enrolled.html:262 templates/index.html:2192
-#: templates/index.html:2212 templates/index.html:2280
+#: templates/course_page_enrolled.html:301
+#: templates/course_page_enrolled.html:512
+#: templates/course_page_enrolled.html:656
+#: templates/course_page_enrolled.html:874 templates/index.html:2204
+#: templates/index.html:2224 templates/index.html:2292
 msgid "Delete"
 msgstr "Delete"
 
-#: templates/course_page_enrolled.html:488
+#: templates/course_page_enrolled.html:459
+#, fuzzy
+msgid "Course Content"
+msgstr "3. İstifadəçi məzmunu"
+
+#: templates/course_page_enrolled.html:463
+#: templates/course_page_enrolled.html:982
+#: templates/course_page_enrolled.html:1002
+msgid "Create Folder"
+msgstr ""
+
+#: templates/course_page_enrolled.html:466
+#: templates/course_page_enrolled.html:1017
+#: templates/course_page_enrolled.html:1049
+#, fuzzy
+msgid "Upload File"
+msgstr "PDF yükləyin"
+
+#: templates/course_page_enrolled.html:483
+msgid "Unsorted Files"
+msgstr ""
+
+#: templates/course_page_enrolled.html:529
 msgid "Enroll to Access Course Content"
 msgstr "Kurs Məzmununa Daxil Olməq üçün Qeydiyyatdan Keçin"
 
-#: templates/course_page_enrolled.html:489
+#: templates/course_page_enrolled.html:530
 msgid ""
 "You need to be enrolled in this course to view the content, materials, "
 "and participate in activities."
@@ -172,211 +247,350 @@ msgstr ""
 "Siz məzmuna, materiallara baxmaq və fəaliyyətlərdə iştirak etmək üçün bu "
 "kursa yazılmalısınız."
 
-#: templates/course_page_enrolled.html:501
+#: templates/course_page_enrolled.html:542
+#: templates/course_page_enrolled.html:1063
+#: templates/course_page_enrolled.html:1092
 #, fuzzy
 msgid "Create Assignment"
 msgstr "Tapşırıqlar"
 
-#: templates/course_page_enrolled.html:509
+#: templates/course_page_enrolled.html:550
 msgid "pts"
 msgstr "xal"
 
-#: templates/course_page_enrolled.html:511
+#: templates/course_page_enrolled.html:552
 msgid "Due:"
 msgstr "Müddəti:"
 
-#: templates/course_page_enrolled.html:511
+#: templates/course_page_enrolled.html:552
 msgid "N/A"
 msgstr "Yoxdur"
 
-#: templates/course_page_enrolled.html:518
-#: templates/course_page_enrolled.html:584
+#: templates/course_page_enrolled.html:559
+#: templates/course_page_enrolled.html:630
 msgid "On Time"
 msgstr "Vaxtında"
 
-#: templates/course_page_enrolled.html:522
-#: templates/course_page_enrolled.html:588
+#: templates/course_page_enrolled.html:563
+#: templates/course_page_enrolled.html:634
 #, fuzzy
 msgid "Late"
 msgstr "Delete"
 
-#: templates/course_page_enrolled.html:525
-#: templates/course_page_enrolled.html:591
+#: templates/course_page_enrolled.html:566
+#: templates/course_page_enrolled.html:637
 #, fuzzy
 msgid "Early"
 msgstr "Email"
 
-#: templates/course_page_enrolled.html:530
+#: templates/course_page_enrolled.html:571
 msgid "View Your Submission"
 msgstr "Göndərmənizi Baxın"
 
-#: templates/course_page_enrolled.html:536
+#: templates/course_page_enrolled.html:577
 msgid "Visible to Others"
 msgstr "Digərlərinə Görünür"
 
-#: templates/course_page_enrolled.html:539
+#: templates/course_page_enrolled.html:580
 #, fuzzy
 msgid "Are you sure you want to delete your submission?"
 msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
 
-#: templates/course_page_enrolled.html:542
+#: templates/course_page_enrolled.html:583
 msgid "Delete My Submission"
 msgstr "Göndərməmi Sil"
 
-#: templates/course_page_enrolled.html:545
-#: templates/course_page_enrolled.html:629
+#: templates/course_page_enrolled.html:586
+#: templates/course_page_enrolled.html:675
 msgid "Grade:"
 msgstr "Qiymət:"
 
-#: templates/course_page_enrolled.html:548
+#: templates/course_page_enrolled.html:589
 msgid "Feedback:"
 msgstr "Rəy:"
 
-#: templates/course_page_enrolled.html:553
+#: templates/course_page_enrolled.html:594
 msgid "Not Submitted"
 msgstr "Göndərilməyib"
 
-#: templates/course_page_enrolled.html:556
+#: templates/course_page_enrolled.html:597
 msgid "Overdue"
 msgstr "Vaxtı Keçib"
 
-#: templates/course_page_enrolled.html:565
+#: templates/course_page_enrolled.html:606
 msgid "Upload Your Work:"
 msgstr "İşinizi Yükləyin:"
 
-#: templates/course_page_enrolled.html:568
+#: templates/course_page_enrolled.html:609
 #, fuzzy
 msgid "Submit Assignment"
 msgstr "Tapşırıqlar"
 
-#: templates/course_page_enrolled.html:575
+#: templates/course_page_enrolled.html:615
+#, fuzzy
+msgid ""
+"Are you sure you want to delete this assignment? This will also delete "
+"all submissions."
+msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
+
+#: templates/course_page_enrolled.html:618
+#, fuzzy
+msgid "Delete Assignment"
+msgstr "Tapşırıqlar"
+
+#: templates/course_page_enrolled.html:621
 msgid "View Submissions"
 msgstr "Göndərmələrə Baxın"
 
-#: templates/course_page_enrolled.html:596
+#: templates/course_page_enrolled.html:642
 msgid "Submitted:"
 msgstr "Göndərilib:"
 
-#: templates/course_page_enrolled.html:597
+#: templates/course_page_enrolled.html:643
 msgid "View Submission"
 msgstr "Göndərməyə Baxın"
 
-#: templates/course_page_enrolled.html:607
+#: templates/course_page_enrolled.html:653
 #, fuzzy
 msgid "Are you sure you want to delete this submission?"
 msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
 
-#: templates/course_page_enrolled.html:618
+#: templates/course_page_enrolled.html:664
 msgid "Grade"
 msgstr "Qiymət"
 
-#: templates/course_page_enrolled.html:621
+#: templates/course_page_enrolled.html:667
 #, fuzzy
 msgid "Comment"
 msgstr "Contacts"
 
-#: templates/course_page_enrolled.html:624
+#: templates/course_page_enrolled.html:670
 msgid "Save Grade"
 msgstr "Qiyməti Saxla"
 
-#: templates/course_page_enrolled.html:632
+#: templates/course_page_enrolled.html:678
 #, fuzzy
 msgid "Comment:"
 msgstr "Contacts"
 
-#: templates/course_page_enrolled.html:638
+#: templates/course_page_enrolled.html:684
 msgid "No submissions yet."
 msgstr "Hələ göndərmə yoxdur."
 
-#: templates/course_page_enrolled.html:646
+#: templates/course_page_enrolled.html:692
 #, fuzzy
 msgid "No assignments available."
 msgstr "mövcud olduğu kimi"
 
-#: templates/course_page_enrolled.html:651
+#: templates/course_page_enrolled.html:697
 msgid "Enroll to Access Assignments"
 msgstr "Tapşırıqlara Daxil Olməq üçün Qeydiyyatdan Keçin"
 
-#: templates/course_page_enrolled.html:652
+#: templates/course_page_enrolled.html:698
 #, fuzzy
 msgid "You need to be enrolled in this course to view and submit assignments."
 msgstr "Siz bütün mövcud kurslara yazılmısınız!"
 
-#: templates/course_page_enrolled.html:666
-#: templates/course_page_enrolled.html:714
+#: templates/course_page_enrolled.html:712
+#: templates/course_page_enrolled.html:768
 msgid "Reply"
 msgstr "Cavab ver"
 
-#: templates/course_page_enrolled.html:676
-#: templates/course_page_enrolled.html:723
+#: templates/course_page_enrolled.html:722
+#: templates/course_page_enrolled.html:777
 msgid "Write a reply..."
 msgstr "Cavab yaz..."
 
-#: templates/course_page_enrolled.html:678
+#: templates/course_page_enrolled.html:724
+#: templates/course_page_enrolled.html:779
 msgid "Post Reply"
 msgstr "Cavabı Göndər"
 
-#: templates/course_page_enrolled.html:700
+#: templates/course_page_enrolled.html:746
+#: templates/course_page_enrolled.html:946
+#: templates/course_page_enrolled.html:967
 #, fuzzy
 msgid "Add Announcement"
 msgstr "Elanlar"
 
-#: templates/course_page_enrolled.html:710
+#: templates/course_page_enrolled.html:756
 #, fuzzy
 msgid "Posted:"
 msgstr "Uploaded:"
 
-#: templates/course_page_enrolled.html:742
+#: templates/course_page_enrolled.html:759
+#, fuzzy
+msgid ""
+"Are you sure you want to delete this announcement? This will also delete "
+"all replies."
+msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
+
+#: templates/course_page_enrolled.html:762
+#, fuzzy
+msgid "Delete Announcement"
+msgstr "Elanlar"
+
+#: templates/course_page_enrolled.html:796
 #, fuzzy
 msgid "No announcements yet."
 msgstr "Elanlar"
 
-#: templates/course_page_enrolled.html:749
+#: templates/course_page_enrolled.html:803
 #, fuzzy
 msgid "Course Reviews"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_page_enrolled.html:755
+#: templates/course_page_enrolled.html:809
 #, fuzzy
 msgid "Write Your Review"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_page_enrolled.html:762
+#: templates/course_page_enrolled.html:816
+#: templates/course_page_enrolled.html:899
 msgid "Rating"
 msgstr "Reytinq"
 
-#: templates/course_page_enrolled.html:771
+#: templates/course_page_enrolled.html:825
 msgid "Click on a star to rate (1-5)"
 msgstr "Reytinq vermək üçün ulduza klikləyin (1-5)"
 
-#: templates/course_page_enrolled.html:775
+#: templates/course_page_enrolled.html:829
+#: templates/course_page_enrolled.html:910
 #, fuzzy
 msgid "Review Title"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_page_enrolled.html:776
+#: templates/course_page_enrolled.html:830
 msgid "Summarize your experience"
 msgstr "Təcrübənizi ümumiləşdirin"
 
-#: templates/course_page_enrolled.html:780
+#: templates/course_page_enrolled.html:834
+#: templates/course_page_enrolled.html:914
 #, fuzzy
 msgid "Your Review"
 msgstr "Rəylər"
 
-#: templates/course_page_enrolled.html:781
+#: templates/course_page_enrolled.html:835
 #, fuzzy
 msgid "Share your thoughts about this course..."
 msgstr "Bu kurs haqqında fikirlərinizi paylaşın..."
 
-#: templates/course_page_enrolled.html:785
+#: templates/course_page_enrolled.html:839
 #, fuzzy
 msgid "Submit Review"
 msgstr "Ətraflı Baxın"
 
-#: templates/course_page_enrolled.html:816
+#: templates/course_page_enrolled.html:868
+msgid "Edit"
+msgstr ""
+
+#: templates/course_page_enrolled.html:870
 #, fuzzy
 msgid "Are you sure you want to delete this review?"
 msgstr "Bu resursu silmək istədiyinizə əminsiniz?"
+
+#: templates/course_page_enrolled.html:892
+#, fuzzy
+msgid "Edit Review"
+msgstr "Ətraflı Baxın"
+
+#: templates/course_page_enrolled.html:920
+#, fuzzy
+msgid "Update Review"
+msgstr "Ətraflı Baxın"
+
+#: templates/course_page_enrolled.html:931
+msgid "No reviews yet. Be the first to review this course!"
+msgstr ""
+
+#: templates/course_page_enrolled.html:953
+#: templates/course_page_enrolled.html:1031
+#: templates/course_page_enrolled.html:1070
+#, fuzzy
+msgid "Title"
+msgstr "Title:"
+
+#: templates/course_page_enrolled.html:957
+#, fuzzy
+msgid "Message"
+msgstr "Message:"
+
+#: templates/course_page_enrolled.html:962
+#: templates/course_page_enrolled.html:1040
+#: templates/course_page_enrolled.html:1087
+msgid "Publish immediately"
+msgstr ""
+
+#: templates/course_page_enrolled.html:966
+#: templates/course_page_enrolled.html:1001
+#: templates/course_page_enrolled.html:1048
+#: templates/course_page_enrolled.html:1091
+#: templates/course_page_enrolled.html:1123
+#: templates/course_page_enrolled.html:1155
+msgid "Cancel"
+msgstr ""
+
+#: templates/course_page_enrolled.html:989
+msgid "Parent:"
+msgstr ""
+
+#: templates/course_page_enrolled.html:989
+#: templates/course_page_enrolled.html:1024
+#: templates/course_page_enrolled.html:1115
+#: templates/course_page_enrolled.html:1147
+#, fuzzy
+msgid "Root"
+msgstr "Logout"
+
+#: templates/course_page_enrolled.html:992
+#, fuzzy
+msgid "Folder Name"
+msgstr "Username:"
+
+#: templates/course_page_enrolled.html:1024
+#, fuzzy
+msgid "Upload to:"
+msgstr "Uploaded:"
+
+#: templates/course_page_enrolled.html:1027
+#, fuzzy
+msgid "File"
+msgstr "Profile"
+
+#: templates/course_page_enrolled.html:1044
+#, fuzzy
+msgid "Allow students to view this file"
+msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
+
+#: templates/course_page_enrolled.html:1078
+msgid "Due Date"
+msgstr ""
+
+#: templates/course_page_enrolled.html:1082
+#, fuzzy
+msgid "Points"
+msgstr "xal"
+
+#: templates/course_page_enrolled.html:1113
+msgid "Select Destination Folder"
+msgstr ""
+
+#: templates/course_page_enrolled.html:1124
+msgid "Move"
+msgstr ""
+
+#: templates/course_page_enrolled.html:1145
+msgid "Select New Parent Folder"
+msgstr ""
+
+#: templates/course_page_enrolled.html:1213
+#, fuzzy
+msgid "Move File:"
+msgstr "Ətraflı Baxın"
+
+#: templates/course_page_enrolled.html:1224
+msgid "Move Folder:"
+msgstr ""
 
 #: templates/index.html:7
 msgid "Yonca - Learning Platform"
@@ -475,6 +689,40 @@ msgstr ""
 "Öyrənmə platformamızda ən son yeniləmələri, yeni funksiyaları və maraqlı "
 "inkişafları kəşf edin."
 
+#: templates/index.html:1373
+msgid ""
+"If video shows 'still being processed,' please wait 5-60 minutes for "
+"Google Drive to finish processing, then refresh the page."
+msgstr ""
+
+#: templates/index.html:1393
+#, fuzzy
+msgid "Learning Community"
+msgstr "Bu gün öyrənmə cəmiyyətimizə qoşulun!"
+
+#: templates/index.html:1394
+#, fuzzy
+msgid "Our vibrant learning community"
+msgstr "Bu gün öyrənmə cəmiyyətimizə qoşulun!"
+
+#: templates/index.html:1397 templates/index.html:1599
+msgid "Interactive Courses"
+msgstr "İnteraktiv kurslar"
+
+#: templates/index.html:1398
+#, fuzzy
+msgid "Engage with interactive course content"
+msgstr "İnteraktiv kurslar"
+
+#: templates/index.html:1401 templates/index.html:1603
+msgid "Study Groups"
+msgstr "Tədris Qrupları"
+
+#: templates/index.html:1402
+#, fuzzy
+msgid "Collaborate in study groups"
+msgstr "Tədris Qrupları"
+
 #: templates/index.html:1412
 msgid "Explore our available courses and start your learning journey."
 msgstr "Mövcud kurslarımızı araşdırın və öyrənmə səyahətinizə başlayın."
@@ -487,8 +735,8 @@ msgstr "Qeydiyyatdan Keçdiyim Kurslar"
 msgid "Loading enrolled courses..."
 msgstr "Qeydiyyatdan keçmiş kurslar yüklənir..."
 
-#: templates/index.html:1424 templates/index.html:1816
-#: templates/index.html:1855
+#: templates/index.html:1424 templates/index.html:1828
+#: templates/index.html:1867
 msgid "Available Courses"
 msgstr "Mövcud Kurslar"
 
@@ -511,6 +759,37 @@ msgstr "İcma forumunda iştirak etmək üçün daxil olun."
 #: templates/index.html:1439
 msgid "You can still view messages without logging in."
 msgstr "Siz hələ də daxil olmadan mesajlara baxa bilərsiniz."
+
+#: templates/index.html:1451
+msgid "Translation Settings"
+msgstr "Tərcümə Parametrləri"
+
+#: templates/index.html:1454
+msgid "Language:"
+msgstr "Dil:"
+
+#: templates/index.html:1456
+msgid "Don't translate"
+msgstr "Tərcümə etməyin"
+
+#: templates/index.html:1457
+msgid "English"
+msgstr "İngilis"
+
+#: templates/index.html:1458
+msgid "Russian"
+msgstr "Rus"
+
+#: templates/index.html:1459
+msgid "Azerbaijani"
+msgstr "Azərbaycan dili"
+
+#: templates/index.html:1463
+msgid ""
+"Select a language to translate messages, or choose 'Don't translate' to "
+"view messages in their original language. Click individual messages to "
+"toggle translation."
+msgstr "Mesajları tərcümə etmək üçün dil seçin və ya orijinal dildə görmək üçün 'Tərcümə etməyin' seçin. Tərcüməni dəyişdirmək üçün fərdi mesajlara klikləyin."
 
 #: templates/index.html:1467
 msgid "Post a New Message"
@@ -602,7 +881,7 @@ msgstr ""
 "Giriş PIN-i avtomatik yaradılacaq (6 simvol, müddəti 10 dəqiqə ərzində "
 "bitir)"
 
-#: templates/index.html:1530 templates/index.html:2430
+#: templates/index.html:1530 templates/index.html:2442
 msgid "Upload Material"
 msgstr "Materialı yükləyin"
 
@@ -654,17 +933,9 @@ msgstr "Xüsusiyyətlərimiz"
 msgid "Discover what makes our platform special."
 msgstr "Platformamızı nəyin xüsusi etdiyini kəşf edin."
 
-#: templates/index.html:1599
-msgid "Interactive Courses"
-msgstr "İnteraktiv kurslar"
-
 #: templates/index.html:1600
 msgid "Engage with dynamic course content and interactive learning materials."
 msgstr "Dinamik kurs məzmunu və interaktiv təlim materialları ilə məşğul olun."
-
-#: templates/index.html:1603
-msgid "Study Groups"
-msgstr "Tədris Qrupları"
 
 #: templates/index.html:1604
 msgid "Collaborate with fellow learners in our vibrant study communities."
@@ -698,159 +969,159 @@ msgstr "Təhsil konfranslarımızda və şəbəkələşmə tədbirlərimizdə i�
 msgid "Conferences section coming soon..."
 msgstr "Konfrans bölməsi tezliklə..."
 
-#: templates/index.html:1814
+#: templates/index.html:1826
 msgid "You're enrolled in all available courses!"
 msgstr "Siz bütün mövcud kurslara yazılmısınız!"
 
-#: templates/index.html:1815
+#: templates/index.html:1827
 msgid "Error loading courses. Please try again."
 msgstr "Kursları yükləmə xətası. Yenidən cəhd edin."
 
-#: templates/index.html:1836
+#: templates/index.html:1848
 msgid "No courses available at the moment."
 msgstr "Hazırda mövcud kurs yoxdur."
 
-#: templates/index.html:1852
+#: templates/index.html:1864
 msgid "Other Available Courses"
 msgstr "Digər Mövcud Kurslar"
 
-#: templates/index.html:1986
+#: templates/index.html:1998
 msgid "Loading..."
 msgstr "Yüklənir..."
 
-#: templates/index.html:1987 templates/index.html:1999
-#: templates/index.html:2006
+#: templates/index.html:1999 templates/index.html:2011
+#: templates/index.html:2018
 msgid "View Details"
 msgstr "Ətraflı Baxın"
 
-#: templates/index.html:1998
+#: templates/index.html:2010
 msgid "Enroll Now"
 msgstr "İndi qeydiyyatdan keçin"
 
-#: templates/index.html:2061
+#: templates/index.html:2073
 msgid "Enrolling in"
 msgstr "Qeydiyyatdan keçirilir"
 
-#: templates/index.html:2131
+#: templates/index.html:2143
 msgid "No materials available at the moment."
 msgstr "Hazırda heç bir material yoxdur."
 
-#: templates/index.html:2149
+#: templates/index.html:2161
 msgid "Log In to Access"
 msgstr "Access üçün daxil olun"
 
-#: templates/index.html:2152 templates/index.html:2172
-#: templates/index.html:2207
+#: templates/index.html:2164 templates/index.html:2184
+#: templates/index.html:2219
 msgid "View Resource"
 msgstr "Mənbəyə baxın"
 
-#: templates/index.html:2162
+#: templates/index.html:2174
 msgid "Expires in:"
 msgstr "Müddəti bitir:"
 
-#: templates/index.html:2162
+#: templates/index.html:2174
 msgid "minutes"
 msgstr "minutes"
 
-#: templates/index.html:2164
+#: templates/index.html:2176
 msgid "PIN has expired"
 msgstr "PİN-in vaxtı keçib"
 
-#: templates/index.html:2168 templates/index.html:2259
+#: templates/index.html:2180 templates/index.html:2271
 msgid "Your Access PIN:"
 msgstr "Giriş PIN kodunuz:"
 
-#: templates/index.html:2170 templates/index.html:2261
+#: templates/index.html:2182 templates/index.html:2273
 msgid "Share this PIN with others to grant access"
 msgstr "Giriş icazəsi vermək üçün bu PIN kodu başqaları ilə paylaşın"
 
-#: templates/index.html:2175 templates/index.html:2266
+#: templates/index.html:2187 templates/index.html:2278
 msgid "Request Access"
 msgstr "Giriş sorğusu"
 
-#: templates/index.html:2183 templates/index.html:2203
-#: templates/index.html:2271
+#: templates/index.html:2195 templates/index.html:2215
+#: templates/index.html:2283
 msgid "No description available"
 msgstr "Təsvir mövcud deyil"
 
-#: templates/index.html:2185 templates/index.html:2205
-#: templates/index.html:2273
+#: templates/index.html:2197 templates/index.html:2217
+#: templates/index.html:2285
 msgid "Uploaded:"
 msgstr "Uploaded:"
 
-#: templates/index.html:2189 templates/index.html:2209
+#: templates/index.html:2201 templates/index.html:2221
 msgid "Are you sure you want to delete this resource?"
 msgstr "Bu resursu silmək istədiyinizə əminsiniz?"
 
-#: templates/index.html:2226
+#: templates/index.html:2238
 msgid "Error loading materials. Please try again."
 msgstr "Materialların yüklənməsi xətası. Yenidən cəhd edin."
 
-#: templates/index.html:2242
+#: templates/index.html:2254
 msgid "No PDF documents available at the moment."
 msgstr "Hazırda heç bir PDF sənədi mövcud deyil."
 
-#: templates/index.html:2263
+#: templates/index.html:2275
 msgid "Access PDF"
 msgstr "PDF-ə daxil olun"
 
-#: templates/index.html:2277
+#: templates/index.html:2289
 msgid "Are you sure you want to delete this PDF?"
 msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
 
-#: templates/index.html:2288
+#: templates/index.html:2300
 msgid "Error loading PDFs. Please try again."
 msgstr "PDF-ləri yükləmə xətası. Yenidən cəhd edin."
 
-#: templates/index.html:2294
+#: templates/index.html:2306
 msgid "Enter access PIN for:"
 msgstr "Giriş PIN kodunu daxil edin:"
 
-#: templates/index.html:2320
+#: templates/index.html:2332
 msgid "Invalid PIN or access denied."
 msgstr "Yanlış PIN və ya giriş rədd edildi."
 
-#: templates/index.html:2324
+#: templates/index.html:2336
 msgid "Error accessing resource. Please try again."
 msgstr "Mənbəyə daxil olma xətası. Yenidən cəhd edin."
 
-#: templates/index.html:2338 templates/index.html:2340
+#: templates/index.html:2350 templates/index.html:2352
 msgid "Uploading PDF..."
 msgstr "PDF yüklənir..."
 
-#: templates/index.html:2362
+#: templates/index.html:2374
 msgid "PDF uploaded successfully! Access PIN:"
 msgstr "PDF uğurla yükləndi! Giriş PIN kodu:"
 
-#: templates/index.html:2370 templates/index.html:2374
+#: templates/index.html:2382 templates/index.html:2386
 msgid "Error uploading PDF. Please try again."
 msgstr "PDF yükləmə xətası. Yenidən cəhd edin."
 
-#: templates/index.html:2377
+#: templates/index.html:2389
 msgid "Upload PDF"
 msgstr "PDF yükləyin"
 
-#: templates/index.html:2391
+#: templates/index.html:2403
 msgid "Uploading..."
 msgstr "Yüklənir..."
 
-#: templates/index.html:2393
+#: templates/index.html:2405
 msgid "Uploading resource..."
 msgstr "Resurs yüklənir..."
 
-#: templates/index.html:2415
+#: templates/index.html:2427
 msgid "Material uploaded successfully! Access PIN:"
 msgstr "Material uğurla yükləndi! Giriş PIN kodu:"
 
-#: templates/index.html:2423
+#: templates/index.html:2435
 msgid "Error uploading material. Please try again."
 msgstr "Material yüklənərkən xəta baş verdi. Yenidən cəhd edin."
 
-#: templates/index.html:2427
+#: templates/index.html:2439
 msgid "Error uploading resource. Please try again."
 msgstr "Mənbə yüklənərkən xəta baş verdi. Yenidən cəhd edin."
 
-#: templates/index.html:3633 templates/login.html:245 templates/terms.html:80
+#: templates/index.html:3670 templates/login.html:245 templates/terms.html:80
 msgid "Terms of Service"
 msgstr "Xidmət Şərtləri"
 
