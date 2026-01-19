@@ -6,7 +6,7 @@ import time
 from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from flask_login import current_user, login_required
-from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, db
+from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, Translation, db
 from yonca.translation_service import translation_service
 from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
 
@@ -725,18 +725,51 @@ def translate_text():
     text = data['text']
     target_language = data.get('target_language', 'en')
     source_language = data.get('source_language', 'auto')
+    return_all = data.get('return_all', False)
 
     if not text or not text.strip():
         return jsonify({'translated_text': text})
 
     try:
+        # Always call get_translation to ensure all translations are cached
         translated_text = translation_service.get_translation(text, target_language, source_language)
-        return jsonify({
-            'original_text': text,
-            'translated_text': translated_text,
-            'target_language': target_language,
-            'source_language': source_language
-        })
+        
+        if return_all:
+            # Return translations for all supported languages
+            all_translations = {}
+            detected_source = translation_service._detect_source_language(text)
+            
+            for lang in translation_service.SUPPORTED_LANGUAGES:
+                if lang == detected_source:
+                    all_translations[lang] = text
+                else:
+                    # Try to get from cache
+                    cached = Translation.query.filter_by(
+                        source_text=text,
+                        target_language=lang,
+                        source_language='auto'
+                    ).first()
+                    if cached:
+                        all_translations[lang] = cached.translated_text
+                    else:
+                        all_translations[lang] = text  # Fallback to original
+            
+            return jsonify({
+                'original_text': text,
+                'detected_source_language': detected_source,
+                'translations': all_translations,
+                'requested_translation': {
+                    'text': translated_text,
+                    'target_language': target_language
+                }
+            })
+        else:
+            return jsonify({
+                'original_text': text,
+                'translated_text': translated_text,
+                'target_language': target_language,
+                'source_language': source_language
+            })
     except Exception as e:
         current_app.logger.error(f"Translation API error: {str(e)}")
         return jsonify({'error': 'Translation failed', 'translated_text': text}), 500

@@ -2,7 +2,7 @@
 
 ## Summary
 
-A comprehensive automatic content translation system has been successfully created for the Yonca platform. The system automatically translates dynamic content (courses, resources, gallery captions, home content) into Azerbaijani (az) and Russian (ru).
+A comprehensive automatic content translation system has been successfully created for the Yonca platform. The system automatically detects the language of dynamic content (courses, resources, gallery captions, home content) and translates it into Azerbaijani (az) and Russian (ru).
 
 ## What Was Implemented
 

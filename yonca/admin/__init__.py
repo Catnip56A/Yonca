@@ -684,6 +684,12 @@ class CourseView(SecureModelView):
             course.page_description = request.form.get('page_description', '')
             course.page_show_navigation = 'page_show_navigation' in request.form
             course.page_show_footer = 'page_show_footer' in request.form
+            
+            # Course tab labels
+            course.tab_content_label = request.form.get('tab_content_label', 'Content')
+            course.tab_assignments_label = request.form.get('tab_assignments_label', 'Assignments')
+            course.tab_announcements_label = request.form.get('tab_announcements_label', 'Announcements')
+            course.tab_reviews_label = request.form.get('tab_reviews_label', 'Reviews')
 
             # Handle course page features
             features = []

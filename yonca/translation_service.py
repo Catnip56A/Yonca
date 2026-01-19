@@ -35,6 +35,9 @@ PROTECTED_TERMS = [
 class TranslationService:
     """Service for handling AI-powered translations with caching and protected terms"""
 
+    # Supported languages for automatic translation
+    SUPPORTED_LANGUAGES = ['en', 'az', 'ru']
+
     def __init__(self):
         if DEEP_TRANS_AVAILABLE:
             print("Deep Translator available")
@@ -47,6 +50,26 @@ class TranslationService:
             print("BeautifulSoup not available - HTML translation limited")
             
         self.protected_terms = PROTECTED_TERMS
+    
+    def _detect_source_language(self, text):
+        """
+        Detect the source language of the text.
+        Returns language code or 'en' as default.
+        """
+        try:
+            from langdetect import detect, LangDetectException
+            if not text or len(text.strip()) < 10:
+                return 'en'
+            detected = detect(text)
+            # Map to supported languages
+            lang_map = {
+                'az': 'az',
+                'ru': 'ru', 
+                'en': 'en'
+            }
+            return lang_map.get(detected, 'en')
+        except (ImportError, LangDetectException, Exception):
+            return 'en'
     
     def _protect_terms(self, text):
         """
@@ -193,12 +216,12 @@ class TranslationService:
         """
         Get translation for text, using cache if available.
         Protects specified terms from translation.
-        Always detects source language automatically.
+        Detects source language automatically and pre-translates to all supported languages.
 
         Args:
             text (str): Text to translate
             target_language (str): Target language code (e.g., 'az', 'ru')
-            source_language (str): Ignored - always uses 'auto' for detection
+            source_language (str): Ignored - always detects automatically
 
         Returns:
             str: Translated text or original text if translation fails/disabled
@@ -215,12 +238,16 @@ class TranslationService:
         # Skip translation if source and target languages are the same
         if source_language and source_language == target_language:
             return text
-        # Always use 'auto' for source language detection
-        source_language = 'auto'
-        if not text or not text.strip():
+            
+        # Detect the actual source language
+        detected_source = self._detect_source_language(text)
+        source_language = 'auto'  # Keep 'auto' for translation services
+        
+        # Skip if detected source is the same as target
+        if detected_source == target_language:
             return text
 
-        # Check cache first
+        # Check cache first for the requested translation
         cached = Translation.query.filter_by(
             source_text=text,
             target_language=target_language,
@@ -231,122 +258,118 @@ class TranslationService:
             current_app.logger.debug(f"Translation cache hit for: {text[:50]}...")
             return cached.translated_text
 
-        try:
-            # Protect terms before translation
-            protected_text, replacements = self._protect_terms(text)
+        # If not cached, translate to all supported languages
+        self._translate_to_all_languages(text, detected_source)
+        
+        # Now check cache again for the requested translation
+        cached = Translation.query.filter_by(
+            source_text=text,
+            target_language=target_language,
+            source_language=source_language
+        ).first()
+
+        if cached:
+            return cached.translated_text
+        
+        # If still not found, return original text
+        current_app.logger.warning(f"Translation failed for {detected_source} -> {target_language}")
+        return text
+    
+    def _translate_to_all_languages(self, text, detected_source):
+        """
+        Translate text to all supported languages and cache the results.
+        This is called when a translation is requested but not cached.
+        """
+        # Protect terms before translation
+        protected_text, replacements = self._protect_terms(text)
+        
+        for target_lang in self.SUPPORTED_LANGUAGES:
+            if target_lang == detected_source:
+                continue
+                
+            # Check if already cached
+            existing = Translation.query.filter_by(
+                source_text=text,
+                target_language=target_lang,
+                source_language='auto'
+            ).first()
             
-            translated_text = None
-            service_used = None
-            
-            # Use GoogleTranslator if available, otherwise fall back to LibreTranslate
-            if DEEP_TRANS_AVAILABLE:
-                try:
-                    # Set timeout based on environment (shorter in production to prevent Gunicorn timeouts)
-                    flask_env = os.getenv('FLASK_ENV', 'development')
-                    timeout_seconds = 10 if flask_env == 'production' else 30
-                    
-                    # Try Deep Translator with timeout using threading
-                    result = [None]
-                    exception = [None]
-                    
-                    def translate_with_timeout():
-                        try:
-                            result[0] = GoogleTranslator(source='auto', target=target_language).translate(protected_text)
-                        except Exception as e:
-                            exception[0] = e
-                    
-                    translate_thread = threading.Thread(target=translate_with_timeout)
-                    translate_thread.daemon = True
-                    translate_thread.start()
-                    translate_thread.join(timeout_seconds)
-                    
-                    if translate_thread.is_alive():
-                        # Translation timed out
-                        current_app.logger.warning(f"Deep Translator timed out after {timeout_seconds}s")
-                        translated_text = None
-                    elif exception[0]:
-                        # Translation failed with exception
-                        raise exception[0]
-                    else:
-                        # Translation succeeded
-                        translated_text = result[0]
-                        service_used = 'deep_translator'
-                        current_app.logger.debug("Deep Translator succeeded")
+            if existing:
+                continue
+                
+            try:
+                translated_text = None
+                service_used = None
+                
+                # Use GoogleTranslator if available
+                if DEEP_TRANS_AVAILABLE:
+                    try:
+                        flask_env = os.getenv('FLASK_ENV', 'development')
+                        timeout_seconds = 10 if flask_env == 'production' else 30
                         
-                except Exception as e:
-                    current_app.logger.warning(f"Deep Translator failed: {str(e)}, trying LibreTranslate")
-                    translated_text = None
-                    
-                    # Check if we should try LibreTranslate (only in local/server environment)
+                        result = [None]
+                        exception = [None]
+                        
+                        def translate_with_timeout():
+                            try:
+                                result[0] = GoogleTranslator(source='auto', target=target_lang).translate(protected_text)
+                            except Exception as e:
+                                exception[0] = e
+                        
+                        translate_thread = threading.Thread(target=translate_with_timeout)
+                        translate_thread.daemon = True
+                        translate_thread.start()
+                        translate_thread.join(timeout_seconds)
+                        
+                        if not translate_thread.is_alive() and not exception[0]:
+                            translated_text = result[0]
+                            service_used = 'deep_translator'
+                            
+                    except Exception as e:
+                        pass
+                        
+                # Fallback to LibreTranslate if needed
+                if translated_text is None:
                     env = os.getenv('ENV', 'local')
                     flask_env = os.getenv('FLASK_ENV', 'development')
                     
                     if env in ['local', 'server'] and flask_env != 'production':
                         try:
-                            # Fallback to LibreTranslate with timeout
-                            translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
+                            translated_text = self._translate_with_libretranslate(protected_text, 'auto', target_lang)
                             service_used = 'libretranslate'
-                        except Exception as e2:
-                            current_app.logger.error(f"LibreTranslate also failed: {str(e2)}")
-                            translated_text = None
-                    else:
-                        # In production, don't try LibreTranslate since it's not configured
-                        current_app.logger.warning("Skipping LibreTranslate fallback in production environment")
-                        translated_text = None
-            else:
-                # Check environment before trying LibreTranslate
-                env = os.getenv('ENV', 'local')
-                flask_env = os.getenv('FLASK_ENV', 'development')
+                        except Exception as e:
+                            pass
                 
-                if env in ['local', 'server'] and flask_env != 'production':
+                # Use mock translation as final fallback
+                if translated_text is None:
                     try:
-                        translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
-                        service_used = 'libretranslate'
+                        translated_text = self._mock_translate(protected_text, target_lang)
+                        service_used = 'mock'
                     except Exception as e:
-                        current_app.logger.error(f"LibreTranslate failed: {str(e)}")
-                        translated_text = None
-                else:
-                    # In production without Deep Translator, return original text
-                    current_app.logger.warning("No translation services available in production environment")
-                    translated_text = None
-            
-            # If both translation services failed, try mock translation as final fallback
-            if translated_text is None:
-                try:
-                    translated_text = self._mock_translate(protected_text, target_language)
-                    service_used = 'mock'
-                    current_app.logger.info(f"Using mock translation for: {text[:50]}...")
-                except Exception as e:
-                    current_app.logger.error(f"Mock translation also failed: {str(e)}")
-                    return text
-            
-            # Restore protected terms
-            translated_text = self._restore_terms(translated_text, replacements)
-
-            # Only cache successful translations (not mock ones)
-            if service_used != 'mock':
-                try:
-                    new_translation = Translation(
-                        source_text=text,
-                        source_language=source_language,
-                        target_language=target_language,
-                        translated_text=translated_text,
-                        translation_service=service_used
-                    )
-                    db.session.add(new_translation)
-                    db.session.commit()
-                    current_app.logger.debug(f"Translation performed and cached: {text[:50]}... -> {translated_text[:50]}...")
-                except Exception as e:
-                    current_app.logger.error(f"Failed to cache translation: {str(e)}")
-            else:
-                current_app.logger.debug(f"Mock translation used: {text[:50]}... -> {translated_text[:50]}...")
-            
-            return translated_text
-
-        except Exception as e:
-            current_app.logger.error(f"Translation failed: {str(e)}")
-            # Return original text if translation fails
-            return text
+                        continue
+                
+                # Restore protected terms
+                translated_text = self._restore_terms(translated_text, replacements)
+                
+                # Cache the translation
+                if service_used != 'mock':
+                    try:
+                        new_translation = Translation(
+                            source_text=text,
+                            source_language='auto',
+                            target_language=target_lang,
+                            translated_text=translated_text,
+                            translation_service=service_used
+                        )
+                        db.session.add(new_translation)
+                        db.session.commit()
+                        current_app.logger.debug(f"Pre-translated and cached: {text[:30]}... -> {target_lang}")
+                    except Exception as e:
+                        current_app.logger.error(f"Failed to cache pre-translation: {str(e)}")
+                        
+            except Exception as e:
+                current_app.logger.error(f"Failed to pre-translate to {target_lang}: {str(e)}")
+                continue
 
     def translate_html(self, html_content, target_language, source_language='auto'):
         """

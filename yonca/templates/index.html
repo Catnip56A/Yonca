@@ -1725,6 +1725,18 @@
                 console.log('Prevented default event');
             }
 
+            // Update URL hash for navigation (except for home)
+            if (pageId !== 'home') {
+                // Map page ID to URL hash
+                let hash = pageId;
+                if (pageId === 'tavi') hash = 'tavi-test';
+                if (pageId === 'contacts') hash = 'contact';
+                window.location.hash = hash;
+            } else {
+                // For home, remove the hash
+                history.replaceState(null, null, window.location.pathname);
+            }
+
             // Show selected page first to check if it exists
             const pageElement = document.getElementById(pageId);
             
@@ -3284,10 +3296,14 @@
             const hash = window.location.hash.substring(1); // Remove the '#'
             if (hash && hash !== 'home') {
                 // Valid page hashes - must match section IDs in HTML
-                const validPages = ['courses', 'forum', 'resources', 'tavi', 'contacts', 'about'];
+                const validPages = ['courses', 'forum', 'resources', 'tavi-test', 'contact', 'contacts', 'about'];
                 if (validPages.includes(hash)) {
                     console.log('Loading page from URL hash:', hash);
-                    showPage(hash);
+                    // Map hash to actual page ID
+                    let pageId = hash;
+                    if (hash === 'tavi-test') pageId = 'tavi';
+                    if (hash === 'contact') pageId = 'contacts';
+                    showPage(pageId);
                 } else {
                     console.log('Invalid hash, loading initial page:', initialPage);
                     showPage(initialPage);
@@ -3300,6 +3316,27 @@
 
             checkUser();
             // Don't load forum messages here - let checkUser handle it after determining auth status
+
+            // Handle hash changes (when user manually changes URL or uses back/forward)
+            window.addEventListener('hashchange', function() {
+                const hash = window.location.hash.substring(1); // Remove the '#'
+                if (hash) {
+                    // Valid page hashes - must match navbar hrefs
+                    const validPages = ['courses', 'forum', 'resources', 'tavi-test', 'contact', 'about'];
+                    if (validPages.includes(hash)) {
+                        console.log('Hash changed to:', hash, '- showing page');
+                        // Map hash to actual page ID
+                        let pageId = hash;
+                        if (hash === 'tavi-test') pageId = 'tavi';
+                        if (hash === 'contact') pageId = 'contacts';
+                        showPage(pageId);
+                    }
+                } else {
+                    // No hash means home
+                    console.log('Hash removed - showing home page');
+                    showPage('home');
+                }
+            });
 
             // Add navigation event listeners (include dropdown items but exclude dropdown toggles and language button)
             console.log('Initializing nav links - language button should be excluded');

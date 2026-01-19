@@ -567,6 +567,91 @@ def course_page_enrolled(course_id):
             flash(f"Submission visibility updated: {'Visible to others' if submission.allow_others_to_view else 'Private'}", 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
+        # Delete folder
+        elif action == 'delete_folder' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContentFolder
+            folder_id = request.form.get('folder_id')
+            folder = CourseContentFolder.query.get(folder_id)
+            
+            if not folder:
+                flash('Folder not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Check if folder belongs to this course
+            if folder.course_id != course.id:
+                flash('Folder does not belong to this course.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Check if folder has contents or subfolders
+            if folder.items.count() > 0 or folder.subfolders.count() > 0:
+                flash('Cannot delete folder that contains files or subfolders. Please delete them first.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Delete from database
+            db.session.delete(folder)
+            db.session.commit()
+            flash('Folder deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
+        # Delete assignment
+        elif action == 'delete_assignment' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseAssignment
+            from yonca.google_drive_service import authenticate, delete_file
+            assignment_id = request.form.get('assignment_id')
+            assignment = CourseAssignment.query.get(assignment_id)
+            
+            if not assignment:
+                flash('Assignment not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Check if assignment belongs to this course
+            if assignment.course_id != course.id:
+                flash('Assignment does not belong to this course.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Delete all submissions first
+            for submission in assignment.submissions:
+                # Delete from Google Drive
+                if submission.drive_file_id:
+                    service = authenticate()
+                    if service:
+                        try:
+                            delete_file(service, submission.drive_file_id)
+                        except Exception as e:
+                            print(f"Error deleting submission file from Google Drive: {e}")
+                db.session.delete(submission)
+            
+            # Delete assignment
+            db.session.delete(assignment)
+            db.session.commit()
+            flash('Assignment deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
+        # Delete announcement
+        elif action == 'delete_announcement' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseAnnouncement
+            announcement_id = request.form.get('announcement_id')
+            announcement = CourseAnnouncement.query.get(announcement_id)
+            
+            if not announcement:
+                flash('Announcement not found.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Check if announcement belongs to this course
+            if announcement.course_id != course.id:
+                flash('Announcement does not belong to this course.', 'error')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            
+            # Delete all replies first
+            for reply in announcement.replies:
+                db.session.delete(reply)
+            
+            # Delete announcement
+            db.session.delete(announcement)
+            db.session.commit()
+            flash('Announcement deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
         # Add review
         elif action == 'add_review' and current_user.is_authenticated:
             rating = request.form.get('rating')

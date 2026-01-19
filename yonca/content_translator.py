@@ -56,8 +56,6 @@ def detect_language(text):
             'az': 'az',  # Azerbaijani
             'ru': 'ru',  # Russian
             'en': 'en',  # English
-            'tr': 'tr',  # Turkish
-            'ar': 'ar',  # Arabic
         }
         return lang_map.get(detected, detected)
     except (LangDetectException, Exception):

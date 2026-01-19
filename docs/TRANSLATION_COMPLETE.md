@@ -5,7 +5,7 @@
 ### 1. **Admin "Translate All Content" Button** ✓
    - **Location**: Admin dashboard toolbar (top-right area)
    - **Icon**: 🌐 "Translate Content" button
-   - **Functionality**: One-click translation of all content to Azerbaijani and Russian
+   - **Functionality**: One-click translation of all content to Azerbaijani and Russian with automatic language detection
    - **User Experience**: 
      - Click button → Confirmation dialog appears
      - Shows "Translating..." with spinner while processing
@@ -79,7 +79,7 @@ The `/api/resources` endpoint now returns translated resource titles and descrip
 - **Table**: `content_translation`
 - **Indexed**: Fast lookups by content_type, content_id, field_name, target_language
 - **Languages**: Azerbaijani (az), Russian (ru)
-- **Source**: English (en)
+- **Source**: Auto-detected from content
 
 ## Translation Coverage
 

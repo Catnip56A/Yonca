@@ -8,7 +8,8 @@ The system automatically translates dynamic content when it's created or updated
 
 ## Features
 
-- **Automatic translation**: Content is automatically translated to Azerbaijani (az) and Russian (ru) when created/updated
+- **Automatic language detection**: Content language is automatically detected when created/updated
+- **Multi-language translation**: Content is automatically translated to Azerbaijani (az) and Russian (ru)
 - **Template helpers**: Use `translate_field()` and `translate_json()` to display translated content
 - **Database caching**: Translations are stored in the database for fast retrieval
 - **Protected terms**: "Yonca" brand name is never translated
