@@ -5,6 +5,9 @@ import hashlib
 import os
 import re
 import requests
+import signal
+import platform
+import threading
 from yonca.models import Translation, db
 from flask import current_app
 
@@ -198,8 +201,20 @@ class TranslationService:
             source_language (str): Ignored - always uses 'auto' for detection
 
         Returns:
-            str: Translated text with protected terms preserved
+            str: Translated text or original text if translation fails/disabled
         """
+        # Check if translations are disabled via environment variable
+        if os.getenv('DISABLE_TRANSLATIONS', '').lower() in ('true', '1', 'yes'):
+            current_app.logger.info("Translations disabled via DISABLE_TRANSLATIONS environment variable")
+            return text
+            
+        # Skip translation if text is too short
+        if not text or len(text.strip()) < 2:
+            return text
+            
+        # Skip translation if source and target languages are the same
+        if source_language and source_language == target_language:
+            return text
         # Always use 'auto' for source language detection
         source_language = 'auto'
         if not text or not text.strip():
@@ -226,12 +241,41 @@ class TranslationService:
             # Use GoogleTranslator if available, otherwise fall back to LibreTranslate
             if DEEP_TRANS_AVAILABLE:
                 try:
-                    # Try Deep Translator first (no timeout as it's external service)
-                    translated_text = GoogleTranslator(source='auto', target=target_language).translate(protected_text)
-                    service_used = 'deep_translator'
-                    current_app.logger.debug("Deep Translator succeeded")
+                    # Set timeout based on environment (shorter in production to prevent Gunicorn timeouts)
+                    flask_env = os.getenv('FLASK_ENV', 'development')
+                    timeout_seconds = 10 if flask_env == 'production' else 30
+                    
+                    # Try Deep Translator with timeout using threading
+                    result = [None]
+                    exception = [None]
+                    
+                    def translate_with_timeout():
+                        try:
+                            result[0] = GoogleTranslator(source='auto', target=target_language).translate(protected_text)
+                        except Exception as e:
+                            exception[0] = e
+                    
+                    translate_thread = threading.Thread(target=translate_with_timeout)
+                    translate_thread.daemon = True
+                    translate_thread.start()
+                    translate_thread.join(timeout_seconds)
+                    
+                    if translate_thread.is_alive():
+                        # Translation timed out
+                        current_app.logger.warning(f"Deep Translator timed out after {timeout_seconds}s")
+                        translated_text = None
+                    elif exception[0]:
+                        # Translation failed with exception
+                        raise exception[0]
+                    else:
+                        # Translation succeeded
+                        translated_text = result[0]
+                        service_used = 'deep_translator'
+                        current_app.logger.debug("Deep Translator succeeded")
+                        
                 except Exception as e:
                     current_app.logger.warning(f"Deep Translator failed: {str(e)}, trying LibreTranslate")
+                    translated_text = None
                     
                     # Check if we should try LibreTranslate (only in local/server environment)
                     env = os.getenv('ENV', 'local')
