@@ -1138,8 +1138,8 @@ document.getElementById('translate-all').addEventListener('click', async functio
     try {
         while (continueProcessing) {
             const url = nextType === 'all'
-                ? `/admin/translate-content?offset=${nextOffset}&batch_size=5`
-                : `/admin/translate-content?offset=${nextOffset}&batch_size=5&type=${nextType}`;
+                ? `/admin/translate/translate-content?offset=${nextOffset}&batch_size=5`
+                : `/admin/translate/translate-content?offset=${nextOffset}&batch_size=5&type=${nextType}`;
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -1177,10 +1177,6 @@ document.getElementById('translate-all').addEventListener('click', async functio
         button.innerHTML = originalHtml;
     }
 });
-        button.disabled = false;
-        button.innerHTML = originalHtml;
-    }
-});
 
 // Delete translations button handler
 document.getElementById('delete-translations').addEventListener('click', async function() {
@@ -1200,7 +1196,7 @@ document.getElementById('delete-translations').addEventListener('click', async f
     button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Deleting...';
     
     try {
-        const response = await fetch('/admin/delete-translations', {
+        const response = await fetch('/admin/translate/delete-translations', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
