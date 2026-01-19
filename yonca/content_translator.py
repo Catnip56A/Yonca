@@ -1,6 +1,7 @@
 """
 Content translation helper for automatic translation of dynamic content
 """
+import re
 from yonca.models import ContentTranslation, db
 from yonca.translation_service import translation_service
 
@@ -98,8 +99,16 @@ def translate_content(content_type, content_id, field_name, text, source_languag
             continue
             
         try:
-            # Translate the text using get_translation method
-            translated = translation_service.get_translation(text, target_lang, source_language)
+            # Check if content contains HTML
+            is_html = bool(re.search(r'<[^>]+>', text))
+            
+            if is_html:
+                # Use HTML-aware translation
+                translated = translation_service.translate_html(text, target_lang, source_language)
+                print(f"   Translated HTML content for {content_type}:{content_id}.{field_name} -> {target_lang}")
+            else:
+                # Use regular text translation
+                translated = translation_service.get_translation(text, target_lang, source_language)
             
             if not translated:
                 print(f"Warning: Translation failed for {content_type}:{content_id}.{field_name} -> {target_lang}")
@@ -289,7 +298,7 @@ def get_translated_content(content_type, content_id, field_name, original_text, 
     Returns:
         Translated text or original text if translation not found
     """
-    if not target_language or target_language == 'en':
+    if not target_language:
         return original_text
     
     translation = ContentTranslation.query.filter_by(

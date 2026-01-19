@@ -15,6 +15,13 @@ except ImportError:
     DEEP_TRANS_AVAILABLE = False
     print("Warning: deep-translator not available, using LibreTranslate only")
 
+try:
+    from bs4 import BeautifulSoup
+    BS4_AVAILABLE = True
+except ImportError:
+    BS4_AVAILABLE = False
+    print("Warning: beautifulsoup4 not available, HTML translation will be limited")
+
 # Protected terms that should never be translated
 PROTECTED_TERMS = [
     'Yonca',
@@ -30,6 +37,12 @@ class TranslationService:
             print("Deep Translator available")
         else:
             print("Using LibreTranslate only")
+        
+        if BS4_AVAILABLE:
+            print("BeautifulSoup available for HTML translation")
+        else:
+            print("BeautifulSoup not available - HTML translation limited")
+            
         self.protected_terms = PROTECTED_TERMS
     
     def _protect_terms(self, text):
@@ -94,8 +107,8 @@ class TranslationService:
         }
 
         try:
-            # Send POST request to LibreTranslate API
-            response = requests.post(url, json=payload, timeout=10)
+            # Send POST request to LibreTranslate API with shorter timeout
+            response = requests.post(url, json=payload, timeout=5)  # Reduced from 10 to 5 seconds
             response.raise_for_status()  # Raise exception for bad status codes
 
             # Parse the response
@@ -104,15 +117,17 @@ class TranslationService:
 
             return translated_text
 
+        except requests.exceptions.Timeout:
+            current_app.logger.error("LibreTranslate request timed out after 5 seconds")
+            raise Exception("LibreTranslate timeout")
         except requests.exceptions.RequestException as e:
             # Log the error
             current_app.logger.error(f"LibreTranslate request failed: {str(e)}")
-            # Return original text if translation fails
-            return text
+            raise e
         except Exception as e:
             # Catch any other errors
             current_app.logger.error(f"LibreTranslate translation error: {str(e)}")
-            return text
+            raise e
 
     def translate_with_libretranslate(text, source_language, target_language):
         """
@@ -205,42 +220,250 @@ class TranslationService:
             # Protect terms before translation
             protected_text, replacements = self._protect_terms(text)
             
+            translated_text = None
+            service_used = None
+            
             # Use GoogleTranslator if available, otherwise fall back to LibreTranslate
             if DEEP_TRANS_AVAILABLE:
                 try:
+                    # Try Deep Translator first (no timeout as it's external service)
                     translated_text = GoogleTranslator(source='auto', target=target_language).translate(protected_text)
                     service_used = 'deep_translator'
+                    current_app.logger.debug("Deep Translator succeeded")
                 except Exception as e:
                     current_app.logger.warning(f"Deep Translator failed: {str(e)}, trying LibreTranslate")
-                    # Fallback to LibreTranslate
-                    translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
-                    service_used = 'libretranslate'
+                    
+                    # Check if we should try LibreTranslate (only in local/server environment)
+                    env = os.getenv('ENV', 'local')
+                    flask_env = os.getenv('FLASK_ENV', 'development')
+                    
+                    if env in ['local', 'server'] and flask_env != 'production':
+                        try:
+                            # Fallback to LibreTranslate with timeout
+                            translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
+                            service_used = 'libretranslate'
+                        except Exception as e2:
+                            current_app.logger.error(f"LibreTranslate also failed: {str(e2)}")
+                            translated_text = None
+                    else:
+                        # In production, don't try LibreTranslate since it's not configured
+                        current_app.logger.warning("Skipping LibreTranslate fallback in production environment")
+                        translated_text = None
             else:
-                # Use LibreTranslate if Deep Translator not available
-                translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
-                service_used = 'libretranslate'
+                # Check environment before trying LibreTranslate
+                env = os.getenv('ENV', 'local')
+                flask_env = os.getenv('FLASK_ENV', 'development')
+                
+                if env in ['local', 'server'] and flask_env != 'production':
+                    try:
+                        translated_text = self._translate_with_libretranslate(protected_text, source_language, target_language)
+                        service_used = 'libretranslate'
+                    except Exception as e:
+                        current_app.logger.error(f"LibreTranslate failed: {str(e)}")
+                        translated_text = None
+                else:
+                    # In production without Deep Translator, return original text
+                    current_app.logger.warning("No translation services available in production environment")
+                    translated_text = None
+            
+            # If both translation services failed, try mock translation as final fallback
+            if translated_text is None:
+                try:
+                    translated_text = self._mock_translate(protected_text, target_language)
+                    service_used = 'mock'
+                    current_app.logger.info(f"Using mock translation for: {text[:50]}...")
+                except Exception as e:
+                    current_app.logger.error(f"Mock translation also failed: {str(e)}")
+                    return text
             
             # Restore protected terms
             translated_text = self._restore_terms(translated_text, replacements)
 
-            # Cache the result
-            new_translation = Translation(
-                source_text=text,
-                source_language=source_language,
-                target_language=target_language,
-                translated_text=translated_text,
-                translation_service=service_used
-            )
-            db.session.add(new_translation)
-            db.session.commit()
-
-            current_app.logger.debug(f"Translation performed and cached: {text[:50]}... -> {translated_text[:50]}...")
+            # Only cache successful translations (not mock ones)
+            if service_used != 'mock':
+                try:
+                    new_translation = Translation(
+                        source_text=text,
+                        source_language=source_language,
+                        target_language=target_language,
+                        translated_text=translated_text,
+                        translation_service=service_used
+                    )
+                    db.session.add(new_translation)
+                    db.session.commit()
+                    current_app.logger.debug(f"Translation performed and cached: {text[:50]}... -> {translated_text[:50]}...")
+                except Exception as e:
+                    current_app.logger.error(f"Failed to cache translation: {str(e)}")
+            else:
+                current_app.logger.debug(f"Mock translation used: {text[:50]}... -> {translated_text[:50]}...")
+            
             return translated_text
 
         except Exception as e:
             current_app.logger.error(f"Translation failed: {str(e)}")
             # Return original text if translation fails
             return text
+
+    def translate_html(self, html_content, target_language, source_language='auto'):
+        """
+        Translate HTML content while preserving HTML structure.
+        
+        Args:
+            html_content (str): HTML content to translate
+            target_language (str): Target language code
+            source_language (str): Source language code (default: auto-detect)
+            
+        Returns:
+            str: Translated HTML content
+        """
+        if not html_content or not html_content.strip():
+            return html_content
+            
+        if not BS4_AVAILABLE:
+            current_app.logger.warning("BeautifulSoup not available, falling back to plain text translation")
+            return self.get_translation(html_content, target_language, source_language)
+        
+        try:
+            # Split content into lines to preserve line structure
+            lines = html_content.replace('\r\n', '\n').split('\n')
+            translated_lines = []
+            
+            for line in lines:
+                if line.strip():  # Only translate non-empty lines
+                    # Check if this line contains button syntax
+                    if '<button:' in line and '</button>' in line:
+                        # This is a button line - translate the button text but keep HTML structure
+                        button_pattern = r'<button:\s*\[([^\]]+)\]\s*>\s*([^<\s]+)\s*</button>'
+                        def translate_button(match):
+                            button_text = match.group(1).strip()
+                            url = match.group(2).strip()
+                            translated_button_text = self.get_translation(button_text, target_language, source_language)
+                            return f"<button: [{translated_button_text}] > {url} </button>"
+                        
+                        translated_line = re.sub(button_pattern, translate_button, line, flags=re.IGNORECASE)
+                        translated_lines.append(translated_line)
+                        continue  # Skip BeautifulSoup processing for button lines
+                    else:
+                        # This is regular HTML - parse and translate
+                        # Protect any button syntax in this line first
+                        button_pattern = r'<button:\s*\[([^\]]+)\]\s*>\s*([^<\s]+)\s*</button>'
+                        button_placeholders = []
+                        
+                        def protect_buttons(match):
+                            button_text = match.group(1).strip()
+                            url = match.group(2).strip()
+                            placeholder = f"__BUTTON_{len(button_placeholders)}__"
+                            button_placeholders.append((button_text, url))
+                            return placeholder
+                        
+                        protected_line = re.sub(button_pattern, protect_buttons, line, flags=re.IGNORECASE)
+                        
+                        # Parse and translate HTML for this line
+                        if protected_line.strip():
+                            soup = BeautifulSoup(protected_line, 'html.parser')
+                            
+                            # Find text nodes
+                            text_nodes = []
+                            def collect_text_nodes(element):
+                                if hasattr(element, 'attrs'):
+                                    for attr in ['alt', 'title', 'placeholder', 'value']:
+                                        if attr in element.attrs and element.attrs[attr]:
+                                            attr_text = element.attrs[attr].strip()
+                                            if attr_text and len(attr_text) > 0:
+                                                text_nodes.append((element, attr, attr_text))
+                                
+                                for child in element.children:
+                                    if child.name in ['script', 'style', 'code', 'pre']:
+                                        continue
+                                    elif isinstance(child, str):
+                                        text = child.strip()
+                                        if text and len(text) > 0:
+                                            text_nodes.append((child, text))
+                                    elif child.name:
+                                        collect_text_nodes(child)
+                            
+                            collect_text_nodes(soup)
+                            
+                            # Translate text nodes
+                            for item in text_nodes:
+                                try:
+                                    if len(item) == 2:
+                                        text_node, original_text = item
+                                        if not original_text.startswith('__BUTTON_'):
+                                            translated_text = self.get_translation(original_text, target_language, source_language)
+                                            if translated_text and translated_text != original_text:
+                                                text_node.replace_with(translated_text)
+                                    else:
+                                        element, attr, original_text = item
+                                        translated_text = self.get_translation(original_text, target_language, source_language)
+                                        if translated_text and translated_text != original_text:
+                                            element.attrs[attr] = translated_text
+                                except Exception as e:
+                                    current_app.logger.warning(f"Failed to translate '{original_text[:50]}...': {str(e)}")
+                            
+                            translated_line = str(soup)
+                            
+                            # Restore buttons
+                            for i, (button_text, url) in enumerate(button_placeholders):
+                                translated_button_text = self.get_translation(button_text, target_language, source_language)
+                                button_html = f"<button: [{translated_button_text}] > {url} </button>"
+                                translated_line = translated_line.replace(f"__BUTTON_{i}__", button_html)
+                        else:
+                            translated_line = protected_line
+                else:
+                    translated_line = line  # Preserve empty lines
+                
+                translated_lines.append(translated_line)
+            
+            # Join lines back
+            translated_html = '\n'.join(translated_lines)
+            
+            # Add lang attribute - but skip if HTML contains custom button syntax
+            if target_language and target_language != 'en' and '<button:' not in translated_html:
+                try:
+                    final_soup = BeautifulSoup(translated_html, 'html.parser')
+                    if final_soup and hasattr(final_soup, 'attrs'):
+                        final_soup.attrs['lang'] = target_language
+                        translated_html = str(final_soup)
+                except Exception as e:
+                    current_app.logger.warning(f"Failed to add lang attribute: {str(e)}")
+            
+            return translated_html
+            
+        except Exception as e:
+            current_app.logger.error(f"HTML translation failed: {str(e)}")
+            # Fall back to plain text translation
+            return self.get_translation(html_content, target_language, source_language)
+
+    def extract_text_from_html(self, html_content):
+        """
+        Extract plain text from HTML content.
+        
+        Args:
+            html_content (str): HTML content
+            
+        Returns:
+            str: Plain text extracted from HTML
+        """
+        if not html_content:
+            return ""
+            
+        if BS4_AVAILABLE:
+            try:
+                soup = BeautifulSoup(html_content, 'html.parser')
+                # Extract text while preserving some structure
+                return soup.get_text(separator=' ', strip=True)
+            except Exception as e:
+                current_app.logger.warning(f"Failed to parse HTML: {str(e)}")
+        
+        # Fallback: simple regex-based text extraction
+        import re
+        # Remove HTML tags
+        text = re.sub(r'<[^>]+>', '', html_content)
+        # Decode HTML entities
+        import html
+        text = html.unescape(text)
+        return text.strip()
 
     def _mock_translate(self, text, target_language):
         """Mock translation for development"""
@@ -318,6 +541,54 @@ class TranslationService:
                     'I would like...': 'Ich möchte...',
                     'Do you speak English?': 'Sprechen Sie Englisch?',
                     'I speak a little German': 'Ich spreche ein bisschen Deutsch'
+                },
+                'az': {
+                    'Hello': 'Salam',
+                    'Welcome': 'Xoş gəlmisiniz',
+                    'Thank you': 'Təşəkkür edirəm',
+                    'Please': 'Zəhmət olmasa',
+                    'Yes': 'Bəli',
+                    'No': 'Xeyr',
+                    'Good morning': 'Sabahınız xeyir',
+                    'Good evening': 'Axşamınız xeyir',
+                    'How are you?': 'Necəsiniz?',
+                    'I am fine': 'Yaxşıyam',
+                    'What is your name?': 'Adınız nədir?',
+                    'My name is': 'Mənim adım',
+                    'I need help': 'Köməyə ehtiyacım var',
+                    'Can you help me?': 'Mənə kömək edə bilərsiniz?',
+                    'I understand': 'Başadüşürəm',
+                    'I do not understand': 'Başadüşmürəm',
+                    'Please speak slowly': 'Zəhmət olmasa yavaş danışın',
+                    'Where is...?': 'Haradadır...?',
+                    'How much does it cost?': 'Neçəyə başa gəlir?',
+                    'I would like...': 'İstərdim...',
+                    'Do you speak English?': 'İngiliscə danışırsınız?',
+                    'I speak a little Azeri': 'Azərbaycanca bir az danışıram'
+                },
+                'ru': {
+                    'Hello': 'Привет',
+                    'Welcome': 'Добро пожаловать',
+                    'Thank you': 'Спасибо',
+                    'Please': 'Пожалуйста',
+                    'Yes': 'Да',
+                    'No': 'Нет',
+                    'Good morning': 'Доброе утро',
+                    'Good evening': 'Добрый вечер',
+                    'How are you?': 'Как дела?',
+                    'I am fine': 'У меня всё хорошо',
+                    'What is your name?': 'Как ваше имя?',
+                    'My name is': 'Меня зовут',
+                    'I need help': 'Мне нужна помощь',
+                    'Can you help me?': 'Вы можете мне помочь?',
+                    'I understand': 'Я понимаю',
+                    'I do not understand': 'Я не понимаю',
+                    'Please speak slowly': 'Пожалуйста, говорите медленно',
+                    'Where is...?': 'Где...?',
+                    'How much does it cost?': 'Сколько это стоит?',
+                    'I would like...': 'Я бы хотел...',
+                    'Do you speak English?': 'Вы говорите по-английски?',
+                    'I speak a little Russian': 'Я говорю немного по-русски'
                 }
             }
         }

@@ -706,14 +706,42 @@ class CourseView(SecureModelView):
             course.page_features = features
 
             db.session.commit()
+            
+            # Automatically translate the course content
+            try:
+                from yonca.content_translator import auto_translate_course
+                auto_translate_course(course)
+                db.session.commit()
+                print(f"Auto-translated course: {course.title}")
+            except Exception as e:
+                print(f"Warning: Failed to auto-translate course {course.id}: {str(e)}")
+            
             flash('Course updated successfully!', 'success')
             return redirect(url_for('admin.index'))
 
         # Get existing menu items (no longer used, but keep for backward compatibility)
         menu_items = course.dropdown_menu or []
 
+        # For editing, we need to show the original English text, not translated versions
+        # Create a dict with English versions of translatable fields
+        from yonca.content_translator import get_translated_content
+        english_course_data = {
+            'id': course.id,
+            'title': get_translated_content('course', course.id, 'title', course.title, 'en') or course.title,
+            'description': get_translated_content('course', course.id, 'description', course.description, 'en') or course.description,
+            'time_slot': course.time_slot,
+            'profile_emoji': course.profile_emoji,
+            'page_welcome_title': get_translated_content('course', course.id, 'page_welcome_title', course.page_welcome_title or '', 'en') or course.page_welcome_title,
+            'page_subtitle': get_translated_content('course', course.id, 'page_subtitle', course.page_subtitle or '', 'en') or course.page_subtitle,
+            'page_description': get_translated_content('course', course.id, 'page_description', course.page_description or '', 'en') or course.page_description,
+            'page_show_navigation': course.page_show_navigation,
+            'page_show_footer': course.page_show_footer,
+            'page_features': course.page_features,
+            'dropdown_menu': course.dropdown_menu
+        }
+
         return self.render('admin/course_edit.html',
-                         course=course,
+                         course=english_course_data,
                          menu_items=menu_items,
                          menu_item_count=len(menu_items))
 
@@ -758,6 +786,16 @@ class CourseView(SecureModelView):
 
             db.session.add(course)
             db.session.commit()
+            
+            # Automatically translate the new course content
+            try:
+                from yonca.content_translator import auto_translate_course
+                auto_translate_course(course)
+                db.session.commit()
+                print(f"Auto-translated new course: {course.title}")
+            except Exception as e:
+                print(f"Warning: Failed to auto-translate new course {course.id}: {str(e)}")
+            
             flash('Course created successfully!', 'success')
             return redirect(url_for('admin.index'))
 

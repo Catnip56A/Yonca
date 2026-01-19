@@ -23,6 +23,42 @@
     .star-display .star.filled {
         color: #ffc107;
     }
+    
+    /* Multilingual text handling */
+    .course-marketing h1, .course-marketing h2, .course-marketing h4 {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    .course-marketing p {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    /* Ensure buttons and links work with long translated text */
+    .btn {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    
+    /* Feature cards should be flexible */
+    .course-marketing .col-md-4 > div {
+        display: flex;
+        flex-direction: column;
+        min-height: 300px;
+    }
+    
+    .course-marketing .col-md-4 h4 {
+        flex-shrink: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .course-marketing .col-md-4 p {
+        flex: 1;
+        margin-bottom: 0;
+    }
 </style>
 {% endblock %}
 
@@ -47,9 +83,11 @@
 {% if course.page_description %}
     <div style="margin-top:1.2rem; font-size:1.1rem; color:#444; font-family: 'Georgia', serif; line-height:1.6;">
         {% set translated_desc = translate_field('course', course.id, 'page_description', course.page_description) %}
-        {% set normalized_desc = translated_desc.replace('\r\n', '\n') %}
-        {% for paragraph in normalized_desc.split('\n\n') %}
+        {% set paragraphs = translated_desc.split('\n') %}
+        {% for paragraph in paragraphs %}
+        {% if paragraph.strip() %}
         <p style="margin-bottom:1rem;">{{ paragraph | parse_buttons | safe }}</p>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}
