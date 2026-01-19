@@ -89,17 +89,13 @@ def translate_content(content_type, content_id, field_name, text, source_languag
         session = db.session
     
     # Determine which languages to translate to
-    # Always include English if source is not English
+    # Include English if source is not English
     target_langs = TARGET_LANGUAGES.copy()
     if source_language != 'en' and 'en' not in target_langs:
         target_langs.append('en')
-        print(f"   Added English to target languages (source: {source_language})")
-    
-    print(f"   Target languages: {target_langs} (source: {source_language})")
     
     for target_lang in target_langs:
         if target_lang == source_language:
-            print(f"   Skipping {target_lang} (same as source)")
             continue
             
         try:
