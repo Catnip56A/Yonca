@@ -13,12 +13,9 @@ from flask import current_app
 
 try:
     from deep_translator import GoogleTranslator
-    from langdetect import detect, LangDetectException
     DEEP_TRANS_AVAILABLE = True
-    LANGDETECT_AVAILABLE = True
 except ImportError:
     DEEP_TRANS_AVAILABLE = False
-    LANGDETECT_AVAILABLE = False
     print("Warning: deep-translator not available, using LibreTranslate only")
 
 try:
@@ -44,41 +41,12 @@ class TranslationService:
         else:
             print("Using LibreTranslate only")
         
-        if LANGDETECT_AVAILABLE:
-            print("Language detection available")
-        else:
-            print("Warning: langdetect not available, source language detection disabled")
-        
         if BS4_AVAILABLE:
             print("BeautifulSoup available for HTML translation")
         else:
             print("BeautifulSoup not available - HTML translation limited")
             
         self.protected_terms = PROTECTED_TERMS
-    
-    def detect_language(self, text):
-        """
-        Detect the language of the given text.
-        
-        Args:
-            text (str): Text to detect language for
-            
-        Returns:
-            str: Language code (e.g., 'en', 'az', 'ru') or None if detection fails
-        """
-        if not LANGDETECT_AVAILABLE or not text or len(text.strip()) < 3:
-            return None
-            
-        try:
-            detected_lang = detect(text)
-            current_app.logger.debug(f"Detected language: {detected_lang} for text: {text[:50]}...")
-            return detected_lang
-        except LangDetectException as e:
-            current_app.logger.warning(f"Language detection failed: {str(e)}")
-            return None
-        except Exception as e:
-            current_app.logger.error(f"Unexpected error in language detection: {str(e)}")
-            return None
     
     def _protect_terms(self, text):
         """
@@ -225,15 +193,15 @@ class TranslationService:
         """
         Get translation for text, using cache if available.
         Protects specified terms from translation.
-        Detects source language and skips translation if source = target.
+        Always detects source language automatically.
 
         Args:
             text (str): Text to translate
-            target_language (str): Target language code (e.g., 'az', 'ru', 'en')
-            source_language (str): Source language code (optional, will auto-detect if not provided)
+            target_language (str): Target language code (e.g., 'az', 'ru')
+            source_language (str): Ignored - always uses 'auto' for detection
 
         Returns:
-            str: Translated text or original text if translation fails/disabled/not needed
+            str: Translated text or original text if translation fails/disabled
         """
         # Check if translations are disabled via environment variable
         if os.getenv('DISABLE_TRANSLATIONS', '').lower() in ('true', '1', 'yes'):
@@ -243,21 +211,12 @@ class TranslationService:
         # Skip translation if text is too short
         if not text or len(text.strip()) < 2:
             return text
-        
-        # Detect source language if not provided
-        if not source_language or source_language == 'auto':
-            detected_lang = self.detect_language(text)
-            if detected_lang:
-                source_language = detected_lang
-                current_app.logger.debug(f"Detected source language: {source_language}")
-            else:
-                # If detection fails, use 'auto' for translator
-                source_language = 'auto'
-        
+            
         # Skip translation if source and target languages are the same
-        if source_language and source_language != 'auto' and source_language == target_language:
-            current_app.logger.debug(f"Skipping translation: source ({source_language}) = target ({target_language})")
+        if source_language and source_language == target_language:
             return text
+        # Always use 'auto' for source language detection
+        source_language = 'auto'
         if not text or not text.strip():
             return text
 
