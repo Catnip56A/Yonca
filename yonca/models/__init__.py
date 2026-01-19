@@ -444,6 +444,38 @@ class CourseReview(db.Model):
         return f'<CourseReview {self.id} - {self.title}>'
 
 
+class BackgroundJob(db.Model):
+    """Model for tracking background jobs"""
+    id = db.Column(db.String(36), primary_key=True)  # UUID as string
+    type = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='queued')  # queued, running, completed, failed
+    progress = db.Column(db.Integer, default=0)  # 0-100
+    message = db.Column(db.Text)
+    result = db.Column(db.JSON)  # Store result data as JSON
+    error = db.Column(db.Text)  # Store error message if failed
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    started_at = db.Column(db.DateTime)
+    completed_at = db.Column(db.DateTime)
+
+    def to_dict(self):
+        """Convert job to dictionary for JSON serialization"""
+        return {
+            'id': self.id,
+            'type': self.type,
+            'status': self.status,
+            'progress': self.progress,
+            'message': self.message,
+            'result': self.result,
+            'error': self.error,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'started_at': self.started_at.isoformat() if self.started_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+        }
+
+    def __repr__(self):
+        return f'<BackgroundJob {self.id} ({self.type})>'
+
+
 class AppSetting(db.Model):
     """Application settings model for storing configuration values securely"""
     id = db.Column(db.Integer, primary_key=True)

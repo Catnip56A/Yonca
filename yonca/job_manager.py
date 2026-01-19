@@ -3,10 +3,10 @@ Background job system for long-running tasks like content translation
 """
 import threading
 import time
-import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional
 import json
+from yonca.models import db, BackgroundJob as BackgroundJobModel
 
 class JobStatus:
     """Job status constants"""
@@ -18,43 +18,92 @@ class JobStatus:
 class BackgroundJob:
     """Represents a background job"""
 
-    def __init__(self, job_type: str, job_data: Dict[str, Any], job_function):
-        self.id = str(uuid.uuid4())
-        self.type = job_type
-        self.data = job_data
-        self.function = job_function
-        self.status = JobStatus.QUEUED
-        self.progress = 0
-        self.message = ""
-        self.result = None
-        self.error = None
-        self.created_at = datetime.now()
-        self.started_at = None
-        self.completed_at = None
+    def __init__(self, job_model):
+        self.model = job_model
 
-    def to_dict(self) -> Dict[str, Any]:
+    @property
+    def id(self):
+        return self.model.id
+
+    @property
+    def type(self):
+        return self.model.type
+
+    @property
+    def status(self):
+        return self.model.status
+
+    @status.setter
+    def status(self, value):
+        self.model.status = value
+
+    @property
+    def progress(self):
+        return self.model.progress
+
+    @progress.setter
+    def progress(self, value):
+        self.model.progress = value
+
+    @property
+    def message(self):
+        return self.model.message
+
+    @message.setter
+    def message(self, value):
+        self.model.message = value
+
+    @property
+    def result(self):
+        return self.model.result
+
+    @result.setter
+    def result(self, value):
+        self.model.result = value
+
+    @property
+    def error(self):
+        return self.model.error
+
+    @error.setter
+    def error(self, value):
+        self.model.error = value
+
+    @property
+    def created_at(self):
+        return self.model.created_at
+
+    @property
+    def started_at(self):
+        return self.model.started_at
+
+    @started_at.setter
+    def started_at(self, value):
+        self.model.started_at = value
+
+    @property
+    def completed_at(self):
+        return self.model.completed_at
+
+    @completed_at.setter
+    def completed_at(self, value):
+        self.model.completed_at = value
+
+    def to_dict(self):
         """Convert job to dictionary for JSON serialization"""
-        return {
-            'id': self.id,
-            'type': self.type,
-            'status': self.status,
-            'progress': self.progress,
-            'message': self.message,
-            'result': self.result,
-            'error': self.error,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'started_at': self.started_at.isoformat() if self.started_at else None,
-            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-        }
+        return self.model.to_dict()
+
+    def save(self):
+        """Save job to database"""
+        db.session.add(self.model)
+        db.session.commit()
 
 class JobManager:
-    """Manages background jobs"""
+    """Manages background jobs using database persistence"""
 
     def __init__(self):
-        self.jobs: Dict[str, BackgroundJob] = {}
         self.worker_thread = None
         self.running = False
-        self.job_queue = []
 
     def start_worker(self):
         """Start the background worker thread"""
@@ -72,54 +121,210 @@ class JobManager:
         if self.worker_thread:
             self.worker_thread.join(timeout=5)
 
-    def queue_job(self, job_type: str, job_data: Dict[str, Any], job_function) -> str:
+    def queue_job(self, job_type: str, job_data: Dict[str, Any]) -> str:
         """Queue a new job and return its ID"""
-        job = BackgroundJob(job_type, job_data, job_function)
-        self.jobs[job.id] = job
-        self.job_queue.append(job)
-        print(f"Queued job {job.id} of type {job_type}")
-        return job.id
+        import uuid
+        job_id = str(uuid.uuid4())
+        
+        # Create job in database
+        job_model = BackgroundJobModel(
+            id=job_id,
+            type=job_type,
+            status=JobStatus.QUEUED
+        )
+        db.session.add(job_model)
+        db.session.commit()
+
+        # Store function reference for when job is executed
+        # Note: This won't persist across app restarts, but for now we'll handle this
+        # by having the worker know which functions to call based on job type
+        print(f"Queued job {job_id} of type {job_type}")
+        return job_id
 
     def get_job(self, job_id: str) -> Optional[BackgroundJob]:
-        """Get job by ID"""
-        return self.jobs.get(job_id)
+        """Get job by ID from database"""
+        job_model = BackgroundJobModel.query.get(job_id)
+        if job_model:
+            return BackgroundJob(job_model)
+        return None
 
     def get_all_jobs(self) -> Dict[str, Dict[str, Any]]:
         """Get all jobs as dictionaries"""
-        return {job_id: job.to_dict() for job_id, job in self.jobs.items()}
+        jobs = BackgroundJobModel.query.order_by(BackgroundJobModel.created_at.desc()).limit(50).all()
+        return {job.id: BackgroundJob(job).to_dict() for job in jobs}
 
     def _worker_loop(self):
-        """Main worker loop that processes queued jobs"""
-        while self.running:
-            if self.job_queue:
-                job = self.job_queue.pop(0)  # FIFO
-                self._execute_job(job)
-            else:
-                time.sleep(1)  # Wait for jobs
+        """Main worker loop that processes queued jobs from database"""
+        # Import here to avoid circular imports
+        from yonca import create_app
+        
+        app = create_app()
+        
+        with app.app_context():
+            while self.running:
+                try:
+                    # Get next queued job from database
+                    job_model = BackgroundJobModel.query.filter_by(status=JobStatus.QUEUED).order_by(BackgroundJobModel.created_at).first()
+                    
+                    if job_model:
+                        job = BackgroundJob(job_model)
+                        self._execute_job(job)
+                    else:
+                        # No jobs, wait before checking again
+                        time.sleep(1)
+                except Exception as e:
+                    print(f"Error in worker loop: {e}")
+                    time.sleep(5)  # Wait longer on error
 
     def _execute_job(self, job: BackgroundJob):
         """Execute a single job"""
         try:
             job.status = JobStatus.RUNNING
             job.started_at = datetime.now()
+            job.save()
             print(f"Starting job {job.id}")
 
-            # Execute the job function
-            result = job.function(job)
+            # Execute the job function based on type
+            if job.type == 'translate_content':
+                result = self._execute_translate_content_job(job)
+            else:
+                raise ValueError(f"Unknown job type: {job.type}")
 
             job.status = JobStatus.COMPLETED
             job.result = result
             job.progress = 100
             job.message = "Job completed successfully"
             job.completed_at = datetime.now()
+            job.save()
 
             print(f"Completed job {job.id}")
 
         except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Failed job {job.id}: {error_details}")
+            
             job.status = JobStatus.FAILED
             job.error = str(e)
             job.completed_at = datetime.now()
-            print(f"Failed job {job.id}: {e}")
+            job.save()
+
+    def _execute_translate_content_job(self, job):
+        """Execute the translate content job"""
+        try:
+            from yonca.content_translator import (
+                auto_translate_course,
+                auto_translate_resource,
+                auto_translate_home_content,
+                auto_translate_course_content,
+                auto_translate_course_content_folder
+            )
+            from yonca.models import Course, Resource, HomeContent, CourseContent, CourseContentFolder
+
+            # Initialize stats
+            stats = {
+                'courses': 0,
+                'resources': 0,
+                'home_content': 0,
+                'course_content': 0,
+                'folders': 0,
+                'total_processed': 0
+            }
+
+            batch_size = 5  # Process 5 items at a time
+
+            # Process all content types sequentially
+            job.message = "Starting translation process..."
+
+            # Process courses
+            job.message = "Translating courses..."
+            courses = Course.query.all()
+            for i, course in enumerate(courses):
+                try:
+                    auto_translate_course(course)
+                    stats['courses'] += 1
+                    stats['total_processed'] += 1
+                    job.progress = int((i + 1) / len(courses) * 25)  # 25% for courses
+                    job.message = f"Translated {stats['courses']} courses..."
+                    job.save()
+                except Exception as e:
+                    print(f"Failed to translate course {course.id}: {e}")
+                    continue
+
+            # Process resources
+            job.message = "Translating resources..."
+            resources = Resource.query.all()
+            for i, resource in enumerate(resources):
+                try:
+                    auto_translate_resource(resource)
+                    stats['resources'] += 1
+                    stats['total_processed'] += 1
+                    job.progress = 25 + int((i + 1) / len(resources) * 25)  # 25-50% for resources
+                    job.message = f"Translated {stats['resources']} resources..."
+                    job.save()
+                except Exception as e:
+                    print(f"Failed to translate resource {resource.id}: {e}")
+                    continue
+
+            # Process home content
+            job.message = "Translating home content..."
+            home_contents = HomeContent.query.all()
+            for i, home_content in enumerate(home_contents):
+                try:
+                    auto_translate_home_content(home_content)
+                    stats['home_content'] += 1
+                    stats['total_processed'] += 1
+                    job.progress = 50 + int((i + 1) / len(home_contents) * 25)  # 50-75% for home content
+                    job.message = f"Translated {stats['home_content']} home content items..."
+                    job.save()
+                except Exception as e:
+                    print(f"Failed to translate home content {home_content.id}: {e}")
+                    continue
+
+            # Process course content
+            job.message = "Translating course content..."
+            course_contents = CourseContent.query.all()
+            for i, content in enumerate(course_contents):
+                try:
+                    auto_translate_course_content(content)
+                    stats['course_content'] += 1
+                    stats['total_processed'] += 1
+                    job.progress = 75 + int((i + 1) / len(course_contents) * 15)  # 75-90% for course content
+                    job.message = f"Translated {stats['course_content']} course content items..."
+                    job.save()
+                except Exception as e:
+                    print(f"Failed to translate course content {content.id}: {e}")
+                    continue
+
+            # Process folders
+            job.message = "Translating folders..."
+            folders = CourseContentFolder.query.all()
+            for i, folder in enumerate(folders):
+                try:
+                    auto_translate_course_content_folder(folder)
+                    stats['folders'] += 1
+                    stats['total_processed'] += 1
+                    job.progress = 90 + int((i + 1) / len(folders) * 10)  # 90-100% for folders
+                    job.message = f"Translated {stats['folders']} folders..."
+                    job.save()
+                except Exception as e:
+                    print(f"Failed to translate folder {folder.id}: {e}")
+                    continue
+
+            # Commit all changes
+            db.session.commit()
+
+            job.progress = 100
+            job.message = f"Translation completed! Processed {stats['total_processed']} total items."
+            job.save()
+
+            return stats
+
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Translation job error: {error_details}")
+            raise
 
 # Global job manager instance
 job_manager = JobManager()

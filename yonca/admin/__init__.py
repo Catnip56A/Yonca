@@ -1183,8 +1183,7 @@ class TranslateContentView(BaseView):
         # Queue the translation job
         job_id = job_manager.queue_job(
             job_type='translate_content',
-            job_data={},
-            job_function=self._perform_translation
+            job_data={}
         )
 
         return jsonify({
@@ -1211,117 +1210,6 @@ class TranslateContentView(BaseView):
             'job': job.to_dict()
         })
 
-    def _perform_translation(self, job):
-        """Background job function to perform content translation"""
-        try:
-            from yonca.content_translator import (
-                auto_translate_course,
-                auto_translate_resource,
-                auto_translate_home_content,
-                auto_translate_course_content,
-                auto_translate_course_content_folder
-            )
-            from yonca.models import Course, Resource, HomeContent, CourseContent, CourseContentFolder
-
-            # Initialize stats
-            stats = {
-                'courses': 0,
-                'resources': 0,
-                'home_content': 0,
-                'course_content': 0,
-                'folders': 0,
-                'total_processed': 0
-            }
-
-            batch_size = 5  # Process 5 items at a time
-
-            # Process all content types sequentially
-            job.message = "Starting translation process..."
-
-            # Process courses
-            job.message = "Translating courses..."
-            courses = Course.query.all()
-            for i, course in enumerate(courses):
-                try:
-                    auto_translate_course(course)
-                    stats['courses'] += 1
-                    stats['total_processed'] += 1
-                    job.progress = int((i + 1) / len(courses) * 25)  # 25% for courses
-                    job.message = f"Translated {stats['courses']} courses..."
-                except Exception as e:
-                    print(f"Failed to translate course {course.id}: {e}")
-                    continue
-
-            # Process resources
-            job.message = "Translating resources..."
-            resources = Resource.query.all()
-            for i, resource in enumerate(resources):
-                try:
-                    auto_translate_resource(resource)
-                    stats['resources'] += 1
-                    stats['total_processed'] += 1
-                    job.progress = 25 + int((i + 1) / len(resources) * 25)  # 25-50% for resources
-                    job.message = f"Translated {stats['resources']} resources..."
-                except Exception as e:
-                    print(f"Failed to translate resource {resource.id}: {e}")
-                    continue
-
-            # Process home content
-            job.message = "Translating home content..."
-            home_contents = HomeContent.query.all()
-            for i, home_content in enumerate(home_contents):
-                try:
-                    auto_translate_home_content(home_content)
-                    stats['home_content'] += 1
-                    stats['total_processed'] += 1
-                    job.progress = 50 + int((i + 1) / len(home_contents) * 25)  # 50-75% for home content
-                    job.message = f"Translated {stats['home_content']} home content items..."
-                except Exception as e:
-                    print(f"Failed to translate home content {home_content.id}: {e}")
-                    continue
-
-            # Process course content
-            job.message = "Translating course content..."
-            course_contents = CourseContent.query.all()
-            for i, content in enumerate(course_contents):
-                try:
-                    auto_translate_course_content(content)
-                    stats['course_content'] += 1
-                    stats['total_processed'] += 1
-                    job.progress = 75 + int((i + 1) / len(course_contents) * 15)  # 75-90% for course content
-                    job.message = f"Translated {stats['course_content']} course content items..."
-                except Exception as e:
-                    print(f"Failed to translate course content {content.id}: {e}")
-                    continue
-
-            # Process folders
-            job.message = "Translating folders..."
-            folders = CourseContentFolder.query.all()
-            for i, folder in enumerate(folders):
-                try:
-                    auto_translate_course_content_folder(folder)
-                    stats['folders'] += 1
-                    stats['total_processed'] += 1
-                    job.progress = 90 + int((i + 1) / len(folders) * 10)  # 90-100% for folders
-                    job.message = f"Translated {stats['folders']} folders..."
-                except Exception as e:
-                    print(f"Failed to translate folder {folder.id}: {e}")
-                    continue
-
-            # Commit all changes
-            db.session.commit()
-
-            job.progress = 100
-            job.message = f"Translation completed! Processed {stats['total_processed']} total items."
-            job.result = stats
-
-        except Exception as e:
-            import traceback
-            error_details = traceback.format_exc()
-            print(f"Translation job error: {error_details}")
-            job.error = str(e)
-            raise
-    
     @expose('/delete-translations', methods=['POST'])
     def delete_translations(self):
         """Delete all translations for Azerbaijani and Russian"""
