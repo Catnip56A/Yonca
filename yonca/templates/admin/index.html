@@ -1200,7 +1200,7 @@ document.getElementById('delete-translations').addEventListener('click', async f
     button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Deleting...';
     
     try {
-        const response = await fetch('/admin/translate/delete-translations', {
+        const response = await fetch('/admin/delete-translations', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
