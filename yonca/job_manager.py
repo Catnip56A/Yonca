@@ -221,6 +221,16 @@ class JobManager:
             )
             from yonca.models import Course, Resource, HomeContent, CourseContent, CourseContentFolder
 
+            # Get total counts for progress calculation
+            total_courses = Course.query.count()
+            total_resources = Resource.query.count()
+            total_home_content = HomeContent.query.count()
+            total_course_content = CourseContent.query.count()
+            total_folders = CourseContentFolder.query.count()
+            
+            total_items = total_courses + total_resources + total_home_content + total_course_content + total_folders
+            processed_items = 0
+
             # Initialize stats
             stats = {
                 'courses': 0,
@@ -230,8 +240,6 @@ class JobManager:
                 'folders': 0,
                 'total_processed': 0
             }
-
-            batch_size = 5  # Process 5 items at a time
 
             # Process all content types sequentially
             job.message = "Starting translation process..."
@@ -244,7 +252,8 @@ class JobManager:
                     auto_translate_course(course)
                     stats['courses'] += 1
                     stats['total_processed'] += 1
-                    job.progress = int((i + 1) / len(courses) * 25)  # 25% for courses
+                    processed_items += 1
+                    job.progress = int((processed_items / total_items) * 100)
                     job.message = f"Translated {stats['courses']} courses..."
                     job.save()
                 except Exception as e:
@@ -259,7 +268,8 @@ class JobManager:
                     auto_translate_resource(resource)
                     stats['resources'] += 1
                     stats['total_processed'] += 1
-                    job.progress = 25 + int((i + 1) / len(resources) * 25)  # 25-50% for resources
+                    processed_items += 1
+                    job.progress = int((processed_items / total_items) * 100)
                     job.message = f"Translated {stats['resources']} resources..."
                     job.save()
                 except Exception as e:
@@ -274,7 +284,8 @@ class JobManager:
                     auto_translate_home_content(home_content)
                     stats['home_content'] += 1
                     stats['total_processed'] += 1
-                    job.progress = 50 + int((i + 1) / len(home_contents) * 25)  # 50-75% for home content
+                    processed_items += 1
+                    job.progress = int((processed_items / total_items) * 100)
                     job.message = f"Translated {stats['home_content']} home content items..."
                     job.save()
                 except Exception as e:
@@ -289,7 +300,8 @@ class JobManager:
                     auto_translate_course_content(content)
                     stats['course_content'] += 1
                     stats['total_processed'] += 1
-                    job.progress = 75 + int((i + 1) / len(course_contents) * 15)  # 75-90% for course content
+                    processed_items += 1
+                    job.progress = int((processed_items / total_items) * 100)
                     job.message = f"Translated {stats['course_content']} course content items..."
                     job.save()
                 except Exception as e:
@@ -304,7 +316,8 @@ class JobManager:
                     auto_translate_course_content_folder(folder)
                     stats['folders'] += 1
                     stats['total_processed'] += 1
-                    job.progress = 90 + int((i + 1) / len(folders) * 10)  # 90-100% for folders
+                    processed_items += 1
+                    job.progress = int((processed_items / total_items) * 100)
                     job.message = f"Translated {stats['folders']} folders..."
                     job.save()
                 except Exception as e:
