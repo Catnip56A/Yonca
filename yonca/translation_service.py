@@ -25,15 +25,6 @@ except ImportError:
     BS4_AVAILABLE = False
     print("Warning: beautifulsoup4 not available, HTML translation will be limited")
 
-try:
-    from langdetect import detect, LangDetectException
-    LANGDETECT_AVAILABLE = True
-except ImportError:
-    LANGDETECT_AVAILABLE = False
-
-    class LangDetectException(Exception):
-        pass
-
 # Protected terms that should never be translated
 PROTECTED_TERMS = [
     'Yonca',
@@ -65,13 +56,10 @@ class TranslationService:
         Detect the source language of the text.
         Returns language code or 'en' as default.
         """
-        if not LANGDETECT_AVAILABLE:
-            return 'en'
-            
-        if not text or len(text.strip()) < 10:
-            return 'en'
-            
         try:
+            from langdetect import detect, LangDetectException
+            if not text or len(text.strip()) < 10:
+                return 'en'
             detected = detect(text)
             # Map to supported languages
             lang_map = {
@@ -80,7 +68,7 @@ class TranslationService:
                 'en': 'en'
             }
             return lang_map.get(detected, 'en')
-        except LangDetectException:
+        except (ImportError, LangDetectException, Exception):
             return 'en'
     
     def _protect_terms(self, text):
