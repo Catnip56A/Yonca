@@ -1,49 +1,46 @@
 # Caddyfile for Yonca
-# Replace with your actual domain
 magsud.yonca-sdc.com {
-    # Automatic HTTPS is enabled by default
+	# Automatic HTTPS is enabled by default
 
-    # Increase request body size for large file uploads (500MB)
-    request_body {
-        max_size 500MB
-    }
+	# Increase request body size for large file uploads (500MB)
+	request_body {
+		max_size 500MB
+	}
 
-    # Serve static files directly
-    handle /static/* {
-        root * /home/magsud/work/Yonca
-        file_server
-    }
+	# Serve static files directly
+	handle /static/* {
+		root * /home/magsud/work/Yonca
+		file_server
+	}
 
-    # Proxy all other requests to gunicorn
-    handle {
-        reverse_proxy unix//tmp/yonca.sock {
-            # Increase timeouts for large file uploads (10 minutes)
-            transport http {
-                dial_timeout 10m
-                response_header_timeout 10m
-            }
-            
-            # Forward headers
-            header_up X-Real-IP {remote_host}
-            header_up X-Forwarded-For {remote_host}
-            header_up X-Forwarded-Proto {scheme}
-        }
-    }
+	# Proxy all other requests to gunicorn
+	handle {
+		reverse_proxy unix//tmp/yonca.sock {
+			# Increase timeouts for large file uploads (10 minutes)
+			transport http {
+				dial_timeout 10m
+				response_header_timeout 10m
+			}
 
-    # Security headers
-    header {
-        X-Frame-Options "SAMEORIGIN"
-        X-XSS-Protection "1; mode=block"
-        X-Content-Type-Options "nosniff"
-        Referrer-Policy "no-referrer-when-downgrade"
-    }
+			# Caddy forwards X-Forwarded-For and X-Forwarded-Proto by default
+			header_up X-Real-IP {remote_host}
+		}
+	}
 
-    # Logging
-    log {
-        output file /home/magsud/work/Yonca/logs/caddy-access.log
-        format json
-    }
+	# Security headers
+	header {
+		X-Frame-Options "SAMEORIGIN"
+		X-XSS-Protection "1; mode=block"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer-when-downgrade"
+	}
 
-    # Enable compression
-    encode gzip zstd
+	# Logging
+	log {
+		output file /home/magsud/work/Yonca/logs/caddy-access.log
+		format json
+	}
+
+	# Enable compression
+	encode gzip zstd
 }
