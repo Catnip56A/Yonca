@@ -290,8 +290,8 @@
                                 <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
                                     <input type="hidden" name="action" value="toggle_content_visibility">
                                     <input type="hidden" name="content_id" value="{{ item.id }}">
-                                    <label class="btn btn-sm btn-{{ 'success' if item.allow_others_to_view else 'secondary' }} ml-1" style="margin: 0;">
-                                        <input type="checkbox" name="allow_others_to_view" {% if item.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
+                                    <label for="visibility_{{ item.id }}" class="btn btn-sm btn-{{ 'success' if item.allow_others_to_view else 'secondary' }} ml-1" style="margin: 0;">
+                                        <input type="checkbox" id="visibility_{{ item.id }}" name="allow_others_to_view" {% if item.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
                                         {{ '👁️ ' + _('Visible') if item.allow_others_to_view else '🔒 ' + _('Private') }}
                                     </label>
                                 </form>
@@ -504,8 +504,8 @@
                         <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
                             <input type="hidden" name="action" value="toggle_content_visibility">
                             <input type="hidden" name="content_id" value="{{ item.id }}">
-                            <label class="btn btn-sm btn-{{ 'success' if item.allow_others_to_view else 'secondary' }} ml-1" style="margin: 0;">
-                                <input type="checkbox" name="allow_others_to_view" {% if item.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
+                            <label for="visibility_{{ item.id }}" class="btn btn-sm btn-{{ 'success' if item.allow_others_to_view else 'secondary' }} ml-1" style="margin: 0;">
+                                <input type="checkbox" id="visibility_{{ item.id }}" name="allow_others_to_view" {% if item.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
                                 {{ '👁️ Visible' if item.allow_others_to_view else '🔒 Private' }}
                             </label>
                         </form>
@@ -577,8 +577,8 @@
                             <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
                                 <input type="hidden" name="action" value="toggle_submission_visibility">
                                 <input type="hidden" name="submission_id" value="{{ user_submission.id }}">
-                                <label class="btn btn-sm btn-{{ 'success' if user_submission.allow_others_to_view else 'secondary' }} mt-1" style="margin: 0;">
-                                    <input type="checkbox" name="allow_others_to_view" {% if user_submission.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
+                                <label for="submission_visibility_{{ user_submission.id }}" class="btn btn-sm btn-{{ 'success' if user_submission.allow_others_to_view else 'secondary' }} mt-1" style="margin: 0;">
+                                    <input type="checkbox" id="submission_visibility_{{ user_submission.id }}" name="allow_others_to_view" {% if user_submission.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
                                     {{ '👁️ ' + _('Visible to Others') if user_submission.allow_others_to_view else '🔒 ' + _('Private') }}
                                 </label>
                             </form>
@@ -650,8 +650,8 @@
                                 <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
                                     <input type="hidden" name="action" value="toggle_submission_visibility">
                                     <input type="hidden" name="submission_id" value="{{ submission.id }}">
-                                    <label class="btn btn-sm btn-{{ 'success' if submission.allow_others_to_view else 'secondary' }} mt-1" style="margin: 0;">
-                                        <input type="checkbox" name="allow_others_to_view" {% if submission.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
+                                    <label for="submission_visibility_{{ submission.id }}" class="btn btn-sm btn-{{ 'success' if submission.allow_others_to_view else 'secondary' }} mt-1" style="margin: 0;">
+                                        <input type="checkbox" id="submission_visibility_{{ submission.id }}" name="allow_others_to_view" {% if submission.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
                                         {{ '👁️ ' + _('Visible') if submission.allow_others_to_view else '🔒 ' + _('Private') }}
                                     </label>
                                 </form>
