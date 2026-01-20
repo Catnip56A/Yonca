@@ -379,7 +379,7 @@ def course_page_enrolled(course_id):
             from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
+                flash(Markup('Failed to authenticate with Google Drive. Please <a href="/auth/link-google-account" class="alert-link">link your Google account</a> first.'), 'error')
                 return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
             try:
@@ -387,7 +387,7 @@ def course_page_enrolled(course_id):
             except Exception as e:
                 print(f"Error uploading to Drive: {e}")
                 if "insufficientPermissions" in str(e) or "403" in str(e):
-                    flash('Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.', 'error')
+                    flash(Markup('Your Google account does not have sufficient Drive permissions. Please <a href="/auth/link-google-account" class="alert-link">re-link your Google account</a> to grant full Drive access.'), 'error')
                 else:
                     flash('Failed to upload file to Google Drive. Please try again.', 'error')
                 # Clean up temporary file
@@ -920,7 +920,7 @@ def edit_course_page(slug):
             from yonca.google_drive_service import authenticate, upload_file, create_view_only_link
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
+                flash(Markup('Failed to authenticate with Google Drive. Please <a href="/auth/link-google-account" class="alert-link">link your Google account</a> first.'), 'error')
                 return redirect(request.url, code=303)
             
             try:
@@ -928,7 +928,7 @@ def edit_course_page(slug):
             except Exception as e:
                 print(f"Error uploading to Drive: {e}")
                 if "insufficientPermissions" in str(e) or "403" in str(e):
-                    flash('Your Google account does not have sufficient permissions. Please re-link your Google account with full Drive access.', 'error')
+                    flash(Markup('Your Google account does not have sufficient Drive permissions. Please <a href="/auth/link-google-account" class="alert-link">re-link your Google account</a> to grant full Drive access.'), 'error')
                 else:
                     flash('Failed to upload file to Google Drive. Please try again.', 'error')
                 # Clean up temporary file
@@ -988,7 +988,7 @@ def edit_course_page(slug):
             from yonca.google_drive_service import authenticate, import_drive_file
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
+                flash(Markup('Failed to authenticate with Google Drive. Please <a href="/auth/link-google-account" class="alert-link">link your Google account</a> first.'), 'error')
                 return redirect(request.url, code=303)
             
             file_data = import_drive_file(service, drive_url)
@@ -1026,7 +1026,7 @@ def edit_course_page(slug):
             from yonca.google_drive_service import authenticate, import_drive_folder
             service = authenticate()
             if not service:
-                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
+                flash(Markup('Failed to authenticate with Google Drive. Please <a href="/auth/link-google-account" class="alert-link">link your Google account</a> first.'), 'error')
                 return redirect(request.url, code=303)
             
             folder_data = import_drive_folder(service, folder_url)
