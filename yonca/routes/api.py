@@ -993,7 +993,7 @@ def serve_file(file_id):
     """Serve a Google Drive file after authentication"""
     from yonca.models import CourseAssignmentSubmission, CourseContent, Resource, PDFDocument
     from flask_login import current_user
-    from flask import redirect
+    from flask import redirect, render_template, url_for
     
     # Find the file in any of the models that store files
     submission = CourseAssignmentSubmission.query.filter_by(drive_file_id=file_id).first()
@@ -1045,7 +1045,31 @@ def serve_file(file_id):
             else:
                 return jsonify({'error': 'You must be logged in to view course content'}), 403
     
-    # For public files or files the user owns/can access, redirect to the drive_view_link
+    # For course content files, use the embedded viewer (no download)
+    if course_content:
+        file_title = course_content.title
+        back_url = url_for('main.course_page_enrolled', course_id=course_content.course_id)
+        
+        # Detect file type from title/extension
+        file_type = 'document'  # default
+        if file_title:
+            title_lower = file_title.lower()
+            if any(ext in title_lower for ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg']):
+                file_type = 'image'
+            elif any(ext in title_lower for ext in ['.mp3', '.wav', '.ogg', '.m4a', '.aac']):
+                file_type = 'audio'
+            elif any(ext in title_lower for ext in ['.mp4', '.webm', '.ogv', '.mov', '.avi']):
+                file_type = 'video'
+            elif any(ext in title_lower for ext in ['.zip', '.rar', '.7z', '.tar', '.gz']):
+                file_type = 'unsupported'
+        
+        return render_template('file_viewer.html', 
+                             file_id=file_id, 
+                             file_title=file_title,
+                             file_type=file_type,
+                             back_url=back_url)
+    
+    # For other files (submissions, resources, etc.), redirect to the drive_view_link
     if hasattr(file_record, 'drive_view_link') and file_record.drive_view_link:
         return redirect(file_record.drive_view_link)
     

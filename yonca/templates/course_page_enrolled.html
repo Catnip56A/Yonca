@@ -281,7 +281,7 @@
                                 {% if item.content_type == 'file' %}
                                 <a href="{{ url_for('api.serve_file', file_id=item.drive_file_id) }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                                 {% else %}
-                                <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View/Download') }}</a>
+                                <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                                 {% endif %}
                                 {% if is_teacher_or_admin %}
                                 <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
@@ -492,7 +492,7 @@
                         {% if item.content_type == 'file' %}
                         <a href="{{ url_for('api.serve_file', file_id=item.drive_file_id) }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                         {% else %}
-                        <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View/Download') }}</a>
+                        <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                         {% endif %}
                         {% if is_teacher_or_admin %}
                         <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
