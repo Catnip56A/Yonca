@@ -767,6 +767,7 @@ def course_page_enrolled(course_id):
                           is_teacher_or_admin=is_teacher_or_admin,
                           folder_paths=folder_paths,
                           enrolled=enrolled,
+                          current_user=current_user,
                           datetime=dt)
     if user:
         user.is_teacher = is_teacher
