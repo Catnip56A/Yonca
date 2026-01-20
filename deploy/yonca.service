@@ -9,7 +9,7 @@ Group=magsud
 WorkingDirectory=/home/magsud/work/Yonca
 Environment="PATH=/home/magsud/work/Yonca/venv/bin"
 Environment="FLASK_ENV=production"
-ExecStart=/home/magsud/work/Yonca/venv/bin/gunicorn --workers 3 --bind unix:/tmp/yonca.sock -m 007 wsgi:app
+ExecStart=/home/magsud/work/Yonca/venv/bin/gunicorn --config gunicorn_config.py wsgi:app
 Restart=always
 
 [Install]
