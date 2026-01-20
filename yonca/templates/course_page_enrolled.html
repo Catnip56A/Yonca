@@ -528,7 +528,9 @@
                 <div class="alert alert-warning">
                     <h4>{{ _('Enroll to Access Course Content') }}</h4>
                     <p>{{ _('You need to be enrolled in this course to view the content, materials, and participate in activities.') }}</p>
+                    {% if not session.get('user_id') %}
                     <a href="/login" class="btn btn-success">{{ _('Login to Enroll') }}</a>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
@@ -696,7 +698,9 @@
                 <div class="alert alert-warning">
                     <h4>{{ _('Enroll to Access Assignments') }}</h4>
                     <p>{{ _('You need to be enrolled in this course to view and submit assignments.') }}</p>
+                    {% if not session.get('user_id') %}
                     <a href="/login" class="btn btn-success">{{ _('Login to Enroll') }}</a>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
