@@ -265,6 +265,9 @@
                 <div class="card-header" style="background: #e3f2fd; cursor: pointer;" data-toggle="collapse" data-target="#folder-{{ folder.id }}">
                     <strong>📁 {{ translate_field('course_content_folder', folder.id, 'title', folder.title) }} <span class="ml-1" id="icon-{{ folder.id }}">▼</span></strong>
                     {% if is_teacher_or_admin %}
+                    <button type="button" class="btn btn-info btn-sm ml-2 float-right" data-toggle="modal" data-target="#editFolderModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.title }}" data-folder-description="{{ folder.description or '' }}">
+                        {{ _('Edit Folder') }}
+                    </button>
                     <button type="button" class="btn btn-warning btn-sm ml-2 float-right" data-toggle="modal" data-target="#moveFolderModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.title }}">
                         {{ _('Move Folder') }}
                     </button>
@@ -296,6 +299,9 @@
                                 <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                                 {% endif %}
                                 {% if is_teacher_or_admin %}
+                                <button type="button" class="btn btn-info btn-sm ml-2" data-toggle="modal" data-target="#editFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}" data-file-description="{{ item.description or '' }}">
+                                    {{ _('Edit File') }}
+                                </button>
                                 <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
                                     {{ _('Move File') }}
                                 </button>
@@ -510,6 +516,9 @@
                         <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                         {% endif %}
                         {% if is_teacher_or_admin %}
+                        <button type="button" class="btn btn-info btn-sm ml-2" data-toggle="modal" data-target="#editFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}" data-file-description="{{ item.description or '' }}">
+                            {{ _('Edit File') }}
+                        </button>
                         <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
                             {{ _('Move File') }}
                         </button>
@@ -1097,7 +1106,7 @@
                 </div>
                 <div class="form-check">
                   <input type="radio" class="form-check-input" name="import_type" id="importTypeFolder" value="folder">
-                  <label class="form-check-label" for="importTypeFolder">{{ _('Entire Folder') }}</label>
+                  <label class="form-check-label" for="importTypeFolder">{{ _('Entire Folder (includes all subfolders and files)') }}</label>
                 </div>
               </div>
               <div class="form-group">
@@ -1105,6 +1114,7 @@
                 <input type="text" id="drive_url" class="form-control" name="drive_url" required placeholder="https://drive.google.com/file/d/...">
                 <small class="form-text text-muted">
                   {{ _('Paste the sharing link from Google Drive or just the file/folder ID') }}
+                  <br><a href="{{ url_for('auth.google_account_info') }}" target="_blank">{{ _('Check linked Google account') }}</a>
                 </small>
               </div>
               <div class="form-group" id="fileTitleGroup">
@@ -1235,6 +1245,70 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Folder Modal -->
+    <div class="modal fade" id="editFolderModal" tabindex="-1" role="dialog" aria-labelledby="editFolderModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFolderModalLabel">{{ _('Edit Folder') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="action" value="edit_folder">
+                        <input type="hidden" name="folder_id" id="editFolderId">
+                        <div class="form-group">
+                            <label for="editFolderName">{{ _('Folder Name') }}</label>
+                            <input type="text" class="form-control" name="folder_name" id="editFolderName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFolderDescription">{{ _('Folder Description') }}</label>
+                            <textarea class="form-control" name="folder_description" id="editFolderDescription" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit File Modal -->
+    <div class="modal fade" id="editFileModal" tabindex="-1" role="dialog" aria-labelledby="editFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editFileModalLabel">{{ _('Edit File') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}">
+                    <div class="modal-body">
+                        <input type="hidden" name="action" value="edit_file">
+                        <input type="hidden" name="file_id" id="editFileId">
+                        <div class="form-group">
+                            <label for="editFileName">{{ _('File Name') }}</label>
+                            <input type="text" class="form-control" name="file_name" id="editFileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editFileDescription">{{ _('File Description') }}</label>
+                            <textarea class="form-control" name="file_description" id="editFileDescription" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
@@ -1332,6 +1406,34 @@ $(document).ready(function() {
         var modal = $(this);
         modal.find('#moveFolderId').val(folderId);
         modal.find('.modal-title').text('{{ _('Move Folder:') }} ' + folderName);
+    });
+
+    // Populate the Edit Folder Modal with folder data
+    $('#editFolderModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var folderId = button.data('folder-id'); // Extract folder ID from data-* attributes
+        var folderName = button.data('folder-name'); // Extract folder name
+        var folderDescription = button.data('folder-description'); // Extract folder description
+
+        var modal = $(this);
+        modal.find('#editFolderId').val(folderId);
+        modal.find('#editFolderName').val(folderName);
+        modal.find('#editFolderDescription').val(folderDescription);
+        modal.find('.modal-title').text('{{ _('Edit Folder:') }} ' + folderName);
+    });
+
+    // Populate the Edit File Modal with file data
+    $('#editFileModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var fileId = button.data('file-id'); // Extract file ID from data-* attributes
+        var fileName = button.data('file-name'); // Extract file name
+        var fileDescription = button.data('file-description'); // Extract file description
+
+        var modal = $(this);
+        modal.find('#editFileId').val(fileId);
+        modal.find('#editFileName').val(fileName);
+        modal.find('#editFileDescription').val(fileDescription);
+        modal.find('.modal-title').text('{{ _('Edit File:') }} ' + fileName);
     });
 
     // Toggle folder arrow icons

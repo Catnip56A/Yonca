@@ -12,8 +12,8 @@ from flask import url_for, current_app
 from datetime import datetime, timedelta, timedelta
 import requests
 
-# Google Drive API scopes - need file access for uploads
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+# Google Drive API scopes - need read access for importing shared files
+SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 FOLDER_ID = None  # Upload to root directory for OAuth users
 
 def authenticate(user=None):
@@ -62,8 +62,22 @@ def authenticate(user=None):
     
     if creds:
         try:
-            service = build('drive', 'v3', credentials=creds)
-            print("Google Drive service authenticated successfully using OAuth")
+            # Build service with timeout configuration for large folder operations
+            # The timeout parameter sets the request timeout for individual API calls
+            service = build(
+                'drive', 
+                'v3', 
+                credentials=creds,
+                cache_discovery=False
+            )
+            
+            # Configure the underlying HTTP client timeout
+            if hasattr(service, '_http'):
+                service._http.timeout = 300  # 5 minutes timeout
+                if hasattr(service._http, 'http') and hasattr(service._http.http, 'timeout'):
+                    service._http.http.timeout = 300  # Also set on underlying httplib2.Http
+            
+            print("Google Drive service authenticated successfully using OAuth (with 5min timeout)")
             return service
         except Exception as e:
             print(f'Failed to build Google Drive service: {e}')
@@ -77,6 +91,32 @@ def authenticate(user=None):
     else:
         print('Failed to authenticate with Google Drive')
         return None
+
+def get_linked_google_account(user=None):
+    """Get information about the linked Google account"""
+    if user is None:
+        from flask_login import current_user
+        user = current_user
+    
+    if not user or not user.google_access_token:
+        return None
+    
+    try:
+        # Get user info from Google
+        userinfo_url = 'https://www.googleapis.com/oauth2/v2/userinfo'
+        headers = {'Authorization': f'Bearer {user.google_access_token}'}
+        response = requests.get(userinfo_url, headers=headers)
+        response.raise_for_status()
+        userinfo = response.json()
+        return {
+            'email': userinfo.get('email'),
+            'name': userinfo.get('name'),
+            'token_expiry': user.google_token_expiry.isoformat() if user.google_token_expiry else None,
+            'has_refresh_token': bool(user.google_refresh_token)
+        }
+    except Exception as e:
+        print(f'Failed to get Google account info: {e}')
+        return {'error': str(e)}
 
 def refresh_credentials(user):
     """Refresh expired access token"""
@@ -156,44 +196,70 @@ def create_view_only_link(service, file_id, is_image=False):
         print(f"DEBUG: Returning file view_link: {view_link}")
         return view_link
 
-def set_file_permissions(service, file_id, make_public=False):
-    """Set file permissions on Google Drive file"""
-    try:
-        if make_public:
-            # Make file publicly viewable
-            permission = {
-                'type': 'anyone',
-                'role': 'reader'
-            }
-            service.permissions().create(
-                fileId=file_id,
-                body=permission,
-                fields='id'
-            ).execute()
-            print(f"DEBUG: File {file_id} made public")
-            return True
-        else:
-            # Remove public permissions to make file private
-            try:
-                # Get all permissions for the file
-                permissions = service.permissions().list(fileId=file_id, fields='permissions(id,type)').execute()
-                
-                # Delete all 'anyone' permissions
-                for permission in permissions.get('permissions', []):
-                    if permission.get('type') == 'anyone':
-                        service.permissions().delete(fileId=file_id, permissionId=permission['id']).execute()
-                        print(f"DEBUG: Removed public permission from file {file_id}")
-                
-                print(f"DEBUG: File {file_id} made private")
+def set_file_permissions(service, file_id, make_public=False, max_retries=3):
+    """Set file permissions on Google Drive file with retry logic and timeout handling"""
+    import time
+    start_time = time.time()
+
+    for attempt in range(max_retries + 1):
+        try:
+            if make_public:
+                # Make file publicly viewable
+                permission = {
+                    'type': 'anyone',
+                    'role': 'reader'
+                }
+                service.permissions().create(
+                    fileId=file_id,
+                    body=permission,
+                    fields='id'
+                ).execute()
+                elapsed = time.time() - start_time
+                print(f"DEBUG: File {file_id} made public (took {elapsed:.2f}s)")
+                if elapsed > 30:  # Warn if taking more than 30 seconds
+                    print(f"WARNING: Making file public took {elapsed:.2f}s - approaching timeout limits")
                 return True
-            except HttpError as error:
-                print(f'Error removing public permissions: {error}')
-                # If removing fails, still return True to not break the flow
-                print(f"DEBUG: File {file_id} kept as is (may already be private)")
-                return True
-    except HttpError as error:
-        print(f'An error occurred setting permissions: {error}')
-        return False
+            else:
+                # Remove public permissions to make file private
+                try:
+                    # Get all permissions for the file
+                    permissions = service.permissions().list(fileId=file_id, fields='permissions(id,type)').execute()
+                    
+                    # Delete all 'anyone' permissions
+                    for permission in permissions.get('permissions', []):
+                        if permission.get('type') == 'anyone':
+                            service.permissions().delete(fileId=file_id, permissionId=permission['id']).execute()
+                            print(f"DEBUG: Removed public permission from file {file_id}")
+                    
+                    elapsed = time.time() - start_time
+                    print(f"DEBUG: File {file_id} made private (took {elapsed:.2f}s)")
+                    if elapsed > 30:  # Warn if taking more than 30 seconds
+                        print(f"WARNING: Making file private took {elapsed:.2f}s - approaching timeout limits")
+                    return True
+                except HttpError as error:
+                    print(f'Error removing public permissions: {error}')
+                    # If removing fails, still return True to not break the flow
+                    print(f"DEBUG: File {file_id} kept as is (may already be private)")
+                    return True
+        except HttpError as error:
+            elapsed = time.time() - start_time
+            print(f'An error occurred setting permissions (attempt {attempt + 1}/{max_retries + 1}, {elapsed:.2f}s): {error}')
+            if attempt < max_retries:
+                print(f'Retrying in 1 second...')
+                time.sleep(1)
+                continue
+            return False
+        except (ConnectionResetError, ConnectionError, TimeoutError, OSError) as error:
+            elapsed = time.time() - start_time
+            print(f'Network/timeout error occurred setting permissions for file {file_id} (attempt {attempt + 1}/{max_retries + 1}, {elapsed:.2f}s): {error}')
+            if attempt < max_retries:
+                # Exponential backoff for timeout errors
+                delay = min(2 ** attempt, 10)  # Max 10 seconds delay
+                print(f'Retrying in {delay} seconds...')
+                time.sleep(delay)
+                continue
+            print(f'DEBUG: File {file_id} permissions unchanged due to network/timeout issues after {max_retries + 1} attempts - continuing import')
+            return True  # Return True to not break the import flow
 
 def delete_file(service, file_id):
     """Delete a file from Google Drive"""
@@ -246,38 +312,121 @@ def extract_file_id_from_url(drive_url):
 
 def get_file_metadata(service, file_id):
     """Get metadata for a Google Drive file"""
+    import time
+    start_time = time.time()
+    
     try:
         file = service.files().get(
             fileId=file_id,
             fields='id, name, mimeType, size, webViewLink, iconLink'
         ).execute()
+        
+        elapsed = time.time() - start_time
+        print(f"DEBUG: get_file_metadata for {file_id} took {elapsed:.2f}s")
+        if elapsed > 30:  # Warn if taking more than 30 seconds
+            print(f"WARNING: get_file_metadata took {elapsed:.2f}s - approaching timeout limits")
         return file
     except HttpError as error:
-        print(f'An error occurred getting file metadata: {error}')
-        return None
+        elapsed = time.time() - start_time
+        print(f'An error occurred getting file metadata after {elapsed:.2f}s: {error}')
+        # Return error information for better handling
+        return {'error': str(error), 'error_code': error.resp.status}
+    except (ConnectionResetError, ConnectionError, TimeoutError, OSError) as error:
+        elapsed = time.time() - start_time
+        print(f'Network/timeout error occurred getting file metadata for {file_id} after {elapsed:.2f}s: {error}')
+        return {'error': f'Network/timeout error: {str(error)}', 'error_code': 0}
 
 def list_folder_contents(service, folder_id):
-    """List all files in a Google Drive folder"""
+    """List all files and folders in a Google Drive folder"""
+    import time
+    start_time = time.time()
+    
     try:
         results = service.files().list(
             q=f"'{folder_id}' in parents and trashed=false",
             fields='files(id, name, mimeType, size, webViewLink, iconLink)',
-            pageSize=100
+            pageSize=1000  # Increase page size to handle more files
         ).execute()
+        
+        elapsed = time.time() - start_time
+        items_count = len(results.get('files', []))
+        print(f"DEBUG: list_folder_contents for {folder_id} returned {items_count} items in {elapsed:.2f}s")
+        if elapsed > 30:  # Warn if taking more than 30 seconds
+            print(f"WARNING: list_folder_contents took {elapsed:.2f}s - approaching timeout limits")
         return results.get('files', [])
     except HttpError as error:
-        print(f'An error occurred listing folder contents: {error}')
+        elapsed = time.time() - start_time
+        print(f'An error occurred listing folder contents after {elapsed:.2f}s: {error}')
         return []
+    except (ConnectionResetError, ConnectionError, TimeoutError, OSError) as error:
+        elapsed = time.time() - start_time
+        print(f'Network/timeout error occurred listing folder contents for {folder_id} after {elapsed:.2f}s: {error}')
+        return []
+
+def collect_folder_structure(service, folder_id, base_path=""):
+    """Recursively collect all files and folders from a Google Drive folder structure"""
+    structure = {
+        'folders': [],
+        'files': []
+    }
+    
+    try:
+        items = list_folder_contents(service, folder_id)
+        
+        for item in items:
+            item_path = f"{base_path}/{item['name']}" if base_path else item['name']
+            
+            if item.get('mimeType') == 'application/vnd.google-apps.folder':
+                # This is a subfolder - recursively collect its contents
+                subfolder_structure = collect_folder_structure(service, item['id'], item_path)
+                structure['folders'].append({
+                    'id': item['id'],
+                    'name': item['name'],
+                    'path': item_path,
+                    'structure': subfolder_structure
+                })
+            else:
+                # This is a file
+                structure['files'].append({
+                    'id': item['id'],
+                    'name': item['name'],
+                    'path': item_path,
+                    'mime_type': item.get('mimeType'),
+                    'size': item.get('size'),
+                    'web_view_link': item.get('webViewLink'),
+                    'icon_link': item.get('iconLink')
+                })
+        
+        return structure
+    except Exception as e:
+        print(f'Error collecting folder structure: {e}')
+        return structure
 
 def import_drive_file(service, file_id_or_url):
     """Import a single file from Google Drive and return its metadata with view link"""
+    print(f"DEBUG: import_drive_file called with: {file_id_or_url}")
     file_id = extract_file_id_from_url(file_id_or_url)
+    print(f"DEBUG: extracted file_id: {file_id}")
     if not file_id:
+        print("DEBUG: No file_id extracted, returning None")
         return None
     
     metadata = get_file_metadata(service, file_id)
+    print(f"DEBUG: get_file_metadata returned: {metadata}")
+    
+    # Check if metadata contains an error
+    if isinstance(metadata, dict) and 'error' in metadata:
+        error_code = metadata.get('error_code', 0)
+        if error_code == 404:
+            return {'error': 'File not found. The file may be private or you may not have access to it. Please make sure the file is shared with your Google account or is public.'}
+        elif error_code == 403:
+            return {'error': 'Access denied. You do not have permission to access this file.'}
+        else:
+            return {'error': f'Google Drive API error: {metadata["error"]}'}
+    
     if not metadata:
-        return None
+        print("DEBUG: No metadata retrieved, returning None")
+        return {'error': 'Failed to retrieve file metadata'}
     
     # Ensure file has proper sharing permissions
     set_file_permissions(service, file_id)
@@ -286,7 +435,7 @@ def import_drive_file(service, file_id_or_url):
     is_image = metadata.get('mimeType', '').startswith('image/')
     view_link = create_view_only_link(service, file_id, is_image)
     
-    return {
+    result = {
         'file_id': file_id,
         'name': metadata.get('name'),
         'mime_type': metadata.get('mimeType'),
@@ -294,33 +443,82 @@ def import_drive_file(service, file_id_or_url):
         'view_link': view_link or metadata.get('webViewLink'),
         'icon_link': metadata.get('iconLink')
     }
+    print(f"DEBUG: import_drive_file returning: {result['name']}")
+    return result
 
 def import_drive_folder(service, folder_id_or_url):
-    """Import all files from a Google Drive folder and return metadata for each"""
+    """Import all files and folders from a Google Drive folder recursively and return metadata"""
+    print(f"DEBUG: import_drive_folder called with: {folder_id_or_url}")
     folder_id = extract_file_id_from_url(folder_id_or_url)
+    print(f"DEBUG: extracted folder_id: {folder_id}")
     if not folder_id:
+        print("DEBUG: No folder_id extracted, returning None")
         return None
     
     # Get folder metadata
     folder_metadata = get_file_metadata(service, folder_id)
+    print(f"DEBUG: folder_metadata: {folder_metadata}")
+    
+    # Check if folder_metadata contains an error
+    if isinstance(folder_metadata, dict) and 'error' in folder_metadata:
+        error_code = folder_metadata.get('error_code', 0)
+        if error_code == 404:
+            return {'error': 'Folder not found. The folder may be private or you may not have access to it. Please make sure the folder is shared with your Google account or is public.'}
+        elif error_code == 403:
+            return {'error': 'Access denied. You do not have permission to access this folder.'}
+        else:
+            return {'error': f'Google Drive API error: {folder_metadata["error"]}'}
+    
     if not folder_metadata or folder_metadata.get('mimeType') != 'application/vnd.google-apps.folder':
-        return None
+        print("DEBUG: Invalid folder metadata or not a folder, returning None")
+        return {'error': 'Invalid folder. Please make sure the URL points to a Google Drive folder.'}
     
-    # List all files in folder
-    files = list_folder_contents(service, folder_id)
+    # Recursively collect all files and folders
+    folder_structure = collect_folder_structure(service, folder_id)
+    print(f"DEBUG: Collected folder structure with {len(folder_structure['folders'])} folders and {len(folder_structure['files'])} files")
     
-    imported_files = []
-    for file in files:
-        # Skip folders within folders for now (can be enhanced later)
-        if file.get('mimeType') == 'application/vnd.google-apps.folder':
-            continue
+    # Flatten the structure into a list of files with their folder paths
+    all_files = []
+    
+    def flatten_structure(structure, current_path=""):
+        """Flatten the nested folder structure into a list of files with paths"""
+        # Add files from current level
+        for file_info in structure['files']:
+            file_path = f"{current_path}/{file_info['name']}" if current_path else file_info['name']
+            all_files.append({
+                'file_id': file_info['id'],
+                'name': file_info['name'],
+                'path': file_path,
+                'folder_path': current_path,
+                'mime_type': file_info['mime_type'],
+                'size': file_info['size'],
+                'web_view_link': file_info['web_view_link'],
+                'icon_link': file_info['icon_link']
+            })
         
-        file_data = import_drive_file(service, file['id'])
+        # Recursively process subfolders
+        for folder_info in structure['folders']:
+            folder_path = f"{current_path}/{folder_info['name']}" if current_path else folder_info['name']
+            flatten_structure(folder_info['structure'], folder_path)
+    
+    flatten_structure(folder_structure)
+    
+    # Process each file to get proper view links and permissions
+    imported_files = []
+    for file_info in all_files:
+        # Import the file (this sets permissions and creates view links)
+        file_data = import_drive_file(service, file_info['file_id'])
         if file_data:
+            # Add folder path information
+            file_data['folder_path'] = file_info['folder_path']
+            file_data['full_path'] = file_info['path']
             imported_files.append(file_data)
     
-    return {
+    result = {
         'folder_name': folder_metadata.get('name'),
         'folder_id': folder_id,
-        'files': imported_files
+        'files': imported_files,
+        'total_files': len(imported_files)
     }
+    print(f"DEBUG: import_drive_folder returning {len(imported_files)} files from recursive import")
+    return result

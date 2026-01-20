@@ -214,7 +214,7 @@ def login_google():
     
     print(f"DEBUG: OAuth login - request.host={request.host}, redirect_uri={redirect_uri}")
     
-    scope = 'openid email profile https://www.googleapis.com/auth/drive.file'
+    scope = 'openid email profile https://www.googleapis.com/auth/drive.readonly'
     state = secrets.token_urlsafe(32)  # Generate a secure state
     # Store state in session for verification
     from flask import session
@@ -256,7 +256,7 @@ def link_google_account():
     
     print(f"DEBUG: Link account - request.host={request.host}, redirect_uri={redirect_uri}")
     
-    scope = 'openid email profile https://www.googleapis.com/auth/drive.file'
+    scope = 'openid email profile https://www.googleapis.com/auth/drive.readonly'
     state = secrets.token_urlsafe(32)  # Generate a secure state
     # Store state in session for verification
     from flask import session
@@ -472,3 +472,17 @@ def google_callback():
         logging.error(f'OAuth token exchange failed: {e}')
         flash('OAuth authentication failed')
         return redirect(url_for('auth.login'))
+
+@auth_bp.route('/google-account-info')
+@login_required
+def google_account_info():
+    """Display information about the linked Google account"""
+    from yonca.google_drive_service import get_linked_google_account
+    
+    account_info = get_linked_google_account(current_user)
+    
+    if account_info and 'error' not in account_info:
+        return render_template('google_account_info.html', account_info=account_info)
+    else:
+        error = account_info.get('error', 'No Google account linked') if account_info else 'No Google account linked'
+        return render_template('google_account_info.html', error=error)
