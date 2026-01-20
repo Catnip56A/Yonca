@@ -105,19 +105,19 @@
                 <div class="menu-item" data-index="{{ loop.index0 }}">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Feature Title</label>
-                            <input type="text" class="form-control" name="feature_title_{{ loop.index0 }}"
+                            <label for="feature_title_{{ loop.index0 }}">Feature Title</label>
+                            <input type="text" id="feature_title_{{ loop.index0 }}" class="form-control" name="feature_title_{{ loop.index0 }}"
                                    value="{{ feature.title }}" placeholder="e.g., Interactive Learning">
                             <small class="form-text text-muted">Supports HTML formatting and button syntax</small>
                         </div>
                         <div class="form-group">
-                            <label>Feature Description</label>
-                            <textarea class="form-control" name="feature_desc_{{ loop.index0 }}" rows="2"
+                            <label for="feature_desc_{{ loop.index0 }}">Feature Description</label>
+                            <textarea id="feature_desc_{{ loop.index0 }}" class="form-control" name="feature_desc_{{ loop.index0 }}" rows="2"
                                       placeholder="Describe this feature">{{ feature.description }}</textarea>
                             <small class="form-text text-muted">Press Enter twice between paragraphs. Supports button syntax: &lt;button: [Button Text]&gt; https://example.com &lt;/button&gt;</small>
                         </div>
                         <div class="form-group">
-                            <label>Feature Image</label>
+                            <label for="feature_file_{{ loop.index0 }}">Feature Image</label>
                             <div class="feature-image-upload">
                                 <input type="file" class="form-control-file" id="feature_file_{{ loop.index0 }}" accept="image/*" onchange="updateFileStatus({{ loop.index0 }})">
                                 <button type="button" class="btn btn-sm btn-primary mt-1" onclick="uploadFeatureImage({{ loop.index0 }})" id="upload_btn_{{ loop.index0 }}">Upload</button>
@@ -179,18 +179,18 @@ function addFeature() {
     featureDiv.innerHTML = `
         <div class="form-row">
             <div class="form-group">
-                <label>Feature Title</label>
-                <input type="text" class="form-control" name="feature_title_${featureCount}"
+                <label for="feature_title_${featureCount}">Feature Title</label>
+                <input type="text" id="feature_title_${featureCount}" class="form-control" name="feature_title_${featureCount}"
                        placeholder="e.g., Interactive Learning">
             </div>
             <div class="form-group">
-                <label>Feature Description</label>
-                <textarea class="form-control" name="feature_desc_${featureCount}" rows="2"
+                <label for="feature_desc_${featureCount}">Feature Description</label>
+                <textarea id="feature_desc_${featureCount}" class="form-control" name="feature_desc_${featureCount}" rows="2"
                           placeholder="Describe this feature"></textarea>
                 <small class="form-text text-muted">Press Enter twice between paragraphs. Supports button syntax: &lt;button: [Button Text]&gt; https://example.com &lt;/button&gt;</small>
             </div>
             <div class="form-group">
-                <label>Feature Image</label>
+                <label for="feature_file_${featureCount}">Feature Image</label>
                 <div class="feature-image-upload">
                     <input type="file" class="form-control-file" id="feature_file_${featureCount}" accept="image/*" onchange="updateFileStatus(${featureCount})">
                     <button type="button" class="btn btn-sm btn-primary mt-1" onclick="uploadFeatureImage(${featureCount})" id="upload_btn_${featureCount}">Upload</button>

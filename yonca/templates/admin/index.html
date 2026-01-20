@@ -724,13 +724,13 @@ function addFeature(containerId, prefix) {
             </button>
         </div>
         <div class="form-group-inline">
-            <label>Title:</label>
-            <input type="text" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
+            <label for="${prefix}_title_${featureIndex}">Title:</label>
+            <input type="text" id="${prefix}_title_${featureIndex}" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
                    placeholder="Feature title" value="">
         </div>
         <div class="form-group-inline">
-            <label>Description:</label>
-            <textarea name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
+            <label for="${prefix}_desc_${featureIndex}">Description:</label>
+            <textarea id="${prefix}_desc_${featureIndex}" name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
                       placeholder="Feature description"></textarea>
         </div>
     `;
@@ -768,13 +768,13 @@ function addFeatureFromData(containerId, prefix, title, description) {
             </button>
         </div>
         <div class="form-group-inline">
-            <label>Title:</label>
-            <input type="text" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
+            <label for="${prefix}_title_${featureIndex}">Title:</label>
+            <input type="text" id="${prefix}_title_${featureIndex}" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
                    placeholder="Feature title" value="${escapedTitle}">
         </div>
         <div class="form-group-inline">
-            <label>Description:</label>
-            <textarea name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
+            <label for="${prefix}_desc_${featureIndex}">Description:</label>
+            <textarea id="${prefix}_desc_${featureIndex}" name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
                       placeholder="Feature description">${escapedDescription}</textarea>
         </div>
     `;
@@ -967,26 +967,26 @@ function addGalleryImage(containerId, prefix) {
         </div>
         <div class="file-input-group">
             <div class="form-group-inline">
-                <label>Media File:</label>
-                <input type="file" name="${prefix}_file_${imageIndex}" class="form-control gallery-file"
+                <label for="${prefix}_file_${imageIndex}">Media File:</label>
+                <input type="file" id="${prefix}_file_${imageIndex}" name="${prefix}_file_${imageIndex}" class="form-control gallery-file"
                        accept="image/*,video/*" required>
             </div>
         </div>
         <div class="url-input-group" style="display: none;">
             <div class="form-group-inline">
-                <label>Media URL:</label>
-                <input type="url" name="${prefix}_url_${imageIndex}" class="form-control gallery-url"
+                <label for="${prefix}_url_${imageIndex}">Media URL:</label>
+                <input type="url" id="${prefix}_url_${imageIndex}" name="${prefix}_url_${imageIndex}" class="form-control gallery-url"
                        placeholder="https://youtube.com/watch?v=... or https://drive.google.com/file/d/... or direct video URL" value="">
             </div>
         </div>
         <div class="form-group-inline">
-            <label>Alt Text:</label>
-            <input type="text" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
+            <label for="${prefix}_alt_${imageIndex}">Alt Text:</label>
+            <input type="text" id="${prefix}_alt_${imageIndex}" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
                    placeholder="Image description" value="">
         </div>
         <div class="form-group-inline">
-            <label>Caption:</label>
-            <input type="text" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
+            <label for="${prefix}_caption_${imageIndex}">Caption:</label>
+            <input type="text" id="${prefix}_caption_${imageIndex}" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
                    placeholder="Image caption" value="">
         </div>
     `;
@@ -1043,13 +1043,13 @@ function addGalleryImageFromData(containerId, prefix, url, alt, caption) {
             <small style="color: #6c757d;"><i class="fa fa-info-circle"></i> Image already uploaded: <code>${url}</code></small>
         </div>
         <div class="form-group-inline">
-            <label>Alt Text:</label>
-            <input type="text" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
+            <label for="${prefix}_alt_${imageIndex}">Alt Text:</label>
+            <input type="text" id="${prefix}_alt_${imageIndex}" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
                    placeholder="Image description" value="${escapedAlt}">
         </div>
         <div class="form-group-inline">
-            <label>Caption:</label>
-            <input type="text" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
+            <label for="${prefix}_caption_${imageIndex}">Caption:</label>
+            <input type="text" id="${prefix}_caption_${imageIndex}" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
                    placeholder="Image caption" value="${escapedCaption}">
         </div>
     `;
