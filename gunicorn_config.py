@@ -2,7 +2,7 @@
 
 # Server socket
 bind = "unix:/tmp/yonca.sock"
-umask = 0o007
+umask = 0o000
 
 # Worker processes
 workers = 3
