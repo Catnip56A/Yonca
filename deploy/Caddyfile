@@ -15,7 +15,7 @@ magsud.yonca-sdc.com {
 
 	# Proxy all other requests to gunicorn
 	handle {
-		reverse_proxy unix//tmp/yonca.sock {
+		reverse_proxy unix///tmp/yonca.sock {
 			# Increase timeouts for large file uploads (10 minutes)
 			transport http {
 				dial_timeout 10m
