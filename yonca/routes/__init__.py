@@ -768,6 +768,7 @@ def course_page_enrolled(course_id):
                           folder_paths=folder_paths,
                           enrolled=enrolled,
                           current_user=current_user,
+                          is_authenticated=current_user.is_authenticated,
                           datetime=dt)
     if user:
         user.is_teacher = is_teacher

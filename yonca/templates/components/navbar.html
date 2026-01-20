@@ -48,11 +48,10 @@
                             {{ current_user.username }}
                         </a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/api/user">{{ _('Profile') }}</a>
                             {% if current_user.is_admin %}
                             <a class="dropdown-item" href="/admin/">{{ _('Admin Panel') }}</a>
-                            {% endif %}
                             <div class="dropdown-divider"></div>
+                            {% endif %}
                             <a class="dropdown-item" href="/logout">{{ _('Logout') }}</a>
                         </div>
                     </li>
