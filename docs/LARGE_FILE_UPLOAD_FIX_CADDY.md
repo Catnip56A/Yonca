@@ -1,10 +1,10 @@
-# Fix for Large File Upload Timeouts
+# Fix for Large File Upload Timeouts - Caddy Version
 
 ## Problem
 Worker timeouts occur when uploading large files (audio, video, etc.) because:
 - Default gunicorn timeout is 30 seconds
 - Large files take longer to upload to Google Drive
-- Nginx has default file size and timeout limits
+- Default file size and timeout limits
 
 ## Solution Applied
 
@@ -25,14 +25,14 @@ To:
 ExecStart=/home/magsud/work/Yonca/venv/bin/gunicorn --config gunicorn_config.py wsgi:app
 ```
 
-### 3. Updated Nginx Configuration (`deploy/yonca.nginx`)
-Added:
-- `client_max_body_size 500M` - Allow 500MB uploads
-- `proxy_connect_timeout 600s` - 10 minute connection timeout
-- `proxy_send_timeout 600s` - 10 minute send timeout
-- `proxy_read_timeout 600s` - 10 minute read timeout
-- `proxy_request_buffering off` - Stream uploads directly
-- `proxy_buffering off` - Disable response buffering
+### 3. Created Caddyfile Configuration (`deploy/Caddyfile`)
+Features:
+- `max_size 500MB` - Allow 500MB uploads
+- `dial_timeout 10m` - 10 minute connection timeout
+- `response_header_timeout 10m` - 10 minute response timeout
+- Automatic HTTPS with Let's Encrypt
+- Gzip compression
+- Security headers
 
 ## Deployment Steps
 
@@ -42,7 +42,7 @@ On the production server, run these commands:
 # 1. Copy new files to server
 scp gunicorn_config.py magsud@your-server:/home/magsud/work/Yonca/
 scp deploy/yonca.service magsud@your-server:/home/magsud/work/Yonca/deploy/
-scp deploy/yonca.nginx magsud@your-server:/home/magsud/work/Yonca/deploy/
+scp deploy/Caddyfile magsud@your-server:/home/magsud/work/Yonca/deploy/
 
 # 2. SSH into server
 ssh magsud@your-server
@@ -54,20 +54,19 @@ mkdir -p /home/magsud/work/Yonca/logs
 sudo cp /home/magsud/work/Yonca/deploy/yonca.service /etc/systemd/system/
 sudo systemctl daemon-reload
 
-# 4. Update nginx configuration
-sudo cp /home/magsud/work/Yonca/deploy/yonca.nginx /etc/nginx/sites-available/yonca
-sudo nginx -t  # Test configuration
+# 5. Update Caddy configuration
+sudo cp /home/magsud/work/Yonca/deploy/Caddyfile /etc/caddy/Caddyfile
 
-# If nginx is not running, start it; otherwise reload it
-sudo systemctl start nginx || sudo systemctl reload nginx
+# 6. Test Caddy configuration
+sudo caddy validate --config /etc/caddy/Caddyfile
 
-# 5. Restart gunicorn service
+# 7. Restart services
 sudo systemctl restart yonca
+sudo systemctl restart caddy
 
-# 6. Check status
+# 8. Check status
 sudo systemctl status yonca
-sudo systemctl status nginx
-sudo journalctl -u yonca -f  # Monitor logs
+sudo systemctl status caddy
 ```
 
 ## Verify Fix
@@ -79,18 +78,18 @@ sudo journalctl -u yonca -f  # Monitor logs
 ## File Size Limits
 
 Current limits:
-- **Nginx**: 500MB max upload
+- **Caddy**: 500MB max upload
 - **Gunicorn**: 10 minute timeout
 - **Google Drive**: No limit (API handles large files)
 
 To increase further, modify:
-- `client_max_body_size` in nginx config
+- `max_size` in Caddyfile
 - `timeout` in gunicorn_config.py
 
 ## Troubleshooting
 
 ### 502 Bad Gateway Error
-If you get a 502 error after restarting:
+If you get a 502 error:
 
 ```bash
 # 1. Check if logs directory exists
@@ -103,49 +102,47 @@ sudo journalctl -u yonca -n 50 --no-pager
 # 3. Check if socket file exists
 ls -la /tmp/yonca.sock
 
-# 4. Check socket permissions
-sudo chmod 666 /tmp/yonca.sock  # Temporary fix
-
-# 5. Restart services
+# 4. Restart services
 sudo systemctl restart yonca
 sleep 2
-sudo systemctl restart nginx
+sudo systemctl restart caddy
 
-# 6. Verify socket was created
+# 5. Verify socket was created
 ls -la /tmp/yonca.sock
-
-# 7. Test the socket manually
-curl --unix-socket /tmp/yonca.sock http://localhost/
 ```
-
-### Nginx Proxy Headers Warning
-If you see: `could not build optimal proxy_headers_hash...`
-
-Add these lines to `/etc/nginx/nginx.conf` in the `http` block:
-```nginx
-http {
-    # ... existing config ...
-    
-    # Fix proxy headers hash warning
-    proxy_headers_hash_max_size 1024;
-    proxy_headers_hash_bucket_size 128;
-    
-    # ... rest of config ...
-}
-```
-Then: `sudo systemctl restart nginx`
 
 ### Upload Timeouts
 If timeouts still occur:
-1. Check nginx error log: `sudo tail -f /var/log/nginx/error.log`
+1. Check Caddy error log: `sudo journalctl -u caddy -n 50`
 2. Check gunicorn log: `tail -f /home/magsud/work/Yonca/logs/gunicorn-error.log`
 3. Increase timeout values if needed
-4. Consider implementing async background uploads for very large files
 
-### Nginx Not Running
-If nginx fails to start/reload:
+### Caddy Not Starting
+If Caddy fails to start:
 ```bash
-sudo systemctl start nginx
-sudo systemctl enable nginx  # Enable on boot
-sudo systemctl status nginx
+sudo systemctl status caddy
+sudo journalctl -u caddy -n 50
+sudo caddy validate --config /etc/caddy/Caddyfile
 ```
+
+### HTTPS Certificate Issues
+Caddy automatically gets Let's Encrypt certificates. If there are issues:
+```bash
+# Check Caddy logs
+sudo journalctl -u caddy -f
+
+# Make sure ports 80 and 443 are open
+sudo ufw allow 80
+sudo ufw allow 443
+
+# Verify domain DNS points to your server
+dig magsud.yonca-sdc.com
+```
+
+## Advantages of Caddy
+
+1. **Automatic HTTPS** - No need to manually configure SSL certificates
+2. **Simpler configuration** - Easier to read and maintain
+3. **Better defaults** - Secure by default
+4. **Automatic renewal** - Let's Encrypt certificates renew automatically
+5. **HTTP/2 and HTTP/3** support out of the box
