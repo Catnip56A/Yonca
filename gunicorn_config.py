@@ -1,8 +1,7 @@
 # Gunicorn configuration file for Yonca
 
 # Server socket
-bind = "unix:/tmp/yonca.sock"
-umask = 0o000
+bind = "127.0.0.1:8000"
 
 # Worker processes
 workers = 3
