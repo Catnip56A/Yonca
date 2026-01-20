@@ -978,6 +978,93 @@ def edit_course_page(slug):
             db.session.commit()
             flash('Content added successfully!', 'success')
             
+        elif action == 'import_drive_file':
+            # Import a single file from Google Drive
+            drive_url = request.form.get('drive_url', '').strip()
+            if not drive_url:
+                flash('Please provide a Google Drive file URL or ID.', 'error')
+                return redirect(request.url, code=303)
+            
+            from yonca.google_drive_service import authenticate, import_drive_file
+            service = authenticate()
+            if not service:
+                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
+                return redirect(request.url, code=303)
+            
+            file_data = import_drive_file(service, drive_url)
+            if not file_data:
+                flash('Failed to import file from Google Drive. Please check the URL and permissions.', 'error')
+                return redirect(request.url, code=303)
+            
+            # Optional folder assignment
+            folder_id = request.form.get('import_folder_id')
+            
+            content = CourseContent(
+                course_id=course.id,
+                title=request.form.get('import_title') or file_data['name'],
+                description='',
+                content_type='file',
+                content_data=file_data['view_link'],
+                drive_file_id=file_data['file_id'],
+                drive_view_link=file_data['view_link'],
+                order=CourseContent.query.filter_by(course_id=course.id).count() + 1,
+                folder_id=int(folder_id) if folder_id else None,
+                is_published=request.form.get('import_published') == 'on',
+                allow_others_to_view=request.form.get('import_allow_view') == 'on'
+            )
+            db.session.add(content)
+            db.session.commit()
+            flash(f'Successfully imported: {file_data["name"]}', 'success')
+            
+        elif action == 'import_drive_folder':
+            # Import entire folder from Google Drive
+            folder_url = request.form.get('drive_url', '').strip()
+            if not folder_url:
+                flash('Please provide a Google Drive folder URL or ID.', 'error')
+                return redirect(request.url, code=303)
+            
+            from yonca.google_drive_service import authenticate, import_drive_folder
+            service = authenticate()
+            if not service:
+                flash('Failed to authenticate with Google Drive. Please link your Google account first.', 'error')
+                return redirect(request.url, code=303)
+            
+            folder_data = import_drive_folder(service, folder_url)
+            if not folder_data:
+                flash('Failed to import folder from Google Drive. Please check the URL and ensure it\'s a folder.', 'error')
+                return redirect(request.url, code=303)
+            
+            # Create a course folder for this Drive folder
+            course_folder = CourseContentFolder(
+                course_id=course.id,
+                title=folder_data['folder_name'],
+                order=CourseContentFolder.query.filter_by(course_id=course.id).count() + 1
+            )
+            db.session.add(course_folder)
+            db.session.flush()  # Get the folder ID
+            
+            # Add all files from the folder
+            imported_count = 0
+            for file_data in folder_data['files']:
+                content = CourseContent(
+                    course_id=course.id,
+                    title=file_data['name'],
+                    description='',
+                    content_type='file',
+                    content_data=file_data['view_link'],
+                    drive_file_id=file_data['file_id'],
+                    drive_view_link=file_data['view_link'],
+                    order=imported_count + 1,
+                    folder_id=course_folder.id,
+                    is_published=request.form.get('import_published') == 'on',
+                    allow_others_to_view=True  # Default to visible for bulk imports
+                )
+                db.session.add(content)
+                imported_count += 1
+            
+            db.session.commit()
+            flash(f'Successfully imported folder "{folder_data["folder_name"]}" with {imported_count} files!', 'success')
+            
         elif action == 'add_assignment':
             due_date_str = request.form.get('assignment_due_date')
             due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M') if due_date_str else None

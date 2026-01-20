@@ -465,6 +465,9 @@
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadFileModal" data-folder-id="" data-folder-name="Root">
                         + {{ _('Upload File') }}
                     </button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#importDriveModal" data-folder-id="" data-folder-name="Root">
+                        <i class="fas fa-cloud-download-alt"></i> {{ _('Import from Drive') }}
+                    </button>
                 </div>
                 {% endif %}
             </div>
@@ -1057,6 +1060,63 @@
       </div>
     </div>
 
+    <!-- Import from Google Drive Modal -->
+    <div class="modal fade" id="importDriveModal" tabindex="-1" role="dialog" aria-labelledby="importDriveModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}">
+            <input type="hidden" name="action" id="importDriveAction" value="import_drive_file">
+            <input type="hidden" name="import_folder_id" id="importDriveFolderId" value="">
+            <div class="modal-header">
+              <h5 class="modal-title" id="importDriveModalLabel">{{ _('Import from Google Drive') }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-info">
+                {{ _('Import to:') }} <strong id="importDriveFolderName">{{ _('Root') }}</strong>
+              </div>
+              <div class="form-group">
+                <label>{{ _('Import Type') }}</label>
+                <div class="form-check">
+                  <input type="radio" class="form-check-input" name="import_type" id="importTypeFile" value="file" checked>
+                  <label class="form-check-label" for="importTypeFile">{{ _('Single File') }}</label>
+                </div>
+                <div class="form-check">
+                  <input type="radio" class="form-check-input" name="import_type" id="importTypeFolder" value="folder">
+                  <label class="form-check-label" for="importTypeFolder">{{ _('Entire Folder') }}</label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="drive_url">{{ _('Google Drive URL or File/Folder ID') }} *</label>
+                <input type="text" id="drive_url" class="form-control" name="drive_url" required placeholder="https://drive.google.com/file/d/...">
+                <small class="form-text text-muted">
+                  {{ _('Paste the sharing link from Google Drive or just the file/folder ID') }}
+                </small>
+              </div>
+              <div class="form-group" id="fileTitleGroup">
+                <label for="import_title">{{ _('Title (Optional)') }}</label>
+                <input type="text" id="import_title" class="form-control" name="import_title" placeholder="{{ _('Leave empty to use original filename') }}">
+              </div>
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="import_published" id="importPublished" checked>
+                <label class="form-check-label" for="importPublished">{{ _('Publish immediately') }}</label>
+              </div>
+              <div class="form-check" id="allowViewGroup">
+                <input type="checkbox" class="form-check-input" name="import_allow_view" id="importAllowView" checked>
+                <label class="form-check-label" for="importAllowView">{{ _('Allow students to view') }}</label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Cancel') }}</button>
+              <button type="submit" class="btn btn-success">{{ _('Import') }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Add Assignment Modal -->
     <div class="modal fade" id="addAssignmentModal" tabindex="-1" role="dialog" aria-labelledby="addAssignmentModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -1203,6 +1263,40 @@ $(document).ready(function() {
             $('#uploadFileModal').modal('show');
         } catch(err) {
             console.error('Error showing modal:', err);
+        }
+    });
+
+    // Manually handle import from Drive button clicks
+    $(document).on('click', '[data-target="#importDriveModal"]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var folderId = $(this).data('folder-id');
+        var folderName = $(this).data('folder-name');
+
+        $('#importDriveFolderId').val(folderId || '');
+        $('#importDriveFolderName').text(folderName || 'Root');
+
+        try {
+            $('#importDriveModal').modal('show');
+        } catch(err) {
+            console.error('Error showing modal:', err);
+        }
+    });
+
+    // Handle import type change
+    $('input[name="import_type"]').change(function() {
+        var importType = $('input[name="import_type"]:checked').val();
+        if (importType === 'folder') {
+            $('#importDriveAction').val('import_drive_folder');
+            $('#fileTitleGroup').hide();
+            $('#allowViewGroup').hide();
+            $('#drive_url').attr('placeholder', 'https://drive.google.com/drive/folders/...');
+        } else {
+            $('#importDriveAction').val('import_drive_file');
+            $('#fileTitleGroup').show();
+            $('#allowViewGroup').show();
+            $('#drive_url').attr('placeholder', 'https://drive.google.com/file/d/...');
         }
     });
 

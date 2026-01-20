@@ -221,3 +221,106 @@ def download_file(service, file_id, local_path):
     except HttpError as error:
         print(f'An error occurred downloading file: {error}')
         return False
+
+def extract_file_id_from_url(drive_url):
+    """Extract Google Drive file ID from various URL formats"""
+    import re
+    
+    # Handle different Drive URL formats
+    patterns = [
+        r'/d/([a-zA-Z0-9_-]+)',  # /d/FILE_ID
+        r'id=([a-zA-Z0-9_-]+)',  # ?id=FILE_ID
+        r'/folders/([a-zA-Z0-9_-]+)',  # /folders/FOLDER_ID
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, drive_url)
+        if match:
+            return match.group(1)
+    
+    # If no pattern matches, assume it's already a file ID
+    if re.match(r'^[a-zA-Z0-9_-]+$', drive_url):
+        return drive_url
+    
+    return None
+
+def get_file_metadata(service, file_id):
+    """Get metadata for a Google Drive file"""
+    try:
+        file = service.files().get(
+            fileId=file_id,
+            fields='id, name, mimeType, size, webViewLink, iconLink'
+        ).execute()
+        return file
+    except HttpError as error:
+        print(f'An error occurred getting file metadata: {error}')
+        return None
+
+def list_folder_contents(service, folder_id):
+    """List all files in a Google Drive folder"""
+    try:
+        results = service.files().list(
+            q=f"'{folder_id}' in parents and trashed=false",
+            fields='files(id, name, mimeType, size, webViewLink, iconLink)',
+            pageSize=100
+        ).execute()
+        return results.get('files', [])
+    except HttpError as error:
+        print(f'An error occurred listing folder contents: {error}')
+        return []
+
+def import_drive_file(service, file_id_or_url):
+    """Import a single file from Google Drive and return its metadata with view link"""
+    file_id = extract_file_id_from_url(file_id_or_url)
+    if not file_id:
+        return None
+    
+    metadata = get_file_metadata(service, file_id)
+    if not metadata:
+        return None
+    
+    # Ensure file has proper sharing permissions
+    set_file_permissions(service, file_id)
+    
+    # Create view-only link
+    is_image = metadata.get('mimeType', '').startswith('image/')
+    view_link = create_view_only_link(service, file_id, is_image)
+    
+    return {
+        'file_id': file_id,
+        'name': metadata.get('name'),
+        'mime_type': metadata.get('mimeType'),
+        'size': metadata.get('size'),
+        'view_link': view_link or metadata.get('webViewLink'),
+        'icon_link': metadata.get('iconLink')
+    }
+
+def import_drive_folder(service, folder_id_or_url):
+    """Import all files from a Google Drive folder and return metadata for each"""
+    folder_id = extract_file_id_from_url(folder_id_or_url)
+    if not folder_id:
+        return None
+    
+    # Get folder metadata
+    folder_metadata = get_file_metadata(service, folder_id)
+    if not folder_metadata or folder_metadata.get('mimeType') != 'application/vnd.google-apps.folder':
+        return None
+    
+    # List all files in folder
+    files = list_folder_contents(service, folder_id)
+    
+    imported_files = []
+    for file in files:
+        # Skip folders within folders for now (can be enhanced later)
+        if file.get('mimeType') == 'application/vnd.google-apps.folder':
+            continue
+        
+        file_data = import_drive_file(service, file['id'])
+        if file_data:
+            imported_files.append(file_data)
+    
+    return {
+        'folder_name': folder_metadata.get('name'),
+        'folder_id': folder_id,
+        'files': imported_files
+    }
