@@ -288,9 +288,14 @@
                         <ul class="list-group mb-2">
                             {% for item in folder_items %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{ translate_field('course_content', item.id, 'title', item.title) }}</strong><br>
-                                    <small>{{ translate_field('course_content', item.id, 'description', item.description) }}</small>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    {% if is_teacher_or_admin %}
+                                    <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()">
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ translate_field('course_content', item.id, 'title', item.title) }}</strong><br>
+                                        <small>{{ translate_field('course_content', item.id, 'description', item.description) }}</small>
+                                    </div>
                                 </div>
                                 <div>
                                 {% if item.content_type == 'file' %}
@@ -489,6 +494,42 @@
                 </div>
                 {% endif %}
             </div>
+
+            {% if is_teacher_or_admin %}
+            <!-- Bulk Actions -->
+            <div class="bulk-actions-enrolled" style="display: none; background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #dee2e6;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span class="text-muted"><strong><span id="selected-count-enrolled">0</span> items selected</strong></span>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="bulkDeleteEnrolled()">
+                        <i class="fas fa-trash"></i> {{ _('Delete Selected') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="bulkMoveEnrolled()">
+                        <i class="fas fa-folder"></i> {{ _('Move Selected') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning" onclick="bulkToggleVisibilityEnrolled()">
+                        <i class="fas fa-eye"></i> {{ _('Toggle Visibility') }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelectionEnrolled()">
+                        <i class="fas fa-times"></i> {{ _('Clear') }}
+                    </button>
+                </div>
+                <div id="bulk-move-controls-enrolled" style="display: none; margin-top: 8px;">
+                    <form method="POST" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline;">
+                        <input type="hidden" name="action" value="bulk_move_content">
+                        <input type="hidden" name="selected_ids" id="bulk-move-ids-enrolled">
+                        <select name="target_folder_id" class="form-control form-control-sm" style="display: inline-block; width: auto;">
+                            <option value="">{{ _('Unsorted') }}</option>
+                            {% if content_folders %}
+                                {% for f in content_folders %}
+                                <option value="{{ f.id }}">{{ f.title }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">{{ _('Move to Folder') }}</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
             
             {# Display root-level folders #}
             {% set root_folders = content_folders.filter_by(parent_folder_id=None).all() %}
@@ -505,9 +546,14 @@
                 <ul class="list-group mb-4">
                     {% for item in unassigned %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{ item.title }}</strong><br>
-                            <small>{{ item.description }}</small>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            {% if is_teacher_or_admin %}
+                            <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()">
+                            {% endif %}
+                            <div>
+                                <strong>{{ item.title }}</strong><br>
+                                <small>{{ item.description }}</small>
+                            </div>
                         </div>
                         <div>
                         {% if item.content_type == 'file' %}
@@ -1507,5 +1553,87 @@ $(document).ready(function() {
     {% endfor %}
     {% endif %}
 });
+
+// Bulk actions functions for enrolled page
+function updateBulkActionsEnrolled() {
+    const checkboxes = document.querySelectorAll('.content-checkbox-enrolled:checked');
+    const bulkActions = document.querySelector('.bulk-actions-enrolled');
+    const selectedCount = document.getElementById('selected-count-enrolled');
+    
+    selectedCount.textContent = checkboxes.length;
+    
+    if (checkboxes.length > 0) {
+        bulkActions.style.display = 'block';
+    } else {
+        bulkActions.style.display = 'none';
+        document.getElementById('bulk-move-controls-enrolled').style.display = 'none';
+    }
+}
+
+function clearSelectionEnrolled() {
+    document.querySelectorAll('.content-checkbox-enrolled:checked').forEach(cb => cb.checked = false);
+    updateBulkActionsEnrolled();
+}
+
+function bulkDeleteEnrolled() {
+    const checkboxes = document.querySelectorAll('.content-checkbox-enrolled:checked');
+    if (checkboxes.length === 0) return;
+    
+    if (confirm(`{{ _('Delete') }} ${checkboxes.length} {{ _('selected items? This action cannot be undone.') }}`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("main.course_page_enrolled", course_id=course.id) }}';
+        form.style.display = 'none';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'bulk_delete_content';
+        form.appendChild(actionInput);
+        
+        checkboxes.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'content_ids';
+            input.value = cb.value;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function bulkMoveEnrolled() {
+    const moveControls = document.getElementById('bulk-move-controls-enrolled');
+    moveControls.style.display = moveControls.style.display === 'none' ? 'block' : 'none';
+}
+
+function bulkToggleVisibilityEnrolled() {
+    const checkboxes = document.querySelectorAll('.content-checkbox-enrolled:checked');
+    if (checkboxes.length === 0) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("main.course_page_enrolled", course_id=course.id) }}';
+    form.style.display = 'none';
+    
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = 'action';
+    actionInput.value = 'bulk_toggle_visibility';
+    form.appendChild(actionInput);
+    
+    checkboxes.forEach(cb => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'content_ids';
+        input.value = cb.value;
+        form.appendChild(input);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+}
 </script>
 {% endblock %}

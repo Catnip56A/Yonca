@@ -181,6 +181,40 @@
                         </button>
                     </div>
 
+                    <!-- Bulk Actions -->
+                    <div class="bulk-actions" style="display: none; background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #dee2e6;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="text-muted"><strong><span id="selected-count">0</span> items selected</strong></span>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="bulkDelete()">
+                                <i class="fas fa-trash"></i> Delete Selected
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="bulkMove()">
+                                <i class="fas fa-folder"></i> Move Selected
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning" onclick="bulkToggleVisibility()">
+                                <i class="fas fa-eye"></i> Toggle Visibility
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                        <div id="bulk-move-controls" style="display: none; margin-top: 8px;">
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="bulk_move_content">
+                                <input type="hidden" name="selected_ids" id="bulk-move-ids">
+                                <select name="target_folder_id" class="form-control form-control-sm" style="display: inline-block; width: auto;">
+                                    <option value="">Unsorted</option>
+                                    {% if content_folders %}
+                                        {% for f in content_folders %}
+                                        <option value="{{ f.id }}">{{ f.title }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Move to Folder</button>
+                            </form>
+                        </div>
+                    </div>
+
                     <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
                         <button class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#addFolderModal">Create Folder</button>
                         <small class="text-muted">Organize content into folders for easier navigation.</small>
@@ -196,14 +230,17 @@
                                     {% for item in folder_items %}
                                     <div class="item-card">
                                         <div class="item-header">
-                                            <div>
-                                                <div class="item-title">{{ item.title }}</div>
-                                                <small class="text-muted">{{ item.content_type|upper }}</small>
-                                                {% if item.is_published %}
-                                                    <span class="badge-published">Published</span>
-                                                {% else %}
-                                                    <span class="badge-draft">Draft</span>
-                                                {% endif %}
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <input type="checkbox" class="content-checkbox" value="{{ item.id }}" onchange="updateBulkActions()">
+                                                <div>
+                                                    <div class="item-title">{{ item.title }}</div>
+                                                    <small class="text-muted">{{ item.content_type|upper }}</small>
+                                                    {% if item.is_published %}
+                                                        <span class="badge-published">Published</span>
+                                                    {% else %}
+                                                        <span class="badge-draft">Draft</span>
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                             <div>
                                                 <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">
@@ -249,14 +286,17 @@
                         {% for item in unassigned %}
                         <div class="item-card">
                             <div class="item-header">
-                                <div>
-                                    <div class="item-title">{{ item.title }}</div>
-                                    <small class="text-muted">{{ item.content_type|upper }}</small>
-                                    {% if item.is_published %}
-                                        <span class="badge-published">Published</span>
-                                    {% else %}
-                                        <span class="badge-draft">Draft</span>
-                                    {% endif %}
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" class="content-checkbox" value="{{ item.id }}" onchange="updateBulkActions()">
+                                    <div>
+                                        <div class="item-title">{{ item.title }}</div>
+                                        <small class="text-muted">{{ item.content_type|upper }}</small>
+                                        {% if item.is_published %}
+                                            <span class="badge-published">Published</span>
+                                        {% else %}
+                                            <span class="badge-draft">Draft</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
                                 <div>
                                     <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">
@@ -622,5 +662,93 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function updateBulkActions() {
+            const checkboxes = document.querySelectorAll('.content-checkbox:checked');
+            const bulkActions = document.querySelector('.bulk-actions');
+            const selectedCount = document.getElementById('selected-count');
+            
+            selectedCount.textContent = checkboxes.length;
+            
+            if (checkboxes.length > 0) {
+                bulkActions.style.display = 'block';
+            } else {
+                bulkActions.style.display = 'none';
+                document.getElementById('bulk-move-controls').style.display = 'none';
+            }
+        }
+        
+        function clearSelection() {
+            document.querySelectorAll('.content-checkbox:checked').forEach(cb => cb.checked = false);
+            updateBulkActions();
+        }
+        
+        function bulkDelete() {
+            const checkboxes = document.querySelectorAll('.content-checkbox:checked');
+            if (checkboxes.length === 0) return;
+            
+            if (confirm(`Delete ${checkboxes.length} selected items? This action cannot be undone.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.style.display = 'none';
+                
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'bulk_delete_content';
+                form.appendChild(actionInput);
+                
+                checkboxes.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'content_ids';
+                    input.value = cb.value;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        function bulkMove() {
+            const moveControls = document.getElementById('bulk-move-controls');
+            moveControls.style.display = moveControls.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function bulkToggleVisibility() {
+            const checkboxes = document.querySelectorAll('.content-checkbox:checked');
+            if (checkboxes.length === 0) return;
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.style.display = 'none';
+            
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'bulk_toggle_visibility';
+            form.appendChild(actionInput);
+            
+            checkboxes.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'content_ids';
+                input.value = cb.value;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+        // Update bulk move IDs when showing move controls
+        document.getElementById('bulk-move-controls').addEventListener('show', function() {
+            const checkboxes = document.querySelectorAll('.content-checkbox:checked');
+            const ids = Array.from(checkboxes).map(cb => cb.value);
+            document.getElementById('bulk-move-ids').value = ids.join(',');
+        });
+    </script>
 </body>
 </html>

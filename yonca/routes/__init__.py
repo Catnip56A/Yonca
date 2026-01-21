@@ -1017,6 +1017,69 @@ def course_page_enrolled(course_id):
             print("DEBUG: Committed recursive folder import to database")
             flash(f'Successfully imported folder "{folder_data["folder_name"]}" with {imported_count} files from all subfolders!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
+        # Bulk delete content
+        elif action == 'bulk_delete_content' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            from yonca.google_drive_service import authenticate, delete_file
+            
+            content_ids = request.form.getlist('content_ids')
+            deleted_count = 0
+            
+            for content_id in content_ids:
+                content = CourseContent.query.get(content_id)
+                if content and content.course_id == course.id:
+                    # Delete from Google Drive
+                    if content.drive_file_id:
+                        service = authenticate()
+                        if service:
+                            try:
+                                delete_file(service, content.drive_file_id)
+                            except Exception as e:
+                                print(f"Error deleting file from Google Drive: {e}")
+                    
+                    # Delete from database
+                    db.session.delete(content)
+                    deleted_count += 1
+            
+            db.session.commit()
+            flash(f'{deleted_count} items deleted successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
+        # Bulk move content
+        elif action == 'bulk_move_content' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            
+            content_ids = request.form.get('selected_ids').split(',')
+            target_folder_id = request.form.get('target_folder_id')
+            moved_count = 0
+            
+            for content_id in content_ids:
+                content = CourseContent.query.get(content_id.strip())
+                if content and content.course_id == course.id:
+                    content.folder_id = int(target_folder_id) if target_folder_id else None
+                    moved_count += 1
+            
+            db.session.commit()
+            flash(f'{moved_count} items moved successfully!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+        
+        # Bulk toggle visibility
+        elif action == 'bulk_toggle_visibility' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            
+            content_ids = request.form.getlist('content_ids')
+            toggled_count = 0
+            
+            for content_id in content_ids:
+                content = CourseContent.query.get(content_id)
+                if content and content.course_id == course.id:
+                    content.is_published = not content.is_published
+                    toggled_count += 1
+            
+            db.session.commit()
+            flash(f'Visibility toggled for {toggled_count} items!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
 
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     contents = CourseContent.query.filter_by(course_id=course.id, is_published=True).order_by(CourseContent.title).all()
@@ -1586,6 +1649,63 @@ def edit_course_page(slug):
                 flash('Content moved successfully!', 'success')
             else:
                 flash('Content not found or permission denied.', 'error')
+        
+        elif action == 'bulk_delete_content' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            from yonca.google_drive_service import authenticate, delete_file
+            
+            content_ids = request.form.getlist('content_ids')
+            deleted_count = 0
+            
+            for content_id in content_ids:
+                content = CourseContent.query.get(content_id)
+                if content and content.course_id == course.id:
+                    # Delete from Google Drive
+                    if content.drive_file_id:
+                        service = authenticate()
+                        if service:
+                            try:
+                                delete_file(service, content.drive_file_id)
+                            except Exception as e:
+                                print(f"Error deleting file from Google Drive: {e}")
+                    
+                    # Delete from database
+                    db.session.delete(content)
+                    deleted_count += 1
+            
+            db.session.commit()
+            flash(f'{deleted_count} items deleted successfully!', 'success')
+        
+        elif action == 'bulk_move_content' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            
+            content_ids = request.form.get('selected_ids').split(',')
+            target_folder_id = request.form.get('target_folder_id')
+            moved_count = 0
+            
+            for content_id in content_ids:
+                content = CourseContent.query.get(content_id.strip())
+                if content and content.course_id == course.id:
+                    content.folder_id = int(target_folder_id) if target_folder_id else None
+                    moved_count += 1
+            
+            db.session.commit()
+            flash(f'{moved_count} items moved successfully!', 'success')
+        
+        elif action == 'bulk_toggle_visibility' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            
+            content_ids = request.form.getlist('content_ids')
+            toggled_count = 0
+            
+            for content_id in content_ids:
+                content = CourseContent.query.get(content_id)
+                if content and content.course_id == course.id:
+                    content.is_published = not content.is_published
+                    toggled_count += 1
+            
+            db.session.commit()
+            flash(f'Visibility toggled for {toggled_count} items!', 'success')
         
         return redirect(request.url, code=303)
     
