@@ -23,7 +23,8 @@ def create_admin_user(app, username=None, email=None, password=None):
     if not username:
         username = input("Enter username: ").strip()
     if not email:
-        email = input("Enter email: ").strip()
+        email_input = input("Enter email (optional for non-Google users): ").strip()
+        email = email_input if email_input else None
     if not password:
         password = getpass.getpass("Enter password: ")
         confirm_password = getpass.getpass("Confirm password: ")
@@ -31,8 +32,8 @@ def create_admin_user(app, username=None, email=None, password=None):
             print("Passwords do not match.")
             return
 
-    if not username or not email or not password:
-        print("Username, email, and password are required.")
+    if not username or not password:
+        print("Username and password are required.")
         return
 
     if len(password) < 6:
@@ -42,11 +43,15 @@ def create_admin_user(app, username=None, email=None, password=None):
     # Check if user already exists
     with app.app_context():
         try:
-            existing_user = User.query.filter(
-                (User.username == username) | (User.email == email)
-            ).first()
+            # Build query based on what's provided
+            query_filters = [User.username == username]
+            if email:
+                query_filters.append(User.email == email)
+            
+            existing_user = User.query.filter(db.or_(*query_filters)).first()
             if existing_user:
-                print(f"User with username '{username}' or email '{email}' already exists.")
+                conflict_field = "username" if existing_user.username == username else "email"
+                print(f"User with {conflict_field} '{username if conflict_field == 'username' else email}' already exists.")
                 return
         except Exception as e:
             print(f"Error checking existing user: {e}")

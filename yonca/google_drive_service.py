@@ -101,6 +101,29 @@ def get_linked_google_account(user=None):
     if not user or not user.google_access_token:
         return None
     
+    # Check if token is expired and refresh if needed
+    if user.google_token_expiry and datetime.utcnow() >= user.google_token_expiry:
+        if user.google_refresh_token:
+            creds = refresh_credentials(user)
+            if not creds:
+                # Refresh failed, clear tokens
+                print('Token refresh failed for account info, clearing tokens')
+                user.google_access_token = None
+                user.google_refresh_token = None
+                user.google_token_expiry = None
+                from yonca.models import db
+                db.session.commit()
+                return {'error': 'Token refresh failed'}
+        else:
+            print('Access token expired and no refresh token available for account info')
+            # Clear expired token
+            user.google_access_token = None
+            user.google_refresh_token = None
+            user.google_token_expiry = None
+            from yonca.models import db
+            db.session.commit()
+            return {'error': 'Access token expired'}
+    
     try:
         # Get user info from Google
         userinfo_url = 'https://www.googleapis.com/oauth2/v2/userinfo'
@@ -114,6 +137,19 @@ def get_linked_google_account(user=None):
             'token_expiry': user.google_token_expiry.isoformat() if user.google_token_expiry else None,
             'has_refresh_token': bool(user.google_refresh_token)
         }
+    except requests.HTTPError as e:
+        if e.response.status_code == 401:
+            # Token is invalid/expired, clear it
+            print('Token is invalid (401), clearing tokens')
+            user.google_access_token = None
+            user.google_refresh_token = None
+            user.google_token_expiry = None
+            from yonca.models import db
+            db.session.commit()
+            return {'error': 'Invalid or expired token'}
+        else:
+            print(f'Failed to get Google account info: HTTP {e.response.status_code}')
+            return {'error': f'HTTP {e.response.status_code}: {e.response.text}'}
     except Exception as e:
         print(f'Failed to get Google account info: {e}')
         return {'error': str(e)}

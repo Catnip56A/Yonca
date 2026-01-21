@@ -347,7 +347,7 @@ def google_link_callback():
         ).first()
         
         if existing_linked_user:
-            flash(f'This Google account ({google_email}) is already linked to another user. Please use a different Google account.')
+            flash(f'Google account ({google_email}) is already linked to another user account. Please use a different Google account.')
             logging.warning(f"Attempted to link Google account {google_email} which is already linked to user ID {existing_linked_user.id}")
             return redirect(url_for('auth.login'))
         

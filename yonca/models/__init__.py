@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
     """User model for authentication and course enrollment"""
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)  # Made nullable for non-Google users
     _password = db.Column('password', db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_teacher = db.Column(db.Boolean, default=False)
