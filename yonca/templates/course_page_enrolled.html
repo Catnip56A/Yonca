@@ -1,64 +1,3 @@
-{# Macro to render the nested folder tree #}
-{% macro render_folders(tree, depth=0) %}
-    <ul class="folder-list">
-    {% for node in tree %}
-        <li>
-            <div class="folder-item" data-depth="{{ depth }}" data-folder-id="{{ node.folder.id }}">
-                <strong>📁 {{ node.folder.title }}</strong>
-                {# You can add folder actions/buttons here if needed #}
-            </div>
-            {# Render folder contents if needed #}
-            {# Recursively render children #}
-            {% if node.children %}
-                {{ render_folders(node.children, depth + 1) }}
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% endmacro %}
-
-{% macro render_folder(folder, depth=0) %}
-    <div class="folder-panel" style="margin-left: {{ depth * 15 }}px; margin-bottom: 0.5rem;">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <strong>📁 {{ folder.title }}</strong>
-            </div>
-            {% if is_teacher_or_admin %}
-            <div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('parentFolderId').value='{{ folder.id }}'; $('#createFolderModal').modal('show');">{{ _('New') }}</button>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    {# Files assigned to this folder #}
-    {% set folder_contents = contents | selectattr('folder_id', 'equalto', folder.id) | list %}
-    {% if folder_contents and folder_contents|length > 0 %}
-    <ul class="list-group mb-2 file-sortable" data-parent-folder-id="{{ folder.id }}">
-        {% for item in folder_contents %}
-        <li class="list-group-item d-flex justify-content-between align-items-center" data-file-id="{{ item.id }}">
-            <div>
-                <strong>{{ item.title }}</strong>
-                <div><small>{{ item.description }}</small></div>
-            </div>
-            <div>
-                {% if item.content_type == 'file' %}
-                <a href="{{ url_for('api.serve_file', file_id=item.drive_file_id) }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View') }}</a>
-                {% else %}
-                <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View') }}</a>
-                {% endif %}
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    {# Render subfolders of this folder #}
-    {% set children = content_folders | selectattr('parent_folder_id', 'equalto', folder.id) | list %}
-    {% if children and children|length > 0 %}
-        {{ render_folders(children, depth + 1) }}
-    {% endif %}
-{% endmacro %}
 {% extends 'base.html' %}
 
 {% block title %}{{ course.title }} - {{ home_content.site_name }}{% endblock %}
@@ -75,6 +14,112 @@
         width: auto;
     }
     .nav-link {
+        color: #374151;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .nav-link.active {
+        background-color: #337a2c;
+        color: white;
+    }
+    .nav-link:hover {
+        background-color: #f3f4f6;
+        color: #337a2c;
+    }
+    .list-group-item {
+        font-size: 1rem;
+    }
+    .tab-content {
+        margin-top: 24px;
+    }
+    .folder-item[data-depth="0"] { margin-left: 0px; }
+    .folder-item[data-depth="1"] { margin-left: 20px; }
+    .folder-item[data-depth="2"] { margin-left: 40px; }
+    .folder-item[data-depth="3"] { margin-left: 60px; }
+    .folder-item[data-depth="4"] { margin-left: 80px; }
+    .folder-item[data-depth="5"] { margin-left: 100px; }
+    .reply-card[data-depth] { background: #f8f9fa; }
+    .reply-card[data-depth="0"] { margin-left: 0px; }
+    .reply-card[data-depth="1"] { margin-left: 20px; background: #e9ecef; }
+    .reply-card[data-depth="2"] { margin-left: 40px; }
+    .reply-card[data-depth="3"] { margin-left: 60px; background: #e9ecef; }
+    .reply-card[data-depth="4"] { margin-left: 80px; }
+
+    /* Star Rating Styles */
+    .star-rating {
+        font-size: 2rem;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    .star-rating .star {
+        color: #ddd;
+        transition: color 0.2s;
+    }
+    .star-rating .star:hover,
+    .star-rating .star.hover {
+        color: #ffc107;
+    }
+    .star-rating .star.selected {
+        color: #ffc107;
+    }
+    .star-display {
+        font-size: 1.2rem;
+    }
+    .star-display .star {
+        color: #ddd;
+    }
+    .star-display .star.filled {
+        color: #ffc107;
+    }
+
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 10px;
+        }
+
+        .nav-tabs {
+            flex-direction: column;
+        }
+
+        .nav-tabs .nav-link {
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+            text-align: center;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-content {
+            margin-top: 16px;
+        }
+
+        .card {
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .card-header {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .btn {
+            min-height: 44px;
+            font-size: 1rem;
+            border-radius: 6px;
+        }
+
         .form-control {
             min-height: 44px;
             font-size: 16px; /* Prevent zoom on iOS */
@@ -176,7 +221,6 @@
 
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-
         {% for category, message in messages %}
             <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
                 {{ message }}
@@ -216,16 +260,167 @@
     </ul>
     <div class="tab-content" id="courseTabsContent">
 
-        {# Render the folder tree in the Content tab #}
-        {% if folder_tree %}
-            {{ render_folders(folder_tree) }}
-        {% else %}
-            <p class="text-muted">No folders found.</p>
-        {% endif %}
+        {% macro render_folder(folder, depth=0) %}
+        <div class="folder-item" data-depth="{{ depth }}" data-folder-id="{{ folder.id }}">
+            <div class="card mb-2">
+                <div class="card-header" style="background: #e3f2fd; cursor: pointer;" data-toggle="collapse" data-target="#folder-{{ folder.id }}">
+                    <strong>📁 {{ folder.title }} <span class="ml-1" id="icon-{{ folder.id }}">▼</span></strong>
+                    {% if is_teacher_or_admin %}
+                    <button type="button" class="btn btn-info btn-sm ml-2 float-right" data-toggle="modal" data-target="#editFolderModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.title }}" data-folder-description="{{ folder.description or '' }}">
+                        {{ _('Edit Folder') }}
+                    </button>
+                    <button type="button" class="btn btn-warning btn-sm ml-2 float-right" data-toggle="modal" data-target="#moveFolderModal" data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.title }}">
+                        {{ _('Move Folder') }}
+                    </button>
+                    <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;" onsubmit="return confirm(document.getElementById('delete-with-contents-{{ folder.id }}').checked ? '{{ _('Are you sure you want to delete this folder and ALL its contents? This cannot be undone.') }}' : '{{ _('Are you sure you want to delete this folder? This will only work if the folder is empty.') }}');">
+                        <input type="hidden" name="action" value="delete_folder">
+                        <input type="hidden" name="folder_id" value="{{ folder.id }}">
+                        <label style="font-weight:normal; margin-right:8px;">
+                            <input type="checkbox" id="delete-with-contents-{{ folder.id }}" name="delete_with_contents" value="1" style="vertical-align:middle; margin-right:4px;"> {{ _('Delete with contents') }}
+                        </label>
+                        <button type="submit" class="btn btn-danger btn-sm float-right">{{ _('Delete Folder') }}</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <div id="folder-{{ folder.id }}" class="collapse">
+                    <div class="card-body">
+                        {% if folder.description %}<p class="text-muted">{{ folder.description }}</p>{% endif %}
 
+                        {# Display files in this folder #}
+                        {% set folder_items = folder.items.filter_by(is_published=True).order_by('order').all() %}
+                        {% if folder_items %}
+                        <ul class="list-group mb-2 file-sortable" data-folder-id="{{ folder.id }}">
+                            {% for item in folder_items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center" data-file-id="{{ item.id }}">
+                                <span class="drag-handle mr-2" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; margin-right:8px; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto;">☰</span>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    {% if is_teacher_or_admin %}
+                                    <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()">
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ item.title }}</strong><br>
+                                        <small>{{ item.description }}</small>
+                                    </div>
+                                </div>
+                                <div>
+                                {% if item.content_type == 'file' %}
+                                <a href="{{ url_for('api.serve_file', file_id=item.drive_file_id) }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
+                                {% else %}
+                                <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
+                                {% endif %}
+                                {% if is_teacher_or_admin %}
+                                <button type="button" class="btn btn-info btn-sm ml-2" data-toggle="modal" data-target="#editFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}" data-file-description="{{ item.description or '' }}">
+                                    {{ _('Edit File') }}
+                                </button>
+                                <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#moveFileModal" data-file-id="{{ item.id }}" data-file-name="{{ item.title }}">
+                                    {{ _('Move File') }}
+                                </button>
+                                <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
+                                    <input type="hidden" name="action" value="toggle_content_visibility">
+                                    <input type="hidden" name="content_id" value="{{ item.id }}">
+                                    <label for="visibility_{{ item.id }}" class="btn btn-sm btn-{{ 'success' if item.allow_others_to_view else 'secondary' }} ml-1" style="margin: 0;">
+                                        <input type="checkbox" id="visibility_{{ item.id }}" name="allow_others_to_view" {% if item.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
+                                        {{ '👁️ ' + _('Visible') if item.allow_others_to_view else '🔒 ' + _('Private') }}
+                                    </label>
+                                </form>
+                                <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline;" onsubmit="return confirm('{{ _('Are you sure you want to delete this file?') }}');">
+                                    <input type="hidden" name="action" value="delete_content">
+                                    <input type="hidden" name="content_id" value="{{ item.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm ml-2">{{ _('Delete') }}</button>
+                                </form>
+                                {% endif %}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% if is_teacher_or_admin %}
+                        <form id="file-order-form-{{ folder.id }}" method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display:none;">
+                            <input type="hidden" name="action" value="reorder_files">
+                            <input type="hidden" name="folder_id" value="{{ folder.id }}">
+                            <input type="hidden" name="file_order" value="">
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                
+                        {# Recursively render subfolders #}
+                        {% set subfolders = folder.subfolders.order_by('order').all() %}
+                        {% if subfolders %}
+                        <ul class="list-group folder-sortable" data-parent-folder-id="{{ folder.id }}">
+                            {% for subfolder in subfolders %}
+                            <li class="list-group-item" data-folder-id="{{ subfolder.id }}">
+                                <span class="drag-handle mr-2" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; margin-right:8px; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto;">☰</span>
+                                {{ render_folder(subfolder, depth + 1) }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% if is_teacher_or_admin %}
+                        <form id="folder-order-form-{{ folder.id }}" method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display:none;">
+                            <input type="hidden" name="action" value="reorder_folders">
+                            <input type="hidden" name="parent_folder_id" value="{{ folder.id }}">
+                            <input type="hidden" name="folder_order" value="">
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-
-
+        {% endmacro %}
+        {% if is_teacher_or_admin %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Drag-and-drop for root folders
+            var rootUl = document.getElementById('root-folder-sortable');
+            if (rootUl) {
+                new Sortable(rootUl, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    onEnd: function (evt) {
+                        var order = Array.from(rootUl.querySelectorAll('li[data-folder-id]')).map(li => li.getAttribute('data-folder-id'));
+                        var form = document.getElementById('root-folder-order-form');
+                        if (form) {
+                            form.querySelector('input[name="folder_order"]').value = order.join(',');
+                            form.submit();
+                        }
+                    }
+                });
+            }
+            // Drag-and-drop for files
+            document.querySelectorAll('.file-sortable').forEach(function(ul) {
+                new Sortable(ul, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    onEnd: function (evt) {
+                        var folderId = ul.getAttribute('data-folder-id');
+                        var order = Array.from(ul.querySelectorAll('li[data-file-id]')).map(li => li.getAttribute('data-file-id'));
+                        var form = document.getElementById('file-order-form-' + folderId);
+                        if (form) {
+                            form.querySelector('input[name="file_order"]').value = order.join(',');
+                            form.submit();
+                        }
+                    }
+                });
+            });
+            // Drag-and-drop for folders
+            document.querySelectorAll('.folder-sortable').forEach(function(ul) {
+                new Sortable(ul, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    onEnd: function (evt) {
+                        var parentId = ul.getAttribute('data-parent-folder-id');
+                        var order = Array.from(ul.querySelectorAll('li[data-folder-id]')).map(li => li.getAttribute('data-folder-id'));
+                        var form = document.getElementById('folder-order-form-' + parentId);
+                        if (form) {
+                            form.querySelector('input[name="folder_order"]').value = order.join(',');
+                            form.submit();
+                        }
+                    }
+                });
+            });
+        });
+        </script>
+        {% endif %}
         
         <div class="tab-pane fade" id="features" role="tabpanel">
             <div class="mt-4">
@@ -415,7 +610,7 @@
             {% endif %}
             
             {# Display root-level folders #}
-            {% set root_folders = content_folders | selectattr('parent_folder_id', 'equalto', None) | list %}
+            {% set root_folders = content_folders.filter_by(parent_folder_id=None).all() %}
             {% if root_folders %}
             <ul class="list-group root-folder-sortable" id="root-folder-sortable">
             {% for folder in root_folders %}
