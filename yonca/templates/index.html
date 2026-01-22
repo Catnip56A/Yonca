@@ -360,6 +360,30 @@
             font-size: 1.5rem;
         }
 
+        /* Home features container styled like gallery items (rounded rectangle background) */
+        .features-section {
+            margin: 3rem 0;
+        }
+
+        .features-section .features {
+            background: #f5f1ea;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .features-section .feature-card {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+            text-align: left;
+        }
+
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, 300px);
@@ -1238,6 +1262,7 @@
                     </button>
                 </div>
             </div>
+            <!-- Home Features Section removed from header (kept after gallery) -->
         </div>
     </header>
 
@@ -1279,50 +1304,8 @@
 
     <main class="container">
         <div class="white-overlay">
-        <!-- Home Page -->
+        <!-- Home Page (start with gallery; removed welcome hero and CTA) -->
         <section id="home" class="page active">
-            {% if is_authenticated %}
-            <div class="hero">
-                <h1>{{ translate_field('home_content', home_content.id, 'welcome_title', home_content.welcome_title or _('Welcome to Yonca')) }}</h1>
-                <p>{{ translate_field('home_content', home_content.id, 'subtitle', home_content.subtitle or _('Your gateway to knowledge and community learning.')) }}</p>
-                <p>{{ translate_field('home_content', home_content.id, 'get_started_text', home_content.get_started_text or _('Get Started')) }}</p>
-                {% if current_user.is_authenticated and not current_user.google_access_token %}
-                <div style="margin-top: 1.5rem;">
-                    <a href="{{ url_for('auth.link_google_account') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #34a853; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s ease;">
-                        🔗 {{ _('Link Google Account') }}
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="features">
-                {% if home_content.features %}
-                {% for feature in translate_json('home_content', home_content.id, 'features', home_content.features) %}
-                <div class="feature-card">
-                    <h3>{{ feature.title }}</h3>
-                    <p>{{ feature.description }}</p>
-                </div>
-                {% endfor %}
-                {% endif %}
-            </div>
-            {% else %}
-            <div class="hero">
-                <h1>{{ translate_field('home_content', home_content.id, 'logged_out_welcome_title', home_content.logged_out_welcome_title or _('Welcome to Yonca')) }}</h1>
-                <p>{{ translate_field('home_content', home_content.id, 'logged_out_subtitle', home_content.logged_out_subtitle or _('Join our learning community today!')) }}</p>
-                <p>{{ translate_field('home_content', home_content.id, 'logged_out_get_started_text', home_content.logged_out_get_started_text or _('Sign Up Now')) }}</p>
-            </div>
-
-            <div class="features">
-                {% if home_content.logged_out_features %}
-                {% for feature in translate_json('home_content', home_content.id, 'logged_out_features', home_content.logged_out_features) %}
-                <div class="feature-card">
-                    <h3>{{ feature.title }}</h3>
-                    <p>{{ feature.description }}</p>
-                </div>
-                {% endfor %}
-                {% endif %}
-            </div>
-            {% endif %}
 
             <!-- Gallery Section -->
             <div class="gallery-section">
@@ -1396,6 +1379,37 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- Home Features Section (placed after gallery) -->
+            <div class="features-section">
+                <h2 class="section-title" style="color: #337a2c;">{{ translate_field('home_content', home_content.id, 'features_title', home_content.features_title or _('Our Features')) }}</h2>
+                <p>{{ translate_field('home_content', home_content.id, 'features_subtitle', home_content.features_subtitle or _('Discover what makes our platform special.')) }}</p>
+
+                <div class="features">
+                {% if home_content.features %}
+                {% for feature in translate_json('home_content', home_content.id, 'features', home_content.features) %}
+                <div class="feature-card">
+                    <h3>{{ feature.title }}</h3>
+                    <p>{{ feature.description }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="feature-card">
+                    <h3>{{ _('Interactive Courses') }}</h3>
+                    <p>{{ _('Engage with dynamic course content and interactive learning materials.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Study Groups') }}</h3>
+                    <p>{{ _('Collaborate with fellow learners in our vibrant study communities.') }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3>{{ _('Expert Support') }}</h3>
+                    <p>{{ _('Get help from our team of educational experts and specialists.') }}</p>
+                </div>
+                {% endif %}
+                </div>
+            </div>
+
         </section>
 
         <!-- Courses Page -->

@@ -337,61 +337,25 @@
             <form method="post" id="content-form" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
 
-                <!-- Logged In Content -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-user"></i> Logged In Users</h4>
-                    </div>
-
-                    <div class="form-group-inline">
-                        <label for="welcome_title">Welcome Title:</label>
-                        <input type="text" id="welcome_title" name="welcome_title" class="form-control"
-                               value="{{ form.welcome_title.data or 'Welcome to Yonca' }}">
-                    </div>
-
-                    <div class="form-group-inline">
-                        <label for="subtitle">Subtitle:</label>
-                        <textarea id="subtitle" name="subtitle" class="form-control" rows="2">{{ form.subtitle.data or 'Your gateway to knowledge and community learning.' }}</textarea>
-                    </div>
-
-                    <div class="form-group-inline">
-                        <label for="get_started_text">Button Text:</label>
-                        <input type="text" id="get_started_text" name="get_started_text" class="form-control"
-                               value="{{ form.get_started_text.data or 'Get Started' }}">
-                    </div>
-                </div>
-
-                <!-- Logged Out Content -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-users"></i> Logged Out Users</h4>
-                    </div>
-
-                    <div class="form-group-inline">
-                        <label for="logged_out_welcome_title">Welcome Title:</label>
-                        <input type="text" id="logged_out_welcome_title" name="logged_out_welcome_title" class="form-control"
-                               value="{{ form.logged_out_welcome_title.data or 'Welcome to Yonca' }}">
-                    </div>
-
-                    <div class="form-group-inline">
-                        <label for="logged_out_subtitle">Subtitle:</label>
-                        <textarea id="logged_out_subtitle" name="logged_out_subtitle" class="form-control" rows="2">{{ form.logged_out_subtitle.data or 'Join our learning community today!' }}</textarea>
-                    </div>
-
-                    <div class="form-group-inline">
-                        <label for="logged_out_get_started_text">Button Text:</label>
-                        <input type="text" id="logged_out_get_started_text" name="logged_out_get_started_text" class="form-control"
-                               value="{{ form.logged_out_get_started_text.data or 'Sign Up Now' }}">
-                    </div>
-                </div>
+                <!-- Logged In / Logged Out welcome fields removed per request -->
 
                 <!-- Features Section -->
                 <div class="content-section">
                     <div class="section-header">
                         <h4 class="section-title"><i class="fa fa-star"></i> Features</h4>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-feature">
-                            <i class="fa fa-plus"></i> Add Feature
-                        </button>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div style="display:flex; flex-direction:column; margin-right:10px;">
+                                <label style="font-weight:600;">Title:</label>
+                                <input type="text" id="features_title" name="features_title" class="form-control" value="{{ form.features_title.data or 'Our Features' }}">
+                            </div>
+                            <div style="display:flex; flex-direction:column;">
+                                <label style="font-weight:600;">Subtitle:</label>
+                                <textarea id="features_subtitle" name="features_subtitle" class="form-control" rows="1">{{ form.features_subtitle.data or 'Discover what makes our platform special.' }}</textarea>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="add-feature">
+                                <i class="fa fa-plus"></i> Add Feature
+                            </button>
+                        </div>
                     </div>
 
                     <div id="features-container">
@@ -470,20 +434,11 @@
                 <small class="text-muted">See your changes in real-time</small>
             </div>
             <div class="preview-content" style="padding: 20px; height: calc(100% - 60px); overflow-y: auto;">
-                <!-- Logged In Preview -->
-                <div id="logged-in-preview" style="margin-bottom: 30px;">
-                    <h5 style="color: #28a745; margin-bottom: 15px;"><i class="fa fa-user"></i> Logged In View</h5>
+                <!-- Previews: welcome title/subtitle/button removed; keeping feature previews -->
+                <div id="preview-features-container">
+                    <h5 style="color: #28a745; margin-bottom: 8px;"><i class="fa fa-user"></i> <span id="preview-features-title">{{ form.features_title.data or home_content.features_title or 'Our Features' }}</span></h5>
+                    <div id="preview-features-subtitle" style="color: #6c757d; margin-bottom: 12px;">{{ form.features_subtitle.data or home_content.features_subtitle or 'Discover what makes our platform special.' }}</div>
                     <div class="live-preview">
-                        <div class="preview-title" id="preview-welcome-title">
-                            {{ form.welcome_title.data or 'Welcome to Yonca' }}
-                        </div>
-                        <div class="preview-subtitle" id="preview-subtitle">
-                            {{ form.subtitle.data or 'Your gateway to knowledge and community learning.' }}
-                        </div>
-                        <button class="preview-button">
-                            <span id="preview-get-started">{{ form.get_started_text.data or 'Get Started' }}</span>
-                        </button>
-
                         <div class="preview-features">
                             {% if home_content.features %}
                             {% for feature in home_content.features %}
@@ -494,33 +449,17 @@
                             {% endfor %}
                             {% endif %}
                         </div>
-                    </div>
-                </div>
-
-                <!-- Logged Out Preview -->
-                <div id="logged-out-preview">
-                    <h5 style="color: #dc3545; margin-bottom: 15px;"><i class="fa fa-users"></i> Logged Out View</h5>
-                    <div class="live-preview">
-                        <div class="preview-title" id="preview-logged-out-welcome-title">
-                            {{ form.logged_out_welcome_title.data or 'Welcome to Yonca' }}
-                        </div>
-                        <div class="preview-subtitle" id="preview-logged-out-subtitle">
-                            {{ form.logged_out_subtitle.data or 'Join our learning community today!' }}
-                        </div>
-                        <button class="preview-button">
-                            <span id="preview-logged-out-get-started">{{ form.logged_out_get_started_text.data or 'Sign Up Now' }}</span>
-                        </button>
-
+                        {% if home_content.logged_out_features %}
+                        <h5 style="color: #dc3545; margin-top: 1.5rem;">Logged Out Features</h5>
                         <div class="preview-features">
-                            {% if home_content.logged_out_features %}
                             {% for feature in home_content.logged_out_features %}
                             <div class="preview-feature">
                                 <div class="feature-title">{{ feature.title }}</div>
                                 <div class="feature-desc">{{ feature.description }}</div>
                             </div>
                             {% endfor %}
-                            {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -637,34 +576,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Update logged in preview
-    document.getElementById('welcome_title').addEventListener('input', function() {
-        document.getElementById('preview-welcome-title').textContent = this.value || 'Welcome to Yonca';
-    });
-
-    document.getElementById('subtitle').addEventListener('input', function() {
-        document.getElementById('preview-subtitle').textContent = this.value || 'Your gateway to knowledge and community learning.';
-    });
-
-    document.getElementById('get_started_text').addEventListener('input', function() {
-        document.getElementById('preview-get-started').textContent = this.value || 'Get Started';
-    });
-
-    // Update logged out preview
-    document.getElementById('logged_out_welcome_title').addEventListener('input', function() {
-        document.getElementById('preview-logged-out-welcome-title').textContent = this.value || 'Welcome to Yonca';
-    });
-
-    document.getElementById('logged_out_subtitle').addEventListener('input', function() {
-        document.getElementById('preview-logged-out-subtitle').textContent = this.value || 'Join our learning community today!';
-    });
-
-    document.getElementById('logged_out_get_started_text').addEventListener('input', function() {
-        document.getElementById('preview-logged-out-get-started').textContent = this.value || 'Sign Up Now';
-    });
+    // Welcome/title/button fields removed; no preview listeners required
 
     // Initialize features from server data
     initializeFeatures();
+
+    // Features title/subtitle preview sync
+    const featuresTitleInput = document.getElementById('features_title');
+    const featuresSubtitleInput = document.getElementById('features_subtitle');
+    if (featuresTitleInput) {
+        featuresTitleInput.addEventListener('input', function() {
+            const el = document.getElementById('preview-features-title');
+            if (el) el.textContent = this.value || 'Our Features';
+        });
+    }
+    if (featuresSubtitleInput) {
+        featuresSubtitleInput.addEventListener('input', function() {
+            const el = document.getElementById('preview-features-subtitle');
+            if (el) el.textContent = this.value || 'Discover what makes our platform special.';
+        });
+    }
 
     // Add feature buttons
     document.getElementById('add-feature').addEventListener('click', function() {

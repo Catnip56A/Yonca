@@ -182,22 +182,20 @@ class AdminIndexView(AdminIndexView):
             if form.validate():
                 print(f"DEBUG: Form validation passed")
                 print(f"DEBUG: Updating home_content record ID: {home_content.id}")
-                print(f"DEBUG: Current welcome_title: {home_content.welcome_title}")
-                print(f"DEBUG: New welcome_title from form: '{form.welcome_title.data}'")
-                
+
                 # Log original values for comparison
-                original_welcome = home_content.welcome_title
                 original_features_count = len(home_content.features) if home_content.features else 0
                 original_logged_out_count = len(home_content.logged_out_features) if home_content.logged_out_features else 0
                 
-                home_content.welcome_title = form.welcome_title.data
-                home_content.subtitle = form.subtitle.data
-                home_content.get_started_text = form.get_started_text.data
-                home_content.logged_out_welcome_title = form.logged_out_welcome_title.data
-                home_content.logged_out_subtitle = form.logged_out_subtitle.data
-                home_content.logged_out_get_started_text = form.logged_out_get_started_text.data
+                # NOTE: Welcome title/subtitle/button fields removed from admin editor.
+                # We intentionally do not update `welcome_title`, `subtitle`, `get_started_text`,
+                # `logged_out_welcome_title`, `logged_out_subtitle`, or `logged_out_get_started_text` here.
                 
                 # Section content
+                # Features title/subtitle (editable in admin)
+                home_content.features_title = form.features_title.data
+                home_content.features_subtitle = form.features_subtitle.data
+
                 home_content.about_section_title = form.about_section_title.data
                 home_content.about_section_description = form.about_section_description.data
                 
@@ -396,7 +394,6 @@ class AdminIndexView(AdminIndexView):
                 print(f"DEBUG: After commit - logged_out_features: {home_content.logged_out_features}")
                 
                 print(f"ADMIN ACTION: Home content updated by {current_user.username} (ID: {current_user.id})")
-                print(f"  - Welcome title changed: '{original_welcome}' → '{home_content.welcome_title}'")
                 print(f"  - Features: {original_features_count} → {len(features)} items")
                 print(f"  - Logged-out features: {original_logged_out_count} → {len(logged_out_features)} items")
                 flash('Home content updated successfully!', 'success')
@@ -405,15 +402,12 @@ class AdminIndexView(AdminIndexView):
                 print(f"DEBUG: Form validation failed")
                 flash('Please fill in all required fields.', 'error')
         
-        # Pre-populate form
-        form.welcome_title.data = home_content.welcome_title
-        form.subtitle.data = home_content.subtitle
-        form.get_started_text.data = home_content.get_started_text
-        form.logged_out_welcome_title.data = home_content.logged_out_welcome_title
-        form.logged_out_subtitle.data = home_content.logged_out_subtitle
-        form.logged_out_get_started_text.data = home_content.logged_out_get_started_text
+        # Pre-populate form (welcome fields omitted)
         
         # Section content
+        form.features_title.data = getattr(home_content, 'features_title', None)
+        form.features_subtitle.data = getattr(home_content, 'features_subtitle', None)
+
         form.about_section_title.data = home_content.about_section_title
         form.about_section_description.data = home_content.about_section_description
         
@@ -607,17 +601,10 @@ class CourseManagementView(BaseView):
 
 class HomeContentForm(FlaskForm):
     """Form for editing home content"""
-    # Logged-in user content
-    welcome_title = StringField('Welcome Title (Logged In)', [Optional()], default="Welcome to Yonca")
-    subtitle = TextAreaField('Subtitle (Logged In)', [Optional()], default="Your gateway to knowledge and community learning.")
-    get_started_text = StringField('Get Started Text (Logged In)', [Optional()], default="Get Started")
-    
-    # Logged-out user content
-    logged_out_welcome_title = StringField('Welcome Title (Logged Out)', [Optional()], default="Welcome to Yonca")
-    logged_out_subtitle = TextAreaField('Subtitle (Logged Out)', [Optional()], default="Join our learning community today!")
-    logged_out_get_started_text = StringField('Get Started Text (Logged Out)', [Optional()], default="Sign Up Now")
-    
     # Section content
+    features_title = StringField('Features Title', [Optional()], default="Our Features")
+    features_subtitle = TextAreaField('Features Subtitle', [Optional()], default="Discover what makes our platform special.")
+
     about_section_title = StringField('About Section Title', [Optional()], default="About Yonca")
     about_section_description = TextAreaField('About Section Description', [Optional()], default="Learn about our mission and vision.")
     
