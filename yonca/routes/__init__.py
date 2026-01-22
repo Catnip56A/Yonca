@@ -569,8 +569,9 @@ def course_page_enrolled(course_id):
         
         # Delete folder
         elif action == 'delete_folder' and (current_user.is_teacher or current_user.is_admin):
-            from yonca.models import CourseContentFolder
+            from yonca.models import CourseContentFolder, CourseContent
             folder_id = request.form.get('folder_id')
+            delete_with_contents = request.form.get('delete_with_contents') == '1'
             folder = CourseContentFolder.query.get(folder_id)
             
             if not folder:
@@ -582,16 +583,29 @@ def course_page_enrolled(course_id):
                 flash('Folder does not belong to this course.', 'error')
                 return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             
-            # Check if folder has contents or subfolders
-            if folder.items.count() > 0 or folder.subfolders.count() > 0:
-                flash('Cannot delete folder that contains files or subfolders. Please delete them first.', 'error')
+            def delete_folder_and_contents(folder):
+                # Recursively delete all subfolders and their contents
+                for subfolder in folder.subfolders:
+                    delete_folder_and_contents(subfolder)
+                # Delete all files in this folder
+                for item in folder.items:
+                    db.session.delete(item)
+                db.session.delete(folder)
+
+            if delete_with_contents:
+                delete_folder_and_contents(folder)
+                db.session.commit()
+                flash('Folder and all its contents deleted successfully!', 'success')
                 return redirect(url_for('main.course_page_enrolled', course_id=course.id))
-            
-            # Delete from database
-            db.session.delete(folder)
-            db.session.commit()
-            flash('Folder deleted successfully!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+            else:
+                # Check if folder has contents or subfolders
+                if folder.items.count() > 0 or folder.subfolders.count() > 0:
+                    flash('Cannot delete folder that contains files or subfolders. Please delete them first, or use the delete with contents option.', 'error')
+                    return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+                db.session.delete(folder)
+                db.session.commit()
+                flash('Folder deleted successfully!', 'success')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
         # Edit folder
         elif action == 'edit_folder' and (current_user.is_teacher or current_user.is_admin):
