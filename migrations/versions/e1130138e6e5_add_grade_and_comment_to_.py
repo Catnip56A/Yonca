@@ -21,7 +21,7 @@ def upgrade():
     with op.batch_alter_table('home_content', schema=None) as batch_op:
         batch_op.alter_column('about_subtitle',
                existing_type=sa.TEXT(),
-               type_=sa.String(length=500),
+               type_=sa.Text(),
                existing_nullable=True,
                existing_server_default=sa.text("'Join our learning community and discover amazing features.'"))
         batch_op.alter_column('about_features',
