@@ -1,0 +1,12 @@
+/* site.css — minimal site-wide styles for Yonca
+   This file now only sets the requested background color so existing
+   site fonts remain unchanged. */
+
+html, body {
+    height: 100%;
+    background-color: #F5F1EA; /* requested background */
+}
+
+body {
+    color: #222;
+}
