@@ -491,6 +491,9 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#importDriveModal" data-folder-id="" data-folder-name="Root">
                         <i class="fas fa-cloud-download-alt"></i> {{ _('Import from Drive') }}
                     </button>
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#importAssignmentModal" data-folder-id="" data-folder-name="Root">
+                        <i class="fas fa-file-import"></i> {{ _('Import Assignment') }}
+                    </button>
                 </div>
                 {% endif %}
             </div>
@@ -525,7 +528,7 @@
                                 {% endfor %}
                             {% endif %}
                         </select>
-                        <button type="submit" class="btn btn-sm btn-primary">{{ _('Move to Folder') }}</button>
+                        <button type="submit" class="btn btn-sm btn-primary" onclick="setBulkMoveIdsEnrolled(event)">{{ _('Move to Folder') }}</button>
                     </form>
                 </div>
             </div>
@@ -556,7 +559,9 @@
                             </div>
                         </div>
                         <div>
-                        {% if item.content_type == 'file' %}
+                        {% if item.content_type == 'assignment' %}
+                        <button class="btn btn-sm btn-info" onclick="viewAssignment('{{ item.content_data }}')">{{ _('View Assignment') }}</button>
+                        {% elif item.content_type == 'file' %}
                         <a href="{{ url_for('api.serve_file', file_id=item.drive_file_id) }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
                         {% else %}
                         <a href="{{ item.content_data }}" class="btn btn-sm btn-primary" target="_blank">{{ _('View File') }}</a>
@@ -616,150 +621,166 @@
                 {% endif %}
             </div>
             {% if assignments %}
-            <ul class="list-group mb-4">
+            <div class="accordion" id="assignmentsAccordionEnrolled">
                 {% for assignment in assignments %}
-                <li class="list-group-item">
-                    <div><strong>{{ assignment.title }}</strong> <span class="badge badge-info">{{ assignment.points }} {{ _('pts') }}</span></div>
-                    <div><small>{{ assignment.description }}</small></div>
-                    <div><small>{{ _('Due:') }} {% if assignment.due_date %}{{ assignment.due_date.strftime('%b %d, %Y %I:%M %p') }}{% else %}{{ _('N/A') }}{% endif %}</small></div>
-                    
-                    {% if not is_teacher_or_admin %}
-                    {# Student submission section #}
-                    {% set user_submission = assignment.submissions.filter_by(user_id=current_user.id).first() %}
-                    {% if user_submission %}
-                        {% set status = 'success' %}
-                        {% set status_text = _('On Time') %}
-                        {% if assignment.due_date %}
-                            {% if user_submission.submitted_at > assignment.due_date %}
-                                {% set status = 'danger' %}
-                                {% set status_text = _('Late') %}
-                            {% elif user_submission.submitted_at < assignment.due_date %}
-                                {% set status = 'warning' %}
-                                {% set status_text = _('Early') %}
-                            {% endif %}
-                        {% endif %}
-                        <div class="alert alert-{{ status }} mt-2">
-                            <strong>✓ {{ status_text }}</strong> on {{ user_submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}<br>
-                            <a href="{{ url_for('api.serve_file', file_id=user_submission.drive_file_id) }}" target="_blank" class="btn btn-sm btn-info mt-1">{{ _('View Your Submission') }}</a>
-                            <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
-                                <input type="hidden" name="action" value="toggle_submission_visibility">
-                                <input type="hidden" name="submission_id" value="{{ user_submission.id }}">
-                                <label for="submission_visibility_{{ user_submission.id }}" class="btn btn-sm btn-{{ 'success' if user_submission.allow_others_to_view else 'secondary' }} mt-1" style="margin: 0;">
-                                    <input type="checkbox" id="submission_visibility_{{ user_submission.id }}" name="allow_others_to_view" {% if user_submission.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
-                                    {{ '👁️ ' + _('Visible to Others') if user_submission.allow_others_to_view else '🔒 ' + _('Private') }}
-                                </label>
-                            </form>
-                            <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline;" onsubmit="return confirm('{{ _('Are you sure you want to delete your submission?') }}');">
-                                <input type="hidden" name="action" value="delete_submission">
-                                <input type="hidden" name="submission_id" value="{{ user_submission.id }}">
-                                <button type="submit" class="btn btn-danger btn-sm mt-1">{{ _('Delete My Submission') }}</button>
-                            </form>
-                            {% if user_submission.grade is not none %}
-                            <div class="mt-2"><strong>{{ _('Grade:') }}</strong> {{ user_submission.grade }}/{{ assignment.points }}</div>
-                            {% endif %}
-                            {% if user_submission.comment %}
-                            <div class="mt-1"><strong>{{ _('Feedback:') }}</strong> {{ user_submission.comment }}</div>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        {% set status = 'secondary' %}
-                        {% set status_text = _('Not Submitted') %}
-                        {% if assignment.due_date and assignment.due_date < datetime.now() %}
-                            {% set status = 'danger' %}
-                            {% set status_text = _('Overdue') %}
-                        {% endif %}
-                        <div class="alert alert-{{ status }} mt-2">
-                            <strong>{{ status_text }}</strong>
-                        </div>
-                        <form method="post" enctype="multipart/form-data" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" class="mt-2">
-                            <input type="hidden" name="action" value="submit_assignment">
-                            <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
-                            <div class="form-group">
-                                <label for="submission_file_{{ assignment.id }}">{{ _('Upload Your Work:') }}</label>
-                                <input type="file" id="submission_file_{{ assignment.id }}" class="form-control-file" name="submission_file" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-sm">{{ _('Submit Assignment') }}</button>
-                        </form>
-                    {% endif %}
-                    {% endif %}
-                    
-                    {% if is_teacher_or_admin %}
-                    <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-right: 0.5rem;" onsubmit="return confirm('{{ _('Are you sure you want to delete this assignment? This will also delete all submissions.') }}');">
-                        <input type="hidden" name="action" value="delete_assignment">
-                        <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
-                        <button type="submit" class="btn btn-danger btn-sm">{{ _('Delete Assignment') }}</button>
-                    </form>
-                    <button class="btn btn-sm btn-primary mt-2" type="button" data-toggle="collapse" data-target="#submissions-{{ assignment.id }}">
-                        {{ _('View Submissions') }}
-                    </button>
-                    <div class="collapse mt-2" id="submissions-{{ assignment.id }}">
-                        {% set submissions = assignment.submissions.all() %}
-                        {% if submissions %}
-                        <ul class="list-group mt-2">
-                            {% for submission in submissions %}
-                            <li class="list-group-item">
-                                {% set status = 'success' %}
-                                {% set status_text = _('On Time') %}
-                                {% if assignment.due_date %}
-                                    {% if submission.submitted_at > assignment.due_date %}
-                                        {% set status = 'danger' %}
-                                        {% set status_text = _('Late') %}
-                                    {% elif submission.submitted_at < assignment.due_date %}
-                                        {% set status = 'warning' %}
-                                        {% set status_text = _('Early') %}
+                <div class="card">
+                    <div class="card-header" id="assignHeading{{ assignment.id }}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-left w-100 d-flex justify-content-between align-items-center" type="button" data-toggle="collapse" data-target="#assignCollapse{{ assignment.id }}" aria-expanded="false" aria-controls="assignCollapse{{ assignment.id }}">
+                                <div>
+                                    <strong>{{ assignment.title }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        {% if assignment.due_date %}{{ _('Due:') }} {{ assignment.due_date.strftime('%b %d, %Y %I:%M %p') }}{% else %}{{ _('Due: N/A') }}{% endif %}
+                                        • {{ assignment.points }} {{ _('pts') }}
+                                        {% if not is_teacher_or_admin %}
+                                            {% set user_submission = assignment.submissions.filter_by(user_id=current_user.id).first() %}
+                                            •
+                                            {% if user_submission %}
+                                                {% set is_late = false %}
+                                                {% if assignment.due_date and user_submission.submitted_at > assignment.due_date %}
+                                                    {% set is_late = true %}
+                                                {% endif %}
+                                                {% if is_late %}
+                                                    <i class="fas fa-times-circle text-danger"></i> <span class="text-danger">{{ _('Late') }}</span>
+                                                {% else %}
+                                                    <i class="fas fa-check-circle text-success"></i> <span class="text-success">{{ _('Submitted') }}</span>
+                                                {% endif %}
+                                                {% if user_submission.grade is not none %}
+                                                    &nbsp;•&nbsp;{{ _('Grade:') }} {{ user_submission.grade }}
+                                                {% endif %}
+                                            {% else %}
+                                                {% if assignment.due_date and assignment.due_date < datetime.now() %}
+                                                    <i class="fas fa-times-circle text-danger"></i> <span class="text-danger">{{ _('Overdue') }}</span>
+                                                {% else %}
+                                                    <i class="fas fa-times-circle text-danger"></i> <span class="text-danger">{{ _('Not submitted') }}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% set submissions_count = assignment.submissions.count() %}
+                                            • {{ submissions_count }} {{ _('submissions') }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if assignment.is_published and is_teacher_or_admin %}
+                                        <span class="badge badge-success">{{ _('Published') }}</span>
                                     {% endif %}
-                                {% endif %}
-                                <strong>{{ submission.user.username }}</strong> 
-                                <span class="badge badge-{{ status }}">{{ status_text }}</span>
-                                - {{ _('Submitted:') }} {{ submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}<br>
-                                <a href="{{ url_for('api.serve_file', file_id=submission.drive_file_id) }}" target="_blank" class="btn btn-sm btn-info mt-1">{{ _('View Submission') }}</a>
-                                {% if is_teacher_or_admin %}
-                                <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-left: 0.5rem;">
-                                    <input type="hidden" name="action" value="toggle_submission_visibility">
-                                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
-                                    <label for="submission_visibility_{{ submission.id }}" class="btn btn-sm btn-{{ 'success' if submission.allow_others_to_view else 'secondary' }} mt-1" style="margin: 0;">
-                                        <input type="checkbox" id="submission_visibility_{{ submission.id }}" name="allow_others_to_view" {% if submission.allow_others_to_view %}checked{% endif %} onchange="this.form.submit()" style="display: none;">
-                                        {{ '👁️ ' + _('Visible') if submission.allow_others_to_view else '🔒 ' + _('Private') }}
-                                    </label>
-                                </form>
-                                <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline;" onsubmit="return confirm('{{ _('Are you sure you want to delete this submission?') }}');">
-                                    <input type="hidden" name="action" value="delete_submission">
-                                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
-                                    <button type="submit" class="btn btn-danger btn-sm mt-1">{{ _('Delete') }}</button>
-                                </form>
-                                {% endif %}
-                                <form method="post" class="mt-2" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}">
-                                    <input type="hidden" name="action" value="grade_submission">
-                                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
-                                    <div class="form-row">
-                                        <div class="col-md-3">
-                                            <input type="number" name="grade" class="form-control form-control-sm" placeholder="{{ _('Grade') }}" value="{{ submission.grade or '' }}" min="0" max="{{ assignment.points }}">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input type="text" name="comment" class="form-control form-control-sm" placeholder="{{ _('Comment') }}" value="{{ submission.comment or '' }}">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <button type="submit" class="btn btn-sm btn-success">{{ _('Save Grade') }}</button>
-                                        </div>
-                                    </div>
-                                </form>
-                                {% if submission.grade is not none %}
-                                <div class="alert alert-success mt-2 mb-0">{{ _('Grade:') }} {{ submission.grade }}/{{ assignment.points }}</div>
-                                {% endif %}
-                                {% if submission.comment %}
-                                <div class="alert alert-info mt-1 mb-0">{{ _('Comment:') }} {{ submission.comment }}</div>
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p class="text-muted mt-2">{{ _('No submissions yet.') }}</p>
-                        {% endif %}
+                                    <i class="fas fa-chevron-down ml-2"></i>
+                                </div>
+                            </button>
+                        </h5>
                     </div>
-                    {% endif %}
-                </li>
+                    <div id="assignCollapse{{ assignment.id }}" class="collapse" aria-labelledby="assignHeading{{ assignment.id }}" data-parent="#assignmentsAccordionEnrolled">
+                        <div class="card-body">
+                            {% if assignment.description %}
+                            <p class="text-muted mb-3">{{ assignment.description }}</p>
+                            {% endif %}
+
+                                {% if not is_teacher_or_admin %}
+                                {% if user_submission %}
+                                    {% set is_late = false %}
+                                    {% if assignment.due_date and user_submission.submitted_at > assignment.due_date %}
+                                        {% set is_late = true %}
+                                    {% endif %}
+                                    <div class="mt-2">
+                                        {% if is_late %}
+                                            <div class="text-danger"><i class="fas fa-times-circle"></i> <strong>{{ _('Late') }}</strong> — {{ user_submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}</div>
+                                        {% else %}
+                                            <div class="text-success"><i class="fas fa-check-circle"></i> <strong>{{ _('Submitted') }}</strong> — {{ user_submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}</div>
+                                        {% endif %}
+                                        <a href="{{ url_for('api.serve_file', file_id=user_submission.drive_file_id) }}" target="_blank" class="btn btn-sm btn-info mt-1">{{ _('View Your Submission') }}</a>
+                                        {% if user_submission.grade is not none %}
+                                            <div class="mt-2"><strong>{{ _('Grade:') }}</strong> {{ user_submission.grade }}/{{ assignment.points }}</div>
+                                        {% endif %}
+                                        {% if user_submission.comment %}
+                                            <div class="mt-1"><strong>{{ _('Feedback:') }}</strong> {{ user_submission.comment }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    {% if assignment.due_date and assignment.due_date < datetime.now() %}
+                                        <div class="text-danger"><i class="fas fa-times-circle"></i> <strong>{{ _('Overdue') }}</strong></div>
+                                    {% else %}
+                                        <div class="text-danger"><i class="fas fa-times-circle"></i> <strong>{{ _('Not submitted') }}</strong></div>
+                                    {% endif %}
+                                    <form method="post" enctype="multipart/form-data" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" class="mt-2">
+                                        <input type="hidden" name="action" value="submit_assignment">
+                                        <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                                        <div class="form-group">
+                                            <label for="submission_file_{{ assignment.id }}">{{ _('Upload Your Work:') }}</label>
+                                            <input type="file" id="submission_file_{{ assignment.id }}" class="form-control-file" name="submission_file" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm">{{ _('Submit Assignment') }}</button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display: inline; margin-right: 0.5rem;" onsubmit="return confirm('{{ _('Are you sure you want to delete this assignment? This will also delete all submissions.') }}');">
+                                            <input type="hidden" name="action" value="delete_assignment">
+                                            <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                                            <button type="submit" class="btn btn-danger btn-sm">{{ _('Delete Assignment') }}</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-primary mt-2" type="button" data-toggle="collapse" data-target="#submissions-{{ assignment.id }}">
+                                    {{ _('View Submissions') }}
+                                </button>
+                                <div class="collapse mt-2" id="submissions-{{ assignment.id }}">
+                                    {% set submissions = assignment.submissions.all() %}
+                                    {% if submissions %}
+                                    <ul class="list-group mt-2">
+                                        {% for submission in submissions %}
+                                        <li class="list-group-item">
+                                            {% set status = 'success' %}
+                                            {% set status_text = _('On Time') %}
+                                            {% if assignment.due_date %}
+                                                {% if submission.submitted_at > assignment.due_date %}
+                                                    {% set status = 'danger' %}
+                                                    {% set status_text = _('Late') %}
+                                                {% elif submission.submitted_at < assignment.due_date %}
+                                                    {% set status = 'warning' %}
+                                                    {% set status_text = _('Early') %}
+                                                {% endif %}
+                                            {% endif %}
+                                            <strong>{{ submission.user.username }}</strong>
+                                            <span class="badge badge-{{ status }}">{{ status_text }}</span>
+                                            - {{ _('Submitted:') }} {{ submission.submitted_at.strftime('%b %d, %Y %I:%M %p') }}<br>
+                                            <a href="{{ url_for('api.serve_file', file_id=submission.drive_file_id) }}" target="_blank" class="btn btn-sm btn-info mt-1">{{ _('View Submission') }}</a>
+                                            <form method="post" class="mt-2" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}">
+                                                <input type="hidden" name="action" value="grade_submission">
+                                                <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                                                <div class="form-row">
+                                                    <div class="col-md-3">
+                                                        <input type="number" name="grade" class="form-control form-control-sm" placeholder="{{ _('Grade') }}" value="{{ submission.grade or '' }}" min="0" max="{{ assignment.points }}">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="text" name="comment" class="form-control form-control-sm" placeholder="{{ _('Comment') }}" value="{{ submission.comment or '' }}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button type="submit" class="btn btn-sm btn-success">{{ _('Save Grade') }}</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            {% if submission.grade is not none %}
+                                            <div class="alert alert-success mt-2 mb-0">{{ _('Grade:') }} {{ submission.grade }}/{{ assignment.points }}</div>
+                                            {% endif %}
+                                            {% if submission.comment %}
+                                            <div class="alert alert-info mt-1 mb-0">{{ _('Comment:') }} {{ submission.comment }}</div>
+                                            {% endif %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p class="text-muted mt-2">{{ _('No submissions yet.') }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
             {% else %}
             <p>{{ _('No assignments available.') }}</p>
             {% endif %}
@@ -1228,6 +1249,49 @@
       </div>
     </div>
 
+        <!-- Import Assignment Modal -->
+        <div class="modal fade" id="importAssignmentModal" tabindex="-1" role="dialog" aria-labelledby="importAssignmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}">
+                        <input type="hidden" name="action" value="import_assignment">
+                        <input type="hidden" name="import_assignment_folder_id" id="importAssignmentFolderId" value="">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importAssignmentModalLabel">{{ _('Import Assignment') }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                {{ _('Import to:') }} <strong id="importAssignmentFolderName">{{ _('Root') }}</strong>
+                            </div>
+                            <div class="form-group">
+                                <label for="assignment_select">{{ _('Select Assignment') }}</label>
+                                <select id="assignment_select" name="assignment_id" class="form-control" required>
+                                    {% if assignments %}
+                                        {% for a in assignments %}
+                                            <option value="{{ a.id }}">{{ a.title }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="">{{ _('No assignments available') }}</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="import_assignment_published" id="importAssignmentPublished" checked>
+                                <label class="form-check-label" for="importAssignmentPublished">{{ _('Publish immediately') }}</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Cancel') }}</button>
+                            <button type="submit" class="btn btn-success">{{ _('Import Assignment') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     <!-- Move File Modal -->
     <div class="modal fade" id="moveFileModal" tabindex="-1" role="dialog" aria-labelledby="moveFileModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -1361,6 +1425,17 @@
 
 {% block scripts %}
 <script>
+// Set selected_ids for bulk move before submitting the form
+function setBulkMoveIdsEnrolled(event) {
+    const checkboxes = document.querySelectorAll('.content-checkbox-enrolled:checked');
+    const ids = Array.from(checkboxes).map(cb => cb.value).filter(v => v && !isNaN(v));
+    if (ids.length === 0) {
+        event.preventDefault();
+        alert('No files selected for moving.');
+        return false;
+    }
+    document.getElementById('bulk-move-ids-enrolled').value = ids.join(',');
+}
 $(document).ready(function() {
     // Manually handle folder button clicks
     $(document).on('click', '[data-target="#createFolderModal"]', function(e) {
@@ -1411,6 +1486,24 @@ $(document).ready(function() {
 
         try {
             $('#importDriveModal').modal('show');
+        } catch(err) {
+            console.error('Error showing modal:', err);
+        }
+    });
+
+    // Manually handle import assignment button clicks
+    $(document).on('click', '[data-target="#importAssignmentModal"]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var folderId = $(this).data('folder-id');
+        var folderName = $(this).data('folder-name');
+
+        $('#importAssignmentFolderId').val(folderId || '');
+        $('#importAssignmentFolderName').text(folderName || 'Root');
+
+        try {
+            $('#importAssignmentModal').modal('show');
         } catch(err) {
             console.error('Error showing modal:', err);
         }
@@ -1635,5 +1728,24 @@ function bulkToggleVisibilityEnrolled() {
     document.body.appendChild(form);
     form.submit();
 }
+</script>
+<script>
+    // Assignment view button handler
+    window.viewAssignment = function(assignmentId) {
+        // Switch to assignments tab
+        $('#assignments-tab').tab('show');
+        // Wait for tab to show, then scroll
+        setTimeout(function() {
+            var target = document.getElementById('assignHeading' + assignmentId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Optionally expand the assignment accordion
+                var collapse = document.getElementById('assignCollapse' + assignmentId);
+                if (collapse && !$(collapse).hasClass('show')) {
+                    $(collapse).collapse('show');
+                }
+            }
+        }, 300);
+    };
 </script>
 {% endblock %}

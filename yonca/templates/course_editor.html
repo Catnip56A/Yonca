@@ -112,6 +112,28 @@
             border-radius: 12px;
             font-size: 0.75rem;
         }
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0;
+        }
+        .card-header button {
+            text-decoration: none;
+            color: #1a202c;
+            padding: 1rem;
+        }
+        .card-header button:hover {
+            text-decoration: none;
+            color: #2563eb;
+        }
+        .card-body {
+            background: white;
+        }
     </style>
 </head>
 <body>
@@ -349,80 +371,129 @@
                     </div>
 
                     {% if assignments %}
+                        <div class="accordion" id="assignmentsAccordion">
                         {% for item in assignments %}
-                        <div class="item-card">
-                            <div class="item-header">
-                                <div>
-                                    <div class="item-title">{{ item.title }}</div>
-                                    <small class="text-muted">
-                                        {% if item.due_date %}Due: {{ item.due_date.strftime('%b %d, %Y %I:%M %p') }}{% endif %}
-                                        • Points: {{ item.points }}
-                                    </small>
-                                    {% if item.is_published %}
-                                        <span class="badge-published">Published</span>
+                        <div class="card">
+                            <div class="card-header" id="heading{{ item.id }}">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-left w-100 d-flex justify-content-between align-items-center" type="button" data-toggle="collapse" data-target="#collapse{{ item.id }}" aria-expanded="false" aria-controls="collapse{{ item.id }}">
+                                        <div>
+                                            <strong>{{ item.title }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {% if item.due_date %}Due: {{ item.due_date.strftime('%b %d, %Y %I:%M %p') }}{% endif %}
+                                                • Points: {{ item.points }}
+                                                {% if current_user.is_teacher %}
+                                                    {% set submissions_count = item.submissions.count() %}
+                                                    • {{ submissions_count }} submission{{ 's' if submissions_count != 1 else '' }}
+                                                {% else %}
+                                                    {% set my_submission = item.submissions.filter_by(user_id=current_user.id).order_by(CourseAssignmentSubmission.submitted_at.desc()).first() %}
+                                                    • Status: 
+                                                    {% if my_submission %}
+                                                        {% if my_submission.grade is not none %}
+                                                            Submitted (Grade: {{ my_submission.grade }})
+                                                        {% else %}
+                                                            Submitted (Not graded)
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Not submitted
+                                                    {% endif %}
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <div>
+                                            {% if item.is_published %}
+                                                <span class="badge badge-success">Published</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">Draft</span>
+                                            {% endif %}
+                                            <i class="fas fa-chevron-down ml-2"></i>
+                                        </div>
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapse{{ item.id }}" class="collapse" aria-labelledby="heading{{ item.id }}" data-parent="#assignmentsAccordion">
+                                <div class="card-body">
+                                    {% if item.description %}
+                                    <p class="text-muted mb-3">{{ item.description }}</p>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            {% if current_user.is_teacher %}
+                                                <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editAssignmentModal{{ item.id }}">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <form method="POST" style="display: inline;">
+                                            <input type="hidden" name="action" value="delete_assignment">
+                                            <input type="hidden" name="assignment_id" value="{{ item.id }}">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    {% if current_user.is_teacher %}
+                                        {% set submissions = item.submissions.order_by(CourseAssignmentSubmission.submitted_at.desc()).all() %}
+                                        {% if submissions %}
+                                            <div class="assignment-submissions">
+                                                <strong>Student Submissions:</strong>
+                                                <ul class="list-unstyled mt-2">
+                                                    {% for sub in submissions %}
+                                                        <li style="margin-bottom: 1rem; padding: 0.75rem; background: #f8f9fa; border-radius: 4px;">
+                                                            <div><b>{{ sub.user.username if sub.user else 'User' }}</b> <small class="text-muted">{{ sub.submitted_at.strftime('%b %d, %Y %I:%M %p') }}</small></div>
+                                                            <div><a href="{{ sub.drive_view_link }}" target="_blank" class="btn btn-sm btn-outline-primary">View Submission</a></div>
+                                                            <form method="POST" class="mt-2">
+                                                                <input type="hidden" name="action" value="grade_submission">
+                                                                <input type="hidden" name="submission_id" value="{{ sub.id }}">
+                                                                <div class="form-row">
+                                                                    <div class="col-md-3">
+                                                                        <label for="grade_{{ sub.id }}">Grade:</label>
+                                                                        <input type="number" id="grade_{{ sub.id }}" name="grade" class="form-control" value="{{ sub.grade if sub.grade is not none else '' }}" min="0" max="100">
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label for="comment_{{ sub.id }}">Comment:</label>
+                                                                        <textarea id="comment_{{ sub.id }}" name="comment" class="form-control" rows="2">{{ sub.comment if sub.comment else '' }}</textarea>
+                                                                    </div>
+                                                                    <div class="col-md-3 d-flex align-items-end">
+                                                                        <button type="submit" class="btn btn-sm btn-success">Save</button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                            {% if sub.grade is not none or sub.comment %}
+                                                                <div class="mt-2">
+                                                                    <span class="badge badge-info">Grade: {{ sub.grade if sub.grade is not none else 'N/A' }}</span>
+                                                                    {% if sub.comment %}<span class="badge badge-secondary ml-1">Has Comment</span>{% endif %}
+                                                                </div>
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
                                     {% else %}
-                                        <span class="badge-draft">Draft</span>
+                                        {% set my_submission = item.submissions.filter_by(user_id=current_user.id).order_by(CourseAssignmentSubmission.submitted_at.desc()).first() %}
+                                        {% if my_submission %}
+                                            <div class="my-assignment-submission">
+                                                <strong>Your Submission:</strong>
+                                                <div class="mt-2">
+                                                    <a href="{{ my_submission.drive_view_link }}" target="_blank" class="btn btn-sm btn-outline-primary">View Submission</a>
+                                                    <span class="badge badge-info ml-2">Grade: {{ my_submission.grade if my_submission.grade is not none else 'Not graded yet' }}</span>
+                                                    {% if my_submission.comment %}<span class="badge badge-secondary ml-1">Has Comment</span>{% endif %}
+                                                </div>
+                                                {% if my_submission.comment %}
+                                                    <div class="mt-2"><strong>Comment:</strong> {{ my_submission.comment }}</div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="action" value="delete_assignment">
-                                    <input type="hidden" name="assignment_id" value="{{ item.id }}">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
                             </div>
-                            {% if item.description %}
-                            <p class="text-muted mb-0">{{ item.description }}</p>
-                            {% endif %}
-                            {% if current_user.is_teacher %}
-                                {% set submissions = item.submissions.order_by(CourseAssignmentSubmission.submitted_at.desc()).all() %}
-                                {% if submissions %}
-                                    <div class="assignment-submissions" style="margin-top: 1rem; margin-left: 2rem;">
-                                        <strong>Student Submissions:</strong>
-                                        <ul class="list-unstyled">
-                                            {% for sub in submissions %}
-                                                <li style="margin-bottom: 0.75rem;">
-                                                    <div><b>{{ sub.user.username if sub.user else 'User' }}</b> <small class="text-muted">{{ sub.submitted_at.strftime('%b %d, %Y %I:%M %p') }}</small></div>
-                                                    <div><a href="{{ sub.drive_view_link }}" target="_blank">View Submission</a></div>
-                                                    <form method="POST" style="margin-top: 0.5rem;">
-                                                        <input type="hidden" name="action" value="grade_submission">
-                                                        <input type="hidden" name="submission_id" value="{{ sub.id }}">
-                                                        <div class="form-group">
-                                                            <label for="grade_{{ sub.id }}">Grade:</label>
-                                                            <input type="number" id="grade_{{ sub.id }}" name="grade" class="form-control" value="{{ sub.grade if sub.grade is not none else '' }}" min="0" max="100" style="width: 100px; display: inline-block;">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="comment_{{ sub.id }}">Comment:</label>
-                                                            <textarea id="comment_{{ sub.id }}" name="comment" class="form-control" rows="2">{{ sub.comment if sub.comment else '' }}</textarea>
-                                                        </div>
-                                                        <button type="submit" class="btn btn-sm btn-success">Save</button>
-                                                    </form>
-                                                    {% if sub.grade is not none or sub.comment %}
-                                                        <div style="margin-top: 0.5rem;">
-                                                            <span class="badge badge-info">Grade: {{ sub.grade if sub.grade is not none else 'N/A' }}</span>
-                                                            {% if sub.comment %}<span class="badge badge-secondary">Comment: {{ sub.comment }}</span>{% endif %}
-                                                        </div>
-                                                    {% endif %}
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                {% endif %}
-                                        {% if not current_user.is_teacher %}
-                                            {% set my_submission = item.submissions.filter_by(user_id=current_user.id).order_by(CourseAssignmentSubmission.submitted_at.desc()).first() %}
-                                            {% if my_submission %}
-                                                <div class="my-assignment-submission" style="margin-top: 1rem; margin-left: 2rem;">
-                                                    <strong>Your Submission:</strong>
-                                                    <div><a href="{{ my_submission.drive_view_link }}" target="_blank">View Submission</a></div>
-                                                    <div><span class="badge badge-info">Grade: {{ my_submission.grade if my_submission.grade is not none else 'Not graded yet' }}</span></div>
-                                                    {% if my_submission.comment %}<div><span class="badge badge-secondary">Comment: {{ my_submission.comment }}</span></div>{% endif %}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-                            {% endif %}
                         </div>
                         {% endfor %}
+                        </div>
                     {% else %}
                         <div class="empty-state">
                             <i class="fas fa-tasks"></i>

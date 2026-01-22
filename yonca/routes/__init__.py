@@ -1025,9 +1025,11 @@ def course_page_enrolled(course_id):
             
             content_ids = request.form.getlist('content_ids')
             deleted_count = 0
-            
             for content_id in content_ids:
-                content = CourseContent.query.get(content_id)
+                content_id = content_id.strip()
+                if not content_id or not content_id.isdigit():
+                    continue
+                content = CourseContent.query.get(int(content_id))
                 if content and content.course_id == course.id:
                     # Delete from Google Drive
                     if content.drive_file_id:
@@ -1037,11 +1039,9 @@ def course_page_enrolled(course_id):
                                 delete_file(service, content.drive_file_id)
                             except Exception as e:
                                 print(f"Error deleting file from Google Drive: {e}")
-                    
                     # Delete from database
                     db.session.delete(content)
                     deleted_count += 1
-            
             db.session.commit()
             flash(f'{deleted_count} items deleted successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
@@ -1050,33 +1050,59 @@ def course_page_enrolled(course_id):
         elif action == 'bulk_move_content' and (current_user.is_teacher or current_user.is_admin):
             from yonca.models import CourseContent
             
-            content_ids = request.form.get('selected_ids').split(',')
+            content_ids_raw = request.form.get('selected_ids', '')
+            content_ids = [cid.strip() for cid in content_ids_raw.split(',') if cid.strip().isdigit()]
             target_folder_id = request.form.get('target_folder_id')
             moved_count = 0
-            
+            if not content_ids:
+                flash('No valid files selected for moving.', 'warning')
+                return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             for content_id in content_ids:
-                content = CourseContent.query.get(content_id.strip())
+                content = CourseContent.query.get(int(content_id))
                 if content and content.course_id == course.id:
                     content.folder_id = int(target_folder_id) if target_folder_id else None
                     moved_count += 1
-            
             db.session.commit()
             flash(f'{moved_count} items moved successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
+        # Import assignment into folder as content
+        elif action == 'import_assignment' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent, CourseAssignment
+            assignment_id = request.form.get('assignment_id')
+            folder_id = request.form.get('import_assignment_folder_id')
+            assignment = CourseAssignment.query.get(assignment_id)
+            if assignment and assignment.course_id == course.id:
+                content = CourseContent(
+                    course_id=course.id,
+                    title=assignment.title,
+                    description=assignment.description,
+                    content_type='assignment',
+                    content_data=str(assignment.id),
+                    folder_id=int(folder_id) if folder_id else None,
+                    is_published=request.form.get('import_assignment_published') == 'on',
+                    allow_others_to_view=True
+                )
+                db.session.add(content)
+                db.session.commit()
+                flash(f'Assignment "{assignment.title}" imported to folder!', 'success')
+            else:
+                flash('Assignment not found or does not belong to this course.', 'danger')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         # Bulk toggle visibility
         elif action == 'bulk_toggle_visibility' and (current_user.is_teacher or current_user.is_admin):
             from yonca.models import CourseContent
             
             content_ids = request.form.getlist('content_ids')
             toggled_count = 0
-            
             for content_id in content_ids:
-                content = CourseContent.query.get(content_id)
+                content_id = content_id.strip()
+                if not content_id or not content_id.isdigit():
+                    continue
+                content = CourseContent.query.get(int(content_id))
                 if content and content.course_id == course.id:
                     content.is_published = not content.is_published
                     toggled_count += 1
-            
             db.session.commit()
             flash(f'Visibility toggled for {toggled_count} items!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
