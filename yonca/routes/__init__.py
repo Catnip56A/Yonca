@@ -1046,8 +1046,35 @@ def course_page_enrolled(course_id):
             flash(f'{deleted_count} items deleted successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
         
-        # Bulk move content
-        elif action == 'bulk_move_content' and (current_user.is_teacher or current_user.is_admin):
+        # Reorder files in a folder
+        elif action == 'reorder_files' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContent
+            folder_id = request.form.get('folder_id')
+            file_order = request.form.get('file_order', '')
+            if folder_id and file_order:
+                file_ids = [int(fid) for fid in file_order.split(',') if fid.isdigit()]
+                for idx, file_id in enumerate(file_ids):
+                    content = CourseContent.query.get(file_id)
+                    if content and content.folder_id == int(folder_id) and content.course_id == course.id:
+                        content.order = idx
+                db.session.commit()
+                flash('File order updated!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+
+        # Reorder subfolders in a folder
+        elif action == 'reorder_folders' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContentFolder
+            parent_folder_id = request.form.get('parent_folder_id')
+            folder_order = request.form.get('folder_order', '')
+            if parent_folder_id is not None and folder_order:
+                folder_ids = [int(fid) for fid in folder_order.split(',') if fid.isdigit()]
+                for idx, folder_id in enumerate(folder_ids):
+                    folder = CourseContentFolder.query.get(folder_id)
+                    if folder and str(folder.parent_folder_id or '') == str(parent_folder_id) and folder.course_id == course.id:
+                        folder.order = idx
+                db.session.commit()
+                flash('Folder order updated!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
             from yonca.models import CourseContent
             
             content_ids_raw = request.form.get('selected_ids', '')
@@ -1108,8 +1135,8 @@ def course_page_enrolled(course_id):
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
 
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
-    contents = CourseContent.query.filter_by(course_id=course.id, is_published=True).order_by(CourseContent.title).all()
-    content_folders = CourseContentFolder.query.filter_by(course_id=course.id).order_by(CourseContentFolder.title)
+    contents = CourseContent.query.filter_by(course_id=course.id, is_published=True).order_by(CourseContent.order).all()
+    content_folders = CourseContentFolder.query.filter_by(course_id=course.id).order_by(CourseContentFolder.order)
     assignments = CourseAssignment.query.filter_by(course_id=course.id, is_published=True).order_by(CourseAssignment.due_date).all()
     announcements = CourseAnnouncement.query.filter_by(course_id=course.id, is_published=True).order_by(CourseAnnouncement.created_at.desc()).all()
     reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ translate_field('course', course.id, 'title', course.title) }} - {{ home_content.site_name }}{% endblock %}
+{% block title %}{{ course.title }} - {{ home_content.site_name }}{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -76,14 +76,13 @@
 </div>
 {% endif %}
 <section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
-    <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ translate_field('course', course.id, 'page_welcome_title', course.page_welcome_title or course.title) }}</h1>
+    <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ course.page_welcome_title or course.title }}</h1>
     {% if course.page_subtitle %}
-    <h2 style="font-size:1.3rem; color:#374151; margin-top:0.5rem;">{{ translate_field('course', course.id, 'page_subtitle', course.page_subtitle) }}</h2>
+    <h2 style="font-size:1.3rem; color:#374151; margin-top:0.5rem;">{{ course.page_subtitle }}</h2>
     {% endif %}
 {% if course.page_description %}
     <div style="margin-top:1.2rem; font-size:1.1rem; color:#444; font-family: 'Georgia', serif; line-height:1.6;">
-        {% set translated_desc = translate_field('course', course.id, 'page_description', course.page_description) %}
-        {% set paragraphs = translated_desc.split('\n') %}
+        {% set paragraphs = course.page_description.split('\n') %}
         {% for paragraph in paragraphs %}
         {% if paragraph.strip() %}
         <p style="margin-bottom:1rem;">{{ paragraph | parse_buttons | safe }}</p>
@@ -93,7 +92,7 @@
     {% endif %}
     {% if course.page_features %}
     <div class="row" style="margin-top:2rem;">
-        {% for feature in translate_json('course', course.id, 'page_features', course.page_features) %}
+        {% for feature in course.page_features %}
         <div class="col-md-4" style="margin-bottom:1.5rem;">
             <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%;">
                 {% if feature.image %}
