@@ -1,3 +1,16 @@
+        # Reorder root folders
+        elif action == 'reorder_root_folders' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContentFolder
+            folder_order = request.form.get('folder_order', '')
+            if folder_order:
+                folder_ids = [int(fid) for fid in folder_order.split(',') if fid.isdigit()]
+                for idx, folder_id in enumerate(folder_ids):
+                    folder = CourseContentFolder.query.get(folder_id)
+                    if folder and folder.parent_folder_id is None and folder.course_id == course.id:
+                        folder.order = idx
+                db.session.commit()
+                flash('Root folder order updated!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
 from flask import Blueprint, render_template, request, redirect, flash, url_for, jsonify, current_app, abort
 from markupsafe import Markup
 from flask_babel import get_locale, force_locale

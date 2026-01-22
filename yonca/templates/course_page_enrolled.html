@@ -370,6 +370,22 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Drag-and-drop for root folders
+            var rootUl = document.getElementById('root-folder-sortable');
+            if (rootUl) {
+                new Sortable(rootUl, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    onEnd: function (evt) {
+                        var order = Array.from(rootUl.querySelectorAll('li[data-folder-id]')).map(li => li.getAttribute('data-folder-id'));
+                        var form = document.getElementById('root-folder-order-form');
+                        if (form) {
+                            form.querySelector('input[name="folder_order"]').value = order.join(',');
+                            form.submit();
+                        }
+                    }
+                });
+            }
             // Drag-and-drop for files
             document.querySelectorAll('.file-sortable').forEach(function(ul) {
                 new Sortable(ul, {
@@ -596,9 +612,20 @@
             {# Display root-level folders #}
             {% set root_folders = content_folders.filter_by(parent_folder_id=None).all() %}
             {% if root_folders %}
+            <ul class="list-group root-folder-sortable" id="root-folder-sortable">
             {% for folder in root_folders %}
-                {{ render_folder(folder, 0) }}
+                <li class="list-group-item" data-folder-id="{{ folder.id }}">
+                    <span class="drag-handle mr-2" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; margin-right:8px; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto;">☰</span>
+                    {{ render_folder(folder, 0) }}
+                </li>
             {% endfor %}
+            </ul>
+            {% if is_teacher_or_admin %}
+            <form id="root-folder-order-form" method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display:none;">
+                <input type="hidden" name="action" value="reorder_root_folders">
+                <input type="hidden" name="folder_order" value="">
+            </form>
+            {% endif %}
             {% endif %}
             
             {# Display unassigned content #}
