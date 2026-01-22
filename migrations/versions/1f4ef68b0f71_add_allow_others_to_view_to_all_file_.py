@@ -80,10 +80,10 @@ def downgrade():
                type_=sa.TEXT(),
                existing_nullable=True,
                existing_server_default=sa.text("'[]'"))
-        batch_op.alter_column('about_subtitle',
-               existing_type=sa.String(length=500),
-               type_=sa.TEXT(),
-               existing_nullable=True,
-               existing_server_default=sa.text("'Join our learning community and discover amazing features.'"))
+         batch_op.alter_column('about_subtitle',
+             existing_type=sa.Text(),
+             type_=sa.TEXT(),
+             existing_nullable=True,
+             existing_server_default=sa.text("'Join our learning community and discover amazing features.'"))
 
     # ### end Alembic commands ###
