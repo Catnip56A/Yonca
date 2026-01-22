@@ -28,7 +28,8 @@ def upload_gallery_image_to_drive(file, filename):
         service = authenticate()
         if not service:
             print("Failed to authenticate with Google Drive for gallery upload")
-            return None
+            # Instead of returning None, raise an exception to be caught by the caller
+            raise Exception("Google Drive authentication failed - user needs to link their Google account")
 
         # Create temporary directory if it doesn't exist
         temp_dir = os.path.join(current_app.static_folder, 'temp')
@@ -344,16 +345,23 @@ class AdminIndexView(AdminIndexView):
                         file = request.files[file_key]
                         if file and file.filename:
                             # Upload to Google Drive instead of local storage
-                            drive_url = upload_gallery_image_to_drive(file, file.filename)
-                            if drive_url:
-                                # Replace or add image at this index
-                                try:
-                                    index_num = int(index)
-                                    gallery_images[index_num] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
-                                except (ValueError, IndexError):
-                                    gallery_images.append({'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None})
-                            else:
-                                flash(f'Failed to upload gallery image {file.filename} to Google Drive', 'error')
+                            try:
+                                drive_url = upload_gallery_image_to_drive(file, file.filename)
+                                if drive_url:
+                                    # Replace or add image at this index
+                                    try:
+                                        index_num = int(index)
+                                        gallery_images[index_num] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
+                                    except (ValueError, IndexError):
+                                        gallery_images.append({'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None})
+                                else:
+                                    flash(f'Failed to upload gallery image {file.filename} to Google Drive', 'error')
+                            except Exception as e:
+                                if "Google Drive authentication failed" in str(e):
+                                    flash('Please link your Google account to upload images. Redirecting...', 'warning')
+                                    return redirect(url_for('google_login.index'))
+                                else:
+                                    flash(f'Failed to upload gallery image {file.filename}: {str(e)}', 'error')
                     else:
                         # No new file uploaded - update existing image alt/caption if provided
                         try:
