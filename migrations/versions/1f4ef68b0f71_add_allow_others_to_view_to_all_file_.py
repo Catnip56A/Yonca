@@ -75,11 +75,11 @@ def downgrade():
         batch_op.drop_column('allow_others_to_view')
 
     with op.batch_alter_table('home_content', schema=None) as batch_op:
-        batch_op.alter_column('about_features',
-               existing_type=sa.JSON(),
-               type_=sa.TEXT(),
-               existing_nullable=True,
-               existing_server_default=sa.text("'[]'"))
+         batch_op.alter_column('about_features',
+             existing_type=sa.JSON(),
+             type_=sa.TEXT(),
+             existing_nullable=True,
+             existing_server_default=sa.text("'[]'"))
          batch_op.alter_column('about_subtitle',
              existing_type=sa.Text(),
              type_=sa.TEXT(),
