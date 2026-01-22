@@ -23,17 +23,22 @@ def index():
         if action == 'reorder_root_folders' and (current_user.is_teacher or current_user.is_admin):
             from yonca.models import CourseContentFolder
             folder_order = request.form.get('folder_order', '')
+            course_id_raw = request.form.get('course_id')
+            try:
+                course_id_int = int(course_id_raw) if course_id_raw and str(course_id_raw).isdigit() else None
+            except Exception:
+                course_id_int = None
+
             if folder_order:
                 folder_ids = [int(fid) for fid in folder_order.split(',') if fid.isdigit()]
                 for idx, folder_id in enumerate(folder_ids):
                     folder = CourseContentFolder.query.get(folder_id)
-                    # 'course' variable may not be defined in this context; adjust as needed
-                    # If you need to check course.id, ensure 'course' is available or remove this check
-                    if folder and folder.parent_folder_id is None:
-                        folder.order = idx
+                    # Only update root-level folders that belong to the specified course
+                    if folder and folder.parent_folder_id is None and (course_id_int is None or folder.course_id == course_id_int):
+                        folder.order = idx + 1
                 db.session.commit()
                 flash('Root folder order updated!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_id=request.form.get('course_id', 0)))
+            return redirect(url_for('main.course_page_enrolled', course_id=course_id_int or 0))
 
         # Delete resource
         if action == 'delete_resource' and current_user.is_authenticated:
@@ -1075,6 +1080,19 @@ def course_page_enrolled(course_id):
                         content.order = idx
                 db.session.commit()
                 flash('File order updated!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+
+        # Reorder root-level folders (drag-and-drop from course page)
+        elif action == 'reorder_root_folders' and (current_user.is_teacher or current_user.is_admin):
+            folder_order = request.form.get('folder_order', '')
+            if folder_order:
+                folder_ids = [int(fid) for fid in folder_order.split(',') if fid.isdigit()]
+                for idx, folder_id in enumerate(folder_ids):
+                    folder = CourseContentFolder.query.get(folder_id)
+                    if folder and folder.course_id == course.id and folder.parent_folder_id is None:
+                        folder.order = idx + 1
+                db.session.commit()
+                flash('Root folder order updated!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
 
         # Reorder subfolders in a folder
