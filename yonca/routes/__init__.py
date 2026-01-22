@@ -1152,25 +1152,34 @@ def course_page_enrolled(course_id):
 
     home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
     contents = CourseContent.query.filter_by(course_id=course.id, is_published=True).order_by(CourseContent.order).all()
-    content_folders = CourseContentFolder.query.filter_by(course_id=course.id).order_by(CourseContentFolder.order)
+    all_folders = CourseContentFolder.query.filter_by(course_id=course.id).order_by(CourseContentFolder.order).all()
+
+    # Build a nested folder tree structure
+    def build_folder_tree(folders):
+        folder_dict = {folder.id: {"folder": folder, "children": []} for folder in folders}
+        root_folders = []
+        for folder in folders:
+            if folder.parent_folder_id and folder.parent_folder_id in folder_dict:
+                folder_dict[folder.parent_folder_id]["children"].append(folder_dict[folder.id])
+            else:
+                root_folders.append(folder_dict[folder.id])
+        return root_folders
+
+    folder_tree = build_folder_tree(all_folders)
     assignments = CourseAssignment.query.filter_by(course_id=course.id, is_published=True).order_by(CourseAssignment.due_date).all()
     announcements = CourseAnnouncement.query.filter_by(course_id=course.id, is_published=True).order_by(CourseAnnouncement.created_at.desc()).all()
     reviews = CourseReview.query.filter_by(course_id=course.id).order_by(CourseReview.created_at.desc()).all()
 
     is_teacher_or_admin = getattr(current_user, 'is_teacher', False) or getattr(current_user, 'is_admin', False)
     
-    # Generate folder paths for dropdown menus
-    folder_paths = {folder.id: folder.title for folder in content_folders}
 
-    # Debugging folder paths
-    print("[DEBUG] Folder Paths:", folder_paths)
+    # Generate folder paths for dropdown menus (flat list)
+    folder_paths = {folder.id: folder.title for folder in all_folders}
 
-    # Debugging content folders
-    print("[DEBUG] Content Folders:", content_folders)
+    content_folders = CourseContentFolder.query.filter_by(course_id=course.id).all()
 
-    # Debugging all folders in the database
-    all_folders = CourseContentFolder.query.all()
-    print("[DEBUG] All Folders in Database:", all_folders)
+    # Debugging folder tree
+    print("[DEBUG] Folder Tree:", folder_tree)
 
     # Debugging is_teacher_or_admin
     print("[DEBUG] is_teacher_or_admin:", is_teacher_or_admin)
@@ -1184,6 +1193,7 @@ def course_page_enrolled(course_id):
                           course=course,
                           home_content=home_content,
                           contents=contents,
+                          folder_tree=folder_tree,
                           content_folders=content_folders,
                           assignments=assignments,
                           announcements=announcements,
