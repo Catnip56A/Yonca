@@ -214,7 +214,7 @@ def login_google():
     
     print(f"DEBUG: OAuth login - request.host={request.host}, redirect_uri={redirect_uri}")
     
-    scope = 'openid email profile https://www.googleapis.com/auth/drive.readonly'
+    scope = 'openid email profile https://www.googleapis.com/auth/drive'
     state = secrets.token_urlsafe(32)  # Generate a secure state
     # Store state in session for verification
     from flask import session
@@ -256,7 +256,7 @@ def link_google_account():
     
     print(f"DEBUG: Link account - request.host={request.host}, redirect_uri={redirect_uri}")
     
-    scope = 'openid email profile https://www.googleapis.com/auth/drive.readonly'
+    scope = 'openid email profile https://www.googleapis.com/auth/drive'
     state = secrets.token_urlsafe(32)  # Generate a secure state
     # Store state in session for verification
     from flask import session

@@ -12,8 +12,8 @@ from flask import url_for, current_app
 from datetime import datetime, timedelta, timedelta
 import requests
 
-# Google Drive API scopes - need read access for importing shared files
-SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+# Google Drive API scopes - need full access for uploading, deleting, and managing files
+SCOPES = ['https://www.googleapis.com/auth/drive']
 FOLDER_ID = None  # Upload to root directory for OAuth users
 
 def authenticate(user=None):
