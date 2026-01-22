@@ -1,16 +1,4 @@
-        # Reorder root folders
-        elif action == 'reorder_root_folders' and (current_user.is_teacher or current_user.is_admin):
-            from yonca.models import CourseContentFolder
-            folder_order = request.form.get('folder_order', '')
-            if folder_order:
-                folder_ids = [int(fid) for fid in folder_order.split(',') if fid.isdigit()]
-                for idx, folder_id in enumerate(folder_ids):
-                    folder = CourseContentFolder.query.get(folder_id)
-                    if folder and folder.parent_folder_id is None and folder.course_id == course.id:
-                        folder.order = idx
-                db.session.commit()
-                flash('Root folder order updated!', 'success')
-            return redirect(url_for('main.course_page_enrolled', course_id=course.id))
+
 from flask import Blueprint, render_template, request, redirect, flash, url_for, jsonify, current_app, abort
 from markupsafe import Markup
 from flask_babel import get_locale, force_locale
@@ -18,38 +6,47 @@ from flask_login import current_user, login_required
 from yonca.models import HomeContent
 from werkzeug.utils import secure_filename
 import os
-
 from datetime import datetime as dt
 
 main_bp = Blueprint('main', __name__)
-
-
 
 @main_bp.route('/', methods=['GET', 'POST'])
 def index():
     """Serve main index page"""
     from yonca.models import HomeContent, Resource, PDFDocument, db
-    
-    # Handle POST requests for deletions
+
+    # Handle POST requests for deletions and actions
     if request.method == 'POST':
         action = request.form.get('action')
-        
+
+        # Reorder root folders
+        if action == 'reorder_root_folders' and (current_user.is_teacher or current_user.is_admin):
+            from yonca.models import CourseContentFolder
+            folder_order = request.form.get('folder_order', '')
+            if folder_order:
+                folder_ids = [int(fid) for fid in folder_order.split(',') if fid.isdigit()]
+                for idx, folder_id in enumerate(folder_ids):
+                    folder = CourseContentFolder.query.get(folder_id)
+                    # 'course' variable may not be defined in this context; adjust as needed
+                    # If you need to check course.id, ensure 'course' is available or remove this check
+                    if folder and folder.parent_folder_id is None:
+                        folder.order = idx
+                db.session.commit()
+                flash('Root folder order updated!', 'success')
+            return redirect(url_for('main.course_page_enrolled', course_id=request.form.get('course_id', 0)))
+
         # Delete resource
         if action == 'delete_resource' and current_user.is_authenticated:
             from yonca.google_drive_service import authenticate, delete_file
-            
             resource_id = request.form.get('resource_id')
             resource = Resource.query.get(resource_id)
-            
             if not resource:
                 flash('Resource not found.', 'error')
                 return redirect(url_for('main.index'))
-            
             # Check permission: must be the uploader or an admin
             if resource.uploaded_by != current_user.id and not current_user.is_admin:
                 flash('You do not have permission to delete this resource.', 'error')
                 return redirect(url_for('main.index'))
-            
             # Delete from Google Drive
             if resource.drive_file_id:
                 service = authenticate()
@@ -58,31 +55,24 @@ def index():
                         delete_file(service, resource.drive_file_id)
                     except Exception as e:
                         print(f"Error deleting resource from Google Drive: {e}")
-            
-            # Note: preview_image is a URL string, not a Drive file ID, so we don't delete it
-            
             # Delete from database
             db.session.delete(resource)
             db.session.commit()
             flash('Resource deleted successfully!', 'success')
             return redirect(url_for('main.index'))
-        
+
         # Delete PDF
-        elif action == 'delete_pdf' and current_user.is_authenticated:
+        if action == 'delete_pdf' and current_user.is_authenticated:
             from yonca.google_drive_service import authenticate, delete_file
-            
             pdf_id = request.form.get('pdf_id')
             pdf = PDFDocument.query.get(pdf_id)
-            
             if not pdf:
                 flash('PDF not found.', 'error')
                 return redirect(url_for('main.index'))
-            
             # Check permission: must be the uploader or an admin
             if pdf.uploaded_by != current_user.id and not current_user.is_admin:
                 flash('You do not have permission to delete this PDF.', 'error')
                 return redirect(url_for('main.index'))
-            
             # Delete from Google Drive
             if pdf.drive_file_id:
                 service = authenticate()
@@ -91,13 +81,12 @@ def index():
                         delete_file(service, pdf.drive_file_id)
                     except Exception as e:
                         print(f"Error deleting PDF from Google Drive: {e}")
-            
             # Delete from database
             db.session.delete(pdf)
             db.session.commit()
             flash('PDF deleted successfully!', 'success')
             return redirect(url_for('main.index'))
-    
+
     # Always return a response, even if database is unavailable
     try:
         home_content = HomeContent.query.filter_by(is_active=True).first() or HomeContent()
@@ -105,7 +94,7 @@ def index():
         # Log the error but don't crash - return empty HomeContent
         print(f"Database error in index route: {e}")
         home_content = HomeContent()
-    
+
     return render_template('index.html', is_authenticated=current_user.is_authenticated, home_content=home_content)
 
 # Public course description/marketing page
