@@ -10,19 +10,19 @@ msgstr ""
 "POT-Creation-Date: 2026-01-19 19:56+0400\n"
 "PO-Revision-Date: 2026-01-18 12:33+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: az\n"
 "Language-Team: az <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: az\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: templates/course_description.html:128
 #: templates/course_page_enrolled.html:373
 #, fuzzy
 msgid "Course Features"
-msgstr ""
+msgstr "Kursun Xüsusiyyətləri"
 
 #: templates/components/navbar.html:24 templates/course_description.html:133
 #: templates/course_page_enrolled.html:378 templates/index.html:1215
@@ -33,13 +33,13 @@ msgstr "Forum"
 #: templates/course_description.html:134
 #: templates/course_page_enrolled.html:379
 msgid "Connect with fellow learners and get help from instructors."
-msgstr ""
+msgstr "Tələbə yoldaşları ilə əlaqə qurun və təlimatçılardan kömək alın."
 
 #: templates/course_description.html:135
 #: templates/course_page_enrolled.html:380
 #, fuzzy
 msgid "Access Forum"
-msgstr ""
+msgstr "Foruma daxil olun"
 
 #: templates/components/navbar.html:27 templates/course_description.html:141
 #: templates/course_page_enrolled.html:386 templates/index.html:1216
@@ -50,13 +50,13 @@ msgstr "Resurslar"
 #: templates/course_description.html:142
 #: templates/course_page_enrolled.html:387
 msgid "Access course materials, documents, and additional resources."
-msgstr ""
+msgstr "Kurs materiallarına, sənədlərə və əlavə resurslara daxil olun."
 
 #: templates/course_description.html:143
 #: templates/course_page_enrolled.html:388
 #, fuzzy
 msgid "Access Resources"
-msgstr ""
+msgstr "Resurslara giriş"
 
 #: templates/course_description.html:149
 #: templates/course_page_enrolled.html:246
@@ -67,28 +67,28 @@ msgstr "Rəylər"
 #: templates/course_description.html:150
 #: templates/course_page_enrolled.html:395
 msgid "Read reviews from other students and share your experience."
-msgstr ""
+msgstr "Digər tələbələrin rəylərini oxuyun və təcrübənizi paylaşın."
 
 #: templates/course_description.html:151
 #: templates/course_page_enrolled.html:396
 #, fuzzy
 msgid "View Reviews"
-msgstr ""
+msgstr "Rəylərə Baxın"
 
 #: templates/course_description.html:161
 #: templates/course_page_enrolled.html:406
 #: templates/course_page_enrolled.html:847
 #, fuzzy
 msgid "Student Reviews"
-msgstr ""
+msgstr "Tələbə rəyləri"
 
 #: templates/course_description.html:162
 #: templates/course_page_enrolled.html:407
 #, fuzzy
 msgid "review"
 msgid_plural "reviews"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "nəzərdən keçirin"
+msgstr[1] "nəzərdən keçirin"
 
 #: templates/course_description.html:162
 #, fuzzy
@@ -98,7 +98,7 @@ msgstr "rəylər"
 #: templates/course_description.html:179
 #: templates/course_page_enrolled.html:424
 msgid "Average Rating"
-msgstr ""
+msgstr "Orta Reytinq"
 
 #: templates/course_description.html:196
 msgid "By"
@@ -108,25 +108,25 @@ msgstr "By"
 #: templates/course_page_enrolled.html:531
 #: templates/course_page_enrolled.html:699 templates/index.html:2017
 msgid "Login to Enroll"
-msgstr ""
+msgstr "Qeydiyyatdan keçmək üçün daxil olun"
 
 #: templates/course_description.html:212
 #, fuzzy
 msgid "You are not enrolled in this course."
-msgstr ""
+msgstr "Siz bu kursa yazılmısınız."
 
 #: templates/course_page_enrolled.html:224
 msgid "Teacher/Admin Mode:"
-msgstr ""
+msgstr "Müəllim/Admin Rejimi:"
 
 #: templates/course_page_enrolled.html:224
 msgid "You have editing privileges for this course."
-msgstr ""
+msgstr "Bu kurs üçün redaktə imtiyazlarınız var."
 
 #: templates/course_page_enrolled.html:229
 #, fuzzy
 msgid "Back to Courses"
-msgstr ""
+msgstr "Kurslara qayıt"
 
 #: templates/course_page_enrolled.html:234
 msgid "Content"
@@ -155,7 +155,7 @@ msgstr "Elanlar"
 #: templates/course_page_enrolled.html:1156
 #, fuzzy
 msgid "Move Folder"
-msgstr ""
+msgstr "Qovluğu köçürün"
 
 #: templates/course_page_enrolled.html:259
 #, fuzzy
@@ -163,17 +163,19 @@ msgid ""
 "Are you sure you want to delete this folder? This will only work if the "
 "folder is empty."
 msgstr ""
+"Bu qovluğu silmək istədiyinizə əminsiniz? Bu, yalnız qovluq boş olduqda "
+"işləyəcək."
 
 #: templates/course_page_enrolled.html:262
 #, fuzzy
 msgid "Delete Folder"
-msgstr ""
+msgstr "Qovluğu silin"
 
 #: templates/course_page_enrolled.html:282
 #: templates/course_page_enrolled.html:493
 #, fuzzy
 msgid "View File"
-msgstr ""
+msgstr "Fayla Baxın"
 
 #: templates/course_page_enrolled.html:284
 #: templates/course_page_enrolled.html:495
@@ -185,7 +187,7 @@ msgstr "Bax/Yüklə"
 #: templates/course_page_enrolled.html:1104
 #, fuzzy
 msgid "Move File"
-msgstr ""
+msgstr "Faylı köçürün"
 
 #: templates/course_page_enrolled.html:295
 #: templates/course_page_enrolled.html:650
@@ -203,7 +205,7 @@ msgstr "Şəxsi"
 #: templates/course_page_enrolled.html:509
 #, fuzzy
 msgid "Are you sure you want to delete this file?"
-msgstr ""
+msgstr "Bu faylı silmək istədiyinizə əminsiniz?"
 
 #: templates/course_page_enrolled.html:301
 #: templates/course_page_enrolled.html:512
@@ -216,41 +218,43 @@ msgstr "Sil"
 #: templates/course_page_enrolled.html:459
 #, fuzzy
 msgid "Course Content"
-msgstr ""
+msgstr "Kursun məzmunu"
 
 #: templates/course_page_enrolled.html:463
 #: templates/course_page_enrolled.html:982
 #: templates/course_page_enrolled.html:1002
 msgid "Create Folder"
-msgstr ""
+msgstr "Qovluq yaradın"
 
 #: templates/course_page_enrolled.html:466
 #: templates/course_page_enrolled.html:1017
 #: templates/course_page_enrolled.html:1049
 #, fuzzy
 msgid "Upload File"
-msgstr ""
+msgstr "Fayl Yüklə"
 
 #: templates/course_page_enrolled.html:483
 msgid "Unsorted Files"
-msgstr ""
+msgstr "Çeşidlənməmiş fayllar"
 
 #: templates/course_page_enrolled.html:529
 msgid "Enroll to Access Course Content"
-msgstr ""
+msgstr "Kurs məzmununa daxil olmaq üçün qeydiyyatdan keçin"
 
 #: templates/course_page_enrolled.html:530
 msgid ""
-"You need to be enrolled in this course to view the content, materials, "
-"and participate in activities."
+"You need to be enrolled in this course to view the content, materials, and "
+"participate in activities."
 msgstr ""
+"Məzmun, materiallara baxmaq və fəaliyyətlərdə iştirak etmək üçün bu kursa "
+"yazılmalısınız."
 
 #: templates/course_page_enrolled.html:542
 #: templates/course_page_enrolled.html:1063
 #: templates/course_page_enrolled.html:1092
 #, fuzzy
 msgid "Create Assignment"
-msgstr ""
+msgstr "Tapşırıq yaradın"
 
 #: templates/course_page_enrolled.html:550
 msgid "pts"
@@ -267,7 +271,7 @@ msgstr "Yoxdur"
 #: templates/course_page_enrolled.html:559
 #: templates/course_page_enrolled.html:630
 msgid "On Time"
-msgstr ""
+msgstr "Vaxtında"
 
 #: templates/course_page_enrolled.html:563
 #: templates/course_page_enrolled.html:634
@@ -283,20 +287,20 @@ msgstr "Erkən"
 
 #: templates/course_page_enrolled.html:571
 msgid "View Your Submission"
-msgstr ""
+msgstr "Təqdimatınıza Baxın"
 
 #: templates/course_page_enrolled.html:577
 msgid "Visible to Others"
-msgstr ""
+msgstr "Başqalarına Görünür"
 
 #: templates/course_page_enrolled.html:580
 #, fuzzy
 msgid "Are you sure you want to delete your submission?"
-msgstr ""
+msgstr "Təqdimatınızı silmək istədiyinizə əminsiniz?"
 
 #: templates/course_page_enrolled.html:583
 msgid "Delete My Submission"
-msgstr ""
+msgstr "Təqdimatı Sil"
 
 #: templates/course_page_enrolled.html:586
 #: templates/course_page_enrolled.html:675
@@ -309,7 +313,7 @@ msgstr "Əlaqə:"
 
 #: templates/course_page_enrolled.html:594
 msgid "Not Submitted"
-msgstr ""
+msgstr "Təqdim olunmayıb"
 
 #: templates/course_page_enrolled.html:597
 msgid "Overdue"
@@ -318,27 +322,31 @@ msgstr "Vaxtı keçmiş"
 #: templates/course_page_enrolled.html:606
 msgid "Upload Your Work:"
 msgstr ""
+"Error 500 (Server Error)!!1500.That’s an error.There was an error. Please "
+"try again later.That’s all we know."
 
 #: templates/course_page_enrolled.html:609
 #, fuzzy
 msgid "Submit Assignment"
-msgstr ""
+msgstr "Tapşırığı təqdim edin"
 
 #: templates/course_page_enrolled.html:615
 #, fuzzy
 msgid ""
-"Are you sure you want to delete this assignment? This will also delete "
-"all submissions."
+"Are you sure you want to delete this assignment? This will also delete all "
+"submissions."
 msgstr ""
+"Bu tapşırığı silmək istədiyinizə əminsiniz? Bu, həmçinin bütün təqdimatları "
+"siləcək."
 
 #: templates/course_page_enrolled.html:618
 #, fuzzy
 msgid "Delete Assignment"
-msgstr ""
+msgstr "Tapşırığı silin"
 
 #: templates/course_page_enrolled.html:621
 msgid "View Submissions"
-msgstr ""
+msgstr "Təqdimatlara baxın"
 
 #: templates/course_page_enrolled.html:642
 msgid "Submitted:"
@@ -346,12 +354,12 @@ msgstr "Təqdim edildi:"
 
 #: templates/course_page_enrolled.html:643
 msgid "View Submission"
-msgstr ""
+msgstr "Təqdimata Baxın"
 
 #: templates/course_page_enrolled.html:653
 #, fuzzy
 msgid "Are you sure you want to delete this submission?"
-msgstr ""
+msgstr "Bu təqdimatı silmək istədiyinizə əminsiniz?"
 
 #: templates/course_page_enrolled.html:664
 msgid "Grade"
@@ -364,7 +372,7 @@ msgstr "Şərh"
 
 #: templates/course_page_enrolled.html:670
 msgid "Save Grade"
-msgstr ""
+msgstr "Qiyməti yadda saxla"
 
 #: templates/course_page_enrolled.html:678
 #, fuzzy
@@ -373,21 +381,23 @@ msgstr "Şərh:"
 
 #: templates/course_page_enrolled.html:684
 msgid "No submissions yet."
-msgstr ""
+msgstr "Hələ təqdimat yoxdur."
 
 #: templates/course_page_enrolled.html:692
 #, fuzzy
 msgid "No assignments available."
-msgstr ""
+msgstr "Heç bir tapşırıq yoxdur."
 
 #: templates/course_page_enrolled.html:697
 msgid "Enroll to Access Assignments"
-msgstr ""
+msgstr "Giriş tapşırıqlarına qeydiyyatdan keçin"
 
 #: templates/course_page_enrolled.html:698
 #, fuzzy
 msgid "You need to be enrolled in this course to view and submit assignments."
 msgstr ""
+"Tapşırıqlara baxmaq və təqdim etmək üçün bu kursda qeydiyyatdan "
+"keçməlisiniz."
 
 #: templates/course_page_enrolled.html:712
 #: templates/course_page_enrolled.html:768
@@ -397,19 +407,19 @@ msgstr "Cavab verin"
 #: templates/course_page_enrolled.html:722
 #: templates/course_page_enrolled.html:777
 msgid "Write a reply..."
-msgstr ""
+msgstr "Cavab yazın..."
 
 #: templates/course_page_enrolled.html:724
 #: templates/course_page_enrolled.html:779
 msgid "Post Reply"
-msgstr ""
+msgstr "Cavab Göndər"
 
 #: templates/course_page_enrolled.html:746
 #: templates/course_page_enrolled.html:946
 #: templates/course_page_enrolled.html:967
 #, fuzzy
 msgid "Add Announcement"
-msgstr ""
+msgstr "Elan əlavə edin"
 
 #: templates/course_page_enrolled.html:756
 #, fuzzy
@@ -419,29 +429,31 @@ msgstr "Göndərilən:"
 #: templates/course_page_enrolled.html:759
 #, fuzzy
 msgid ""
-"Are you sure you want to delete this announcement? This will also delete "
-"all replies."
+"Are you sure you want to delete this announcement? This will also delete all"
+" replies."
 msgstr ""
+"Bu elanı silmək istədiyinizə əminsiniz? Bu, həmçinin bütün cavabları "
+"siləcək."
 
 #: templates/course_page_enrolled.html:762
 #, fuzzy
 msgid "Delete Announcement"
-msgstr ""
+msgstr "Elanı silin"
 
 #: templates/course_page_enrolled.html:796
 #, fuzzy
 msgid "No announcements yet."
-msgstr ""
+msgstr "Hələ heç bir elan yoxdur."
 
 #: templates/course_page_enrolled.html:803
 #, fuzzy
 msgid "Course Reviews"
-msgstr ""
+msgstr "Kurs rəyləri"
 
 #: templates/course_page_enrolled.html:809
 #, fuzzy
 msgid "Write Your Review"
-msgstr ""
+msgstr "Rəyinizi Yazın"
 
 #: templates/course_page_enrolled.html:816
 #: templates/course_page_enrolled.html:899
@@ -450,33 +462,33 @@ msgstr "Reytinq"
 
 #: templates/course_page_enrolled.html:825
 msgid "Click on a star to rate (1-5)"
-msgstr ""
+msgstr "Qiymətləndirmək üçün ulduza klikləyin (1-5)"
 
 #: templates/course_page_enrolled.html:829
 #: templates/course_page_enrolled.html:910
 #, fuzzy
 msgid "Review Title"
-msgstr ""
+msgstr "Baxış Başlığı"
 
 #: templates/course_page_enrolled.html:830
 msgid "Summarize your experience"
-msgstr ""
+msgstr "Təcrübənizi ümumiləşdirin"
 
 #: templates/course_page_enrolled.html:834
 #: templates/course_page_enrolled.html:914
 #, fuzzy
 msgid "Your Review"
-msgstr ""
+msgstr "Rəyiniz"
 
 #: templates/course_page_enrolled.html:835
 #, fuzzy
 msgid "Share your thoughts about this course..."
-msgstr ""
+msgstr "Bu kurs haqqında fikirlərinizi bölüşün..."
 
 #: templates/course_page_enrolled.html:839
 #, fuzzy
 msgid "Submit Review"
-msgstr ""
+msgstr "Rəy göndərin"
 
 #: templates/course_page_enrolled.html:868
 msgid "Edit"
@@ -485,21 +497,21 @@ msgstr "Redaktə et"
 #: templates/course_page_enrolled.html:870
 #, fuzzy
 msgid "Are you sure you want to delete this review?"
-msgstr ""
+msgstr "Bu rəyi silmək istədiyinizə əminsiniz?"
 
 #: templates/course_page_enrolled.html:892
 #, fuzzy
 msgid "Edit Review"
-msgstr ""
+msgstr "Rəyi redaktə et"
 
 #: templates/course_page_enrolled.html:920
 #, fuzzy
 msgid "Update Review"
-msgstr ""
+msgstr "Yeniləmə Baxışı"
 
 #: templates/course_page_enrolled.html:931
 msgid "No reviews yet. Be the first to review this course!"
-msgstr ""
+msgstr "Hələ rəy yoxdur. Bu kursu ilk nəzərdən keçirən siz olun!"
 
 #: templates/course_page_enrolled.html:953
 #: templates/course_page_enrolled.html:1031
@@ -517,7 +529,7 @@ msgstr "Mesaj"
 #: templates/course_page_enrolled.html:1040
 #: templates/course_page_enrolled.html:1087
 msgid "Publish immediately"
-msgstr ""
+msgstr "Dərhal dərc edin"
 
 #: templates/course_page_enrolled.html:966
 #: templates/course_page_enrolled.html:1001
@@ -543,12 +555,12 @@ msgstr "Kök"
 #: templates/course_page_enrolled.html:992
 #, fuzzy
 msgid "Folder Name"
-msgstr ""
+msgstr "Qovluq Adı"
 
 #: templates/course_page_enrolled.html:1024
 #, fuzzy
 msgid "Upload to:"
-msgstr ""
+msgstr "Yüklə:"
 
 #: templates/course_page_enrolled.html:1027
 #, fuzzy
@@ -558,11 +570,11 @@ msgstr "Fayl"
 #: templates/course_page_enrolled.html:1044
 #, fuzzy
 msgid "Allow students to view this file"
-msgstr ""
+msgstr "Tələbələrə bu fayla baxmağa icazə verin"
 
 #: templates/course_page_enrolled.html:1078
 msgid "Due Date"
-msgstr ""
+msgstr "İki Tarix"
 
 #: templates/course_page_enrolled.html:1082
 #, fuzzy
@@ -571,7 +583,7 @@ msgstr "Xallar"
 
 #: templates/course_page_enrolled.html:1113
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "Təyinat Qovluğunu seçin"
 
 #: templates/course_page_enrolled.html:1124
 msgid "Move"
@@ -579,20 +591,20 @@ msgstr "Hərəkət et"
 
 #: templates/course_page_enrolled.html:1145
 msgid "Select New Parent Folder"
-msgstr ""
+msgstr "Yeni Ana Qovluğu seçin"
 
 #: templates/course_page_enrolled.html:1213
 #, fuzzy
 msgid "Move File:"
-msgstr ""
+msgstr "Faylı köçürün:"
 
 #: templates/course_page_enrolled.html:1224
 msgid "Move Folder:"
-msgstr ""
+msgstr "Qovluğu köçürün:"
 
 #: templates/index.html:7
 msgid "Yonca - Learning Platform"
-msgstr ""
+msgstr "Yonca - Öyrənmə Platforması"
 
 #: templates/components/navbar.html:18 templates/index.html:1206
 #: templates/index.html:1258
@@ -621,7 +633,7 @@ msgstr "Konfranslar"
 #: templates/components/navbar.html:30 templates/index.html:1217
 #: templates/index.html:1269 templates/index.html:1538
 msgid "TAVI Test"
-msgstr ""
+msgstr "TAVI Testi"
 
 #: templates/components/navbar.html:33 templates/index.html:1218
 #: templates/index.html:1270
@@ -630,7 +642,7 @@ msgstr "Əlaqələr"
 
 #: templates/index.html:1219 templates/index.html:1271
 msgid "About Company"
-msgstr ""
+msgstr "Şirkət haqqında"
 
 #: templates/components/navbar.html:61 templates/index.html:1230
 #: templates/index.html:1278 templates/login.html:248
@@ -653,112 +665,116 @@ msgstr "Çıxın"
 #: templates/index.html:1294 templates/index.html:1318
 #: templates/index.html:1581
 msgid "Welcome to Yonca"
-msgstr ""
+msgstr "Yonca-a xoş gəlmisiniz"
 
 #: templates/index.html:1295
 msgid "Your gateway to knowledge and community learning."
-msgstr ""
+msgstr "Bilik və icma öyrənmə qapınız."
 
 #: templates/index.html:1296
 msgid "Get Started"
-msgstr ""
+msgstr "Başlayın"
 
 #: templates/index.html:1300 templates/login.html:256
 msgid "Link Google Account"
-msgstr ""
+msgstr "Google Hesabını əlaqələndirin"
 
 #: templates/index.html:1319
 msgid "Join our learning community today!"
-msgstr ""
+msgstr "Bu gün öyrənmə cəmiyyətimizə qoşulun!"
 
 #: templates/index.html:1320
 msgid "Sign Up Now"
-msgstr ""
+msgstr "İndi Qeydiyyatdan Keçin"
 
 #: templates/index.html:1337 templates/index.html:1616
 msgid "What's New"
-msgstr ""
+msgstr "Yeniliklər"
 
 #: templates/index.html:1338 templates/index.html:1617
 msgid ""
-"Discover the latest updates, new features, and exciting developments in "
-"our learning platform."
+"Discover the latest updates, new features, and exciting developments in our "
+"learning platform."
 msgstr ""
+"Öyrənmə platformamızda ən son yeniləmələri, yeni funksiyaları və maraqlı "
+"inkişafları kəşf edin."
 
 #: templates/index.html:1373
 msgid ""
-"If video shows 'still being processed,' please wait 5-60 minutes for "
-"Google Drive to finish processing, then refresh the page."
+"If video shows 'still being processed,' please wait 5-60 minutes for Google "
+"Drive to finish processing, then refresh the page."
 msgstr ""
+"Video \"hələ emal olunur\" görünürsə, lütfən, Google Diskin işlənməsini "
+"tamamlaması üçün 5-60 dəqiqə gözləyin, sonra səhifəni yeniləyin."
 
 #: templates/index.html:1393
 #, fuzzy
 msgid "Learning Community"
-msgstr ""
+msgstr "Öyrənmə İcması"
 
 #: templates/index.html:1394
 #, fuzzy
 msgid "Our vibrant learning community"
-msgstr ""
+msgstr "Canlı öyrənmə icmamız"
 
 #: templates/index.html:1397 templates/index.html:1599
 msgid "Interactive Courses"
-msgstr ""
+msgstr "İnteraktiv kurslar"
 
 #: templates/index.html:1398
 #, fuzzy
 msgid "Engage with interactive course content"
-msgstr ""
+msgstr "İnteraktiv kurs məzmunu ilə məşğul olun"
 
 #: templates/index.html:1401 templates/index.html:1603
 msgid "Study Groups"
-msgstr ""
+msgstr "Tədris Qrupları"
 
 #: templates/index.html:1402
 #, fuzzy
 msgid "Collaborate in study groups"
-msgstr ""
+msgstr "Tədris qruplarında əməkdaşlıq edin"
 
 #: templates/index.html:1412
 msgid "Explore our available courses and start your learning journey."
-msgstr ""
+msgstr "Mövcud kurslarımızı araşdırın və öyrənmə səyahətinizə başlayın."
 
 #: templates/index.html:1416
 msgid "My Enrolled Courses"
-msgstr ""
+msgstr "Qeydiyyatdan Keçdiyim Kurslar"
 
 #: templates/index.html:1418
 msgid "Loading enrolled courses..."
-msgstr ""
+msgstr "Qeydiyyatdan keçmiş kurslar yüklənir..."
 
 #: templates/index.html:1424 templates/index.html:1828
 #: templates/index.html:1867
 msgid "Available Courses"
-msgstr ""
+msgstr "Mövcud Kurslar"
 
 #: templates/index.html:1426
 msgid "Loading courses..."
-msgstr ""
+msgstr "Kurslar yüklənir..."
 
 #: templates/index.html:1433
 msgid "Community Forum"
-msgstr ""
+msgstr "İcma Forumu"
 
 #: templates/index.html:1437
 msgid "Authentication Required"
-msgstr ""
+msgstr "Doğrulama Tələb olunur"
 
 #: templates/index.html:1438
 msgid "Please log in to participate in the community forum."
-msgstr ""
+msgstr "İcma forumunda iştirak etmək üçün daxil olun."
 
 #: templates/index.html:1439
 msgid "You can still view messages without logging in."
-msgstr ""
+msgstr "Siz hələ də daxil olmadan mesajlara baxa bilərsiniz."
 
 #: templates/index.html:1451
 msgid "Translation Settings"
-msgstr ""
+msgstr "Tərcümə Parametrləri"
 
 #: templates/index.html:1454
 msgid "Language:"
@@ -766,7 +782,7 @@ msgstr "Dil:"
 
 #: templates/index.html:1456
 msgid "Don't translate"
-msgstr ""
+msgstr "Tərcümə etməyin"
 
 #: templates/index.html:1457
 msgid "English"
@@ -782,14 +798,17 @@ msgstr "Azərbaycan"
 
 #: templates/index.html:1463
 msgid ""
-"Select a language to translate messages, or choose 'Don't translate' to "
-"view messages in their original language. Click individual messages to "
-"toggle translation."
+"Select a language to translate messages, or choose 'Don't translate' to view"
+" messages in their original language. Click individual messages to toggle "
+"translation."
 msgstr ""
+"Mesajları tərcümə etmək üçün dil seçin və ya mesajları orijinal dilində "
+"görmək üçün \"Tərcümə etməyin\" seçimini edin. Tərcüməni dəyişdirmək üçün "
+"fərdi mesajlara klikləyin."
 
 #: templates/index.html:1467
 msgid "Post a New Message"
-msgstr ""
+msgstr "Yeni Mesaj Göndərin"
 
 #: templates/index.html:1470 templates/login.html:230
 msgid "Username:"
@@ -801,51 +820,56 @@ msgstr "Mesaj:"
 
 #: templates/index.html:1475
 msgid "Share your thoughts, ask questions, or help others..."
-msgstr ""
+msgstr "Fikirlərinizi bölüşün, suallar verin və ya başqalarına kömək edin..."
 
 #: templates/index.html:1477
 msgid "Post Message"
-msgstr ""
+msgstr "Mesaj Göndər"
 
 #: templates/index.html:1482
 msgid "General Discussion"
-msgstr ""
+msgstr "Ümumi müzakirə"
 
 #: templates/index.html:1485
 msgid "Welcome to Yonca Forum!"
-msgstr ""
+msgstr "Yonca Foruma xoş gəlmisiniz!"
 
 #: templates/index.html:1486
 msgid ""
 "This is where community members can connect, ask questions, and share "
 "knowledge."
 msgstr ""
+"Burada icma üzvləri əlaqə saxlaya, suallar verə və biliklərini paylaşa "
+"bilərlər."
 
 #: templates/index.html:1487
 msgid "Posted on December 8, 2025"
-msgstr ""
+msgstr "8 dekabr 2025-ci ildə dərc edilib"
 
 #: templates/index.html:1497
 msgid "Download educational materials, documents, and access protected files."
 msgstr ""
+"Təhsil materiallarını, sənədləri yükləyin və qorunan fayllara daxil olun."
 
 #: templates/index.html:1500
 msgid "Learning Materials"
-msgstr ""
+msgstr "Tədris materialları"
 
 #: templates/index.html:1502
 msgid "Loading materials..."
-msgstr ""
+msgstr "Materiallar yüklənir..."
 
 #: templates/index.html:1507
 msgid "Upload Learning Material"
-msgstr ""
+msgstr "Tədris materialını yükləyin"
 
 #: templates/index.html:1508
 msgid ""
-"Upload documents, presentations, PDFs, or other materials. PIN protection"
-" will be automatically applied for security."
+"Upload documents, presentations, PDFs, or other materials. PIN protection "
+"will be automatically applied for security."
 msgstr ""
+"Sənədləri, təqdimatları, PDF sənədlərini və ya digər materialları yükləyin. "
+"Təhlükəsizlik üçün PİN qoruması avtomatik tətbiq olunacaq."
 
 #: templates/index.html:1511
 msgid "Title:"
@@ -857,31 +881,34 @@ msgstr "Təsvir:"
 
 #: templates/index.html:1519
 msgid "Preview Image (optional):"
-msgstr ""
+msgstr "Şəklin önizləməsi (istəyə görə):"
 
 #: templates/index.html:1521
 msgid "Upload an image to display as a preview for this resource"
-msgstr ""
+msgstr "Bu resurs üçün önizləmə kimi göstərmək üçün şəkil yükləyin"
 
 #: templates/index.html:1524
 msgid "Choose file..."
-msgstr ""
+msgstr "Fayl seçin..."
 
 #: templates/index.html:1528
-msgid "Access PIN will be auto-generated (6 characters, expires in 10 minutes)"
+msgid ""
+"Access PIN will be auto-generated (6 characters, expires in 10 minutes)"
 msgstr ""
+"Giriş PIN-i avtomatik yaradılacaq (6 simvol, müddəti 10 dəqiqə ərzində "
+"bitir)"
 
 #: templates/index.html:1530 templates/index.html:2442
 msgid "Upload Material"
-msgstr ""
+msgstr "Materialı yükləyin"
 
 #: templates/index.html:1540
 msgid "TAVI Test section is coming soon."
-msgstr ""
+msgstr "Tezliklə TAVI Test bölməsi gəlir."
 
 #: templates/index.html:1546
 msgid "Contact Us"
-msgstr ""
+msgstr "Bizimlə əlaqə saxlayın"
 
 #: templates/index.html:1550
 msgid "WhatsApp"
@@ -889,7 +916,7 @@ msgstr "WhatsApp"
 
 #: templates/index.html:1555
 msgid "Available: Mon-Fri, 9AM-6PM"
-msgstr ""
+msgstr "Mövcuddur: Bazar ertəsi-Cümə, 9:00-18:00"
 
 #: templates/index.html:1560
 msgid "Email"
@@ -897,7 +924,7 @@ msgstr "E-poçt"
 
 #: templates/index.html:1565
 msgid "We respond within 24 hours"
-msgstr ""
+msgstr "24 saat ərzində cavab veririk"
 
 #: templates/index.html:1570
 msgid "Location"
@@ -905,105 +932,109 @@ msgstr "Məkan"
 
 #: templates/index.html:1573
 msgid "Baku, Azerbaijan"
-msgstr ""
+msgstr "Bakı, Azərbaycan"
 
 #: templates/index.html:1582
 msgid ""
 "Join our learning community and discover amazing features designed to "
 "enhance your educational experience."
 msgstr ""
+"Öyrənmə icmamıza qoşulun və təhsil təcrübənizi artırmaq üçün hazırlanmış "
+"heyrətamiz xüsusiyyətləri kəşf edin."
 
 #: templates/index.html:1586
 msgid "Our Features"
-msgstr ""
+msgstr "Xüsusiyyətlərimiz"
 
 #: templates/index.html:1587
 msgid "Discover what makes our platform special."
-msgstr ""
+msgstr "Platformamızı nəyin xüsusi etdiyini kəşf edin."
 
 #: templates/index.html:1600
 msgid "Engage with dynamic course content and interactive learning materials."
 msgstr ""
+"Dinamik kurs məzmunu və interaktiv təlim materialları ilə məşğul olun."
 
 #: templates/index.html:1604
 msgid "Collaborate with fellow learners in our vibrant study communities."
-msgstr ""
+msgstr "Canlı təhsil icmalarımızda həmkarlarımızla əməkdaşlıq edin."
 
 #: templates/index.html:1607
 msgid "Expert Support"
-msgstr ""
+msgstr "Ekspert Dəstəyi"
 
 #: templates/index.html:1608
 msgid "Get help from our team of educational experts and specialists."
-msgstr ""
+msgstr "Təhsil ekspertləri və mütəxəssislər komandamızdan kömək alın."
 
 #: templates/index.html:1691
 msgid ""
-"Join our live and recorded webinars to learn from experts in various "
-"fields."
+"Join our live and recorded webinars to learn from experts in various fields."
 msgstr ""
+"Müxtəlif sahələrdə ekspertlərdən öyrənmək üçün canlı və qeydə alınmış "
+"vebinarlarımıza qoşulun."
 
 #: templates/index.html:1693
 msgid "Webinars section coming soon..."
-msgstr ""
+msgstr "Webinarlar bölməsi tezliklə..."
 
 #: templates/index.html:1700
 msgid "Participate in our educational conferences and networking events."
-msgstr ""
+msgstr "Təhsil konfranslarımızda və şəbəkələşmə tədbirlərimizdə iştirak edin."
 
 #: templates/index.html:1702
 msgid "Conferences section coming soon..."
-msgstr ""
+msgstr "Konfrans bölməsi tezliklə..."
 
 #: templates/index.html:1826
 msgid "You're enrolled in all available courses!"
-msgstr ""
+msgstr "Siz bütün mövcud kurslara yazılmısınız!"
 
 #: templates/index.html:1827
 msgid "Error loading courses. Please try again."
-msgstr ""
+msgstr "Kursları yükləmə xətası. Yenidən cəhd edin."
 
 #: templates/index.html:1848
 msgid "No courses available at the moment."
-msgstr ""
+msgstr "Hazırda mövcud kurs yoxdur."
 
 #: templates/index.html:1864
 msgid "Other Available Courses"
-msgstr ""
+msgstr "Digər Mövcud Kurslar"
 
 #: templates/index.html:1998
 msgid "Loading..."
-msgstr ""
+msgstr "Yüklənir..."
 
 #: templates/index.html:1999 templates/index.html:2011
 #: templates/index.html:2018
 msgid "View Details"
-msgstr ""
+msgstr "Təfərrüatlara baxın"
 
 #: templates/index.html:2010
 msgid "Enroll Now"
-msgstr ""
+msgstr "İndi qeydiyyatdan keçin"
 
 #: templates/index.html:2073
 msgid "Enrolling in"
-msgstr ""
+msgstr "Qeydiyyatdan keçirilir"
 
 #: templates/index.html:2143
 msgid "No materials available at the moment."
-msgstr ""
+msgstr "Hazırda heç bir material yoxdur."
 
 #: templates/index.html:2161
 msgid "Log In to Access"
-msgstr ""
+msgstr "Access üçün daxil olun"
 
 #: templates/index.html:2164 templates/index.html:2184
 #: templates/index.html:2219
 msgid "View Resource"
-msgstr ""
+msgstr "Mənbəyə baxın"
 
 #: templates/index.html:2174
 msgid "Expires in:"
-msgstr ""
+msgstr "Müddəti bitir:"
 
 #: templates/index.html:2174
 msgid "minutes"
@@ -1011,24 +1042,24 @@ msgstr "dəqiqə"
 
 #: templates/index.html:2176
 msgid "PIN has expired"
-msgstr ""
+msgstr "PİN-in vaxtı keçib"
 
 #: templates/index.html:2180 templates/index.html:2271
 msgid "Your Access PIN:"
-msgstr ""
+msgstr "Giriş PIN kodunuz:"
 
 #: templates/index.html:2182 templates/index.html:2273
 msgid "Share this PIN with others to grant access"
-msgstr ""
+msgstr "Giriş icazəsi vermək üçün bu PIN kodu başqaları ilə paylaşın"
 
 #: templates/index.html:2187 templates/index.html:2278
 msgid "Request Access"
-msgstr ""
+msgstr "Giriş sorğusu"
 
 #: templates/index.html:2195 templates/index.html:2215
 #: templates/index.html:2283
 msgid "No description available"
-msgstr ""
+msgstr "Təsvir mövcud deyil"
 
 #: templates/index.html:2197 templates/index.html:2217
 #: templates/index.html:2285
@@ -1037,83 +1068,83 @@ msgstr "Yükləndi:"
 
 #: templates/index.html:2201 templates/index.html:2221
 msgid "Are you sure you want to delete this resource?"
-msgstr ""
+msgstr "Bu resursu silmək istədiyinizə əminsiniz?"
 
 #: templates/index.html:2238
 msgid "Error loading materials. Please try again."
-msgstr ""
+msgstr "Materialları yükləmə xətası. Yenidən cəhd edin."
 
 #: templates/index.html:2254
 msgid "No PDF documents available at the moment."
-msgstr ""
+msgstr "Hazırda heç bir PDF sənədi mövcud deyil."
 
 #: templates/index.html:2275
 msgid "Access PDF"
-msgstr ""
+msgstr "PDF-ə daxil olun"
 
 #: templates/index.html:2289
 msgid "Are you sure you want to delete this PDF?"
-msgstr ""
+msgstr "Bu PDF-i silmək istədiyinizə əminsiniz?"
 
 #: templates/index.html:2300
 msgid "Error loading PDFs. Please try again."
-msgstr ""
+msgstr "PDF-ləri yükləmə xətası. Yenidən cəhd edin."
 
 #: templates/index.html:2306
 msgid "Enter access PIN for:"
-msgstr ""
+msgstr "Giriş PIN kodunu daxil edin:"
 
 #: templates/index.html:2332
 msgid "Invalid PIN or access denied."
-msgstr ""
+msgstr "Yanlış PIN və ya giriş rədd edildi."
 
 #: templates/index.html:2336
 msgid "Error accessing resource. Please try again."
-msgstr ""
+msgstr "Mənbəyə daxil olma xətası. Yenidən cəhd edin."
 
 #: templates/index.html:2350 templates/index.html:2352
 msgid "Uploading PDF..."
-msgstr ""
+msgstr "PDF yüklənir..."
 
 #: templates/index.html:2374
 msgid "PDF uploaded successfully! Access PIN:"
-msgstr ""
+msgstr "PDF uğurla yükləndi! Giriş PIN kodu:"
 
 #: templates/index.html:2382 templates/index.html:2386
 msgid "Error uploading PDF. Please try again."
-msgstr ""
+msgstr "PDF yükləmə xətası. Yenidən cəhd edin."
 
 #: templates/index.html:2389
 msgid "Upload PDF"
-msgstr ""
+msgstr "PDF yükləyin"
 
 #: templates/index.html:2403
 msgid "Uploading..."
-msgstr ""
+msgstr "Yüklənir..."
 
 #: templates/index.html:2405
 msgid "Uploading resource..."
-msgstr ""
+msgstr "Resurs yüklənir..."
 
 #: templates/index.html:2427
 msgid "Material uploaded successfully! Access PIN:"
-msgstr ""
+msgstr "Material uğurla yükləndi! Giriş PIN kodu:"
 
 #: templates/index.html:2435
 msgid "Error uploading material. Please try again."
-msgstr ""
+msgstr "Material yüklənərkən xəta baş verdi. Yenidən cəhd edin."
 
 #: templates/index.html:2439
 msgid "Error uploading resource. Please try again."
-msgstr ""
+msgstr "Mənbə yüklənərkən xəta baş verdi. Yenidən cəhd edin."
 
 #: templates/index.html:3670 templates/login.html:245 templates/terms.html:80
 msgid "Terms of Service"
-msgstr ""
+msgstr "Xidmət Şərtləri"
 
 #: templates/login.html:218
 msgid "Login to Your Account"
-msgstr ""
+msgstr "Hesabınıza daxil olun"
 
 #: templates/login.html:234
 msgid "Password:"
@@ -1121,192 +1152,221 @@ msgstr "Şifrə:"
 
 #: templates/login.html:239
 msgid "Login as Administrator"
-msgstr ""
+msgstr "Administrator olaraq daxil olun"
 
 #: templates/login.html:244
 msgid "I acknowledge that I have read and agree to the"
-msgstr ""
+msgstr "Oxuduğumu və razılaşdığımı qəbul edirəm"
 
 #: templates/login.html:252
 msgid "Login with Google"
-msgstr ""
+msgstr "Google ilə daxil olun"
 
 #: templates/login.html:260
 msgid "Back to Yonca"
-msgstr ""
+msgstr "Yonca səhifəsinə qayıt"
 
 #: templates/terms.html:6
 msgid "Terms of Service - Yonca"
-msgstr ""
+msgstr "Xidmət Şərtləri - Yonca"
 
 #: templates/terms.html:82
 msgid "Last updated:"
-msgstr ""
+msgstr "Son yeniləmə:"
 
 #: templates/terms.html:82
 msgid "January 2026"
-msgstr ""
+msgstr "Yanvar 2026"
 
 #: templates/terms.html:84
 msgid "Welcome to"
-msgstr ""
+msgstr "xoş gəlmisiniz"
 
 #: templates/terms.html:84
 msgid "(the \"Service\", \"Platform\", \"Website\"), operated by"
-msgstr ""
+msgstr "(\"Xidmət\", \"Platforma\", \"Veb sayt\"), tərəfindən idarə olunur"
 
 #: templates/terms.html:84
 msgid ""
 "(\"we\", \"us\", \"our\"). By accessing or using Yonca, you agree to be "
-"bound by these Terms of Service (\"Terms\"). If you do not agree with any"
-" part of these Terms, you must not use the Service."
+"bound by these Terms of Service (\"Terms\"). If you do not agree with any "
+"part of these Terms, you must not use the Service."
 msgstr ""
+"(\"biz\", \"biz\", \"bizim\"). Yonca daxil olmaqla və ya istifadə etməklə "
+"siz bu Xidmət Şərtləri (\"Şərtlər\") ilə bağlı olmağa razılaşırsınız. Bu "
+"Şərtlərin hər hansı hissəsi ilə razı deyilsinizsə, Xidmətdən istifadə "
+"etməməlisiniz."
 
 #: templates/terms.html:88
 msgid "1. Eligibility"
-msgstr ""
+msgstr "1. Uyğunluq"
 
 #: templates/terms.html:90
 msgid "You must be at least"
-msgstr ""
+msgstr "Heç olmasa olmalısan"
 
 #: templates/terms.html:90
 msgid "years old"
-msgstr ""
+msgstr "yaş"
 
 #: templates/terms.html:90
 msgid ""
 "to use Yonca. If you are under the age of 18, you confirm that you have "
 "permission from a parent or legal guardian."
 msgstr ""
+"Yonca istifadə etmək. 18 yaşdan kiçiksinizsə, valideyndən və ya qanuni "
+"qəyyumdan icazə aldığınızı təsdiq edirsiniz."
 
 #: templates/terms.html:91
-msgid "You represent that the information you provide is accurate and complete."
-msgstr ""
+msgid ""
+"You represent that the information you provide is accurate and complete."
+msgstr "Siz təqdim etdiyiniz məlumatın dəqiq və tam olduğunu bildirirsiniz."
 
 #: templates/terms.html:94
 msgid "2. Accounts and Authentication"
-msgstr ""
+msgstr "2. Hesablar və Doğrulama"
 
 #: templates/terms.html:96
 msgid "Some features require creating an account."
-msgstr ""
+msgstr "Bəzi xüsusiyyətlər hesab yaratmağı tələb edir."
 
 #: templates/terms.html:97
 msgid ""
 "You are responsible for maintaining the confidentiality of your login "
 "credentials and for all activities that occur under your account."
 msgstr ""
+"Siz giriş məlumatlarınızın məxfiliyinin qorunmasına və hesabınız altında baş"
+" verən bütün fəaliyyətlərə cavabdehsiniz."
 
 #: templates/terms.html:98
 msgid ""
-"You agree not to share your account or use another user's account without"
-" permission."
+"You agree not to share your account or use another user's account without "
+"permission."
 msgstr ""
+"Hesabınızı paylaşmamağa və ya icazəsiz başqa istifadəçinin hesabından "
+"istifadə etməməyə razılaşırsınız."
 
 #: templates/terms.html:99
 msgid ""
 "We reserve the right to suspend or terminate accounts that violate these "
 "Terms."
 msgstr ""
+"Biz bu Şərtləri pozan hesabları dayandırmaq və ya ləğv etmək hüququnu "
+"özümüzdə saxlayırıq."
 
 #: templates/terms.html:102
 msgid "3. User Content"
-msgstr ""
+msgstr "3. İstifadəçi məzmunu"
 
 #: templates/terms.html:104
 msgid "3.1 Content You Provide"
-msgstr ""
+msgstr "3.1 Təqdim etdiyiniz Məzmun"
 
 #: templates/terms.html:105
 msgid ""
-"Yonca may allow you to submit, upload, store, or share content such as "
-"text, images, files, or messages (\"User Content\")."
+"Yonca may allow you to submit, upload, store, or share content such as text,"
+" images, files, or messages (\"User Content\")."
 msgstr ""
+"Yonca sizə mətn, şəkillər, fayllar və ya mesajlar (\"İstifadəçi Məzmunu\") "
+"kimi məzmunu təqdim etməyə, yükləməyə, saxlamağa və ya paylaşmağa icazə verə"
+" bilər."
 
 #: templates/terms.html:106
 msgid ""
-"You retain ownership of your User Content. However, by submitting "
-"content, you grant Yonca a"
+"You retain ownership of your User Content. However, by submitting content, "
+"you grant Yonca a"
 msgstr ""
+"İstifadəçi Məzmununuzun sahibliyini saxlayırsınız. Bununla belə, məzmunu "
+"təqdim etməklə siz Yonca a"
 
 #: templates/terms.html:106
 msgid "non-exclusive, worldwide, royalty-free license"
-msgstr ""
+msgstr "qeyri-eksklüziv, dünya miqyasında, royaltisiz lisenziya"
 
 #: templates/terms.html:106
 msgid ""
-"to host, store, process, and display the content solely for operating and"
-" improving the Service."
+"to host, store, process, and display the content solely for operating and "
+"improving the Service."
 msgstr ""
+"məzmunu yalnız Xidməti idarə etmək və təkmilləşdirmək üçün yerləşdirmək, "
+"saxlamaq, emal etmək və göstərmək."
 
 #: templates/terms.html:108
 msgid "3.2 Responsibility for Content"
-msgstr ""
+msgstr "3.2 Məzmun üçün məsuliyyət"
 
 #: templates/terms.html:109
 msgid ""
-"You are solely responsible for your User Content. You agree not to upload"
-" or share content that:"
+"You are solely responsible for your User Content. You agree not to upload or"
+" share content that:"
 msgstr ""
+"İstifadəçi Məzmununuza görə yalnız siz məsuliyyət daşıyırsınız. Aşağıdakı "
+"məzmunu yükləməməyə və ya paylaşmamağa razılaşırsınız:"
 
 #: templates/terms.html:111
 msgid "Is illegal, fraudulent, or misleading"
-msgstr ""
+msgstr "Qanunsuz, fırıldaqçı və ya aldadıcıdır"
 
 #: templates/terms.html:112
 msgid "Infringes intellectual property or privacy rights"
-msgstr ""
+msgstr "Əqli mülkiyyət və ya məxfilik hüquqlarını pozur"
 
 #: templates/terms.html:113
 msgid "Contains malware, viruses, or harmful code"
-msgstr ""
+msgstr "Zərərli proqram, virus və ya zərərli kod ehtiva edir"
 
 #: templates/terms.html:114
 msgid "Is abusive, hateful, or harassing"
-msgstr ""
+msgstr "Təhqiredici, nifrət dolu və ya təcavüzkardır"
 
 #: templates/terms.html:116
 msgid "We may remove content that violates these Terms or applicable laws."
-msgstr ""
+msgstr "Bu Şərtləri və ya müvafiq qanunları pozan məzmunu silə bilərik."
 
 #: templates/terms.html:118
 msgid "4. File Storage and Third-Party Services"
-msgstr ""
+msgstr "4. Fayl Saxlama və Üçüncü Tərəf Xidmətləri"
 
 #: templates/terms.html:120
 msgid "Yonca may use"
-msgstr ""
+msgstr "Yonca istifadə edə bilər"
 
 #: templates/terms.html:120
 msgid "third-party services"
-msgstr ""
+msgstr "üçüncü tərəf xidmətləri"
 
 #: templates/terms.html:120
 msgid ""
-"(such as cloud storage, APIs, or translation services) to operate "
-"features like file uploads, backups, or content processing."
+"(such as cloud storage, APIs, or translation services) to operate features "
+"like file uploads, backups, or content processing."
 msgstr ""
+"fayl yükləmələri, ehtiyat nüsxələri və ya məzmun emalı kimi funksiyaları "
+"idarə etmək üçün (bulud yaddaşı, API və ya tərcümə xidmətləri kimi)."
 
 #: templates/terms.html:121
 msgid ""
-"Your content may be processed or stored through these services strictly "
-"for functionality."
+"Your content may be processed or stored through these services strictly for "
+"functionality."
 msgstr ""
+"Məzmununuz bu xidmətlər vasitəsilə ciddi şəkildə funksionallıq üçün işlənə "
+"və ya saxlanıla bilər."
 
 #: templates/terms.html:122
 msgid ""
-"Yonca is not responsible for outages, data loss, or changes caused by "
-"third-party providers, to the extent permitted by law."
+"Yonca is not responsible for outages, data loss, or changes caused by third-"
+"party providers, to the extent permitted by law."
 msgstr ""
+"Yonca qanunla icazə verilən həddə üçüncü tərəf provayderlərinin səbəb olduğu"
+" kəsilmələrə, məlumat itkilərinə və ya dəyişikliklərə görə məsuliyyət "
+"daşımır."
 
 #: templates/terms.html:125
 msgid "4.1 Google Drive Integration"
-msgstr ""
+msgstr "4.1 Google Disk İnteqrasiyası"
 
 #: templates/terms.html:127
 msgid "Yonca may allow users to connect their"
-msgstr ""
+msgstr "Yonca istifadəçilərə özlərinə qoşulmağa icazə verə bilər"
 
 #: templates/terms.html:127
 msgid "account"
@@ -1314,23 +1374,27 @@ msgstr "hesab"
 
 #: templates/terms.html:127
 msgid ""
-"using Google OAuth 2.0 for purposes such as uploading, storing, "
-"accessing, or managing files."
+"using Google OAuth 2.0 for purposes such as uploading, storing, accessing, "
+"or managing files."
 msgstr ""
+"faylları yükləmək, saxlamaq, daxil olmaq və ya idarə etmək kimi məqsədlər "
+"üçün Google OAuth 2.0 istifadə etmək."
 
 #: templates/terms.html:128
 msgid "When you connect Google Drive, Yonca accesses only the"
-msgstr ""
+msgstr "Google Diski bağladığınız zaman Yonca yalnız"
 
 #: templates/terms.html:128
 msgid "minimum permissions required"
-msgstr ""
+msgstr "minimum icazələr tələb olunur"
 
 #: templates/terms.html:128
 msgid ""
 "to provide the requested functionality, as disclosed during the Google "
 "authorization process."
 msgstr ""
+"Google avtorizasiya prosesi zamanı açıqlanan tələb olunan funksionallığı "
+"təmin etmək."
 
 #: templates/terms.html:129
 msgid "Yonca"
@@ -1338,139 +1402,161 @@ msgstr "__QORUNMALI_0__"
 
 #: templates/terms.html:129
 msgid "does not access, read, or modify"
-msgstr ""
+msgstr "daxil olmur, oxumur və ya dəyişdirmir"
 
 #: templates/terms.html:129
 msgid "files outside the scope explicitly permitted by you."
-msgstr ""
+msgstr "açıq şəkildə icazə verdiyiniz çərçivədən kənar fayllar."
 
 #: templates/terms.html:130
 msgid ""
 "Files uploaded or managed via Google Drive remain under your control and "
 "subject to"
 msgstr ""
+"Google Disk vasitəsilə yüklənmiş və ya idarə olunan fayllar nəzarətinizdə və"
+" tabeliyində qalır"
 
 #: templates/terms.html:130
 msgid "Google's own Terms of Service and Privacy Policy"
-msgstr ""
+msgstr "Google-un öz Xidmət Şərtləri və Məxfilik Siyasəti"
 
 #: templates/terms.html:131
 msgid ""
-"You may revoke Yonca's access to your Google Drive at any time through "
-"your Google Account security settings."
+"You may revoke Yonca's access to your Google Drive at any time through your "
+"Google Account security settings."
 msgstr ""
+"Siz istənilən vaxt Google Hesabınızın təhlükəsizlik parametrləri vasitəsilə "
+"Yonca-ın Google Diskinizə girişini ləğv edə bilərsiniz."
 
 #: templates/terms.html:134
 msgid "5. Translations and Automated Features"
-msgstr ""
+msgstr "5. Tərcümələr və Avtomatlaşdırılmış Xüsusiyyətlər"
 
 #: templates/terms.html:136
 msgid "Yonca may provide automated features such as"
-msgstr ""
+msgstr "Yonca kimi avtomatlaşdırılmış funksiyaları təmin edə bilər"
 
 #: templates/terms.html:136
 msgid "machine translations or AI-assisted tools"
-msgstr ""
+msgstr "maşın tərcümələri və ya süni intellektlə dəstəklənən alətlər"
 
 #: templates/terms.html:137
 msgid ""
 "These features are provided \"as is\" and may contain errors or "
 "inaccuracies."
 msgstr ""
+"Bu xüsusiyyətlər \"olduğu kimi\" verilir və səhvlər və ya qeyri-dəqiqliklər "
+"ola bilər."
 
 #: templates/terms.html:138
 msgid ""
-"Yonca does not guarantee the correctness, completeness, or suitability of"
-" automatically generated results."
+"Yonca does not guarantee the correctness, completeness, or suitability of "
+"automatically generated results."
 msgstr ""
+"Yonca avtomatik yaradılan nəticələrin düzgünlüyünə, tamlığına və ya "
+"uyğunluğuna zəmanət vermir."
 
 #: templates/terms.html:141
 msgid "6. Acceptable Use"
-msgstr ""
+msgstr "6. Məqbul istifadə"
 
 #: templates/terms.html:142
 msgid "You agree not to:"
-msgstr ""
+msgstr "Siz razılaşırsınız:"
 
 #: templates/terms.html:144
-msgid "Abuse, overload, or attempt to disrupt the Service or its infrastructure"
+msgid ""
+"Abuse, overload, or attempt to disrupt the Service or its infrastructure"
 msgstr ""
+"Xidmətdən və ya onun infrastrukturundan sui-istifadə, həddindən artıq "
+"yükləmə və ya pozmağa cəhd"
 
 #: templates/terms.html:145
 msgid "Attempt unauthorized access to systems, accounts, or data"
 msgstr ""
+"Sistemlərə, hesablara və ya məlumatlara icazəsiz daxil olmağa cəhd edin"
 
 #: templates/terms.html:146
 msgid "Use Yonca for spam, scraping, or automated misuse"
 msgstr ""
+"Spam, kazıma və ya avtomatlaşdırılmış sui-istifadə üçün Yonca istifadə edin"
 
 #: templates/terms.html:147
 msgid "Circumvent security or access controls"
-msgstr ""
+msgstr "Təhlükəsizlik və ya giriş nəzarətlərini aşmaq"
 
 #: templates/terms.html:150
 msgid "7. Intellectual Property"
-msgstr ""
+msgstr "7. Əqli Mülkiyyət"
 
 #: templates/terms.html:152
 msgid ""
-"The Yonca name, logo, design, and all platform-related content (excluding"
-" User Content) are owned by Yonca or its licensors."
+"The Yonca name, logo, design, and all platform-related content (excluding "
+"User Content) are owned by Yonca or its licensors."
 msgstr ""
+"Yonca adı, loqosu, dizaynı və platforma ilə əlaqəli bütün məzmun (İstifadəçi"
+" Məzmunu istisna olmaqla) Yonca və ya onun lisenziyalaşdırıcılarına "
+"məxsusdur."
 
 #: templates/terms.html:153
 msgid ""
-"You may not copy, modify, distribute, or reverse-engineer any part of the"
-" Service without written permission."
+"You may not copy, modify, distribute, or reverse-engineer any part of the "
+"Service without written permission."
 msgstr ""
+"Siz yazılı icazə olmadan Xidmətin hər hansı hissəsini köçürə, dəyişdirə, "
+"paylaya və ya tərsinə çevirə bilməzsiniz."
 
 #: templates/terms.html:156
 msgid "8. Privacy"
-msgstr ""
+msgstr "8. Məxfilik"
 
 #: templates/terms.html:157
 msgid "Your use of Yonca is also governed by our"
-msgstr ""
+msgstr "Sizin Yonca istifadəniz də bizim tərəfindən idarə olunur"
 
 #: templates/terms.html:157
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Məxfilik Siyasəti"
 
 #: templates/terms.html:157
 msgid "which explains how we collect, use, and protect your data."
 msgstr ""
+"məlumatlarınızı necə topladığımızı, istifadə etdiyimizi və qoruduğumuzu izah"
+" edir."
 
 #: templates/terms.html:159
 msgid "9. Termination"
-msgstr ""
+msgstr "9. Xitam"
 
 #: templates/terms.html:161
 msgid "You may stop using Yonca at any time."
-msgstr ""
+msgstr "İstənilən vaxt Yonca istifadəsini dayandıra bilərsiniz."
 
 #: templates/terms.html:162
 msgid ""
 "We may suspend or terminate your access immediately if you violate these "
 "Terms or if required by law."
 msgstr ""
+"Bu Şərtləri pozarsanız və ya qanunla tələb olunarsa, girişinizi dərhal "
+"dayandıra və ya ləğv edə bilərik."
 
 #: templates/terms.html:163
 msgid ""
-"Upon termination, access to your account and stored content may be "
-"removed."
+"Upon termination, access to your account and stored content may be removed."
 msgstr ""
+"Ləğv edildikdən sonra hesabınıza və saxlanılan məzmuna giriş silinə bilər."
 
 #: templates/terms.html:166
 msgid "10. Disclaimer of Warranties"
-msgstr ""
+msgstr "10. Zəmanətlərdən imtina"
 
 #: templates/terms.html:167
 msgid "Yonca is provided"
-msgstr ""
+msgstr "__QORUNMALI_0__ təmin edilir"
 
 #: templates/terms.html:167
 msgid "as is"
-msgstr ""
+msgstr "olduğu kimi"
 
 #: templates/terms.html:167
 msgid "and"
@@ -1478,79 +1564,92 @@ msgstr "və"
 
 #: templates/terms.html:167
 msgid "as available"
-msgstr ""
+msgstr "mövcud olduğu kimi"
 
 #: templates/terms.html:167
 msgid "To the maximum extent permitted by law:"
-msgstr ""
+msgstr "Qanunla icazə verilən maksimum həddə:"
 
 #: templates/terms.html:169
 msgid "We make no warranties regarding availability, reliability, or accuracy"
 msgstr ""
+"Biz mövcudluq, etibarlılıq və ya dəqiqliklə bağlı heç bir zəmanət vermirik"
 
 #: templates/terms.html:170
 msgid "We do not guarantee uninterrupted or error-free operation"
-msgstr ""
+msgstr "Biz fasiləsiz və ya səhvsiz işləməyə zəmanət vermirik"
 
 #: templates/terms.html:173
 msgid "11. Limitation of Liability"
-msgstr ""
+msgstr "11. Məsuliyyətin məhdudlaşdırılması"
 
 #: templates/terms.html:174
 msgid "To the extent permitted by law, Yonca shall not be liable for:"
 msgstr ""
+"Qanunla icazə verilən həddə, Yonca aşağıdakılara görə məsuliyyət daşımır:"
 
 #: templates/terms.html:176
 msgid "Indirect, incidental, or consequential damages"
-msgstr ""
+msgstr "Dolayı, təsadüfi və ya nəticəli zərərlər"
 
 #: templates/terms.html:177
 msgid "Loss of data, profits, or business opportunities"
-msgstr ""
+msgstr "Məlumatların, mənfəətin və ya biznes imkanlarının itirilməsi"
 
 #: templates/terms.html:178
 msgid "Issues caused by third-party services or user actions"
 msgstr ""
+"Üçüncü tərəf xidmətləri və ya istifadəçi hərəkətləri nəticəsində yaranan "
+"problemlər"
 
 #: templates/terms.html:181
 msgid "12. Changes to the Terms"
-msgstr ""
+msgstr "12. Şərtlərə Dəyişikliklər"
 
 #: templates/terms.html:182
 msgid ""
-"We may update these Terms from time to time. Continued use of Yonca after"
-" changes become effective constitutes acceptance of the revised Terms."
+"We may update these Terms from time to time. Continued use of Yonca after "
+"changes become effective constitutes acceptance of the revised Terms."
 msgstr ""
+"Biz bu Şərtləri vaxtaşırı yeniləyə bilərik. Dəyişikliklər qüvvəyə mindikdən "
+"sonra Yonca-dan davamlı istifadə yenidən işlənmiş Şərtlərin qəbul edilməsini"
+" təşkil edir."
 
 #: templates/terms.html:184
 msgid "13. Governing Law"
-msgstr ""
+msgstr "13. İdarəetmə Qanunu"
 
 #: templates/terms.html:185
 msgid ""
 "These Terms are governed by and construed in accordance with applicable "
 "laws, without regard to conflict of law principles."
 msgstr ""
+"Bu Şərtlər qanunun ziddiyyəti prinsiplərindən asılı olmayaraq, qüvvədə olan "
+"qanunlarla tənzimlənir və onlara uyğun şərh edilir."
 
 #: templates/terms.html:187
 msgid "14. Contact"
-msgstr ""
+msgstr "14. Əlaqə"
 
 #: templates/terms.html:188
 msgid ""
-"If you have questions about these Terms, please contact us through the "
-"Yonca website."
+"If you have questions about these Terms, please contact us through the Yonca"
+" website."
 msgstr ""
+"Bu Şərtlərlə bağlı suallarınız varsa, lütfən, Yonca vebsaytı vasitəsilə "
+"bizimlə əlaqə saxlayın."
 
 #: templates/terms.html:192
 msgid ""
-"By using Yonca, you acknowledge that you have read, understood, and agree"
-" to these Terms of Service."
+"By using Yonca, you acknowledge that you have read, understood, and agree to"
+" these Terms of Service."
 msgstr ""
+"Yonca istifadə etməklə siz bu Xidmət Şərtlərini oxuduğunuzu, başa "
+"düşdüyünüzü və razılaşdığınızı təsdiq edirsiniz."
 
 #: templates/terms.html:194
 msgid "Back to Home"
-msgstr ""
+msgstr "Evə qayıt"
 
 #: templates/components/navbar.html:36
 msgid "About"
@@ -1562,5 +1661,4 @@ msgstr "Profil"
 
 #: templates/components/navbar.html:53
 msgid "Admin Panel"
-msgstr ""
-
+msgstr "İdarəetmə Paneli"

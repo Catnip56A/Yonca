@@ -10,20 +10,19 @@ msgstr ""
 "POT-Creation-Date: 2026-01-19 19:56+0400\n"
 "PO-Revision-Date: 2026-01-18 12:33+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: templates/course_description.html:128
 #: templates/course_page_enrolled.html:373
 #, fuzzy
 msgid "Course Features"
-msgstr ""
+msgstr "Особенности курса"
 
 #: templates/components/navbar.html:24 templates/course_description.html:133
 #: templates/course_page_enrolled.html:378 templates/index.html:1215
@@ -34,12 +33,12 @@ msgstr "Форум"
 #: templates/course_description.html:134
 #: templates/course_page_enrolled.html:379
 msgid "Connect with fellow learners and get help from instructors."
-msgstr ""
+msgstr "Общайтесь с другими учениками и получайте помощь от преподавателей."
 
 #: templates/course_description.html:135
 #: templates/course_page_enrolled.html:380
 msgid "Access Forum"
-msgstr ""
+msgstr "Доступ к форуму"
 
 #: templates/components/navbar.html:27 templates/course_description.html:141
 #: templates/course_page_enrolled.html:386 templates/index.html:1216
@@ -51,12 +50,13 @@ msgstr "Ресурсы"
 #: templates/course_page_enrolled.html:387
 msgid "Access course materials, documents, and additional resources."
 msgstr ""
+"Получите доступ к материалам курса, документам и дополнительным ресурсам."
 
 #: templates/course_description.html:143
 #: templates/course_page_enrolled.html:388
 #, fuzzy
 msgid "Access Resources"
-msgstr ""
+msgstr "Доступ к ресурсам"
 
 #: templates/course_description.html:149
 #: templates/course_page_enrolled.html:246
@@ -67,28 +67,28 @@ msgstr "Отзывы"
 #: templates/course_description.html:150
 #: templates/course_page_enrolled.html:395
 msgid "Read reviews from other students and share your experience."
-msgstr ""
+msgstr "Прочтите отзывы других студентов и поделитесь своим опытом."
 
 #: templates/course_description.html:151
 #: templates/course_page_enrolled.html:396
 msgid "View Reviews"
-msgstr ""
+msgstr "Посмотреть обзоры"
 
 #: templates/course_description.html:161
 #: templates/course_page_enrolled.html:406
 #: templates/course_page_enrolled.html:847
 #, fuzzy
 msgid "Student Reviews"
-msgstr ""
+msgstr "Отзывы студентов"
 
 #: templates/course_description.html:162
 #: templates/course_page_enrolled.html:407
 #, fuzzy
 msgid "review"
 msgid_plural "reviews"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "обзор"
+msgstr[1] "обзор"
+msgstr[2] "обзор"
 
 #: templates/course_description.html:162
 #, fuzzy
@@ -98,7 +98,7 @@ msgstr "обзоры"
 #: templates/course_description.html:179
 #: templates/course_page_enrolled.html:424
 msgid "Average Rating"
-msgstr ""
+msgstr "Средний рейтинг"
 
 #: templates/course_description.html:196
 msgid "By"
@@ -108,24 +108,24 @@ msgstr "К"
 #: templates/course_page_enrolled.html:531
 #: templates/course_page_enrolled.html:699 templates/index.html:2017
 msgid "Login to Enroll"
-msgstr ""
+msgstr "Войдите, чтобы зарегистрироваться"
 
 #: templates/course_description.html:212
 msgid "You are not enrolled in this course."
-msgstr ""
+msgstr "Вы не зачислены на этот курс."
 
 #: templates/course_page_enrolled.html:224
 msgid "Teacher/Admin Mode:"
-msgstr ""
+msgstr "Режим учителя/администратора:"
 
 #: templates/course_page_enrolled.html:224
 msgid "You have editing privileges for this course."
-msgstr ""
+msgstr "У вас есть права редактирования этого курса."
 
 #: templates/course_page_enrolled.html:229
 #, fuzzy
 msgid "Back to Courses"
-msgstr ""
+msgstr "Вернуться к курсам"
 
 #: templates/course_page_enrolled.html:234
 msgid "Content"
@@ -153,23 +153,25 @@ msgstr "Объявления"
 #: templates/course_page_enrolled.html:1136
 #: templates/course_page_enrolled.html:1156
 msgid "Move Folder"
-msgstr ""
+msgstr "Переместить папку"
 
 #: templates/course_page_enrolled.html:259
 msgid ""
 "Are you sure you want to delete this folder? This will only work if the "
 "folder is empty."
 msgstr ""
+"Вы уверены, что хотите удалить эту папку? Это будет работать только в том "
+"случае, если папка пуста."
 
 #: templates/course_page_enrolled.html:262
 #, fuzzy
 msgid "Delete Folder"
-msgstr ""
+msgstr "Удалить папку"
 
 #: templates/course_page_enrolled.html:282
 #: templates/course_page_enrolled.html:493
 msgid "View File"
-msgstr ""
+msgstr "Посмотреть файл"
 
 #: templates/course_page_enrolled.html:284
 #: templates/course_page_enrolled.html:495
@@ -181,7 +183,7 @@ msgstr "Посмотреть/Скачать"
 #: templates/course_page_enrolled.html:1104
 #, fuzzy
 msgid "Move File"
-msgstr ""
+msgstr "Переместить файл"
 
 #: templates/course_page_enrolled.html:295
 #: templates/course_page_enrolled.html:650
@@ -197,7 +199,7 @@ msgstr "Частный"
 #: templates/course_page_enrolled.html:298
 #: templates/course_page_enrolled.html:509
 msgid "Are you sure you want to delete this file?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить этот файл?"
 
 #: templates/course_page_enrolled.html:301
 #: templates/course_page_enrolled.html:512
@@ -210,41 +212,43 @@ msgstr "Удалить"
 #: templates/course_page_enrolled.html:459
 #, fuzzy
 msgid "Course Content"
-msgstr ""
+msgstr "Содержание курса"
 
 #: templates/course_page_enrolled.html:463
 #: templates/course_page_enrolled.html:982
 #: templates/course_page_enrolled.html:1002
 msgid "Create Folder"
-msgstr ""
+msgstr "Создать папку"
 
 #: templates/course_page_enrolled.html:466
 #: templates/course_page_enrolled.html:1017
 #: templates/course_page_enrolled.html:1049
 #, fuzzy
 msgid "Upload File"
-msgstr ""
+msgstr "Загрузить файл"
 
 #: templates/course_page_enrolled.html:483
 msgid "Unsorted Files"
-msgstr ""
+msgstr "Несортированные файлы"
 
 #: templates/course_page_enrolled.html:529
 msgid "Enroll to Access Course Content"
-msgstr ""
+msgstr "Зарегистрируйтесь, чтобы получить доступ к материалам курса"
 
 #: templates/course_page_enrolled.html:530
 msgid ""
-"You need to be enrolled in this course to view the content, materials, "
-"and participate in activities."
+"You need to be enrolled in this course to view the content, materials, and "
+"participate in activities."
 msgstr ""
+"Вам необходимо зарегистрироваться на этот курс, чтобы просматривать "
+"содержание, материалы и участвовать в мероприятиях."
 
 #: templates/course_page_enrolled.html:542
 #: templates/course_page_enrolled.html:1063
 #: templates/course_page_enrolled.html:1092
 #, fuzzy
 msgid "Create Assignment"
-msgstr ""
+msgstr "Создать задание"
 
 #: templates/course_page_enrolled.html:550
 msgid "pts"
@@ -261,7 +265,7 @@ msgstr "Н/Д"
 #: templates/course_page_enrolled.html:559
 #: templates/course_page_enrolled.html:630
 msgid "On Time"
-msgstr ""
+msgstr "Вовремя"
 
 #: templates/course_page_enrolled.html:563
 #: templates/course_page_enrolled.html:634
@@ -277,19 +281,19 @@ msgstr "Рано"
 
 #: templates/course_page_enrolled.html:571
 msgid "View Your Submission"
-msgstr ""
+msgstr "Посмотреть вашу заявку"
 
 #: templates/course_page_enrolled.html:577
 msgid "Visible to Others"
-msgstr ""
+msgstr "Видно другим"
 
 #: templates/course_page_enrolled.html:580
 msgid "Are you sure you want to delete your submission?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить свою публикацию?"
 
 #: templates/course_page_enrolled.html:583
 msgid "Delete My Submission"
-msgstr ""
+msgstr "Удалить мою заявку"
 
 #: templates/course_page_enrolled.html:586
 #: templates/course_page_enrolled.html:675
@@ -302,7 +306,7 @@ msgstr "Обратная связь:"
 
 #: templates/course_page_enrolled.html:594
 msgid "Not Submitted"
-msgstr ""
+msgstr "Не отправлено"
 
 #: templates/course_page_enrolled.html:597
 msgid "Overdue"
@@ -310,27 +314,29 @@ msgstr "Просрочено"
 
 #: templates/course_page_enrolled.html:606
 msgid "Upload Your Work:"
-msgstr ""
+msgstr "Загрузите свою работу:"
 
 #: templates/course_page_enrolled.html:609
 #, fuzzy
 msgid "Submit Assignment"
-msgstr ""
+msgstr "Отправить задание"
 
 #: templates/course_page_enrolled.html:615
 msgid ""
-"Are you sure you want to delete this assignment? This will also delete "
-"all submissions."
+"Are you sure you want to delete this assignment? This will also delete all "
+"submissions."
 msgstr ""
+"Вы уверены, что хотите удалить это задание? Это также приведет к удалению "
+"всех представленных материалов."
 
 #: templates/course_page_enrolled.html:618
 #, fuzzy
 msgid "Delete Assignment"
-msgstr ""
+msgstr "Удалить назначение"
 
 #: templates/course_page_enrolled.html:621
 msgid "View Submissions"
-msgstr ""
+msgstr "Просмотр материалов"
 
 #: templates/course_page_enrolled.html:642
 msgid "Submitted:"
@@ -338,11 +344,11 @@ msgstr "Поданный:"
 
 #: templates/course_page_enrolled.html:643
 msgid "View Submission"
-msgstr ""
+msgstr "Посмотреть отправку"
 
 #: templates/course_page_enrolled.html:653
 msgid "Are you sure you want to delete this submission?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить эту публикацию?"
 
 #: templates/course_page_enrolled.html:664
 msgid "Grade"
@@ -355,7 +361,7 @@ msgstr "Комментарий"
 
 #: templates/course_page_enrolled.html:670
 msgid "Save Grade"
-msgstr ""
+msgstr "Сохранить оценку"
 
 #: templates/course_page_enrolled.html:678
 #, fuzzy
@@ -364,20 +370,22 @@ msgstr "Комментарий:"
 
 #: templates/course_page_enrolled.html:684
 msgid "No submissions yet."
-msgstr ""
+msgstr "Пока нет заявок."
 
 #: templates/course_page_enrolled.html:692
 #, fuzzy
 msgid "No assignments available."
-msgstr ""
+msgstr "Нет доступных заданий."
 
 #: templates/course_page_enrolled.html:697
 msgid "Enroll to Access Assignments"
-msgstr ""
+msgstr "Зарегистрируйтесь, чтобы получить доступ к заданиям"
 
 #: templates/course_page_enrolled.html:698
 msgid "You need to be enrolled in this course to view and submit assignments."
 msgstr ""
+"Чтобы просматривать и отправлять задания, вам необходимо зарегистрироваться "
+"на этот курс."
 
 #: templates/course_page_enrolled.html:712
 #: templates/course_page_enrolled.html:768
@@ -387,19 +395,19 @@ msgstr "Отвечать"
 #: templates/course_page_enrolled.html:722
 #: templates/course_page_enrolled.html:777
 msgid "Write a reply..."
-msgstr ""
+msgstr "Напишите ответ..."
 
 #: templates/course_page_enrolled.html:724
 #: templates/course_page_enrolled.html:779
 msgid "Post Reply"
-msgstr ""
+msgstr "Опубликовать ответ"
 
 #: templates/course_page_enrolled.html:746
 #: templates/course_page_enrolled.html:946
 #: templates/course_page_enrolled.html:967
 #, fuzzy
 msgid "Add Announcement"
-msgstr ""
+msgstr "Добавить объявление"
 
 #: templates/course_page_enrolled.html:756
 #, fuzzy
@@ -408,28 +416,30 @@ msgstr "Опубликовано:"
 
 #: templates/course_page_enrolled.html:759
 msgid ""
-"Are you sure you want to delete this announcement? This will also delete "
-"all replies."
+"Are you sure you want to delete this announcement? This will also delete all"
+" replies."
 msgstr ""
+"Вы уверены, что хотите удалить это объявление? Это также приведет к удалению"
+" всех ответов."
 
 #: templates/course_page_enrolled.html:762
 #, fuzzy
 msgid "Delete Announcement"
-msgstr ""
+msgstr "Удалить объявление"
 
 #: templates/course_page_enrolled.html:796
 #, fuzzy
 msgid "No announcements yet."
-msgstr ""
+msgstr "Никаких объявлений пока нет."
 
 #: templates/course_page_enrolled.html:803
 #, fuzzy
 msgid "Course Reviews"
-msgstr ""
+msgstr "Обзоры курсов"
 
 #: templates/course_page_enrolled.html:809
 msgid "Write Your Review"
-msgstr ""
+msgstr "Напишите свой отзыв"
 
 #: templates/course_page_enrolled.html:816
 #: templates/course_page_enrolled.html:899
@@ -438,32 +448,32 @@ msgstr "Рейтинг"
 
 #: templates/course_page_enrolled.html:825
 msgid "Click on a star to rate (1-5)"
-msgstr ""
+msgstr "Нажмите на звездочку, чтобы оценить (1-5)"
 
 #: templates/course_page_enrolled.html:829
 #: templates/course_page_enrolled.html:910
 #, fuzzy
 msgid "Review Title"
-msgstr ""
+msgstr "Название обзора"
 
 #: templates/course_page_enrolled.html:830
 msgid "Summarize your experience"
-msgstr ""
+msgstr "Обобщите свой опыт"
 
 #: templates/course_page_enrolled.html:834
 #: templates/course_page_enrolled.html:914
 #, fuzzy
 msgid "Your Review"
-msgstr ""
+msgstr "Ваш отзыв"
 
 #: templates/course_page_enrolled.html:835
 msgid "Share your thoughts about this course..."
-msgstr ""
+msgstr "Поделитесь своим мнением об этом курсе..."
 
 #: templates/course_page_enrolled.html:839
 #, fuzzy
 msgid "Submit Review"
-msgstr ""
+msgstr "Отправить отзыв"
 
 #: templates/course_page_enrolled.html:868
 msgid "Edit"
@@ -471,21 +481,21 @@ msgstr "Редактировать"
 
 #: templates/course_page_enrolled.html:870
 msgid "Are you sure you want to delete this review?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить этот отзыв?"
 
 #: templates/course_page_enrolled.html:892
 #, fuzzy
 msgid "Edit Review"
-msgstr ""
+msgstr "Редактировать обзор"
 
 #: templates/course_page_enrolled.html:920
 #, fuzzy
 msgid "Update Review"
-msgstr ""
+msgstr "Обновление обзора"
 
 #: templates/course_page_enrolled.html:931
 msgid "No reviews yet. Be the first to review this course!"
-msgstr ""
+msgstr "Пока нет отзывов. Будьте первым, кто оставит отзыв об этом курсе!"
 
 #: templates/course_page_enrolled.html:953
 #: templates/course_page_enrolled.html:1031
@@ -503,7 +513,7 @@ msgstr "Сообщение"
 #: templates/course_page_enrolled.html:1040
 #: templates/course_page_enrolled.html:1087
 msgid "Publish immediately"
-msgstr ""
+msgstr "Опубликовать немедленно"
 
 #: templates/course_page_enrolled.html:966
 #: templates/course_page_enrolled.html:1001
@@ -529,12 +539,12 @@ msgstr "Корень"
 #: templates/course_page_enrolled.html:992
 #, fuzzy
 msgid "Folder Name"
-msgstr ""
+msgstr "Имя папки"
 
 #: templates/course_page_enrolled.html:1024
 #, fuzzy
 msgid "Upload to:"
-msgstr ""
+msgstr "Загрузите в:"
 
 #: templates/course_page_enrolled.html:1027
 #, fuzzy
@@ -543,11 +553,11 @@ msgstr "Файл"
 
 #: templates/course_page_enrolled.html:1044
 msgid "Allow students to view this file"
-msgstr ""
+msgstr "Разрешить учащимся просматривать этот файл"
 
 #: templates/course_page_enrolled.html:1078
 msgid "Due Date"
-msgstr ""
+msgstr "Два свидания"
 
 #: templates/course_page_enrolled.html:1082
 #, fuzzy
@@ -556,7 +566,7 @@ msgstr "Очки"
 
 #: templates/course_page_enrolled.html:1113
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "Выберите папку назначения"
 
 #: templates/course_page_enrolled.html:1124
 msgid "Move"
@@ -564,19 +574,19 @@ msgstr "Двигаться"
 
 #: templates/course_page_enrolled.html:1145
 msgid "Select New Parent Folder"
-msgstr ""
+msgstr "Выберите новую родительскую папку"
 
 #: templates/course_page_enrolled.html:1213
 msgid "Move File:"
-msgstr ""
+msgstr "Переместить файл:"
 
 #: templates/course_page_enrolled.html:1224
 msgid "Move Folder:"
-msgstr ""
+msgstr "Переместить папку:"
 
 #: templates/index.html:7
 msgid "Yonca - Learning Platform"
-msgstr ""
+msgstr "Yonca – учебная платформа"
 
 #: templates/components/navbar.html:18 templates/index.html:1206
 #: templates/index.html:1258
@@ -605,7 +615,7 @@ msgstr "Конференции"
 #: templates/components/navbar.html:30 templates/index.html:1217
 #: templates/index.html:1269 templates/index.html:1538
 msgid "TAVI Test"
-msgstr ""
+msgstr "ТАВИ Тест"
 
 #: templates/components/navbar.html:33 templates/index.html:1218
 #: templates/index.html:1270
@@ -614,7 +624,7 @@ msgstr "Контакты"
 
 #: templates/index.html:1219 templates/index.html:1271
 msgid "About Company"
-msgstr ""
+msgstr "О компании"
 
 #: templates/components/navbar.html:61 templates/index.html:1230
 #: templates/index.html:1278 templates/login.html:248
@@ -637,108 +647,112 @@ msgstr "Выход из системы"
 #: templates/index.html:1294 templates/index.html:1318
 #: templates/index.html:1581
 msgid "Welcome to Yonca"
-msgstr ""
+msgstr "Добро пожаловать в Yonca"
 
 #: templates/index.html:1295
 msgid "Your gateway to knowledge and community learning."
-msgstr ""
+msgstr "Ваш путь к знаниям и общественному обучению."
 
 #: templates/index.html:1296
 msgid "Get Started"
-msgstr ""
+msgstr "Начать"
 
 #: templates/index.html:1300 templates/login.html:256
 msgid "Link Google Account"
-msgstr ""
+msgstr "Связать аккаунт Google"
 
 #: templates/index.html:1319
 msgid "Join our learning community today!"
-msgstr ""
+msgstr "Присоединяйтесь к нашему обучающему сообществу сегодня!"
 
 #: templates/index.html:1320
 msgid "Sign Up Now"
-msgstr ""
+msgstr "Зарегистрируйтесь сейчас"
 
 #: templates/index.html:1337 templates/index.html:1616
 msgid "What's New"
-msgstr ""
+msgstr "Что нового"
 
 #: templates/index.html:1338 templates/index.html:1617
 msgid ""
-"Discover the latest updates, new features, and exciting developments in "
-"our learning platform."
+"Discover the latest updates, new features, and exciting developments in our "
+"learning platform."
 msgstr ""
+"Узнайте о последних обновлениях, новых функциях и интересных разработках на "
+"нашей обучающей платформе."
 
 #: templates/index.html:1373
 msgid ""
-"If video shows 'still being processed,' please wait 5-60 minutes for "
-"Google Drive to finish processing, then refresh the page."
+"If video shows 'still being processed,' please wait 5-60 minutes for Google "
+"Drive to finish processing, then refresh the page."
 msgstr ""
+"Если видео показывает, что «все еще обрабатывается», подождите 5–60 минут, "
+"пока Google Диск завершит обработку, а затем обновите страницу."
 
 #: templates/index.html:1393
 msgid "Learning Community"
-msgstr ""
+msgstr "Учебное сообщество"
 
 #: templates/index.html:1394
 msgid "Our vibrant learning community"
-msgstr ""
+msgstr "Наше активное обучающееся сообщество"
 
 #: templates/index.html:1397 templates/index.html:1599
 msgid "Interactive Courses"
-msgstr ""
+msgstr "Интерактивные курсы"
 
 #: templates/index.html:1398
 msgid "Engage with interactive course content"
-msgstr ""
+msgstr "Взаимодействуйте с интерактивным содержанием курса"
 
 #: templates/index.html:1401 templates/index.html:1603
 msgid "Study Groups"
-msgstr ""
+msgstr "исследовательские группы"
 
 #: templates/index.html:1402
 msgid "Collaborate in study groups"
-msgstr ""
+msgstr "Сотрудничать в учебных группах"
 
 #: templates/index.html:1412
 msgid "Explore our available courses and start your learning journey."
-msgstr ""
+msgstr "Изучите наши доступные курсы и начните свой путь обучения."
 
 #: templates/index.html:1416
 msgid "My Enrolled Courses"
-msgstr ""
+msgstr "Мои зарегистрированные курсы"
 
 #: templates/index.html:1418
 msgid "Loading enrolled courses..."
-msgstr ""
+msgstr "Загрузка зарегистрированных курсов..."
 
 #: templates/index.html:1424 templates/index.html:1828
 #: templates/index.html:1867
 msgid "Available Courses"
-msgstr ""
+msgstr "Доступные курсы"
 
 #: templates/index.html:1426
 msgid "Loading courses..."
-msgstr ""
+msgstr "Загрузка курсов..."
 
 #: templates/index.html:1433
 msgid "Community Forum"
-msgstr ""
+msgstr "Форум сообщества"
 
 #: templates/index.html:1437
 msgid "Authentication Required"
-msgstr ""
+msgstr "Требуется аутентификация"
 
 #: templates/index.html:1438
 msgid "Please log in to participate in the community forum."
-msgstr ""
+msgstr "Пожалуйста, войдите, чтобы принять участие в форуме сообщества."
 
 #: templates/index.html:1439
 msgid "You can still view messages without logging in."
-msgstr ""
+msgstr "Вы по-прежнему можете просматривать сообщения без входа в систему."
 
 #: templates/index.html:1451
 msgid "Translation Settings"
-msgstr ""
+msgstr "Настройки перевода"
 
 #: templates/index.html:1454
 msgid "Language:"
@@ -746,7 +760,7 @@ msgstr "Язык:"
 
 #: templates/index.html:1456
 msgid "Don't translate"
-msgstr ""
+msgstr "Не переводи"
 
 #: templates/index.html:1457
 msgid "English"
@@ -762,14 +776,17 @@ msgstr "азербайджанский"
 
 #: templates/index.html:1463
 msgid ""
-"Select a language to translate messages, or choose 'Don't translate' to "
-"view messages in their original language. Click individual messages to "
-"toggle translation."
+"Select a language to translate messages, or choose 'Don't translate' to view"
+" messages in their original language. Click individual messages to toggle "
+"translation."
 msgstr ""
+"Выберите язык для перевода сообщений или выберите «Не переводить», чтобы "
+"просматривать сообщения на языке оригинала. Нажмите на отдельные сообщения, "
+"чтобы переключить перевод."
 
 #: templates/index.html:1467
 msgid "Post a New Message"
-msgstr ""
+msgstr "Опубликовать новое сообщение"
 
 #: templates/index.html:1470 templates/login.html:230
 msgid "Username:"
@@ -781,51 +798,56 @@ msgstr "Сообщение:"
 
 #: templates/index.html:1475
 msgid "Share your thoughts, ask questions, or help others..."
-msgstr ""
+msgstr "Делитесь своими мыслями, задавайте вопросы или помогайте другим..."
 
 #: templates/index.html:1477
 msgid "Post Message"
-msgstr ""
+msgstr "Опубликовать сообщение"
 
 #: templates/index.html:1482
 msgid "General Discussion"
-msgstr ""
+msgstr "Общая дискуссия"
 
 #: templates/index.html:1485
 msgid "Welcome to Yonca Forum!"
-msgstr ""
+msgstr "Добро пожаловать на форум Yonca!"
 
 #: templates/index.html:1486
 msgid ""
 "This is where community members can connect, ask questions, and share "
 "knowledge."
 msgstr ""
+"Здесь члены сообщества могут общаться, задавать вопросы и делиться знаниями."
 
 #: templates/index.html:1487
 msgid "Posted on December 8, 2025"
-msgstr ""
+msgstr "Опубликовано 8 декабря 2025 г."
 
 #: templates/index.html:1497
 msgid "Download educational materials, documents, and access protected files."
 msgstr ""
+"Загружайте учебные материалы, документы и получайте доступ к защищенным "
+"файлам."
 
 #: templates/index.html:1500
 msgid "Learning Materials"
-msgstr ""
+msgstr "Учебные материалы"
 
 #: templates/index.html:1502
 msgid "Loading materials..."
-msgstr ""
+msgstr "Загрузка материалов..."
 
 #: templates/index.html:1507
 msgid "Upload Learning Material"
-msgstr ""
+msgstr "Загрузить учебные материалы"
 
 #: templates/index.html:1508
 msgid ""
-"Upload documents, presentations, PDFs, or other materials. PIN protection"
-" will be automatically applied for security."
+"Upload documents, presentations, PDFs, or other materials. PIN protection "
+"will be automatically applied for security."
 msgstr ""
+"Загружайте документы, презентации, PDF-файлы или другие материалы. Защита "
+"PIN-кодом будет автоматически применена в целях безопасности."
 
 #: templates/index.html:1511
 msgid "Title:"
@@ -837,31 +859,34 @@ msgstr "Описание:"
 
 #: templates/index.html:1519
 msgid "Preview Image (optional):"
-msgstr ""
+msgstr "Предварительный просмотр изображения (необязательно):"
 
 #: templates/index.html:1521
 msgid "Upload an image to display as a preview for this resource"
-msgstr ""
+msgstr "Загрузите изображение для предварительного просмотра этого ресурса."
 
 #: templates/index.html:1524
 msgid "Choose file..."
-msgstr ""
+msgstr "Выбрать файл..."
 
 #: templates/index.html:1528
-msgid "Access PIN will be auto-generated (6 characters, expires in 10 minutes)"
+msgid ""
+"Access PIN will be auto-generated (6 characters, expires in 10 minutes)"
 msgstr ""
+"PIN-код доступа будет сгенерирован автоматически (6 символов, срок действия "
+"истекает через 10 минут)."
 
 #: templates/index.html:1530 templates/index.html:2442
 msgid "Upload Material"
-msgstr ""
+msgstr "Загрузить материал"
 
 #: templates/index.html:1540
 msgid "TAVI Test section is coming soon."
-msgstr ""
+msgstr "Скоро появится раздел TAVI Test."
 
 #: templates/index.html:1546
 msgid "Contact Us"
-msgstr ""
+msgstr "Связаться с нами"
 
 #: templates/index.html:1550
 msgid "WhatsApp"
@@ -869,7 +894,7 @@ msgstr "WhatsApp"
 
 #: templates/index.html:1555
 msgid "Available: Mon-Fri, 9AM-6PM"
-msgstr ""
+msgstr "Доступно: Пн-Пт, 9:00-18:00."
 
 #: templates/index.html:1560
 msgid "Email"
@@ -877,7 +902,7 @@ msgstr "Электронная почта"
 
 #: templates/index.html:1565
 msgid "We respond within 24 hours"
-msgstr ""
+msgstr "Мы отвечаем в течение 24 часов"
 
 #: templates/index.html:1570
 msgid "Location"
@@ -885,105 +910,114 @@ msgstr "Расположение"
 
 #: templates/index.html:1573
 msgid "Baku, Azerbaijan"
-msgstr ""
+msgstr "Баку, Азербайджан"
 
 #: templates/index.html:1582
 msgid ""
 "Join our learning community and discover amazing features designed to "
 "enhance your educational experience."
 msgstr ""
+"Присоединяйтесь к нашему учебному сообществу и откройте для себя "
+"удивительные функции, призванные улучшить ваш образовательный опыт."
 
 #: templates/index.html:1586
 msgid "Our Features"
-msgstr ""
+msgstr "Наши возможности"
 
 #: templates/index.html:1587
 msgid "Discover what makes our platform special."
-msgstr ""
+msgstr "Узнайте, что делает нашу платформу особенной."
 
 #: templates/index.html:1600
 msgid "Engage with dynamic course content and interactive learning materials."
 msgstr ""
+"Работайте с динамичным содержанием курса и интерактивными учебными "
+"материалами."
 
 #: templates/index.html:1604
 msgid "Collaborate with fellow learners in our vibrant study communities."
 msgstr ""
+"Сотрудничайте с другими учениками в наших динамичных учебных сообществах."
 
 #: templates/index.html:1607
 msgid "Expert Support"
-msgstr ""
+msgstr "Экспертная поддержка"
 
 #: templates/index.html:1608
 msgid "Get help from our team of educational experts and specialists."
 msgstr ""
+"Получите помощь от нашей команды экспертов и специалистов в области "
+"образования."
 
 #: templates/index.html:1691
 msgid ""
-"Join our live and recorded webinars to learn from experts in various "
-"fields."
+"Join our live and recorded webinars to learn from experts in various fields."
 msgstr ""
+"Присоединяйтесь к нашим вебинарам в прямом эфире и в записи, чтобы поучиться"
+" у экспертов в различных областях."
 
 #: templates/index.html:1693
 msgid "Webinars section coming soon..."
-msgstr ""
+msgstr "Скоро появится раздел вебинаров..."
 
 #: templates/index.html:1700
 msgid "Participate in our educational conferences and networking events."
 msgstr ""
+"Участвуйте в наших образовательных конференциях и сетевых мероприятиях."
 
 #: templates/index.html:1702
 msgid "Conferences section coming soon..."
-msgstr ""
+msgstr "Скоро появится раздел \"Конференции\"..."
 
 #: templates/index.html:1826
 msgid "You're enrolled in all available courses!"
-msgstr ""
+msgstr "Вы зачислены на все доступные курсы!"
 
 #: templates/index.html:1827
 msgid "Error loading courses. Please try again."
-msgstr ""
+msgstr "Ошибка загрузки курсов. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:1848
 msgid "No courses available at the moment."
-msgstr ""
+msgstr "На данный момент курсов нет."
 
 #: templates/index.html:1864
 msgid "Other Available Courses"
-msgstr ""
+msgstr "Другие доступные курсы"
 
 #: templates/index.html:1998
 msgid "Loading..."
-msgstr ""
+msgstr "Загрузка..."
 
 #: templates/index.html:1999 templates/index.html:2011
 #: templates/index.html:2018
 msgid "View Details"
-msgstr ""
+msgstr "Посмотреть детали"
 
 #: templates/index.html:2010
 msgid "Enroll Now"
-msgstr ""
+msgstr "Зарегистрируйтесь сейчас"
 
 #: templates/index.html:2073
 msgid "Enrolling in"
-msgstr ""
+msgstr "Регистрация в"
 
 #: templates/index.html:2143
 msgid "No materials available at the moment."
-msgstr ""
+msgstr "На данный момент материалов нет."
 
 #: templates/index.html:2161
 msgid "Log In to Access"
-msgstr ""
+msgstr "Войдите, чтобы получить доступ"
 
 #: templates/index.html:2164 templates/index.html:2184
 #: templates/index.html:2219
 msgid "View Resource"
-msgstr ""
+msgstr "Посмотреть ресурс"
 
 #: templates/index.html:2174
 msgid "Expires in:"
-msgstr ""
+msgstr "Срок действия истекает через:"
 
 #: templates/index.html:2174
 msgid "minutes"
@@ -991,24 +1025,24 @@ msgstr "минуты"
 
 #: templates/index.html:2176
 msgid "PIN has expired"
-msgstr ""
+msgstr "Срок действия PIN-кода истек"
 
 #: templates/index.html:2180 templates/index.html:2271
 msgid "Your Access PIN:"
-msgstr ""
+msgstr "Ваш PIN-код доступа:"
 
 #: templates/index.html:2182 templates/index.html:2273
 msgid "Share this PIN with others to grant access"
-msgstr ""
+msgstr "Поделитесь этим PIN-кодом с другими, чтобы предоставить доступ."
 
 #: templates/index.html:2187 templates/index.html:2278
 msgid "Request Access"
-msgstr ""
+msgstr "Запросить доступ"
 
 #: templates/index.html:2195 templates/index.html:2215
 #: templates/index.html:2283
 msgid "No description available"
-msgstr ""
+msgstr "Нет описания"
 
 #: templates/index.html:2197 templates/index.html:2217
 #: templates/index.html:2285
@@ -1017,83 +1051,83 @@ msgstr "Загружено:"
 
 #: templates/index.html:2201 templates/index.html:2221
 msgid "Are you sure you want to delete this resource?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить этот ресурс?"
 
 #: templates/index.html:2238
 msgid "Error loading materials. Please try again."
-msgstr ""
+msgstr "Ошибка загрузки материалов. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:2254
 msgid "No PDF documents available at the moment."
-msgstr ""
+msgstr "PDF-документов на данный момент нет."
 
 #: templates/index.html:2275
 msgid "Access PDF"
-msgstr ""
+msgstr "Доступ к PDF-файлу"
 
 #: templates/index.html:2289
 msgid "Are you sure you want to delete this PDF?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить этот PDF-файл?"
 
 #: templates/index.html:2300
 msgid "Error loading PDFs. Please try again."
-msgstr ""
+msgstr "Ошибка загрузки PDF-файлов. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:2306
 msgid "Enter access PIN for:"
-msgstr ""
+msgstr "Введите PIN-код доступа для:"
 
 #: templates/index.html:2332
 msgid "Invalid PIN or access denied."
-msgstr ""
+msgstr "Неверный PIN-код или доступ запрещен."
 
 #: templates/index.html:2336
 msgid "Error accessing resource. Please try again."
-msgstr ""
+msgstr "Ошибка доступа к ресурсу. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:2350 templates/index.html:2352
 msgid "Uploading PDF..."
-msgstr ""
+msgstr "Загрузка PDF..."
 
 #: templates/index.html:2374
 msgid "PDF uploaded successfully! Access PIN:"
-msgstr ""
+msgstr "PDF успешно загружен! PIN-код доступа:"
 
 #: templates/index.html:2382 templates/index.html:2386
 msgid "Error uploading PDF. Please try again."
-msgstr ""
+msgstr "Ошибка загрузки PDF. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:2389
 msgid "Upload PDF"
-msgstr ""
+msgstr "Загрузить PDF"
 
 #: templates/index.html:2403
 msgid "Uploading..."
-msgstr ""
+msgstr "Загрузка..."
 
 #: templates/index.html:2405
 msgid "Uploading resource..."
-msgstr ""
+msgstr "Загрузка ресурса..."
 
 #: templates/index.html:2427
 msgid "Material uploaded successfully! Access PIN:"
-msgstr ""
+msgstr "Материал успешно загружен! PIN-код доступа:"
 
 #: templates/index.html:2435
 msgid "Error uploading material. Please try again."
-msgstr ""
+msgstr "Ошибка при загрузке материала. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:2439
 msgid "Error uploading resource. Please try again."
-msgstr ""
+msgstr "Ошибка загрузки ресурса. Пожалуйста, попробуйте еще раз."
 
 #: templates/index.html:3670 templates/login.html:245 templates/terms.html:80
 msgid "Terms of Service"
-msgstr ""
+msgstr "Условия использования"
 
 #: templates/login.html:218
 msgid "Login to Your Account"
-msgstr ""
+msgstr "Войдите в свою учетную запись"
 
 #: templates/login.html:234
 msgid "Password:"
@@ -1101,192 +1135,226 @@ msgstr "Пароль:"
 
 #: templates/login.html:239
 msgid "Login as Administrator"
-msgstr ""
+msgstr "Войти как администратор"
 
 #: templates/login.html:244
 msgid "I acknowledge that I have read and agree to the"
-msgstr ""
+msgstr "Я подтверждаю, что прочитал и согласен с"
 
 #: templates/login.html:252
 msgid "Login with Google"
-msgstr ""
+msgstr "Войти через Google"
 
 #: templates/login.html:260
 msgid "Back to Yonca"
-msgstr ""
+msgstr "Вернуться к Yonca"
 
 #: templates/terms.html:6
 msgid "Terms of Service - Yonca"
-msgstr ""
+msgstr "Условия использования – Yonca"
 
 #: templates/terms.html:82
 msgid "Last updated:"
-msgstr ""
+msgstr "Последнее обновление:"
 
 #: templates/terms.html:82
 msgid "January 2026"
-msgstr ""
+msgstr "январь 2026 г."
 
 #: templates/terms.html:84
 msgid "Welcome to"
-msgstr ""
+msgstr "Добро пожаловать в"
 
 #: templates/terms.html:84
 msgid "(the \"Service\", \"Platform\", \"Website\"), operated by"
-msgstr ""
+msgstr "(«Сервис», «Платформа», «Веб-сайт»), управляемый"
 
 #: templates/terms.html:84
 msgid ""
 "(\"we\", \"us\", \"our\"). By accessing or using Yonca, you agree to be "
-"bound by these Terms of Service (\"Terms\"). If you do not agree with any"
-" part of these Terms, you must not use the Service."
+"bound by these Terms of Service (\"Terms\"). If you do not agree with any "
+"part of these Terms, you must not use the Service."
 msgstr ""
+"(«мы», «нас», «наш»). Получая доступ к Yonca или используя его, вы "
+"соглашаетесь соблюдать настоящие Условия обслуживания («Условия»). Если вы "
+"не согласны с какой-либо частью настоящих Условий, вы не должны использовать"
+" Сервис."
 
 #: templates/terms.html:88
 msgid "1. Eligibility"
-msgstr ""
+msgstr "1. Право на участие"
 
 #: templates/terms.html:90
 msgid "You must be at least"
-msgstr ""
+msgstr "Вы должны быть как минимум"
 
 #: templates/terms.html:90
 msgid "years old"
-msgstr ""
+msgstr "лет"
 
 #: templates/terms.html:90
 msgid ""
 "to use Yonca. If you are under the age of 18, you confirm that you have "
 "permission from a parent or legal guardian."
 msgstr ""
+"использовать Yonca. Если вам меньше 18 лет, вы подтверждаете, что у вас есть"
+" разрешение от родителя или законного опекуна."
 
 #: templates/terms.html:91
-msgid "You represent that the information you provide is accurate and complete."
+msgid ""
+"You represent that the information you provide is accurate and complete."
 msgstr ""
+"Вы заявляете, что предоставленная вами информация является точной и полной."
 
 #: templates/terms.html:94
 msgid "2. Accounts and Authentication"
-msgstr ""
+msgstr "2. Учетные записи и аутентификация"
 
 #: templates/terms.html:96
 msgid "Some features require creating an account."
-msgstr ""
+msgstr "Некоторые функции требуют создания учетной записи."
 
 #: templates/terms.html:97
 msgid ""
 "You are responsible for maintaining the confidentiality of your login "
 "credentials and for all activities that occur under your account."
 msgstr ""
+"Вы несете ответственность за сохранение конфиденциальности ваших учетных "
+"данных для входа и за все действия, которые происходят под вашей учетной "
+"записью."
 
 #: templates/terms.html:98
 msgid ""
-"You agree not to share your account or use another user's account without"
-" permission."
+"You agree not to share your account or use another user's account without "
+"permission."
 msgstr ""
+"Вы соглашаетесь не передавать свою учетную запись другим пользователям и не "
+"использовать ее без разрешения."
 
 #: templates/terms.html:99
 msgid ""
 "We reserve the right to suspend or terminate accounts that violate these "
 "Terms."
 msgstr ""
+"Мы оставляем за собой право приостановить или прекратить действие учетных "
+"записей, которые нарушают настоящие Условия."
 
 #: templates/terms.html:102
 msgid "3. User Content"
-msgstr ""
+msgstr "3. Пользовательский контент"
 
 #: templates/terms.html:104
 msgid "3.1 Content You Provide"
-msgstr ""
+msgstr "3.1 Предоставляемый вами контент"
 
 #: templates/terms.html:105
 msgid ""
-"Yonca may allow you to submit, upload, store, or share content such as "
-"text, images, files, or messages (\"User Content\")."
+"Yonca may allow you to submit, upload, store, or share content such as text,"
+" images, files, or messages (\"User Content\")."
 msgstr ""
+"Yonca может разрешать вам отправлять, загружать, хранить или делиться "
+"контентом, например текстом, изображениями, файлами или сообщениями "
+"(«Пользовательский контент»)."
 
 #: templates/terms.html:106
 msgid ""
-"You retain ownership of your User Content. However, by submitting "
-"content, you grant Yonca a"
+"You retain ownership of your User Content. However, by submitting content, "
+"you grant Yonca a"
 msgstr ""
+"You retain ownership of your User Content. Однако, отправляя контент, вы "
+"предоставляете Yonca"
 
 #: templates/terms.html:106
 msgid "non-exclusive, worldwide, royalty-free license"
-msgstr ""
+msgstr "неисключительная, всемирная, бесплатная лицензия"
 
 #: templates/terms.html:106
 msgid ""
-"to host, store, process, and display the content solely for operating and"
-" improving the Service."
+"to host, store, process, and display the content solely for operating and "
+"improving the Service."
 msgstr ""
+"размещать, хранить, обрабатывать и отображать контент исключительно для "
+"работы и улучшения Сервиса."
 
 #: templates/terms.html:108
 msgid "3.2 Responsibility for Content"
-msgstr ""
+msgstr "3.2 Ответственность за контент"
 
 #: templates/terms.html:109
 msgid ""
-"You are solely responsible for your User Content. You agree not to upload"
-" or share content that:"
+"You are solely responsible for your User Content. You agree not to upload or"
+" share content that:"
 msgstr ""
+"Вы несете единоличную ответственность за свой Пользовательский контент. Вы "
+"соглашаетесь не загружать и не делиться контентом, который:"
 
 #: templates/terms.html:111
 msgid "Is illegal, fraudulent, or misleading"
-msgstr ""
+msgstr "Является незаконным, мошенническим или вводящим в заблуждение"
 
 #: templates/terms.html:112
 msgid "Infringes intellectual property or privacy rights"
-msgstr ""
+msgstr "Нарушает права интеллектуальной собственности или конфиденциальности"
 
 #: templates/terms.html:113
 msgid "Contains malware, viruses, or harmful code"
-msgstr ""
+msgstr "Содержит вредоносное ПО, вирусы или вредоносный код."
 
 #: templates/terms.html:114
 msgid "Is abusive, hateful, or harassing"
-msgstr ""
+msgstr "Является оскорбительным, ненавистным или преследующим"
 
 #: templates/terms.html:116
 msgid "We may remove content that violates these Terms or applicable laws."
 msgstr ""
+"Мы можем удалить контент, который нарушает настоящие Условия или применимое "
+"законодательство."
 
 #: templates/terms.html:118
 msgid "4. File Storage and Third-Party Services"
-msgstr ""
+msgstr "4. Хранение файлов и сторонние сервисы"
 
 #: templates/terms.html:120
 msgid "Yonca may use"
-msgstr ""
+msgstr "Yonca может использовать"
 
 #: templates/terms.html:120
 msgid "third-party services"
-msgstr ""
+msgstr "сторонние услуги"
 
 #: templates/terms.html:120
 msgid ""
-"(such as cloud storage, APIs, or translation services) to operate "
-"features like file uploads, backups, or content processing."
+"(such as cloud storage, APIs, or translation services) to operate features "
+"like file uploads, backups, or content processing."
 msgstr ""
+"(например, облачное хранилище, API или службы перевода) для управления "
+"такими функциями, как загрузка файлов, резервное копирование или обработка "
+"контента."
 
 #: templates/terms.html:121
 msgid ""
-"Your content may be processed or stored through these services strictly "
-"for functionality."
+"Your content may be processed or stored through these services strictly for "
+"functionality."
 msgstr ""
+"Ваш контент может обрабатываться или храниться с помощью этих служб "
+"исключительно для обеспечения функциональности."
 
 #: templates/terms.html:122
 msgid ""
-"Yonca is not responsible for outages, data loss, or changes caused by "
-"third-party providers, to the extent permitted by law."
+"Yonca is not responsible for outages, data loss, or changes caused by third-"
+"party providers, to the extent permitted by law."
 msgstr ""
+"Yonca не несет ответственности за сбои в работе, потерю данных или "
+"изменения, вызванные сторонними поставщиками, в пределах, разрешенных "
+"законом."
 
 #: templates/terms.html:125
 msgid "4.1 Google Drive Integration"
-msgstr ""
+msgstr "4.1 Интеграция с Google Диском"
 
 #: templates/terms.html:127
 msgid "Yonca may allow users to connect their"
-msgstr ""
+msgstr "Yonca может разрешить пользователям подключать свои"
 
 #: templates/terms.html:127
 msgid "account"
@@ -1294,23 +1362,27 @@ msgstr "счет"
 
 #: templates/terms.html:127
 msgid ""
-"using Google OAuth 2.0 for purposes such as uploading, storing, "
-"accessing, or managing files."
+"using Google OAuth 2.0 for purposes such as uploading, storing, accessing, "
+"or managing files."
 msgstr ""
+"использование Google OAuth 2.0 для таких целей, как загрузка, хранение, "
+"доступ к файлам или управление ими."
 
 #: templates/terms.html:128
 msgid "When you connect Google Drive, Yonca accesses only the"
-msgstr ""
+msgstr "Когда вы подключаете Google Диск, Yonca получает доступ только к"
 
 #: templates/terms.html:128
 msgid "minimum permissions required"
-msgstr ""
+msgstr "требуется минимум разрешений"
 
 #: templates/terms.html:128
 msgid ""
 "to provide the requested functionality, as disclosed during the Google "
 "authorization process."
 msgstr ""
+"для предоставления запрошенной функциональности, как указано в процессе "
+"авторизации Google."
 
 #: templates/terms.html:129
 msgid "Yonca"
@@ -1318,139 +1390,162 @@ msgstr "Yonca"
 
 #: templates/terms.html:129
 msgid "does not access, read, or modify"
-msgstr ""
+msgstr "не имеет доступа, не читает и не изменяет"
 
 #: templates/terms.html:129
 msgid "files outside the scope explicitly permitted by you."
-msgstr ""
+msgstr "файлы за пределами явно разрешенной вами области."
 
 #: templates/terms.html:130
 msgid ""
 "Files uploaded or managed via Google Drive remain under your control and "
 "subject to"
 msgstr ""
+"Файлы, загруженные или управляемые через Google Диск, остаются под вашим "
+"контролем и подлежат"
 
 #: templates/terms.html:130
 msgid "Google's own Terms of Service and Privacy Policy"
 msgstr ""
+"Собственные Условия использования и Политика конфиденциальности Google."
 
 #: templates/terms.html:131
 msgid ""
-"You may revoke Yonca's access to your Google Drive at any time through "
-"your Google Account security settings."
+"You may revoke Yonca's access to your Google Drive at any time through your "
+"Google Account security settings."
 msgstr ""
+"Вы можете в любое время отозвать доступ Yonca к вашему Google Диску через "
+"настройки безопасности вашего аккаунта Google."
 
 #: templates/terms.html:134
 msgid "5. Translations and Automated Features"
-msgstr ""
+msgstr "5. Переводы и автоматизированные функции"
 
 #: templates/terms.html:136
 msgid "Yonca may provide automated features such as"
-msgstr ""
+msgstr "Yonca может предоставлять автоматизированные функции, такие как"
 
 #: templates/terms.html:136
 msgid "machine translations or AI-assisted tools"
 msgstr ""
+"машинный перевод или инструменты с использованием искусственного интеллекта"
 
 #: templates/terms.html:137
 msgid ""
 "These features are provided \"as is\" and may contain errors or "
 "inaccuracies."
 msgstr ""
+"Эти функции предоставляются «как есть» и могут содержать ошибки и "
+"неточности."
 
 #: templates/terms.html:138
 msgid ""
-"Yonca does not guarantee the correctness, completeness, or suitability of"
-" automatically generated results."
+"Yonca does not guarantee the correctness, completeness, or suitability of "
+"automatically generated results."
 msgstr ""
+"Yonca не гарантирует правильность, полноту или пригодность автоматически "
+"сгенерированных результатов."
 
 #: templates/terms.html:141
 msgid "6. Acceptable Use"
-msgstr ""
+msgstr "6. Допустимое использование"
 
 #: templates/terms.html:142
 msgid "You agree not to:"
-msgstr ""
+msgstr "Вы соглашаетесь не:"
 
 #: templates/terms.html:144
-msgid "Abuse, overload, or attempt to disrupt the Service or its infrastructure"
+msgid ""
+"Abuse, overload, or attempt to disrupt the Service or its infrastructure"
 msgstr ""
+"Злоупотребление, перегрузка или попытка нарушить работу Сервиса или его "
+"инфраструктуры."
 
 #: templates/terms.html:145
 msgid "Attempt unauthorized access to systems, accounts, or data"
 msgstr ""
+"Попытка несанкционированного доступа к системам, учетным записям или данным."
 
 #: templates/terms.html:146
 msgid "Use Yonca for spam, scraping, or automated misuse"
 msgstr ""
+"Используйте Yonca для спама, очистки или автоматического злоупотребления."
 
 #: templates/terms.html:147
 msgid "Circumvent security or access controls"
-msgstr ""
+msgstr "Обход средств безопасности или контроля доступа"
 
 #: templates/terms.html:150
 msgid "7. Intellectual Property"
-msgstr ""
+msgstr "7. Интеллектуальная собственность"
 
 #: templates/terms.html:152
 msgid ""
-"The Yonca name, logo, design, and all platform-related content (excluding"
-" User Content) are owned by Yonca or its licensors."
+"The Yonca name, logo, design, and all platform-related content (excluding "
+"User Content) are owned by Yonca or its licensors."
 msgstr ""
+"Название Yonca, логотип, дизайн и весь контент, связанный с платформой (за "
+"исключением Пользовательского контента), принадлежат Yonca или ее "
+"лицензиарам."
 
 #: templates/terms.html:153
 msgid ""
-"You may not copy, modify, distribute, or reverse-engineer any part of the"
-" Service without written permission."
+"You may not copy, modify, distribute, or reverse-engineer any part of the "
+"Service without written permission."
 msgstr ""
+"Вы не имеете права копировать, изменять, распространять или "
+"перепроектировать любую часть Сервиса без письменного разрешения."
 
 #: templates/terms.html:156
 msgid "8. Privacy"
-msgstr ""
+msgstr "8. Конфиденциальность"
 
 #: templates/terms.html:157
 msgid "Your use of Yonca is also governed by our"
-msgstr ""
+msgstr "Использование вами Yonca также регулируется нашими"
 
 #: templates/terms.html:157
 msgid "Privacy Policy"
-msgstr ""
+msgstr "политика конфиденциальности"
 
 #: templates/terms.html:157
 msgid "which explains how we collect, use, and protect your data."
-msgstr ""
+msgstr "где объясняется, как мы собираем, используем и защищаем ваши данные."
 
 #: templates/terms.html:159
 msgid "9. Termination"
-msgstr ""
+msgstr "9. Прекращение действия"
 
 #: templates/terms.html:161
 msgid "You may stop using Yonca at any time."
-msgstr ""
+msgstr "Вы можете прекратить использование Yonca в любое время."
 
 #: templates/terms.html:162
 msgid ""
 "We may suspend or terminate your access immediately if you violate these "
 "Terms or if required by law."
 msgstr ""
+"Мы можем немедленно приостановить или прекратить ваш доступ, если вы "
+"нарушите настоящие Условия или если этого требует закон."
 
 #: templates/terms.html:163
 msgid ""
-"Upon termination, access to your account and stored content may be "
-"removed."
+"Upon termination, access to your account and stored content may be removed."
 msgstr ""
+"После прекращения действия доступ к вашей учетной записи и сохраненному "
+"контенту может быть закрыт."
 
 #: templates/terms.html:166
 msgid "10. Disclaimer of Warranties"
-msgstr ""
+msgstr "10. Отказ от гарантий"
 
 #: templates/terms.html:167
 msgid "Yonca is provided"
-msgstr ""
+msgstr "Yonca предоставляется"
 
 #: templates/terms.html:167
 msgid "as is"
-msgstr ""
+msgstr "как есть"
 
 #: templates/terms.html:167
 msgid "and"
@@ -1458,79 +1553,90 @@ msgstr "и"
 
 #: templates/terms.html:167
 msgid "as available"
-msgstr ""
+msgstr "как доступно"
 
 #: templates/terms.html:167
 msgid "To the maximum extent permitted by law:"
-msgstr ""
+msgstr "В максимальной степени, разрешенной законом:"
 
 #: templates/terms.html:169
 msgid "We make no warranties regarding availability, reliability, or accuracy"
 msgstr ""
+"Мы не даем никаких гарантий относительно доступности, надежности или "
+"точности."
 
 #: templates/terms.html:170
 msgid "We do not guarantee uninterrupted or error-free operation"
-msgstr ""
+msgstr "Мы не гарантируем бесперебойную и безошибочную работу"
 
 #: templates/terms.html:173
 msgid "11. Limitation of Liability"
-msgstr ""
+msgstr "11. Ограничение ответственности"
 
 #: templates/terms.html:174
 msgid "To the extent permitted by law, Yonca shall not be liable for:"
-msgstr ""
+msgstr "В пределах, разрешенных законом, Yonca не несет ответственности за:"
 
 #: templates/terms.html:176
 msgid "Indirect, incidental, or consequential damages"
-msgstr ""
+msgstr "Косвенный, случайный или косвенный ущерб"
 
 #: templates/terms.html:177
 msgid "Loss of data, profits, or business opportunities"
-msgstr ""
+msgstr "Потеря данных, прибыли или деловых возможностей"
 
 #: templates/terms.html:178
 msgid "Issues caused by third-party services or user actions"
-msgstr ""
+msgstr "Проблемы, вызванные сторонними сервисами или действиями пользователя."
 
 #: templates/terms.html:181
 msgid "12. Changes to the Terms"
-msgstr ""
+msgstr "12. Изменения в Условиях"
 
 #: templates/terms.html:182
 msgid ""
-"We may update these Terms from time to time. Continued use of Yonca after"
-" changes become effective constitutes acceptance of the revised Terms."
+"We may update these Terms from time to time. Continued use of Yonca after "
+"changes become effective constitutes acceptance of the revised Terms."
 msgstr ""
+"Мы можем время от времени обновлять настоящие Условия. Продолжение "
+"использования Yonca после вступления изменений в силу означает принятие "
+"пересмотренных Условий."
 
 #: templates/terms.html:184
 msgid "13. Governing Law"
-msgstr ""
+msgstr "13. Применимое право"
 
 #: templates/terms.html:185
 msgid ""
 "These Terms are governed by and construed in accordance with applicable "
 "laws, without regard to conflict of law principles."
 msgstr ""
+"Настоящие Условия регулируются и толкуются в соответствии с действующим "
+"законодательством, без учета принципов коллизионного права."
 
 #: templates/terms.html:187
 msgid "14. Contact"
-msgstr ""
+msgstr "14. Контакт"
 
 #: templates/terms.html:188
 msgid ""
-"If you have questions about these Terms, please contact us through the "
-"Yonca website."
+"If you have questions about these Terms, please contact us through the Yonca"
+" website."
 msgstr ""
+"Если у вас есть вопросы по поводу настоящих Условий, свяжитесь с нами через "
+"веб-сайт Yonca."
 
 #: templates/terms.html:192
 msgid ""
-"By using Yonca, you acknowledge that you have read, understood, and agree"
-" to these Terms of Service."
+"By using Yonca, you acknowledge that you have read, understood, and agree to"
+" these Terms of Service."
 msgstr ""
+"Используя Yonca, вы подтверждаете, что прочитали, поняли и согласились с "
+"настоящими Условиями обслуживания."
 
 #: templates/terms.html:194
 msgid "Back to Home"
-msgstr ""
+msgstr "Вернуться домой"
 
 #: templates/components/navbar.html:36
 msgid "About"
@@ -1542,5 +1648,4 @@ msgstr "Профиль"
 
 #: templates/components/navbar.html:53
 msgid "Admin Panel"
-msgstr ""
-
+msgstr "Панель администратора"
