@@ -1321,6 +1321,8 @@
                         {% set video_id = '' %}
                         {% if 'youtube.com/watch?v=' in image.url %}
                         {% set video_id = image.url.split('v=')[1].split('&')[0] %}
+                        {% elif 'youtube.com/shorts/' in image.url %}
+                        {% set video_id = image.url.split('shorts/')[1].split('?')[0] %}
                         {% elif 'youtu.be/' in image.url %}
                         {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
                         {% endif %}
@@ -1631,6 +1633,8 @@
                         {% set video_id = '' %}
                         {% if 'youtube.com/watch?v=' in image.url %}
                         {% set video_id = image.url.split('v=')[1].split('&')[0] %}
+                        {% elif 'youtube.com/shorts/' in image.url %}
+                        {% set video_id = image.url.split('shorts/')[1].split('?')[0] %}
                         {% elif 'youtu.be/' in image.url %}
                         {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
                         {% endif %}
