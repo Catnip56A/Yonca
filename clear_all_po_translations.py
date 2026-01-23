@@ -71,13 +71,24 @@ def clear_po_translations(po_file_path):
 def find_po_files(base_path):
     """Find all .po files in the translations directory"""
     po_files = []
-    translations_path = Path(base_path) / 'yonca' / 'translations'
-    
-    if not translations_path.exists():
-        print(f"Error: Translations directory not found at {translations_path}")
+    # Prefer the package translations directory, but allow a project-level
+    # `translations` folder as a fallback. This mirrors other scripts.
+    candidates = [
+        Path(base_path) / 'yonca' / 'translations',
+        Path(base_path) / 'translations',
+    ]
+
+    translations_path = None
+    for cand in candidates:
+        if cand.exists():
+            translations_path = cand
+            break
+
+    if translations_path is None:
+        print(f"Error: Translations directory not found. Checked: {', '.join(str(p) for p in candidates)}")
         return po_files
-    
-    # Find all .po files
+
+    # Find all .po files under the chosen translations directory
     for po_file in translations_path.rglob('*.po'):
         po_files.append(po_file)
     
@@ -86,7 +97,7 @@ def find_po_files(base_path):
 def main():
     """Main function to clear all translations from .po files"""
     # Get the base path (project root)
-    base_path = Path(__file__).parent.parent
+    base_path = Path(__file__).parent
     
     print("=" * 60)
     print("Clearing all translations from .po files")

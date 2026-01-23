@@ -457,9 +457,13 @@
                                                                         <label for="comment_{{ sub.id }}">Comment:</label>
                                                                         <textarea id="comment_{{ sub.id }}" name="comment" class="form-control" rows="2">{{ sub.comment if sub.comment else '' }}</textarea>
                                                                     </div>
-                                                                    <div class="col-md-3 d-flex align-items-end">
-                                                                        <button type="submit" class="btn btn-sm btn-success">Save</button>
-                                                                    </div>
+                                                                        <div class="col-md-2 d-flex align-items-center">
+                                                                            <label class="mb-0 mr-2">{{ _('Passed') }}</label>
+                                                                            <input type="checkbox" name="passed" {% if sub.passed %}checked{% endif %}>
+                                                                        </div>
+                                                                        <div class="col-md-3 d-flex align-items-end">
+                                                                            <button type="submit" class="btn btn-sm btn-success">Save</button>
+                                                                        </div>
                                                                 </div>
                                                             </form>
                                                             {% if sub.grade is not none or sub.comment %}

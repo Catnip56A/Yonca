@@ -200,6 +200,7 @@ def course_page_enrolled(course_id):
             submission_id = request.form.get('submission_id')
             grade = request.form.get('grade')
             comment = request.form.get('comment')
+            passed_flag = request.form.get('passed') == 'on'
             
             submission = CourseAssignmentSubmission.query.get(submission_id)
             if submission:
@@ -207,6 +208,7 @@ def course_page_enrolled(course_id):
                     submission.grade = int(grade)
                 if comment:
                     submission.comment = comment
+                submission.passed = passed_flag
                 db.session.commit()
                 flash('Grade and comment saved successfully!', 'success')
             return redirect(url_for('main.course_page_enrolled', course_id=course.id))
@@ -1132,8 +1134,15 @@ def course_page_enrolled(course_id):
             from yonca.models import CourseContent, CourseAssignment
             assignment_id = request.form.get('assignment_id')
             folder_id = request.form.get('import_assignment_folder_id')
+            lock_assignment_id = request.form.get('import_assignment_lock_assignment_id')
+            lock_folder_ids = request.form.getlist('import_lock_folder_ids')
             assignment = CourseAssignment.query.get(assignment_id)
             if assignment and assignment.course_id == course.id:
+                # Prevent importing the same assignment into course content more than once
+                existing = CourseContent.query.filter_by(course_id=course.id, content_type='assignment', content_data=str(assignment.id)).first()
+                if existing:
+                    flash(f'Assignment "{assignment.title}" has already been imported to course content.', 'warning')
+                    return redirect(url_for('main.course_page_enrolled', course_id=course.id))
                 content = CourseContent(
                     course_id=course.id,
                     title=assignment.title,
@@ -1146,6 +1155,28 @@ def course_page_enrolled(course_id):
                 )
                 db.session.add(content)
                 db.session.commit()
+                # If a lock assignment was chosen, lock selected folders (or all other folders if none selected)
+                try:
+                    if lock_assignment_id:
+                        lock_id_int = int(lock_assignment_id)
+                        from yonca.models import CourseContentFolder
+                        if lock_folder_ids:
+                            # lock only the explicitly selected folders
+                            for fid in lock_folder_ids:
+                                if fid and fid.isdigit():
+                                    f = CourseContentFolder.query.get(int(fid))
+                                    if f and f.course_id == course.id:
+                                        f.locked_until_assignment_id = lock_id_int
+                        else:
+                            # default: lock all other folders except destination
+                            other_folders = CourseContentFolder.query.filter_by(course_id=course.id).all()
+                            for f in other_folders:
+                                if folder_id and f.id == int(folder_id):
+                                    continue
+                                f.locked_until_assignment_id = lock_id_int
+                        db.session.commit()
+                except ValueError:
+                    pass
                 flash(f'Assignment "{assignment.title}" imported to folder!', 'success')
             else:
                 flash('Assignment not found or does not belong to this course.', 'danger')
@@ -1198,6 +1229,16 @@ def course_page_enrolled(course_id):
     # General debug log to confirm route access
     print("[DEBUG] course_page_enrolled route accessed")
 
+    # Determine which assignments the current user has passed (for folder lock checks)
+    passed_assignment_ids = set()
+    try:
+        if current_user.is_authenticated:
+            from yonca.models import CourseAssignmentSubmission
+            passed_subs = CourseAssignmentSubmission.query.filter_by(user_id=current_user.id, passed=True).all()
+            passed_assignment_ids = {s.assignment_id for s in passed_subs}
+    except Exception:
+        passed_assignment_ids = set()
+
     return render_template('course_page_enrolled.html',
                           course=course,
                           home_content=home_content,
@@ -1211,6 +1252,7 @@ def course_page_enrolled(course_id):
                           enrolled=enrolled,
                           current_user=current_user,
                           is_authenticated=current_user.is_authenticated,
+                          passed_assignment_ids=passed_assignment_ids,
                           datetime=dt)
     if user:
         user.is_teacher = is_teacher

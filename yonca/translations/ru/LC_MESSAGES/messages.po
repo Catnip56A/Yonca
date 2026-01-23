@@ -23,7 +23,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:373
 #, fuzzy
 msgid "Course Features"
-msgstr "Курсы"
+msgstr ""
 
 #: templates/components/navbar.html:24 templates/course_description.html:133
 #: templates/course_page_enrolled.html:378 templates/index.html:1215
@@ -50,13 +50,13 @@ msgstr "Ресурсы"
 #: templates/course_description.html:142
 #: templates/course_page_enrolled.html:387
 msgid "Access course materials, documents, and additional resources."
-msgstr "Получите доступ к материалам курса, документам и дополнительным ресурсам."
+msgstr ""
 
 #: templates/course_description.html:143
 #: templates/course_page_enrolled.html:388
 #, fuzzy
 msgid "Access Resources"
-msgstr "Ресурсы"
+msgstr ""
 
 #: templates/course_description.html:149
 #: templates/course_page_enrolled.html:246
@@ -67,7 +67,7 @@ msgstr "Отзывы"
 #: templates/course_description.html:150
 #: templates/course_page_enrolled.html:395
 msgid "Read reviews from other students and share your experience."
-msgstr "Читайте отзывы других студентов и поделитесь своим опытом."
+msgstr ""
 
 #: templates/course_description.html:151
 #: templates/course_page_enrolled.html:396
@@ -79,30 +79,30 @@ msgstr ""
 #: templates/course_page_enrolled.html:847
 #, fuzzy
 msgid "Student Reviews"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_description.html:162
 #: templates/course_page_enrolled.html:407
 #, fuzzy
 msgid "review"
 msgid_plural "reviews"
-msgstr[0] "Отзывы"
+msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
 #: templates/course_description.html:162
 #, fuzzy
 msgid "reviews"
-msgstr "Отзывы"
+msgstr "обзоры"
 
 #: templates/course_description.html:179
 #: templates/course_page_enrolled.html:424
 msgid "Average Rating"
-msgstr "Средний рейтинг"
+msgstr ""
 
 #: templates/course_description.html:196
 msgid "By"
-msgstr "От"
+msgstr "К"
 
 #: templates/course_description.html:210
 #: templates/course_page_enrolled.html:531
@@ -125,7 +125,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:229
 #, fuzzy
 msgid "Back to Courses"
-msgstr "Курсы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:234
 msgid "Content"
@@ -137,7 +137,7 @@ msgstr "Содержание"
 #: templates/course_page_enrolled.html:1074
 #, fuzzy
 msgid "Description"
-msgstr "Описание:"
+msgstr "Описание"
 
 #: templates/course_page_enrolled.html:240
 #: templates/course_page_enrolled.html:539
@@ -164,7 +164,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:262
 #, fuzzy
 msgid "Delete Folder"
-msgstr "Удалить"
+msgstr ""
 
 #: templates/course_page_enrolled.html:282
 #: templates/course_page_enrolled.html:493
@@ -174,25 +174,25 @@ msgstr ""
 #: templates/course_page_enrolled.html:284
 #: templates/course_page_enrolled.html:495
 msgid "View/Download"
-msgstr ""
+msgstr "Посмотреть/Скачать"
 
 #: templates/course_page_enrolled.html:288
 #: templates/course_page_enrolled.html:499
 #: templates/course_page_enrolled.html:1104
 #, fuzzy
 msgid "Move File"
-msgstr "Профиль"
+msgstr ""
 
 #: templates/course_page_enrolled.html:295
 #: templates/course_page_enrolled.html:650
 msgid "Visible"
-msgstr ""
+msgstr "Видимый"
 
 #: templates/course_page_enrolled.html:295
 #: templates/course_page_enrolled.html:577
 #: templates/course_page_enrolled.html:650
 msgid "Private"
-msgstr ""
+msgstr "Частный"
 
 #: templates/course_page_enrolled.html:298
 #: templates/course_page_enrolled.html:509
@@ -210,7 +210,7 @@ msgstr "Удалить"
 #: templates/course_page_enrolled.html:459
 #, fuzzy
 msgid "Course Content"
-msgstr "Содержание"
+msgstr ""
 
 #: templates/course_page_enrolled.html:463
 #: templates/course_page_enrolled.html:982
@@ -223,7 +223,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:1049
 #, fuzzy
 msgid "Upload File"
-msgstr "Загружено:"
+msgstr ""
 
 #: templates/course_page_enrolled.html:483
 msgid "Unsorted Files"
@@ -244,19 +244,19 @@ msgstr ""
 #: templates/course_page_enrolled.html:1092
 #, fuzzy
 msgid "Create Assignment"
-msgstr "Задания"
+msgstr ""
 
 #: templates/course_page_enrolled.html:550
 msgid "pts"
-msgstr ""
+msgstr "баллы"
 
 #: templates/course_page_enrolled.html:552
 msgid "Due:"
-msgstr ""
+msgstr "Должный:"
 
 #: templates/course_page_enrolled.html:552
 msgid "N/A"
-msgstr ""
+msgstr "Н/Д"
 
 #: templates/course_page_enrolled.html:559
 #: templates/course_page_enrolled.html:630
@@ -267,13 +267,13 @@ msgstr ""
 #: templates/course_page_enrolled.html:634
 #, fuzzy
 msgid "Late"
-msgstr "Удалить"
+msgstr "Поздно"
 
 #: templates/course_page_enrolled.html:566
 #: templates/course_page_enrolled.html:637
 #, fuzzy
 msgid "Early"
-msgstr "Электронная почта"
+msgstr "Рано"
 
 #: templates/course_page_enrolled.html:571
 msgid "View Your Submission"
@@ -294,11 +294,11 @@ msgstr ""
 #: templates/course_page_enrolled.html:586
 #: templates/course_page_enrolled.html:675
 msgid "Grade:"
-msgstr ""
+msgstr "Оценка:"
 
 #: templates/course_page_enrolled.html:589
 msgid "Feedback:"
-msgstr ""
+msgstr "Обратная связь:"
 
 #: templates/course_page_enrolled.html:594
 msgid "Not Submitted"
@@ -306,7 +306,7 @@ msgstr ""
 
 #: templates/course_page_enrolled.html:597
 msgid "Overdue"
-msgstr ""
+msgstr "Просрочено"
 
 #: templates/course_page_enrolled.html:606
 msgid "Upload Your Work:"
@@ -315,7 +315,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:609
 #, fuzzy
 msgid "Submit Assignment"
-msgstr "Задания"
+msgstr ""
 
 #: templates/course_page_enrolled.html:615
 msgid ""
@@ -326,7 +326,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:618
 #, fuzzy
 msgid "Delete Assignment"
-msgstr "Задания"
+msgstr ""
 
 #: templates/course_page_enrolled.html:621
 msgid "View Submissions"
@@ -334,7 +334,7 @@ msgstr ""
 
 #: templates/course_page_enrolled.html:642
 msgid "Submitted:"
-msgstr ""
+msgstr "Поданный:"
 
 #: templates/course_page_enrolled.html:643
 msgid "View Submission"
@@ -346,12 +346,12 @@ msgstr ""
 
 #: templates/course_page_enrolled.html:664
 msgid "Grade"
-msgstr ""
+msgstr "Оценка"
 
 #: templates/course_page_enrolled.html:667
 #, fuzzy
 msgid "Comment"
-msgstr "Контакты"
+msgstr "Комментарий"
 
 #: templates/course_page_enrolled.html:670
 msgid "Save Grade"
@@ -360,7 +360,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:678
 #, fuzzy
 msgid "Comment:"
-msgstr "Контакты"
+msgstr "Комментарий:"
 
 #: templates/course_page_enrolled.html:684
 msgid "No submissions yet."
@@ -369,7 +369,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:692
 #, fuzzy
 msgid "No assignments available."
-msgstr "Задания"
+msgstr ""
 
 #: templates/course_page_enrolled.html:697
 msgid "Enroll to Access Assignments"
@@ -382,7 +382,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:712
 #: templates/course_page_enrolled.html:768
 msgid "Reply"
-msgstr ""
+msgstr "Отвечать"
 
 #: templates/course_page_enrolled.html:722
 #: templates/course_page_enrolled.html:777
@@ -399,12 +399,12 @@ msgstr ""
 #: templates/course_page_enrolled.html:967
 #, fuzzy
 msgid "Add Announcement"
-msgstr "Объявления"
+msgstr ""
 
 #: templates/course_page_enrolled.html:756
 #, fuzzy
 msgid "Posted:"
-msgstr "Загружено:"
+msgstr "Опубликовано:"
 
 #: templates/course_page_enrolled.html:759
 msgid ""
@@ -415,17 +415,17 @@ msgstr ""
 #: templates/course_page_enrolled.html:762
 #, fuzzy
 msgid "Delete Announcement"
-msgstr "Объявления"
+msgstr ""
 
 #: templates/course_page_enrolled.html:796
 #, fuzzy
 msgid "No announcements yet."
-msgstr "Объявления"
+msgstr ""
 
 #: templates/course_page_enrolled.html:803
 #, fuzzy
 msgid "Course Reviews"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:809
 msgid "Write Your Review"
@@ -434,7 +434,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:816
 #: templates/course_page_enrolled.html:899
 msgid "Rating"
-msgstr ""
+msgstr "Рейтинг"
 
 #: templates/course_page_enrolled.html:825
 msgid "Click on a star to rate (1-5)"
@@ -444,7 +444,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:910
 #, fuzzy
 msgid "Review Title"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:830
 msgid "Summarize your experience"
@@ -454,7 +454,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:914
 #, fuzzy
 msgid "Your Review"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:835
 msgid "Share your thoughts about this course..."
@@ -463,11 +463,11 @@ msgstr ""
 #: templates/course_page_enrolled.html:839
 #, fuzzy
 msgid "Submit Review"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:868
 msgid "Edit"
-msgstr ""
+msgstr "Редактировать"
 
 #: templates/course_page_enrolled.html:870
 msgid "Are you sure you want to delete this review?"
@@ -476,12 +476,12 @@ msgstr ""
 #: templates/course_page_enrolled.html:892
 #, fuzzy
 msgid "Edit Review"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:920
 #, fuzzy
 msgid "Update Review"
-msgstr "Отзывы"
+msgstr ""
 
 #: templates/course_page_enrolled.html:931
 msgid "No reviews yet. Be the first to review this course!"
@@ -492,12 +492,12 @@ msgstr ""
 #: templates/course_page_enrolled.html:1070
 #, fuzzy
 msgid "Title"
-msgstr "Заголовок:"
+msgstr "Заголовок"
 
 #: templates/course_page_enrolled.html:957
 #, fuzzy
 msgid "Message"
-msgstr "Сообщение:"
+msgstr "Сообщение"
 
 #: templates/course_page_enrolled.html:962
 #: templates/course_page_enrolled.html:1040
@@ -512,11 +512,11 @@ msgstr ""
 #: templates/course_page_enrolled.html:1123
 #: templates/course_page_enrolled.html:1155
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: templates/course_page_enrolled.html:989
 msgid "Parent:"
-msgstr ""
+msgstr "Родитель:"
 
 #: templates/course_page_enrolled.html:989
 #: templates/course_page_enrolled.html:1024
@@ -524,22 +524,22 @@ msgstr ""
 #: templates/course_page_enrolled.html:1147
 #, fuzzy
 msgid "Root"
-msgstr "Выход из системы"
+msgstr "Корень"
 
 #: templates/course_page_enrolled.html:992
 #, fuzzy
 msgid "Folder Name"
-msgstr "Имя пользователя:"
+msgstr ""
 
 #: templates/course_page_enrolled.html:1024
 #, fuzzy
 msgid "Upload to:"
-msgstr "Загружено:"
+msgstr ""
 
 #: templates/course_page_enrolled.html:1027
 #, fuzzy
 msgid "File"
-msgstr "Профиль"
+msgstr "Файл"
 
 #: templates/course_page_enrolled.html:1044
 msgid "Allow students to view this file"
@@ -552,7 +552,7 @@ msgstr ""
 #: templates/course_page_enrolled.html:1082
 #, fuzzy
 msgid "Points"
-msgstr "минуты"
+msgstr "Очки"
 
 #: templates/course_page_enrolled.html:1113
 msgid "Select Destination Folder"
@@ -560,7 +560,7 @@ msgstr ""
 
 #: templates/course_page_enrolled.html:1124
 msgid "Move"
-msgstr ""
+msgstr "Двигаться"
 
 #: templates/course_page_enrolled.html:1145
 msgid "Select New Parent Folder"
@@ -738,7 +738,7 @@ msgstr ""
 
 #: templates/index.html:1451
 msgid "Translation Settings"
-msgstr "Настройки перевода"
+msgstr ""
 
 #: templates/index.html:1454
 msgid "Language:"
@@ -746,7 +746,7 @@ msgstr "Язык:"
 
 #: templates/index.html:1456
 msgid "Don't translate"
-msgstr "Не переводить"
+msgstr ""
 
 #: templates/index.html:1457
 msgid "English"
@@ -758,14 +758,14 @@ msgstr "Русский"
 
 #: templates/index.html:1459
 msgid "Azerbaijani"
-msgstr "Азербайджанский"
+msgstr "азербайджанский"
 
 #: templates/index.html:1463
 msgid ""
 "Select a language to translate messages, or choose 'Don't translate' to "
 "view messages in their original language. Click individual messages to "
 "toggle translation."
-msgstr "Выберите язык для перевода сообщений или выберите 'Не переводить', чтобы просмотреть сообщения на исходном языке. Нажмите на отдельные сообщения, чтобы переключить перевод."
+msgstr ""
 
 #: templates/index.html:1467
 msgid "Post a New Message"
@@ -807,11 +807,11 @@ msgstr ""
 
 #: templates/index.html:1497
 msgid "Download educational materials, documents, and access protected files."
-msgstr "Скачивайте учебные материалы, документы и получайте доступ к защищённым файлам."
+msgstr ""
 
 #: templates/index.html:1500
 msgid "Learning Materials"
-msgstr "Учебные материалы"
+msgstr ""
 
 #: templates/index.html:1502
 msgid "Loading materials..."

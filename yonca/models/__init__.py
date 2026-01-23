@@ -136,6 +136,7 @@ class CourseAssignmentSubmission(db.Model):
     submitted_at = db.Column(db.DateTime, server_default=db.func.now())
     grade = db.Column(db.Integer, nullable=True)
     comment = db.Column(db.Text, nullable=True)
+    passed = db.Column(db.Boolean, default=False)
     allow_others_to_view = db.Column(db.Boolean, default=False)  # Allow other users to view this file
     assignment = db.relationship('CourseAssignment', backref=db.backref('submissions', lazy='dynamic'))
     user = db.relationship('User')
@@ -376,6 +377,8 @@ class CourseContentFolder(db.Model):
 
     course = db.relationship('Course', backref=db.backref('content_folders', lazy='dynamic'))
     parent_folder = db.relationship('CourseContentFolder', remote_side=[id], backref=db.backref('subfolders', lazy='dynamic'))
+    locked_until_assignment_id = db.Column(db.Integer, db.ForeignKey('course_assignment.id'), nullable=True)
+    locked_until_assignment = db.relationship('CourseAssignment', foreign_keys=[locked_until_assignment_id])
 
     def __repr__(self):
         return f'<CourseContentFolder {self.title}>'

@@ -220,11 +220,12 @@ def auto_translate_course(course, session=None):
     # Translate dropdown menu items
     if course.dropdown_menu:
         translate_json_array('course', course.id, 'dropdown_menu', course.dropdown_menu, 'text', session=session)
-    
     # Translate page features
     if course.page_features:
         translate_json_array('course', course.id, 'page_features', course.page_features, session=session)
 
+    # DO NOT translate course content or folders when translating course from admin panel
+    # (Intentionally left blank)
 
 def auto_translate_course_content(content, session=None):
     """Automatically translate course content (lessons, materials, etc.)."""
