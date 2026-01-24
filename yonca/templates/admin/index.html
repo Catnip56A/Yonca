@@ -621,14 +621,14 @@ function initializeFeatures() {
     // Initialize logged in features
     {% if home_content.features %}
     {% for feature in home_content.features %}
-    addFeatureFromData('features-container', 'feature', {{ feature.title|tojson }}, {{ feature.description|tojson }});
+    addFeatureFromData('features-container', 'feature', {{ feature.title|tojson }}, {{ feature.description|tojson }}, {{ feature.button_text|tojson if feature.button_text is defined else '""' }}, {{ feature.button_url|tojson if feature.button_url is defined else '""' }});
     {% endfor %}
     {% endif %}
 
     // Initialize logged out features
     {% if home_content.logged_out_features %}
     {% for feature in home_content.logged_out_features %}
-    addFeatureFromData('logged-out-features-container', 'logged_out_feature', {{ feature.title|tojson }}, {{ feature.description|tojson }});
+    addFeatureFromData('logged-out-features-container', 'logged_out_feature', {{ feature.title|tojson }}, {{ feature.description|tojson }}, {{ feature.button_text|tojson if feature.button_text is defined else '""' }}, {{ feature.button_url|tojson if feature.button_url is defined else '""' }});
     {% endfor %}
     {% endif %}
 
@@ -664,6 +664,16 @@ function addFeature(containerId, prefix) {
             <textarea id="${prefix}_desc_${featureIndex}" name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
                       placeholder="Feature description"></textarea>
         </div>
+        <div class="form-group-inline">
+            <label for="${prefix}_button_text_${featureIndex}">Button Text:</label>
+            <input type="text" id="${prefix}_button_text_${featureIndex}" name="${prefix}_button_text_${featureIndex}" class="form-control feature-button-text"
+                   placeholder="e.g. Learn More" value="">
+        </div>
+        <div class="form-group-inline">
+            <label for="${prefix}_button_url_${featureIndex}">Button URL:</label>
+            <input type="url" id="${prefix}_button_url_${featureIndex}" name="${prefix}_button_url_${featureIndex}" class="form-control feature-button-url"
+                   placeholder="/courses/1 or https://..." value="">
+        </div>
     `;
 
     container.appendChild(featureDiv);
@@ -680,7 +690,7 @@ function addFeature(containerId, prefix) {
     updatePreviewFeatures();
 }
 
-function addFeatureFromData(containerId, prefix, title, description) {
+function addFeatureFromData(containerId, prefix, title, description, buttonText = '', buttonUrl = '') {
     const container = document.getElementById(containerId);
     const featureIndex = container.children.length;
 
@@ -700,13 +710,33 @@ function addFeatureFromData(containerId, prefix, title, description) {
         </div>
         <div class="form-group-inline">
             <label for="${prefix}_title_${featureIndex}">Title:</label>
-            <input type="text" id="${prefix}_title_${featureIndex}" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
-                   placeholder="Feature title" value="${escapedTitle}">
+                 <input type="text" id="${prefix}_title_${featureIndex}" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
+                     placeholder="Feature title" value="${escapedTitle}">
         </div>
         <div class="form-group-inline">
             <label for="${prefix}_desc_${featureIndex}">Description:</label>
             <textarea id="${prefix}_desc_${featureIndex}" name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
                       placeholder="Feature description">${escapedDescription}</textarea>
+        </div>
+        <div class="form-group-inline">
+            <label for="${prefix}_button_text_${featureIndex}">Button Text:</label>
+            <input type="text" id="${prefix}_button_text_${featureIndex}" name="${prefix}_button_text_${featureIndex}" class="form-control feature-button-text"
+                   placeholder="e.g. Learn More" value="${buttonText}">
+        </div>
+        <div class="form-group-inline">
+            <label for="${prefix}_button_url_${featureIndex}">Button URL:</label>
+            <input type="url" id="${prefix}_button_url_${featureIndex}" name="${prefix}_button_url_${featureIndex}" class="form-control feature-button-url"
+                   placeholder="/courses/1 or https://..." value="${buttonUrl}">
+        </div>
+        <div class="form-group-inline">
+            <label for="${prefix}_button_text_${featureIndex}">Button Text:</label>
+            <input type="text" id="${prefix}_button_text_${featureIndex}" name="${prefix}_button_text_${featureIndex}" class="form-control feature-button-text"
+                   placeholder="e.g. Learn More" value="">
+        </div>
+        <div class="form-group-inline">
+            <label for="${prefix}_button_url_${featureIndex}">Button URL:</label>
+            <input type="url" id="${prefix}_button_url_${featureIndex}" name="${prefix}_button_url_${featureIndex}" class="form-control feature-button-url"
+                   placeholder="/courses/1 or https://..." value="">
         </div>
     `;
 
@@ -1016,6 +1046,8 @@ function updatePreviewFeatures() {
     loggedInFeatures.forEach(feature => {
         const title = feature.querySelector('.feature-title').value;
         const desc = feature.querySelector('.feature-desc').value;
+        const btnText = feature.querySelector('.feature-button-text') ? feature.querySelector('.feature-button-text').value : '';
+        const btnUrl = feature.querySelector('.feature-button-url') ? feature.querySelector('.feature-button-url').value : '';
 
         if (title || desc) {
             const featureDiv = document.createElement('div');
@@ -1023,6 +1055,7 @@ function updatePreviewFeatures() {
             featureDiv.innerHTML = `
                 <div class="feature-title">${title || 'Feature Title'}</div>
                 <div class="feature-desc">${desc || 'Feature description'}</div>
+                ${btnText ? `<div style="margin-top:8px;"><a href="${btnUrl || '#'}" class="feature-btn" target="_blank">${btnText}</a></div>` : ''}
             `;
             loggedInPreview.appendChild(featureDiv);
         }
@@ -1036,6 +1069,8 @@ function updatePreviewFeatures() {
     loggedOutFeatures.forEach(feature => {
         const title = feature.querySelector('.feature-title').value;
         const desc = feature.querySelector('.feature-desc').value;
+        const btnText = feature.querySelector('.feature-button-text') ? feature.querySelector('.feature-button-text').value : '';
+        const btnUrl = feature.querySelector('.feature-button-url') ? feature.querySelector('.feature-button-url').value : '';
 
         if (title || desc) {
             const featureDiv = document.createElement('div');
@@ -1043,6 +1078,7 @@ function updatePreviewFeatures() {
             featureDiv.innerHTML = `
                 <div class="feature-title">${title || 'Feature Title'}</div>
                 <div class="feature-desc">${desc || 'Feature description'}</div>
+                ${btnText ? `<div style="margin-top:8px;"><a href="${btnUrl || '#'}" class="feature-btn" target="_blank">${btnText}</a></div>` : ''}
             `;
             loggedOutPreview.appendChild(featureDiv);
         }

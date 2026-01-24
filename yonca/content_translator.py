@@ -202,6 +202,11 @@ def translate_json_array(content_type, content_id, field_name, json_array, text_
             sub_field_name = f"{field_name}[{index}].text"
             translate_content(content_type, content_id, sub_field_name, item['text'], source_language, session)
         
+        # Translate button_text if present (for features)
+        if 'button_text' in item and item['button_text']:
+            sub_field_name = f"{field_name}[{index}].button_text"
+            translate_content(content_type, content_id, sub_field_name, item['button_text'], source_language, session)
+
         # Translate caption if present (for gallery items)
         if 'caption' in item and item['caption']:
             sub_field_name = f"{field_name}[{index}].caption"
@@ -366,6 +371,13 @@ def get_translated_json_array(content_type, content_id, field_name, json_array, 
             sub_field_name = f"{field_name}[{index}].text"
             translated_item['text'] = get_translated_content(
                 content_type, content_id, sub_field_name, item['text'], target_language
+            )
+
+        # Translate button_text if present (for features)
+        if 'button_text' in item:
+            sub_field_name = f"{field_name}[{index}].button_text"
+            translated_item['button_text'] = get_translated_content(
+                content_type, content_id, sub_field_name, item.get('button_text', ''), target_language
             )
         
         translated_array.append(translated_item)

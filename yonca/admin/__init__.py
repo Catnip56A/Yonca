@@ -275,22 +275,40 @@ class AdminIndexView(AdminIndexView):
                 for i in range(len(feature_titles)):
                     title_key = f'feature_title_{i}'
                     desc_key = f'feature_desc_{i}'
+                    btn_text_key = f'feature_button_text_{i}'
+                    btn_url_key = f'feature_button_url_{i}'
                     if title_key in form_data and desc_key in form_data:
                         title = form_data[title_key].strip()
                         desc = form_data[desc_key].strip()
+                        btn_text = form_data.get(btn_text_key, '').strip()
+                        btn_url = form_data.get(btn_url_key, '').strip()
                         if title or desc:  # Only add if there's content
-                            features.append({'title': title, 'description': desc})
+                            item = {'title': title, 'description': desc}
+                            if btn_text:
+                                item['button_text'] = btn_text
+                            if btn_url:
+                                item['button_url'] = btn_url
+                            features.append(item)
                 
                 # Process logged out features
                 logged_out_titles = [key for key in form_data.keys() if key.startswith('logged_out_feature_title_')]
                 for i in range(len(logged_out_titles)):
                     title_key = f'logged_out_feature_title_{i}'
                     desc_key = f'logged_out_feature_desc_{i}'
+                    btn_text_key = f'logged_out_feature_button_text_{i}'
+                    btn_url_key = f'logged_out_feature_button_url_{i}'
                     if title_key in form_data and desc_key in form_data:
                         title = form_data[title_key].strip()
                         desc = form_data[desc_key].strip()
+                        btn_text = form_data.get(btn_text_key, '').strip()
+                        btn_url = form_data.get(btn_url_key, '').strip()
                         if title or desc:  # Only add if there's content
-                            logged_out_features.append({'title': title, 'description': desc})
+                            item = {'title': title, 'description': desc}
+                            if btn_text:
+                                item['button_text'] = btn_text
+                            if btn_url:
+                                item['button_url'] = btn_url
+                            logged_out_features.append(item)
                 
                 home_content.features = features
                 home_content.logged_out_features = logged_out_features

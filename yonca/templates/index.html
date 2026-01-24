@@ -361,6 +361,21 @@
             font-size: 1.5rem;
         }
 
+        /* Feature card buttons (configurable via admin: feature.button_text / feature.button_url) */
+        .feature-card .feature-btn {
+            display: inline-block;
+            margin-top: 0.75rem;
+            background: #337a2c;
+            color: #fff;
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .feature-card .feature-btn:hover {
+            background: #2a5a22;
+        }
+
         /* Home features container styled like gallery items (rounded rectangle background) */
         .features-section {
             margin: 3rem 0;
@@ -1482,6 +1497,9 @@
                 <div class="feature-card">
                     <h3>{{ feature.title }}</h3>
                     <p>{{ feature.description }}</p>
+                    {% if feature.button_text and feature.button_url %}
+                    <a href="{{ feature.button_url }}" class="feature-btn" target="_blank" rel="noopener">{{ feature.button_text }}</a>
+                    {% endif %}
                 </div>
                 {% endfor %}
                 {% else %}
