@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
     <title>{{ _('Yonca - Learning Platform') }}</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%270.9em%27 font-size=%2790%27%3E%F0%9F%8D%80%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -397,6 +398,81 @@
             scrollbar-color: #e5e7eb #f9fafb;
         }
 
+        /* Carousel styles for single large gallery box */
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 2rem 0;
+            background: #f5f1ea;
+            padding: 16px;
+        }
+
+        .gallery-wrapper {
+            display: flex;
+            transition: transform 0.6s ease-in-out;
+            width: 100%;
+        }
+
+        .gallery-wrapper > .gallery-item {
+            min-width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+            padding: 0 20px; /* add horizontal gutter so neighboring slides' edges don't show */
+        }
+
+        /* Enforce width:height = 16:10 (i.e. height:width = 10:16) for gallery media */
+        .gallery-container img,
+        .gallery-container iframe,
+        .gallery-container video {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 16 / 10; /* width / height = 16 / 10 */
+            max-height: none;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Ensure slide box preserves aspect even before media loads */
+        .gallery-wrapper > .gallery-item {
+            min-width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px;
+        }
+
+        .gallery-media-viewport {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            max-height: 80vh;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #e9efe0;
+        }
+
+        .gallery-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.45);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 6px;
+            font-size: 1.25rem;
+        }
+
+        .gallery-control.prev { left: 12px; }
+        .gallery-control.next { right: 12px; }
+
         .gallery-grid::-webkit-scrollbar {
             height: 8px;
         }
@@ -428,7 +504,8 @@
 
         .gallery-item img {
             width: 100%;
-            max-height: 250px;
+            max-height: none;
+            height: 100%;
             object-fit: cover;
             display: block;
             border-radius: 12px 12px 0 0;
@@ -446,7 +523,8 @@
 
         .gallery-item video, .gallery-item iframe {
             width: 100%;
-            max-height: 250px;
+            max-height: none;
+            height: 100%;
             object-fit: cover;
             display: block;
             border-radius: 12px 12px 0 0;
@@ -955,7 +1033,8 @@
             .gallery-item img,
             .gallery-item video,
             .gallery-item iframe {
-                max-height: 250px;
+                max-height: none;
+                height: 100%;
                 border-radius: 12px 12px 0 0;
             }
 
@@ -1066,6 +1145,10 @@
             .white-overlay {
                 padding: 16px;
                 border-radius: 12px;
+            }
+            /* smaller horizontal gutter for slides on mobile */
+            .gallery-wrapper > .gallery-item {
+                padding: 0 12px;
             }
         }
 
@@ -1312,30 +1395,32 @@
                 <h2 class="section-title" style="color: #337a2c;">{{ _('What\'s New') }}</h2>
                 <p>{{ _('Discover the latest updates, new features, and exciting developments in our learning platform.') }}</p>
 
-                <div class="gallery-grid">
+                <div class="gallery-container">
+                    <div class="gallery-wrapper">
                     {% if home_content.gallery_images %}
                     {% for image in translate_json('home_content', home_content.id, 'gallery_images', home_content.gallery_images) %}
                     <div class="gallery-item">
                         {% if image.url %}
+                        <div class="gallery-media-viewport">
                         {% if 'youtube.com' in image.url or 'youtu.be' in image.url %}
                         {% set video_id = '' %}
                         {% if 'youtube.com/watch?v=' in image.url %}
-                        {% set video_id = image.url.split('v=')[1].split('&')[0] %}
+                            {% set video_id = image.url.split('v=')[1].split('&')[0] %}
                         {% elif 'youtube.com/shorts/' in image.url %}
-                        {% set video_id = image.url.split('shorts/')[1].split('?')[0] %}
+                            {% set video_id = image.url.split('shorts/')[1].split('?')[0] %}
                         {% elif 'youtu.be/' in image.url %}
-                        {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
+                            {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
                         {% endif %}
-                        <iframe width="100%" height="250" 
-                                src="https://www.youtube.com/embed/{{ video_id }}" 
-                                frameborder="0" allowfullscreen
-                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        <iframe width="100%" 
+                            src="https://www.youtube.com/embed/{{ video_id }}" 
+                            frameborder="0" allowfullscreen
+                            style="border-radius: 8px; max-width: 100%;"></iframe>
                         {% elif 'vimeo.com' in image.url %}
                         {% set video_id = image.url.split('vimeo.com/')[1].split('?')[0] %}
-                        <iframe width="100%" height="250" 
-                                src="https://player.vimeo.com/video/{{ video_id }}" 
-                                frameborder="0" allowfullscreen
-                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        <iframe width="100%" 
+                            src="https://player.vimeo.com/video/{{ video_id }}" 
+                            frameborder="0" allowfullscreen
+                            style="border-radius: 8px; max-width: 100%;"></iframe>
                         {% elif 'drive.google.com' in image.url %}
                         {% set file_id = '' %}
                         {% if '/d/' in image.url %}
@@ -1344,19 +1429,20 @@
                         {% set file_id = image.url.split('id=')[1].split('&')[0] %}
                         {% endif %}
                         <iframe src="https://drive.google.com/file/d/{{ file_id }}/preview" 
-                                width="100%" height="250" frameborder="0" allowfullscreen
-                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                            width="100%" frameborder="0" allowfullscreen
+                            style="border-radius: 8px; max-width: 100%;"></iframe>
                         <div class="gallery-caption" style="background: #fff3cd; color: #856404; border-color: #ffeaa7;">
                             <small><i class="fa fa-clock-o"></i> {{ _("If video shows 'still being processed,' please wait 5-60 minutes for Google Drive to finish processing, then refresh the page.") }}</small>
                         </div>
                         {% elif image.url.endswith(('.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.mp3', '.wav', '.ogg')) %}
-                        <video controls style="width: 100%; height: auto; max-height: 250px;">
+                        <video controls style="width: 100%; height: auto;">
                             <source src="{{ image.url }}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                         {% else %}
                         <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
                         {% endif %}
+                        </div>
                         {% else %}
                         <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
                         {% endif %}
@@ -1379,6 +1465,9 @@
                         <div class="gallery-caption">{{ _("Collaborate in study groups") }}</div>
                     </div>
                     {% endif %}
+                    </div>
+                    <button class="gallery-control prev" aria-label="Previous">&#10094;</button>
+                    <button class="gallery-control next" aria-label="Next">&#10095;</button>
                 </div>
             </div>
 
@@ -1629,25 +1718,26 @@
                     {% for image in translate_json('home_content', home_content.id, 'about_gallery_images', home_content.about_gallery_images) %}
                     <div class="gallery-item">
                         {% if image.url %}
+                        <div class="gallery-media-viewport">
                         {% if 'youtube.com' in image.url or 'youtu.be' in image.url %}
                         {% set video_id = '' %}
                         {% if 'youtube.com/watch?v=' in image.url %}
-                        {% set video_id = image.url.split('v=')[1].split('&')[0] %}
+                            {% set video_id = image.url.split('v=')[1].split('&')[0] %}
                         {% elif 'youtube.com/shorts/' in image.url %}
-                        {% set video_id = image.url.split('shorts/')[1].split('?')[0] %}
+                            {% set video_id = image.url.split('shorts/')[1].split('?')[0] %}
                         {% elif 'youtu.be/' in image.url %}
-                        {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
+                            {% set video_id = image.url.split('youtu.be/')[1].split('?')[0] %}
                         {% endif %}
-                        <iframe width="100%" height="250" 
-                                src="https://www.youtube.com/embed/{{ video_id }}" 
-                                frameborder="0" allowfullscreen
-                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        <iframe width="100%" 
+                            src="https://www.youtube.com/embed/{{ video_id }}" 
+                            frameborder="0" allowfullscreen
+                            style="border-radius: 8px; max-width: 100%;"></iframe>
                         {% elif 'vimeo.com' in image.url %}
                         {% set video_id = image.url.split('vimeo.com/')[1].split('?')[0] %}
-                        <iframe width="100%" height="250" 
-                                src="https://player.vimeo.com/video/{{ video_id }}" 
-                                frameborder="0" allowfullscreen
-                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                        <iframe width="100%" 
+                            src="https://player.vimeo.com/video/{{ video_id }}" 
+                            frameborder="0" allowfullscreen
+                            style="border-radius: 8px; max-width: 100%;"></iframe>
                         {% elif 'drive.google.com' in image.url %}
                         {% set file_id = '' %}
                         {% if '/d/' in image.url %}
@@ -1656,19 +1746,20 @@
                         {% set file_id = image.url.split('id=')[1].split('&')[0] %}
                         {% endif %}
                         <iframe src="https://drive.google.com/file/d/{{ file_id }}/preview" 
-                                width="100%" height="250" frameborder="0" allowfullscreen
-                                style="border-radius: 8px; max-width: 100%;"></iframe>
+                            width="100%" frameborder="0" allowfullscreen
+                            style="border-radius: 8px; max-width: 100%;"></iframe>
                         <div class="gallery-caption" style="background: #fff3cd; color: #856404; border-color: #ffeaa7;">
                             <small><i class="fa fa-clock-o"></i> If video shows "still being processed," please wait 5-60 minutes for Google Drive to finish processing, then refresh the page.</small>
-                        </div>
+                        </video>
                         {% elif image.url.endswith(('.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.mp3', '.wav', '.ogg')) %}
-                        <video controls style="width: 100%; height: auto; max-height: 250px;">
+                        <video controls style="width: 100%; height: auto;">
                             <source src="{{ image.url }}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                         {% else %}
                         <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
                         {% endif %}
+                        </div>
                         {% else %}
                         <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
                         {% endif %}
@@ -3495,6 +3586,64 @@
                     return false;
                 });
             });
+        });
+    </script>
+    <script>
+        // Gallery carousel behavior: auto-switch, controls, pause/resume on interaction
+        document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.querySelector('.gallery-wrapper');
+            if (!wrapper) return;
+            const slides = Array.from(wrapper.children).filter(c => c.classList.contains('gallery-item'));
+            const prev = document.querySelector('.gallery-control.prev');
+            const next = document.querySelector('.gallery-control.next');
+
+            let current = 0;
+            let autoTimer = null;
+            let pausedByInteraction = false;
+            const INTERVAL = 5000;
+
+            function goTo(index) {
+                if (!wrapper) return;
+                current = (index + slides.length) % slides.length;
+                wrapper.style.transform = `translateX(-${current * 100}%)`;
+            }
+
+            function nextSlide() { goTo(current + 1); }
+            function prevSlide() { goTo(current - 1); }
+
+            function startAuto() {
+                stopAuto();
+                autoTimer = setInterval(() => {
+                    if (!pausedByInteraction) nextSlide();
+                }, INTERVAL);
+            }
+
+            function stopAuto() {
+                if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+            }
+
+            if (next) next.addEventListener('click', function() { pausedByInteraction = true; stopAuto(); nextSlide(); });
+            if (prev) prev.addEventListener('click', function() { pausedByInteraction = true; stopAuto(); prevSlide(); });
+
+            // Pause when user interacts with video/iframe or focuses it; resume when interaction ends
+            const interactiveEls = wrapper.querySelectorAll('iframe, video');
+            interactiveEls.forEach(el => {
+                el.addEventListener('mouseenter', function() { pausedByInteraction = true; stopAuto(); });
+                el.addEventListener('focus', function() { pausedByInteraction = true; stopAuto(); });
+                el.addEventListener('mouseleave', function() { pausedByInteraction = false; startAuto(); });
+                el.addEventListener('blur', function() { pausedByInteraction = false; startAuto(); });
+            });
+
+            // Also pause while user hovers over the gallery area; resume on leave
+            const container = document.querySelector('.gallery-container');
+            if (container) {
+                container.addEventListener('mouseenter', function() { pausedByInteraction = true; stopAuto(); });
+                container.addEventListener('mouseleave', function() { pausedByInteraction = false; startAuto(); });
+            }
+
+            // Initialize
+            goTo(0);
+            startAuto();
         });
     </script>
     <footer style="width: 100%; background: #f5f1ea; border-top: 1px solid #e0e0e0; padding: 1rem; text-align: center; margin-top: 2rem;">
