@@ -10,3 +10,28 @@ html, body {
 body {
     color: #222;
 }
+
+/* Import fonts: Playfair Display for headings, Manrope for body (Inter fallback) */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+    --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+}
+
+/* Use Playfair Display for all headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    margin-top: 0;
+}
+
+/* Ensure strong and emphasis inherit body font unless inside headings */
+strong, b { font-weight: 600; }
+em, i { font-style: italic; }
+
