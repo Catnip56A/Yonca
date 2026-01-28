@@ -37,17 +37,29 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///yonca.db'
+    
+    # Image URLs for development (served by Flask)
+    ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.png'
+    ABOUT_FEATURES_IMAGE = os.environ.get('ABOUT_FEATURES_IMAGE') or '/static/permanent/Yonca_features_img.jpeg'
 
 class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    
+    # Image URLs for testing
+    ABOUT_HERO_BACKGROUND_IMAGE = '/static/permanent/Bg_aboutCompany.png'
+    ABOUT_FEATURES_IMAGE = '/static/permanent/Yonca_features_img.jpeg'
 
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
     SESSION_TYPE = 'filesystem'
+    
+    # Image URLs for production (can be set via environment variables)
+    ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.png'
+    ABOUT_FEATURES_IMAGE = os.environ.get('ABOUT_FEATURES_IMAGE') or '/static/permanent/Yonca_features_img.jpeg'
     SESSION_COOKIE_SECURE = True  # HTTPS required
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'

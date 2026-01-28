@@ -1693,7 +1693,7 @@
 
         <!-- About Company Page -->
         <section id="about" class="page">
-            <div class="about-hero" style="background-image: url('{{ url_for('static', filename='permanent/Bg_aboutCompany.png') }}');">
+            <div class="about-hero" style="background-image: url('{{ config.ABOUT_HERO_BACKGROUND_IMAGE }}');">
                 <div class="about-hero-inner">
                     <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
                     <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
@@ -1702,7 +1702,7 @@
 
             <!-- Features Image -->
             <div style="margin: 2rem 0; text-align: center;">
-                <img src="{{ url_for('static', filename='permanent/Yonca_features_img.jpeg') }}" alt="{{ _('Yonca Features') }}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <img src="{{ config.ABOUT_FEATURES_IMAGE }}" alt="{{ _('Yonca Features') }}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             </div>
 
             <!-- Gallery Section -->
