@@ -385,22 +385,18 @@
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 0.5rem;
-            display: flex;
-            overflow-x: auto;
-            gap: 0.3rem;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
         }
 
         .features-section .feature-card {
             background: white;
             border: 1px solid rgba(0,0,0,0.04);
             border-radius: 10px;
-            padding: 1rem;
+            padding: 2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.04);
-            text-align: left;
-            min-width: 250px;
-            flex-shrink: 0;
+            text-align: center;
         }
 
         .gallery-grid {
