@@ -1971,9 +1971,3 @@ def debug_locale():
     }
     return jsonify(result)
 
-@main_bp.route('/admin/static/bootstrap/bootstrap4/swatch/default/bootstrap.min.css.map')
-def admin_bootstrap_sourcemap():
-    """Handle missing Bootstrap source map to prevent 404 errors"""
-    return '', 204  # Return empty response with no content status
-
-

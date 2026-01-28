@@ -594,22 +594,6 @@
             font-weight: 700;
         }
 
-        .about-subtitle {
-            text-align: center;
-            color: #424242;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-
-        .about-subtitle p {
-            margin: 0 0 1rem 0;
-        }
-
-        .about-subtitle p:last-child {
-            margin-bottom: 0;
-        }
-
         .forum-container {
             background: #f5f1ea;
             border: 1px solid #e5e7eb;
@@ -1712,14 +1696,7 @@
             <div class="about-hero" style="background-image: url('{{ config.ABOUT_HERO_BACKGROUND_IMAGE }}');">
                 <div class="about-hero-inner">
                     <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
-                    <div class="about-subtitle">
-                    {% set subtitle_text = translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) %}
-                    {% for paragraph in subtitle_text.replace('\r\n', '\n').replace('\r', '\n').split('\n\n') %}
-                        {% if paragraph.strip() %}
-                        <p>{{ paragraph.strip() }}</p>
-                        {% endif %}
-                    {% endfor %}
-                    </div>
+                    <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
                 </div>
             </div>
 
