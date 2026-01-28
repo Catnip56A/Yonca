@@ -1491,7 +1491,6 @@
                 <h2 class="section-title" style="color: #337a2c;">{{ translate_field('home_content', home_content.id, 'features_title', home_content.features_title or _('Our Features')) }}</h2>
                 <p>{{ translate_field('home_content', home_content.id, 'features_subtitle', home_content.features_subtitle or _('Discover what makes our platform special.')) }}</p>
 
-                <button class="features-scroll prev" aria-label="Previous feature">&#10094;</button>
                 <div class="features">
                 {% if home_content.features %}
                 {% for feature in translate_json('home_content', home_content.id, 'features', home_content.features) %}
@@ -1728,8 +1727,6 @@
                     <p>{{ _('Get help from our team of educational experts and specialists.') }}</p>
                 </div>
                 {% endif %}
-                </div>
-                <button class="features-scroll next" aria-label="Next feature">&#10095;</button>
             </div>
             </div>
 
