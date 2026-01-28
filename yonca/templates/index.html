@@ -1303,6 +1303,7 @@
             background-color: #f8f9fa !important;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery-popup.css') }}">
 </head>
 <body>
     <header>
@@ -1692,8 +1693,12 @@
 
         <!-- About Company Page -->
         <section id="about" class="page">
-            <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
-            <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
+            <div class="about-hero" style="background-image: url('{{ url_for('static', filename='temp/Bg_aboutCompany.png') }}');">
+                <div class="about-hero-inner">
+                    <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
+                    <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
+                </div>
+            </div>
 
             <!-- Features Section -->
             <div class="features-section">
@@ -3663,6 +3668,7 @@
             startAuto();
         });
     </script>
+    <script src="{{ url_for('static', filename='js/gallery-popup.js') }}"></script>
     <footer style="width: 100%; background: #f5f1ea; border-top: 1px solid #e0e0e0; padding: 1rem; text-align: center; margin-top: 2rem;">
         <a href="{{ url_for('main.terms') }}" style="color: #2e7d32; text-decoration: none;">{{ _('Terms of Service') }}</a>
     </footer>

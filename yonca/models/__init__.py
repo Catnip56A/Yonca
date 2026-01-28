@@ -272,7 +272,7 @@ class HomeContent(db.Model):
     
     # About page specific content
     about_welcome_title = db.Column(db.String(200), default="Welcome to Yonca")
-    about_subtitle = db.Column(db.String(500), default="Join our learning community and discover amazing features designed to enhance your educational experience.")
+    about_subtitle = db.Column(db.Text, default="Join our learning community and discover amazing features designed to enhance your educational experience.")
     about_features = db.Column(db.JSON, default=[
         {"title": "Interactive Courses", "description": "Engage with dynamic course content and interactive learning materials."},
         {"title": "Study Groups", "description": "Collaborate with fellow learners in our vibrant study communities."},
