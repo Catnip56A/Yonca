@@ -384,10 +384,12 @@
             background: #f5f1ea;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
-            padding: 1.25rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.5rem;
+            padding: 0.5rem;
+            display: flex;
+            overflow-x: auto;
+            gap: 0.3rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         .features-section .feature-card {
@@ -397,6 +399,8 @@
             padding: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.04);
             text-align: left;
+            min-width: 250px;
+            flex-shrink: 0;
         }
 
         .gallery-grid {
@@ -1013,13 +1017,13 @@
             }
 
             .features {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                margin: 2rem 0;
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
             }
 
             .feature-card {
-                padding: 1.5rem 1rem;
+            margin-right: 0.75rem;
             }
 
             .feature-card h3 {
@@ -1693,41 +1697,16 @@
 
         <!-- About Company Page -->
         <section id="about" class="page">
-            <div class="about-hero" style="background-image: url('{{ url_for('static', filename='temp/Bg_aboutCompany.png') }}');">
+            <div class="about-hero" style="background-image: url('{{ url_for('static', filename='permanent/Bg_aboutCompany.png') }}');">
                 <div class="about-hero-inner">
                     <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
                     <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
                 </div>
             </div>
 
-            <!-- Features Section -->
-            <div class="features-section">
-                <h2 class="section-title" style="color: #337a2c;">{{ translate_field('home_content', home_content.id, 'about_features_title', home_content.about_features_title or _('Our Features')) }}</h2>
-                <p>{{ translate_field('home_content', home_content.id, 'about_features_subtitle', home_content.about_features_subtitle or _('Discover what makes our platform special.')) }}</p>
-
-                <div class="features">
-                {% if home_content.about_features %}
-                {% for feature in translate_json('home_content', home_content.id, 'about_features', home_content.about_features) %}
-                <div class="feature-card">
-                    <h3>{{ feature.title }}</h3>
-                    <p>{{ feature.description }}</p>
-                </div>
-                {% endfor %}
-                {% else %}
-                <div class="feature-card">
-                    <h3>{{ _('Interactive Courses') }}</h3>
-                    <p>{{ _('Engage with dynamic course content and interactive learning materials.') }}</p>
-                </div>
-                <div class="feature-card">
-                    <h3>{{ _('Study Groups') }}</h3>
-                    <p>{{ _('Collaborate with fellow learners in our vibrant study communities.') }}</p>
-                </div>
-                <div class="feature-card">
-                    <h3>{{ _('Expert Support') }}</h3>
-                    <p>{{ _('Get help from our team of educational experts and specialists.') }}</p>
-                </div>
-                {% endif %}
-            </div>
+            <!-- Features Image -->
+            <div style="margin: 2rem 0; text-align: center;">
+                <img src="{{ url_for('static', filename='permanent/Yonca_features_img.jpeg') }}" alt="{{ _('Yonca Features') }}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             </div>
 
             <!-- Gallery Section -->
