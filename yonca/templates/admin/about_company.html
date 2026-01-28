@@ -327,9 +327,9 @@ function addAboutFeatureFromData(containerId, prefix, title, description) {
     const container = document.getElementById(containerId);
     const featureIndex = container.children.length;
 
-    // Escape quotes for HTML attributes
-    const escapedTitle = title.replace(/"/g, '&quot;');
-    const escapedDescription = description.replace(/"/g, '&quot;');
+    // Escape quotes, ampersands, and backticks for HTML attributes in template literals
+    const escapedTitle = title.replace(/`/g, '\\`').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    const escapedDescription = description.replace(/`/g, '\\`').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 
     const featureDiv = document.createElement('div');
     featureDiv.className = 'feature-item';
@@ -449,10 +449,10 @@ function addAboutGalleryImageFromData(containerId, prefix, url, alt, caption) {
     const container = document.getElementById(containerId);
     const imageIndex = container.children.length;
 
-    // Escape quotes for HTML attributes
-    const escapedUrl = url.replace(/"/g, '&quot;');
-    const escapedAlt = alt.replace(/"/g, '&quot;');
-    const escapedCaption = caption.replace(/"/g, '&quot;');
+    // Escape quotes, ampersands, and backticks for HTML attributes in template literals
+    const escapedUrl = url.replace(/`/g, '\\`').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    const escapedAlt = alt.replace(/`/g, '\\`').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    const escapedCaption = caption.replace(/`/g, '\\`').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 
     // Determine if we have existing URL data
     const hasUrl = url && url.trim() !== '';
