@@ -10,21 +10,7 @@ magsud.yonca-sdc.com {
 	# Serve static files directly
 	handle /static/* {
 		root * /var/www
-		file_server {
-			index index.html
-		}
-		# Ensure proper MIME types
-		header Content-Type {
-			.css  "text/css"
-			.js   "application/javascript"
-			.png  "image/png"
-			.jpg  "image/jpeg"
-			.jpeg "image/jpeg"
-			.gif  "image/gif"
-			.svg  "image/svg+xml"
-			.woff "font/woff"
-			.woff2 "font/woff2"
-		}
+		file_server
 	}
 
 	# Proxy all other requests to gunicorn
