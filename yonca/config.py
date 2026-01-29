@@ -41,9 +41,9 @@ class DevelopmentConfig(Config):
     # Image URLs for development (served by Flask)
     # Language-specific hero background images
     ABOUT_HERO_BACKGROUND_IMAGES = {
-        'en': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_EN') or '/static/permanent/Bg_aboutCompany_en.png',
-        'az': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_AZ') or '/static/permanent/Bg_aboutCompany_az.png',
-        'ru': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_RU') or '/static/permanent/Bg_aboutCompany_ru.png',
+        'en': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_EN') or '/static/permanent/Bg_aboutCompany.png',
+        'az': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_AZ') or '/static/permanent/Bg_aboutCompany.png',
+        'ru': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_RU') or '/static/permanent/Bg_aboutCompany.png',
     }
     ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.png'
     
@@ -54,7 +54,7 @@ class DevelopmentConfig(Config):
         'ru': os.environ.get('ABOUT_FEATURES_IMAGE_RU') or '/static/permanent/Yonca_features_ru.png',
     }
     # Fallback for backward compatibility
-    ABOUT_FEATURES_IMAGE = os.environ.get('ABOUT_FEATURES_IMAGE') or '/static/permanent/Yonca_features_img.jpeg'
+    ABOUT_FEATURES_IMAGE = os.environ.get('ABOUT_FEATURES_IMAGE') or '/static/permanent/Yonca_features_en.png'
 
 class TestingConfig(Config):
     """Testing configuration"""
@@ -63,9 +63,9 @@ class TestingConfig(Config):
     
     # Image URLs for testing
     ABOUT_HERO_BACKGROUND_IMAGES = {
-        'en': '/static/permanent/Bg_aboutCompany_en.png',
-        'az': '/static/permanent/Bg_aboutCompany_az.png',
-        'ru': '/static/permanent/Bg_aboutCompany_ru.png',
+        'en': '/static/permanent/Bg_aboutCompany.png',
+        'az': '/static/permanent/Bg_aboutCompany.png',
+        'ru': '/static/permanent/Bg_aboutCompany.png',
     }
     ABOUT_HERO_BACKGROUND_IMAGE = '/static/permanent/Bg_aboutCompany.png'
     
