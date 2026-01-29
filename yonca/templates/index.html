@@ -1693,22 +1693,32 @@
 
         <!-- About Company Page -->
         <section id="about" class="page">
-            <div class="about-hero" style="background-image: url('{{ config.ABOUT_HERO_BACKGROUND_IMAGE }}');">
+            <div class="about-hero" style="background-image: url('{{ get_localized_image(config.ABOUT_HERO_BACKGROUND_IMAGES, config.ABOUT_HERO_BACKGROUND_IMAGE) }}');">
                 <div class="about-hero-inner">
                     <h2 class="section-title">{{ translate_field('home_content', home_content.id, 'about_welcome_title', home_content.about_welcome_title or _('Welcome to Yonca')) }}</h2>
-                    <p>{{ translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) }}</p>
+                    {% set subtitle = translate_field('home_content', home_content.id, 'about_subtitle', home_content.about_subtitle or _('Join our learning community and discover amazing features designed to enhance your educational experience.')) %}
+                    {% for paragraph in subtitle.split('\n') %}
+                    {% if paragraph.strip() %}
+                    <p>{{ paragraph.strip() }}</p>
+                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
 
             <!-- Features Image -->
             <div style="margin: 2rem 0; text-align: center;">
-                <img src="{{ config.ABOUT_FEATURES_IMAGE }}" alt="{{ _('Yonca Features') }}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <img src="{{ get_localized_image(config.ABOUT_FEATURES_IMAGES, config.ABOUT_FEATURES_IMAGE) }}" alt="{{ _('Yonca Features') }}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             </div>
 
             <!-- Gallery Section -->
             <div class="gallery-section">
                 <h2 class="section-title" style="color: #337a2c;">{{ translate_field('home_content', home_content.id, 'about_gallery_title', home_content.about_gallery_title or _('What\'s New')) }}</h2>
-                <p>{{ translate_field('home_content', home_content.id, 'about_gallery_subtitle', home_content.about_gallery_subtitle or _('Discover the latest updates, new features, and exciting developments in our learning platform.')) }}</p>
+                {% set gallery_subtitle = translate_field('home_content', home_content.id, 'about_gallery_subtitle', home_content.about_gallery_subtitle or _('Discover the latest updates, new features, and exciting developments in our learning platform.')) %}
+                {% for paragraph in gallery_subtitle.split('\n') %}
+                {% if paragraph.strip() %}
+                <p>{{ paragraph.strip() }}</p>
+                {% endif %}
+                {% endfor %}
 
                 <div class="gallery-grid">
                     {% if home_content.about_gallery_images %}

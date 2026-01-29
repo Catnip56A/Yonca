@@ -147,9 +147,17 @@ def create_app(config_name='development'):
             locale = get_locale()
             return get_translated_json_array(content_type, content_id, field_name, json_array, locale)
         
+        def get_localized_image(image_dict, fallback=''):
+            """Get image URL based on current locale"""
+            locale = str(get_locale()) if get_locale() else 'en'
+            if isinstance(image_dict, dict):
+                return image_dict.get(locale, image_dict.get('en', fallback))
+            return fallback
+        
         return {
             'translate_field': translate_field,
-            'translate_json': translate_json
+            'translate_json': translate_json,
+            'get_localized_image': get_localized_image
         }
     
     # Add custom Jinja2 filter for button syntax in course descriptions

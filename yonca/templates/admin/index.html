@@ -467,6 +467,8 @@
     </div>
 </div>
 
+<div id="features-data" data-features='{{ home_content.features|tojson }}' data-logged-out-features='{{ home_content.logged_out_features|tojson }}' data-gallery-images='{{ home_content.gallery_images|tojson }}' style="display: none;"></div>
+
 <script>
 // Track unsaved changes
 let hasUnsavedChanges = false;
@@ -618,26 +620,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeFeatures() {
+    const featuresData = document.getElementById('features-data');
+    const features = JSON.parse(featuresData.dataset.features || '[]');
+    const loggedOutFeatures = JSON.parse(featuresData.dataset.loggedOutFeatures || '[]');
+    const galleryImages = JSON.parse(featuresData.dataset.galleryImages || '[]');
+
     // Initialize logged in features
-    {% if home_content.features %}
-    {% for feature in home_content.features %}
-    addFeatureFromData('features-container', 'feature', {{ feature.title|tojson }}, {{ feature.description|tojson }}, {{ feature.button_text|tojson if feature.button_text is defined else '""' }}, {{ feature.button_url|tojson if feature.button_url is defined else '""' }});
-    {% endfor %}
-    {% endif %}
+    features.forEach(feature => {
+        addFeatureFromData('features-container', 'feature', feature.title || '', feature.description || '', feature.button_text || '', feature.button_url || '');
+    });
 
     // Initialize logged out features
-    {% if home_content.logged_out_features %}
-    {% for feature in home_content.logged_out_features %}
-    addFeatureFromData('logged-out-features-container', 'logged_out_feature', {{ feature.title|tojson }}, {{ feature.description|tojson }}, {{ feature.button_text|tojson if feature.button_text is defined else '""' }}, {{ feature.button_url|tojson if feature.button_url is defined else '""' }});
-    {% endfor %}
-    {% endif %}
+    loggedOutFeatures.forEach(feature => {
+        addFeatureFromData('logged-out-features-container', 'logged_out_feature', feature.title || '', feature.description || '', feature.button_text || '', feature.button_url || '');
+    });
 
     // Initialize What's New media
-    {% if home_content.gallery_images %}
-    {% for image in home_content.gallery_images %}
-    addGalleryImageFromData('gallery-container', 'gallery', {{ image.url|tojson }}, {{ image.alt|tojson }}, {{ image.caption|tojson }});
-    {% endfor %}
-    {% endif %}
+    galleryImages.forEach(image => {
+        addGalleryImageFromData('gallery-container', 'gallery', image.url || '', image.alt || '', image.caption || '');
+    });
 }
 
 function addFeature(containerId, prefix) {
@@ -695,8 +696,12 @@ function addFeatureFromData(containerId, prefix, title, description, buttonText 
     const featureIndex = container.children.length;
 
     // Escape quotes for HTML attributes
-    const escapedTitle = title.replace(/"/g, '&quot;');
-    const escapedDescription = description.replace(/"/g, '&quot;');
+    const escapedTitle = title.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedDescription = description.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedButtonText = buttonText.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedButtonUrl = buttonUrl.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+
+    console.log('addFeatureFromData:', { title, description, buttonText, buttonUrl, escapedTitle, escapedDescription, escapedButtonText, escapedButtonUrl });
 
     const featureDiv = document.createElement('div');
     featureDiv.className = 'feature-item';
@@ -721,12 +726,12 @@ function addFeatureFromData(containerId, prefix, title, description, buttonText 
         <div class="form-group-inline">
             <label for="${prefix}_button_text_${featureIndex}">Button Text:</label>
             <input type="text" id="${prefix}_button_text_${featureIndex}" name="${prefix}_button_text_${featureIndex}" class="form-control feature-button-text"
-                   placeholder="e.g. Learn More" value="${buttonText}">
+                   placeholder="e.g. Learn More" value="${escapedButtonText}">
         </div>
         <div class="form-group-inline">
             <label for="${prefix}_button_url_${featureIndex}">Button URL:</label>
             <input type="url" id="${prefix}_button_url_${featureIndex}" name="${prefix}_button_url_${featureIndex}" class="form-control feature-button-url"
-                   placeholder="/courses/1 or https://..." value="${buttonUrl}">
+                   placeholder="/courses/1 or https://..." value="${escapedButtonUrl}">
         </div>
         <div class="form-group-inline">
             <label for="${prefix}_button_text_${featureIndex}">Button Text:</label>
@@ -987,8 +992,9 @@ function addGalleryImageFromData(containerId, prefix, url, alt, caption) {
     const imageIndex = container.children.length;
 
     // Escape quotes for HTML attributes
-    const escapedAlt = alt.replace(/"/g, '&quot;');
-    const escapedCaption = caption.replace(/"/g, '&quot;');
+    const escapedAlt = alt.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedCaption = caption.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedUrl = url.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
 
     const imageDiv = document.createElement('div');
     imageDiv.className = 'feature-item gallery-item';
@@ -1001,7 +1007,7 @@ function addGalleryImageFromData(containerId, prefix, url, alt, caption) {
             </button>
         </div>
         <div class="form-group-inline" style="background: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 10px;">
-            <small style="color: #6c757d;"><i class="fa fa-info-circle"></i> Image already uploaded: <code>${url}</code></small>
+            <small style="color: #6c757d;"><i class="fa fa-info-circle"></i> Image already uploaded: <code>${escapedUrl}</code></small>
         </div>
         <div class="form-group-inline">
             <label for="${prefix}_alt_${imageIndex}">Alt Text:</label>
@@ -1049,14 +1055,34 @@ function updatePreviewFeatures() {
         const btnText = feature.querySelector('.feature-button-text') ? feature.querySelector('.feature-button-text').value : '';
         const btnUrl = feature.querySelector('.feature-button-url') ? feature.querySelector('.feature-button-url').value : '';
 
+        console.log('updatePreviewFeatures loggedIn:', { title, desc, btnText, btnUrl });
+
         if (title || desc) {
             const featureDiv = document.createElement('div');
             featureDiv.className = 'preview-feature';
-            featureDiv.innerHTML = `
-                <div class="feature-title">${title || 'Feature Title'}</div>
-                <div class="feature-desc">${desc || 'Feature description'}</div>
-                ${btnText ? `<div style="margin-top:8px;"><a href="${btnUrl || '#'}" class="feature-btn" target="_blank">${btnText}</a></div>` : ''}
-            `;
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'feature-title';
+            titleDiv.textContent = title || 'Feature Title';
+            featureDiv.appendChild(titleDiv);
+            
+            const descDiv = document.createElement('div');
+            descDiv.className = 'feature-desc';
+            descDiv.textContent = desc || 'Feature description';
+            featureDiv.appendChild(descDiv);
+            
+            if (btnText) {
+                const btnDiv = document.createElement('div');
+                btnDiv.style.marginTop = '8px';
+                const link = document.createElement('a');
+                link.href = btnUrl || '#';
+                link.className = 'feature-btn';
+                link.target = '_blank';
+                link.textContent = btnText;
+                btnDiv.appendChild(link);
+                featureDiv.appendChild(btnDiv);
+            }
+            
             loggedInPreview.appendChild(featureDiv);
         }
     });
@@ -1072,14 +1098,34 @@ function updatePreviewFeatures() {
         const btnText = feature.querySelector('.feature-button-text') ? feature.querySelector('.feature-button-text').value : '';
         const btnUrl = feature.querySelector('.feature-button-url') ? feature.querySelector('.feature-button-url').value : '';
 
+        console.log('updatePreviewFeatures loggedOut:', { title, desc, btnText, btnUrl });
+
         if (title || desc) {
             const featureDiv = document.createElement('div');
             featureDiv.className = 'preview-feature';
-            featureDiv.innerHTML = `
-                <div class="feature-title">${title || 'Feature Title'}</div>
-                <div class="feature-desc">${desc || 'Feature description'}</div>
-                ${btnText ? `<div style="margin-top:8px;"><a href="${btnUrl || '#'}" class="feature-btn" target="_blank">${btnText}</a></div>` : ''}
-            `;
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'feature-title';
+            titleDiv.textContent = title || 'Feature Title';
+            featureDiv.appendChild(titleDiv);
+            
+            const descDiv = document.createElement('div');
+            descDiv.className = 'feature-desc';
+            descDiv.textContent = desc || 'Feature description';
+            featureDiv.appendChild(descDiv);
+            
+            if (btnText) {
+                const btnDiv = document.createElement('div');
+                btnDiv.style.marginTop = '8px';
+                const link = document.createElement('a');
+                link.href = btnUrl || '#';
+                link.className = 'feature-btn';
+                link.target = '_blank';
+                link.textContent = btnText;
+                btnDiv.appendChild(link);
+                featureDiv.appendChild(btnDiv);
+            }
+            
             loggedOutPreview.appendChild(featureDiv);
         }
     });
@@ -1115,12 +1161,14 @@ document.getElementById('translate-all').addEventListener('click', async functio
             // Poll for job status
             await pollJobStatus(jobId, button, originalHtml);
         } else {
-            alert(`✗ Failed to queue translation job: ${result.error}`);
+            const escapedError = result.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            alert(`✗ Failed to queue translation job: ${escapedError}`);
             button.disabled = false;
             button.innerHTML = originalHtml;
         }
     } catch (error) {
-        alert(`✗ Error: ${error.message}`);
+        const escapedMessage = error.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+        alert(`✗ Error: ${escapedMessage}`);
         button.disabled = false;
         button.innerHTML = originalHtml;
     }
@@ -1138,26 +1186,31 @@ async function pollJobStatus(jobId, button, originalHtml) {
             if (job.status === 'completed') {
                 // Job completed successfully
                 const stats = job.result;
-                alert(`✓ Translation completed successfully!\n\n${job.message}\n\nProcessed: ${stats.total_processed} items\n- ${stats.courses} courses\n- ${stats.resources} resources\n- ${stats.home_content} home content\n- ${stats.course_content} course items\n- ${stats.folders} folders\n\nRefresh the page to see translated content when changing languages.`);
+                const escapedMessage = job.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+                alert(`✓ Translation completed successfully!\n\n${escapedMessage}\n\nProcessed: ${stats.total_processed} items\n- ${stats.courses} courses\n- ${stats.resources} resources\n- ${stats.home_content} home content\n- ${stats.course_content} course items\n- ${stats.folders} folders\n\nRefresh the page to see translated content when changing languages.`);
                 button.disabled = false;
                 button.innerHTML = originalHtml;
             } else if (job.status === 'failed') {
                 // Job failed
-                alert(`✗ Translation failed: ${job.error}`);
+                const escapedError = job.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+                alert(`✗ Translation failed: ${escapedError}`);
                 button.disabled = false;
                 button.innerHTML = originalHtml;
             } else {
                 // Job still running, update progress and continue polling
-                button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${job.progress}% - ${job.message}`;
+                const escapedMessage = job.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+                button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${job.progress}% - ${escapedMessage}`;
                 setTimeout(() => pollJobStatus(jobId, button, originalHtml), 2000); // Poll every 2 seconds
             }
         } else {
-            alert(`✗ Failed to check job status: ${result.error}`);
+            const escapedError = result.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            alert(`✗ Failed to check job status: ${escapedError}`);
             button.disabled = false;
             button.innerHTML = originalHtml;
         }
     } catch (error) {
-        alert(`✗ Error checking job status: ${error.message}`);
+        const escapedMessage = error.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+        alert(`✗ Error checking job status: ${escapedMessage}`);
         button.disabled = false;
         button.innerHTML = originalHtml;
     }
@@ -1191,12 +1244,15 @@ document.getElementById('delete-translations').addEventListener('click', async f
         const result = await response.json();
         
         if (result.success) {
-            alert(`✓ Translations deleted successfully!\n\n${result.message}\n\nContent will now display in English. Use "Translate Content" to re-create translations.`);
+            const escapedMessage = result.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            alert(`✓ Translations deleted successfully!\n\n${escapedMessage}\n\nContent will now display in English. Use "Translate Content" to re-create translations.`);
         } else {
-            alert(`✗ Deletion failed: ${result.error}`);
+            const escapedError = result.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            alert(`✗ Deletion failed: ${escapedError}`);
         }
     } catch (error) {
-        alert(`✗ Error: ${error.message}`);
+        const escapedMessage = error.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+        alert(`✗ Error: ${escapedMessage}`);
     } finally {
         button.disabled = false;
         button.innerHTML = originalHtml;
