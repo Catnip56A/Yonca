@@ -130,3 +130,4 @@ logs/
 flask_session
 service-account-key.json
 client_secret_860511395930-3eojlbffavnl47upo580avedqa49lq3f.apps.googleusercontent.com.json
+static/permanent/
