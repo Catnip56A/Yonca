@@ -246,15 +246,6 @@
             </div>
             <button type="submit" id="login-button" disabled>{{ _('Login') }}</button>
         </form>
-        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
-            <a href="{{ url_for('auth.login_google') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #4285f4; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s ease; margin-bottom: 0.75rem;">
-                {{ _('Login with Google') }}
-            </a>
-            <br>
-            <a href="{{ url_for('auth.link_google_account') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #34a853; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s ease;">
-                {{ _('Link Google Account') }}
-            </a>
-        </div>
         <div class="back-link">
             <a href="/">{{ _('Back to Yonca') }}</a>
         </div>

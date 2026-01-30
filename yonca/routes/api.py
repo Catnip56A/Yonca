@@ -590,9 +590,9 @@ def upload_pdf():
     # Check if user has Google OAuth tokens
     if not current_user.google_access_token:
         return jsonify({
-            'error': 'Google Drive access required. Please login with Google first.',
+            'error': 'Google Drive access required. Please link your Google account first.',
             'login_required': True,
-            'login_url': url_for('auth.login_google', next='/admin', _external=True)
+            'login_url': url_for('auth.link_google_account', _external=True)
         }), 403
     
     # Check if file is present
