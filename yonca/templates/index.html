@@ -21,6 +21,7 @@
             letter-spacing: 0.05em;
             color: #212121;
             background-color: #262d06;
+            font-size: 18px;
         }
 
         header {
@@ -35,24 +36,82 @@
         .header-content {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            align-items: flex-start;
             gap: 1rem;
-                position: relative; /* For absolute positioning context */
+            position: relative; /* For absolute positioning context */
+        }
+
+        .logo-section {
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .nav-auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            gap: 0.5rem;
         }
 
         .nav-section {
-            flex: 1;
             display: flex;
             justify-content: center;
-            max-width: 600px;
+            width: 100%;
         }
 
         .auth-section {
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 0.5rem;
             flex-shrink: 0;
+        }
+
+        .auth-toggle-btn {
+            background: none;
+            border: none;
+            color: #353e45;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: none;
+            margin-left: 0.5rem;
+        }
+
+        .auth-toggle-btn:hover {
+            background: #f0f0f0;
+        }
+
+        @media (min-width: 480px) {
+            .auth-toggle-btn {
+                display: block;
+            }
+
+            .auth-section {
+                display: none;
+            }
+
+            .auth-section.show {
+                display: flex;
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 9999;
+                min-width: 200px;
+                padding: 0.5rem;
+                max-width: calc(100vw - 2rem);
+                max-height: calc(100vh - 6rem); /* Ensure it doesn't exceed viewport height */
+                overflow-y: auto; /* Add scroll if needed */
+                box-sizing: border-box;
+            }
         }
 
         .container {
@@ -183,20 +242,28 @@
             color: #353e45;
             text-decoration: none;
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             transition: all 0.3s ease;
             position: relative;
+            background-color: #fffcf0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            cursor: pointer;
         }
 
         .nav-link:hover {
-            background-color: #fafbed;
-            color: #337a2c;
+            background-color: #1e5919;
+            color: #fafbed;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
 
         .nav-link.active {
             background-color: #337a2c;
             color: #fafbed;
+            border-color: #337a2c;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Dropdown Styles */
@@ -914,9 +981,18 @@
                 height: 40px;
             }
 
+            .nav-auth-container {
+                order: 2;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
             .nav-section {
-                order: 3;
-                max-width: none;
+                order: 1;
+                width: 100%;
             }
 
             .auth-section {
@@ -928,6 +1004,7 @@
                 margin: 0.5rem 0;
                 background: #f9fafb;
                 border-radius: 8px;
+                width: 100%;
             }
 
             #user-info {
@@ -955,6 +1032,7 @@
             .mobile-menu-container {
                 display: block;
                 margin-left: auto;
+                order: 3;
             }
 
             .mobile-menu-toggle {
@@ -1331,31 +1409,39 @@
                     </div>
                 </div>
 
-                <div class="nav-section">
-                    <nav id="main-nav">
-                        <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
-                        {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
-                        {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
-                        <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="nav-link" id="lang-toggle-btn" title="Switch to {{ lang_names.get(lang_cycle.get(current_locale, 'az'), 'English') }}">
-                            🌐 {{ lang_names.get(current_locale, 'English') }}
-                        </a>
-                    </nav>
-                </div>
-
-                <div class="auth-section">
-                    <div id="auth-buttons" style="display: block;">
-                        <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
+                <div class="nav-auth-container">
+                    <div class="nav-section">
+                        <nav id="main-nav">
+                            <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
+                            <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
+                            <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
+                            <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
+                            <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
+                            <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
+                            <button class="auth-toggle-btn" id="auth-toggle-btn" title="Toggle user menu">▼</button>
+                        </nav>
                     </div>
-                    <div id="user-info" style="display: none; align-items: center;">
-                        <span style="color: #353e45; margin-right: 0.5rem; white-space: nowrap;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
-                        <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.25rem; display: none;">{{ _('Admin') }}</button>
-                        <button onclick="window.location.href='{{ url_for('auth.google_account_info') }}'" style="margin-right: 0.25rem; background: #337A2C; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">{{ _('Link Google') }}</button>
-                        <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
+
+                    <div class="auth-section" id="auth-section">
+                        <div id="auth-buttons" style="display: block;">
+                            {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+                            {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+                            <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="nav-link" id="lang-toggle-btn" title="Switch to {{ lang_names.get(lang_cycle.get(current_locale, 'az'), 'English') }}" style="margin-right: 0.5rem;">
+                                🌐 {{ lang_names.get(current_locale, 'English') }}
+                            </a>
+                            <button id="login-btn" onclick="window.location.href='/login'">{{ _('Login') }}</button>
+                        </div>
+                        <div id="user-info" style="display: none; align-items: center;">
+                            {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
+                            {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
+                            <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="nav-link" id="lang-toggle-btn-logged" title="Switch to {{ lang_names.get(lang_cycle.get(current_locale, 'az'), 'English') }}" style="margin-right: 0.5rem;">
+                                🌐 {{ lang_names.get(current_locale, 'English') }}
+                            </a>
+                            <span style="color: #353e45; margin-right: 0.5rem; white-space: nowrap;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
+                            <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.25rem; display: none;">{{ _('Admin') }}</button>
+                            <button onclick="window.location.href='{{ url_for('auth.google_account_info') }}'" style="margin-right: 0.25rem; background: #337A2C; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">{{ _('Link Google') }}</button>
+                            <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
+                        </div>
                     </div>
                 </div>
 
@@ -2954,6 +3040,26 @@
                 }
             });
         }
+        // Update mobile auth buttons when user status changes
+        function updateMobileAuthButtons() {
+            const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+            const mobileUserInfo = document.getElementById('mobile-user-info');
+            const mobileUserName = document.getElementById('mobile-user-name');
+            const mobileAdminBtn = document.getElementById('mobile-admin-btn');
+
+            if (window.currentUser) {
+                mobileAuthButtons.style.display = 'none';
+                mobileUserInfo.style.display = 'block';
+                mobileUserName.textContent = window.currentUser.username;
+                if (window.currentUser.is_admin) {
+                    mobileAdminBtn.style.display = 'block';
+                }
+            } else {
+                mobileAuthButtons.style.display = 'block';
+                mobileUserInfo.style.display = 'none';
+            }
+        }
+
         async function checkUser() {
             try {
                 console.log('Checking user login status...');
@@ -2973,6 +3079,7 @@
                         window.currentUser = user;
                         updateForumForm(true);
                         showHomeCourses(user.courses);
+                        updateMobileAuthButtons(); // Update mobile auth buttons
 
                         // Set user's preferred language
                         if (user.preferred_language) {
@@ -3006,6 +3113,7 @@
                         window.currentUser = null;
                         updateForumForm(false);
                         hideHomeCourses();
+                        updateMobileAuthButtons(); // Update mobile auth buttons
                         // Hide resource upload section for anonymous users
                         document.getElementById('resource-upload-section').style.display = 'none';
                         
@@ -3024,6 +3132,7 @@
                     window.currentUser = null;
                     updateForumForm(false);
                     hideHomeCourses();
+                    updateMobileAuthButtons(); // Update mobile auth buttons
                     document.getElementById('resource-upload-section').style.display = 'none';
                     
                     // Load forum messages for anonymous user (API error)
@@ -3038,6 +3147,7 @@
                 window.currentUser = null;
                 updateForumForm(false);
                 hideHomeCourses();
+                updateMobileAuthButtons(); // Update mobile auth buttons
                 document.getElementById('resource-upload-section').style.display = 'none';
                 
                 // Load forum messages for anonymous user (network error)
@@ -3485,26 +3595,6 @@
                 mobileNavMenu.classList.remove('active');
             }
 
-            // Update mobile auth buttons when user status changes
-            function updateMobileAuthButtons() {
-                const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
-                const mobileUserInfo = document.getElementById('mobile-user-info');
-                const mobileUserName = document.getElementById('mobile-user-name');
-                const mobileAdminBtn = document.getElementById('mobile-admin-btn');
-
-                if (window.currentUser) {
-                    mobileAuthButtons.style.display = 'none';
-                    mobileUserInfo.style.display = 'block';
-                    mobileUserName.textContent = window.currentUser.username;
-                    if (window.currentUser.is_admin) {
-                        mobileAdminBtn.style.display = 'block';
-                    }
-                } else {
-                    mobileAuthButtons.style.display = 'block';
-                    mobileUserInfo.style.display = 'none';
-                }
-            }
-
             // Override checkUser to also update mobile auth buttons
             const originalCheckUser = window.checkUser;
             window.checkUser = function() {
@@ -3582,6 +3672,29 @@
             // Initialize
             goTo(0);
             startAuto();
+        });
+    </script>
+    <script>
+        // Auth section toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const authToggleBtn = document.getElementById('auth-toggle-btn');
+            const authSection = document.getElementById('auth-section');
+
+            if (authToggleBtn && authSection) {
+                authToggleBtn.addEventListener('click', function() {
+                    authSection.classList.toggle('show');
+                    // Change arrow direction
+                    authToggleBtn.textContent = authSection.classList.contains('show') ? '▲' : '▼';
+                });
+
+                // Close auth section when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!authToggleBtn.contains(e.target) && !authSection.contains(e.target)) {
+                        authSection.classList.remove('show');
+                        authToggleBtn.textContent = '▼';
+                    }
+                });
+            }
         });
     </script>
     <script src="{{ url_for('static', filename='js/gallery-popup.js') }}"></script>

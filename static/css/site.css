@@ -23,6 +23,7 @@ body {
     font-family: var(--font-body);
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
+    font-size: 18px !important;
 }
 
 /* Use Playfair Display for all headings */
