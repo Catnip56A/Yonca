@@ -32,6 +32,8 @@ class User(db.Model, UserMixin):
     google_access_token = db.Column(db.Text)
     google_refresh_token = db.Column(db.Text)
     google_token_expiry = db.Column(db.DateTime)
+    login_attempts = db.Column(db.Integer, default=0)  # Track failed login attempts
+    last_attempt_time = db.Column(db.DateTime)  # Track time of last login attempt
     courses = db.relationship('Course', secondary=user_courses, backref=db.backref('users', lazy='select'))
     accessed_resources = db.relationship('Resource', secondary=user_resource_access, backref=db.backref('accessed_users', lazy='select'))
 

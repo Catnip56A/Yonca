@@ -43,7 +43,26 @@ def login():
         
         user = User.query.filter_by(username=username).first()
         
+        # Rate limiting: check if user has exceeded login attempts
+        if user:
+            now = datetime.utcnow()
+            time_since_last_attempt = (now - user.last_attempt_time).total_seconds() if user.last_attempt_time else float('inf')
+            
+            # Reset attempts if more than 30 seconds have passed
+            if time_since_last_attempt > 30:
+                user.login_attempts = 0
+            
+            # Check if user has exceeded rate limit
+            if user.login_attempts >= 5 and time_since_last_attempt <= 30:
+                remaining_time = int(30 - time_since_last_attempt)
+                flash(f'Too many login attempts. Please wait {remaining_time} seconds before trying again.')
+                logging.warning(f"Rate limit exceeded for user: {username}")
+                return render_template('login.html')
+        
         if user and user.check_password(password):
+            # Reset login attempts on successful login
+            user.login_attempts = 0
+            user.last_attempt_time = None
             # Check if there's a pending Google account link
             from flask import session
             pending_link = session.pop('pending_google_link', None)
@@ -79,13 +98,19 @@ def login():
             login_user(user)
             logging.info(f"User {username} logged in successfully")
             
+            db.session.commit()
+            
             # Check if admin login is requested and user is admin
             if admin_login and user.is_admin:
                 return redirect('/admin')
             else:
                 return redirect(url_for('main.index'))
         elif user:
-            logging.warning(f"Failed login attempt for username: {username} - incorrect password")
+            # Track failed login attempt
+            user.login_attempts += 1
+            user.last_attempt_time = datetime.utcnow()
+            db.session.commit()
+            logging.warning(f"Failed login attempt for username: {username} - incorrect password (attempt {user.login_attempts})")
         else:
             logging.warning(f"Failed login attempt for non-existent username: {username}")
         
