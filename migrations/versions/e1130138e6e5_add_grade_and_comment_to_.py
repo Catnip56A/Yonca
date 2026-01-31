@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'e1130138e6e5'
-down_revision = None
+down_revision = 'b5dc9eedb1ad'
 branch_labels = None
 depends_on = None
 
@@ -38,23 +38,28 @@ def upgrade():
             existing_server_default=sa.text("'[]'")
         )
 
-    # --- pdf_document ---
     bind = op.get_bind()
     inspector = inspect(bind)
-    columns = [c["name"] for c in inspector.get_columns("pdf_document")]
 
+    # --- pdf_document ---
+    pdf_cols = [c["name"] for c in inspector.get_columns("pdf_document")]
     with op.batch_alter_table('pdf_document') as batch_op:
-        batch_op.add_column(sa.Column('drive_file_id', sa.String(length=100), nullable=True))
-        batch_op.add_column(sa.Column('drive_view_link', sa.String(length=300), nullable=True))
-
-        if 'file_path' in columns:
+        if 'drive_file_id' not in pdf_cols:
+            batch_op.add_column(sa.Column('drive_file_id', sa.String(length=100), nullable=True))
+        if 'drive_view_link' not in pdf_cols:
+            batch_op.add_column(sa.Column('drive_view_link', sa.String(length=300), nullable=True))
+        if 'file_path' in pdf_cols:
             batch_op.drop_column('file_path')
 
     # --- user ---
+    user_cols = [c["name"] for c in inspector.get_columns("user")]
     with op.batch_alter_table('user') as batch_op:
-        batch_op.add_column(sa.Column('google_access_token', sa.Text(), nullable=True))
-        batch_op.add_column(sa.Column('google_refresh_token', sa.Text(), nullable=True))
-        batch_op.add_column(sa.Column('google_token_expiry', sa.DateTime(), nullable=True))
+        if 'google_access_token' not in user_cols:
+            batch_op.add_column(sa.Column('google_access_token', sa.Text(), nullable=True))
+        if 'google_refresh_token' not in user_cols:
+            batch_op.add_column(sa.Column('google_refresh_token', sa.Text(), nullable=True))
+        if 'google_token_expiry' not in user_cols:
+            batch_op.add_column(sa.Column('google_token_expiry', sa.DateTime(), nullable=True))
 
 
 def downgrade():
