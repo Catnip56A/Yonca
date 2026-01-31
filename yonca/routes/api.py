@@ -292,6 +292,8 @@ def upload_resource():
     # Get form data
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
+    tags = request.form.get('tags', '').strip()
+    pin_enabled = 'pin_enabled' in request.form  # Checkbox is checked if present in form data
     
     if not title:
         return jsonify({'error': 'Title is required'}), 400
@@ -384,6 +386,7 @@ def upload_resource():
         new_resource = Resource(
             title=title,
             description=description,
+            tags=tags,
             preview_image=preview_image_url,
             preview_drive_file_id=preview_drive_file_id if 'preview_drive_file_id' in locals() and preview_drive_file_id else None,
             preview_drive_view_link=preview_drive_view_link if 'preview_drive_view_link' in locals() and preview_drive_view_link else None,
@@ -392,6 +395,12 @@ def upload_resource():
             is_image_file=is_image,
             uploaded_by=current_user.id
         )
+        
+        # Conditionally set PIN based on user choice
+        if not pin_enabled:
+            new_resource.access_pin = None
+            new_resource.pin_expires_at = None
+        
         db.session.add(new_resource)
         db.session.commit()
         
@@ -407,7 +416,8 @@ def upload_resource():
             'title': new_resource.title,
             'drive_view_link': new_resource.drive_view_link,
             'pin': new_resource.access_pin,
-            'expires_at': new_resource.pin_expires_at.isoformat(),
+            'expires_at': new_resource.pin_expires_at.isoformat() if new_resource.pin_expires_at else None,
+            'pin_enabled': pin_enabled,
             'message': 'Resource uploaded successfully'
         }), 201
         
@@ -449,6 +459,7 @@ def get_resources():
             'id': r.id,
             'title': translated_title,
             'description': translated_description,
+            'tags': r.tags,
             'preview_image': r.preview_image,
             'preview_drive_file_id': r.preview_drive_file_id,
             'preview_drive_view_link': r.preview_drive_view_link,

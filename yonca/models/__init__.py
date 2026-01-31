@@ -151,14 +151,15 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
+    tags = db.Column(db.String(500))  # Space-separated tags
     preview_image = db.Column(db.String(300))  # Preview image URL or path
     preview_drive_file_id = db.Column(db.String(100))  # Google Drive file ID for preview image
     preview_drive_view_link = db.Column(db.String(300))  # Google Drive view link for preview image
     drive_file_id = db.Column(db.String(100))  # Google Drive file ID
     drive_view_link = db.Column(db.String(300))  # Google Drive view link
     is_image_file = db.Column(db.Boolean, default=False)  # Whether the main file is an image
-    access_pin = db.Column(db.String(10), nullable=False)
-    pin_expires_at = db.Column(db.DateTime, nullable=False)
+    access_pin = db.Column(db.String(10), nullable=True)
+    pin_expires_at = db.Column(db.DateTime, nullable=True)
     pin_last_reset = db.Column(db.DateTime, server_default=db.func.now())
     uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     upload_date = db.Column(db.DateTime, server_default=db.func.now())
@@ -184,11 +185,14 @@ class Resource(db.Model):
     def is_pin_expired(self):
         """Check if the current PIN has expired"""
         from datetime import datetime
+        if not self.access_pin:
+            return False  # No PIN means no expiration
         return datetime.utcnow() > self.pin_expires_at
 
     def reset_pin(self):
         """Reset the PIN with a new random value and 10-minute expiration"""
-        self.generate_new_pin()
+        if self.access_pin:  # Only reset if there's currently a PIN
+            self.generate_new_pin()
 
     def __repr__(self):
         return f'<Resource {self.title}>'

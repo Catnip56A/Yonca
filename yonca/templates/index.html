@@ -899,9 +899,18 @@
             transform: rotate(180deg);
         }
 
-        .resource-card h4 {
-            color: #212121;
-            margin-bottom: 0.5rem;
+        .resource-tag-btn:hover {
+            background-color: #1e5919;
+            color: #fafbed;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .resource-tag-btn.active {
+            background-color: #337a2c;
+            color: #fafbed;
+            border-color: #337a2c;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         .resource-card p {
@@ -909,7 +918,88 @@
             margin-bottom: 1rem;
         }
 
-        .pdf-access-form {
+        .resource-tag-btn {
+            background: #fffcf0;
+            color: #353e45;
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin: 0.25rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        .resource-tag-btn:hover {
+            background-color: #1e5919;
+            color: #fafbed;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .resource-tag-btn.active {
+            background-color: #337a2c;
+            color: #fafbed;
+            border-color: #337a2c;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .resources-filters-inline {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .resources-filters-inline h3 {
+            color: #337a2c;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .resources-filters-inline .filter-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .resources-filters-inline label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: #353e45;
+            font-size: 0.95rem;
+        }
+
+        .resources-filters-inline .access-toggle-btn {
+            background: #fffcf0;
+            color: #353e45;
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .resources-filters-inline .access-toggle-btn:hover {
+            background-color: #1e5919;
+            color: #fafbed;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .resources-filters-inline .access-toggle-btn.active {
+            background-color: #337a2c;
+            color: #fafbed;
+            border-color: #337a2c;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
             background: #f9fafb;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -1701,6 +1791,27 @@
             <h2 class="section-title">{{ _('Resources') }}</h2>
             <p>{{ _('Download educational materials, documents, and access protected files.') }}</p>
 
+            <!-- Resources Filters (on beige background) -->
+            <div class="resources-filters-inline">
+                <h3>📚 {{ _('Filter Learning Materials') }}</h3>
+
+                <!-- Access Type Filter -->
+                <div class="filter-section">
+                    <label>{{ _('Access Type:') }}</label>
+                    <div>
+                        <button id="toggle-all-access" class="access-toggle-btn active" onclick="filterResourcesByAccess('all')">{{ _('All') }}</button>
+                        <button id="toggle-pinned-access" class="access-toggle-btn" onclick="filterResourcesByAccess('pinned')">{{ _('PIN Protected') }}</button>
+                        <button id="toggle-free-access" class="access-toggle-btn" onclick="filterResourcesByAccess('free')">{{ _('Free Access') }}</button>
+                    </div>
+                </div>
+
+                <!-- Tags Filter -->
+                <div class="filter-section">
+                    <label>{{ _('Tags:') }}</label>
+                    <div id="resource-tags-section"></div>
+                </div>
+            </div>
+
             <!-- Learning Materials -->
             <h3 style="color: #212121; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 {{ _('Learning Materials') }}</h3>
             <div class="resources-grid">
@@ -1710,7 +1821,7 @@
             <!-- Resource Upload Section (Admin Only) -->
             <div id="resource-upload-section" style="display: none; background: #f5f1ea; border-radius: 15px; padding: 20px;">
                 <h3 style="color: #212121; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload Learning Material') }}</h3>
-                <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload documents, presentations, PDFs, or other materials. PIN protection will be automatically applied for security.') }}</p>
+                <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload documents, presentations, PDFs, or other materials. You can choose to enable PIN protection for security or allow free access.') }}</p>
                 <form id="resource-upload-form" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="resource-title">{{ _('Title:') }}</label>
@@ -1721,6 +1832,11 @@
                         <textarea id="resource-description" name="description"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="resource-tags">{{ _('Tags:') }}</label>
+                        <input type="text" id="resource-tags" name="tags" placeholder="{{ _('Enter tags separated by spaces, e.g. math science pdf') }}">
+                        <small style="color: #6b7280;">{{ _('Tags will be displayed as hashtags') }}</small>
+                    </div>
+                    <div class="form-group">
                         <label for="resource-preview">{{ _('Preview Image (optional):') }}</label>
                         <input type="file" id="resource-preview" name="preview_image" accept="image/*">
                         <small style="color: #6b7280;">{{ _('Upload an image to display as a preview for this resource') }}</small>
@@ -1729,7 +1845,16 @@
                         <label for="resource-file">{{ _('Choose file...') }}</label>
                         <input type="file" id="resource-file" name="file" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="text-align: left !important;">
+                        <div style="display: flex; align-items: center; justify-content: flex-start; width: 100%;">
+                            <label for="resource-pin-enabled" style="cursor: pointer; display: flex; align-items: center; margin: 0; flex-shrink: 0;">
+                                <input type="checkbox" id="resource-pin-enabled" name="pin_enabled" checked style="margin: 0 0.5rem 0 0;">
+                                <span>{{ _('Enable PIN Protection') }}</span>
+                            </label>
+                            <small style="color: #6b7280; margin-left: 1rem; flex: 1;">{{ _('Check to require PIN access, uncheck for free access') }}</small>
+                        </div>
+                    </div>
+                    <div class="form-group" id="pin-info-group">
                         <p style="font-size: 0.9em; color: #6b7280; margin: 0;">{{ _('Access PIN will be auto-generated (6 characters, expires in 10 minutes)') }}</p>
                     </div>
                     <button type="submit" id="resource-upload-btn">{{ _('Upload Material') }}</button>
@@ -2261,6 +2386,9 @@
         });
 
         // Load resources
+        let selectedResourceTag = null; // Global variable for selected tag filter
+        let selectedAccessType = 'all'; // Global variable for access type filter: 'all', 'pinned', 'free'
+
         async function loadResources() {
             // Cancel any previous request
             if (currentAbortController) {
@@ -2274,14 +2402,68 @@
                 });
                 const resources = await response.json();
                 const resourcesGrid = document.querySelector('.resources-grid');
+                const tagsSection = document.getElementById('resource-tags-section');
                 resourcesGrid.innerHTML = '';
+
+                // Update access toggle button states
+                document.querySelectorAll('.access-toggle-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(`toggle-${selectedAccessType}-access`).classList.add('active');
 
                 if (resources.length === 0) {
                     resourcesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No materials available at the moment.") }}</p>';
+                    tagsSection.innerHTML = '';
                     return;
                 }
 
+                // Collect all unique tags
+                const allTags = new Set();
                 resources.forEach(resource => {
+                    if (resource.tags) {
+                        resource.tags.split(' ').forEach(tag => {
+                            const trimmedTag = tag.trim();
+                            if (trimmedTag) {
+                                allTags.add(trimmedTag);
+                            }
+                        });
+                    }
+                });
+
+                // Create tag buttons
+                if (allTags.size > 0) {
+                    const tagButtons = Array.from(allTags).sort().map(tag => 
+                        `<button class="resource-tag-btn ${selectedResourceTag === tag ? 'active' : ''}" onclick="filterResourcesByTag('${tag}')">#${tag}</button>`
+                    ).join('');
+                    const allButton = `<button class="resource-tag-btn ${selectedResourceTag === null ? 'active' : ''}" onclick="filterResourcesByTag(null)">{{ _('All') }}</button>`;
+                    tagsSection.innerHTML = `<div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">${allButton}${tagButtons}</div>`;
+                } else {
+                    tagsSection.innerHTML = '';
+                }
+
+                // Filter resources based on selected tag and access type
+                let filteredResources = resources;
+
+                // Apply access type filter first
+                if (selectedAccessType === 'pinned') {
+                    filteredResources = filteredResources.filter(resource => resource.has_pin);
+                } else if (selectedAccessType === 'free') {
+                    filteredResources = filteredResources.filter(resource => !resource.has_pin);
+                }
+
+                // Then apply tag filter
+                if (selectedResourceTag) {
+                    filteredResources = filteredResources.filter(resource => 
+                        resource.tags && resource.tags.split(' ').some(tag => tag.trim() === selectedResourceTag)
+                    );
+                }
+
+                if (filteredResources.length === 0) {
+                    resourcesGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("No materials match the selected filter.") }}</p>';
+                    return;
+                }
+
+                filteredResources.forEach(resource => {
                     const resourceCard = document.createElement('div');
                     resourceCard.className = 'resource-card';
                     
@@ -2330,6 +2512,7 @@
                             ${resource.preview_image ? `<img src="${previewSrc}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title} 🔒</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
+                            ${resource.tags ? `<p style="font-size: 0.9rem; color: #337a2c; margin: 0.5rem 0;">${resource.tags.split(' ').map(tag => tag.trim() ? `#${tag.trim()}` : '').join(' ')}</p>` : ''}
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
                                 {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
                             </p>
@@ -2342,6 +2525,8 @@
                                 </form>
                             ` : ''}
                         `;
+                    
+                        resourcesGrid.appendChild(resourceCard);
                     } else {
                         // Public resource
                         const previewSrc = resource.preview_drive_view_link || (resource.preview_drive_file_id ? `/api/file/${resource.preview_drive_file_id}` : resource.preview_image);
@@ -2350,6 +2535,7 @@
                             ${resource.preview_image ? `<img src="${previewSrc}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title}</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
+                            ${resource.tags ? `<p style="font-size: 0.9rem; color: #337a2c; margin: 0.5rem 0;">${resource.tags.split(' ').map(tag => tag.trim() ? `#${tag.trim()}` : '').join(' ')}</p>` : ''}
                             <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
                                 {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
                             </p>
@@ -2362,9 +2548,9 @@
                                 </form>
                             ` : ''}
                         `;
-                    }
                     
-                    resourcesGrid.appendChild(resourceCard);
+                        resourcesGrid.appendChild(resourceCard);
+                    }
                 });
             } catch (error) {
                 if (error.name === 'AbortError') {
@@ -2376,6 +2562,23 @@
             } finally {
                 currentAbortController = null;
             }
+        }
+
+        // Filter resources by tag
+        function filterResourcesByTag(tag) {
+            selectedResourceTag = tag;
+            loadResources(); // Reload resources with filter
+        }
+
+        // Filter resources by access type
+        function filterResourcesByAccess(accessType) {
+            selectedAccessType = accessType;
+            // Update button states
+            document.querySelectorAll('.access-toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`toggle-${accessType}-access`).classList.add('active');
+            loadResources(); // Reload resources with filter
         }
 
         // Load PDFs
@@ -2561,10 +2764,15 @@
                 }
 
                 if (response.ok) {
-                    statusDiv.innerHTML = `<span style="color: #059669;">✅ {{ _("Material uploaded successfully! Access PIN:") }} <strong>${result.pin}</strong></span>`;
+                    const pinMessage = result.pin_enabled ? `{{ _("Access PIN:") }} <strong>${result.pin}</strong>` : '{{ _("Free access enabled") }}';
+                    statusDiv.innerHTML = `<span style="color: #059669;">✅ {{ _("Material uploaded successfully!") }} ${pinMessage}</span>`;
 
                     // Clear form
                     form.reset();
+                    // Reset checkbox to default checked state
+                    document.getElementById('resource-pin-enabled').checked = true;
+                    // Show PIN info again
+                    document.getElementById('pin-info-group').style.display = 'block';
 
                     // Reload resources
                     loadResources();
@@ -3534,6 +3742,19 @@
             const resourceUploadForm = document.getElementById('resource-upload-form');
             if (resourceUploadForm) {
                 resourceUploadForm.addEventListener('submit', uploadResource);
+                
+                // Add PIN checkbox toggle functionality
+                const pinCheckbox = document.getElementById('resource-pin-enabled');
+                const pinInfoGroup = document.getElementById('pin-info-group');
+                if (pinCheckbox && pinInfoGroup) {
+                    pinCheckbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            pinInfoGroup.style.display = 'block';
+                        } else {
+                            pinInfoGroup.style.display = 'none';
+                        }
+                    });
+                }
             }
 
             // Add channel tab event listeners

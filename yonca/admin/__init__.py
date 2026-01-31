@@ -827,6 +827,7 @@ class ResourceForm(Form):
     """Custom form for resource creation with file upload"""
     title = StringField('Title', [DataRequired()])
     description = TextAreaField('Description')
+    tags = StringField('Tags')  # Space-separated tags
     preview_image = FileField('Preview Image')  # Optional preview image upload
     file = FileField('File')  # Optional file upload
     access_pin = StringField('Access PIN', render_kw={'readonly': True, 'style': 'background-color: #f8f9fa;'})
@@ -834,8 +835,8 @@ class ResourceForm(Form):
 
 class ResourceView(SecureModelView):
     """Admin view for Resource model with file upload"""
-    column_list = ('id', 'title', 'description', 'drive_view_link', 'access_pin', 'pin_expires_at', 'pin_last_reset', 'uploaded_by', 'upload_date', 'is_active', 'reset_pin_button')
-    column_searchable_list = ['title', 'description']
+    column_list = ('id', 'title', 'description', 'tags', 'drive_view_link', 'access_pin', 'pin_expires_at', 'pin_last_reset', 'uploaded_by', 'upload_date', 'is_active', 'reset_pin_button')
+    column_searchable_list = ['title', 'description', 'tags']
     form = ResourceForm
     form_excluded_columns = ('uploaded_by', 'upload_date', 'drive_file_id', 'drive_view_link', 'pin_expires_at', 'pin_last_reset', 'preview_image')
     
