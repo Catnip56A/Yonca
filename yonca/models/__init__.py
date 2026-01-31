@@ -261,8 +261,6 @@ class HomeContent(db.Model):
     tavi_test_section_title = db.Column(db.String(200), default="TAVI Test")
     tavi_test_section_description = db.Column(db.Text, default="Take our interactive assessment to discover your learning style and get personalized recommendations.")
     
-    contacts_section_title = db.Column(db.String(200), default="Contact Us")
-    contacts_section_description = db.Column(db.Text, default="Get in touch with us for support, questions, or collaboration opportunities.")
     contact_info = db.Column(db.JSON, default={
         "whatsapp": "+994 51 623 73 94",
         "email": "info@yonca.az",
@@ -298,7 +296,6 @@ class HomeContent(db.Model):
         {"name": "Forum", "url": "/#forum", "active": True},
         {"name": "Resources", "url": "/#resources", "active": True},
         {"name": "TAVI Test", "url": "/#tavi", "active": True},
-        {"name": "Contacts", "url": "/#contacts", "active": True},
         {"name": "About", "url": "/#about", "active": True}
     ])
     

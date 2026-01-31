@@ -61,6 +61,15 @@
             padding: 0 20px;
         }
 
+        @media (min-width: 768px) {
+            .container {
+                width: 100vw;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
         /* Mobile Menu Styles */
         .mobile-menu-toggle {
             display: none;
@@ -141,6 +150,13 @@
             overflow: visible;
             border-radius: 20px;
             padding: 24px; /* give inner content breathing room */
+        }
+
+        @media (min-width: 768px) {
+            .white-overlay {
+                margin: 0 15vw;
+                width: 70vw;
+            }
         }
 
         .logo {
@@ -1318,18 +1334,10 @@
                 <div class="nav-section">
                     <nav id="main-nav">
                         <a href="javascript:void(0)" class="nav-link active" id="home-link">{{ _('Home') }}</a>
-                        <div class="dropdown">
-                            <a href="javascript:void(0)" class="nav-link dropdown-toggle" id="education-link">{{ _('Education') }}</a>
-                            <div class="dropdown-menu">
-                                <a href="javascript:void(0)" class="dropdown-item" id="courses-link">{{ _('Courses') }}</a>
-                                <a href="javascript:void(0)" class="dropdown-item" id="webinars-link">{{ _('Webinars') }}</a>
-                                <a href="javascript:void(0)" class="dropdown-item" id="conferences-link">{{ _('Conferences') }}</a>
-                            </div>
-                        </div>
+                        <a href="javascript:void(0)" class="nav-link" id="courses-link">{{ _('Courses') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="forum-link">{{ _('Forum') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="resources-link">{{ _('Resources') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="tavi-link">{{ _('TAVI Test') }}</a>
-                        <a href="javascript:void(0)" class="nav-link" id="contacts-link">{{ _('Contacts') }}</a>
                         <a href="javascript:void(0)" class="nav-link" id="about-link">{{ _('About Company') }}</a>
                         {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
                         {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
@@ -1372,18 +1380,10 @@
                 <i class="fas fa-times"></i>
             </button>
             <a href="javascript:void(0)" class="nav-link active" id="mobile-home-link">{{ _('Home') }}</a>
-            <div class="mobile-dropdown">
-                <a href="javascript:void(0)" class="nav-link mobile-dropdown-toggle" id="mobile-education-link">{{ _('Education') }} ▼</a>
-                <div class="mobile-dropdown-menu">
-                    <a href="javascript:void(0)" class="nav-link mobile-dropdown-item" id="mobile-courses-link">{{ _('Courses') }}</a>
-                    <a href="javascript:void(0)" class="nav-link mobile-dropdown-item" id="mobile-webinars-link">{{ _('Webinars') }}</a>
-                    <a href="javascript:void(0)" class="nav-link mobile-dropdown-item" id="mobile-conferences-link">{{ _('Conferences') }}</a>
-                </div>
-            </div>
+            <a href="javascript:void(0)" class="nav-link" id="mobile-courses-link">{{ _('Courses') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-forum-link">{{ _('Forum') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-resources-link">{{ _('Resources') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-tavi-link">{{ _('TAVI Test') }}</a>
-            <a href="javascript:void(0)" class="nav-link" id="mobile-contacts-link">{{ _('Contacts') }}</a>
             <a href="javascript:void(0)" class="nav-link" id="mobile-about-link">{{ _('About Company') }}</a>
             {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
             {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
@@ -1658,41 +1658,6 @@
             </div>
         </section>
 
-        <!-- Contacts Page -->
-        <section id="contacts" class="page">
-            <h2 class="section-title">{{ _('Contact Us') }}</h2>
-
-            <div class="contact-info">
-                <div class="contact-item">
-                    <h3>📱 {{ _('WhatsApp') }}</h3>
-                    <p>
-                        <a href="https://wa.me/994516237394" target="_blank" style="color: #337a2c; text-decoration: none; font-weight: 500;">
-                            +994 51 623 73 94
-                        </a><br>
-                        {{ _('Available: Mon-Fri, 9AM-6PM') }}
-                    </p>
-                </div>
-
-                <div class="contact-item">
-                    <h3>📧 {{ _('Email') }}</h3>
-                    <p>
-                        <a href="mailto:info@yonca.az" style="color: #337a2c; text-decoration: none; font-weight: 500;">
-                            info@yonca.az
-                        </a><br>
-                        {{ _('We respond within 24 hours') }}
-                    </p>
-                </div>
-
-                <div class="contact-item">
-                    <h3>📍 {{ _('Location') }}</h3>
-                    <p>
-                        <a href="https://www.google.com/maps/place/Yonca+Psixoloji+D%C9%99st%C9%99k+v%C9%99+%C4%B0nki%C5%9Faf+M%C9%99rk%C9%99zi/@40.4023792,49.8405822,17z/data=!3m1!4b1!4m6!3m5!1s0x40307dd1ada7fa99:0x8bfdd1b0bb8989bd!8m2!3d40.4023792!4d49.8405822!16s%2Fg%2F11scbknt07?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" style="color: #337a2c; text-decoration: none; font-weight: 500;">52 Maqsud Əlizadə</a><br>
-                        {{ _('Baku, Azerbaijan') }}
-                    </p>
-                </div>
-            </div>
-        </section>
-
         <!-- About Company Page -->
         <section id="about" class="page">
             <div class="about-hero" style="background-image: url('{{ get_localized_image(config.ABOUT_HERO_BACKGROUND_IMAGES, config.ABOUT_HERO_BACKGROUND_IMAGE) }}');">
@@ -1794,24 +1759,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Webinars Page -->
-        <section id="webinars" class="page">
-            <h2 class="section-title">{{ _('Webinars') }}</h2>
-            <p>{{ _('Join our live and recorded webinars to learn from experts in various fields.') }}</p>
-            <div class="webinars-content">
-                <p>{{ _('Webinars section coming soon...') }}</p>
-            </div>
-        </section>
-
-        <!-- Conferences Page -->
-        <section id="conferences" class="page">
-            <h2 class="section-title">{{ _('Conferences') }}</h2>
-            <p>{{ _('Participate in our educational conferences and networking events.') }}</p>
-            <div class="conferences-content">
-                <p>{{ _('Conferences section coming soon...') }}</p>
-            </div>
-        </section>
         </div>
     </main>
 
@@ -1840,7 +1787,6 @@
                 // Map page ID to URL hash
                 let hash = pageId;
                 if (pageId === 'tavi') hash = 'tavi-test';
-                if (pageId === 'contacts') hash = 'contact';
                 window.location.hash = hash;
             } else {
                 // For home, remove the hash
@@ -1910,12 +1856,6 @@
             } else if (pageId === 'resources') {
                 console.log('Loading resources...');
                 loadResources();
-            } else if (pageId === 'webinars') {
-                console.log('Loading webinars...');
-                // Add webinars loading logic here when implemented
-            } else if (pageId === 'conferences') {
-                console.log('Loading conferences...');
-                // Add conferences loading logic here when implemented
             }
             
             console.log('showPage completed for:', pageId);
@@ -3406,13 +3346,12 @@
             const hash = window.location.hash.substring(1); // Remove the '#'
             if (hash && hash !== 'home') {
                 // Valid page hashes - must match section IDs in HTML
-                const validPages = ['courses', 'forum', 'resources', 'tavi-test', 'contact', 'contacts', 'about'];
+                const validPages = ['courses', 'forum', 'resources', 'tavi-test', 'about'];
                 if (validPages.includes(hash)) {
                     console.log('Loading page from URL hash:', hash);
                     // Map hash to actual page ID
                     let pageId = hash;
                     if (hash === 'tavi-test') pageId = 'tavi';
-                    if (hash === 'contact') pageId = 'contacts';
                     showPage(pageId);
                 } else {
                     console.log('Invalid hash, loading initial page:', initialPage);
@@ -3438,7 +3377,6 @@
                         // Map hash to actual page ID
                         let pageId = hash;
                         if (hash === 'tavi-test') pageId = 'tavi';
-                        if (hash === 'contact') pageId = 'contacts';
                         showPage(pageId);
                     }
                 } else {
@@ -3547,15 +3485,6 @@
                 mobileNavMenu.classList.remove('active');
             }
 
-            // Mobile dropdown functionality
-            const mobileDropdownToggle = document.getElementById('mobile-education-link');
-            if (mobileDropdownToggle) {
-                mobileDropdownToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    mobileDropdownToggle.classList.toggle('active');
-                });
-            }
-
             // Update mobile auth buttons when user status changes
             function updateMobileAuthButtons() {
                 const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
@@ -3656,8 +3585,6 @@
         });
     </script>
     <script src="{{ url_for('static', filename='js/gallery-popup.js') }}"></script>
-    <footer style="width: 100%; background: #f5f1ea; border-top: 1px solid #e0e0e0; padding: 1rem; text-align: center; margin-top: 2rem;">
-        <a href="{{ url_for('main.terms') }}" style="color: #2e7d32; text-decoration: none;">{{ _('Terms of Service') }}</a>
-    </footer>
+    {% include 'components/footer.html' %}
 </body>
 </html>
