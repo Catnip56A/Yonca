@@ -1,27 +1,47 @@
 #!/bin/bash
 
-# Date for backup file
-DATE=$(date +%F)
+# -----------------------------
+# SQLite backup script with logging
+# -----------------------------
 
-# Path to your SQLite DB
-DB_FILE="/home/magsud/work/Yonca/yonca.db"
+# Date for backup filename
+DATE=$(date +%F_%H-%M-%S)
 
-# GCS bucket
-BUCKET="gs://yonca-main-site-db-backup"
+# Paths
+DB_FILE="/home/magsud/work/Yonca/yonca.db"        # your SQLite DB file
+BUCKET="gs://yonca-main-site-db-backup"          # GCS bucket
+TMP_FILE="/tmp/backup_sqlite_$DATE.db"
+LOG_FILE="/var/log/db_backup.log"                # log file
 
-# Temporary backup file
-TMP_FILE="/tmp/backup_sqlite_$DATE.db.gz"
+# Start logging
+echo "[$(date)] Starting SQLite backup..." >> $LOG_FILE
 
-# Use sqlite3 backup to safely copy the DB
-sqlite3 "$DB_FILE" ".backup '/tmp/backup_sqlite_$DATE.db'"
+# Backup command
+if sqlite3 "$DB_FILE" ".backup '$TMP_FILE'"; then
+    echo "[$(date)] Database backup created: $TMP_FILE" >> $LOG_FILE
+else
+    echo "[$(date)] ERROR: Failed to backup SQLite database" >> $LOG_FILE
+    exit 1
+fi
 
 # Compress the backup
-gzip -f /tmp/backup_sqlite_$DATE.db
+if gzip -f "$TMP_FILE"; then
+    echo "[$(date)] Backup compressed: $TMP_FILE.gz" >> $LOG_FILE
+else
+    echo "[$(date)] ERROR: Failed to compress backup" >> $LOG_FILE
+    exit 1
+fi
 
 # Upload to GCS
-gsutil cp "$TMP_FILE" "$BUCKET/"
+if gsutil cp "$TMP_FILE.gz" "$BUCKET/"; then
+    echo "[$(date)] Backup uploaded to $BUCKET" >> $LOG_FILE
+else
+    echo "[$(date)] ERROR: Failed to upload backup to GCS" >> $LOG_FILE
+    exit 1
+fi
 
-# Remove local temp file
-rm "$TMP_FILE"
+# Remove local compressed backup
+rm "$TMP_FILE.gz"
+echo "[$(date)] Local temporary file removed" >> $LOG_FILE
 
-echo "SQLite backup $DATE completed and uploaded to $BUCKET"
+echo "[$(date)] Backup completed successfully" >> $LOG_FILE
