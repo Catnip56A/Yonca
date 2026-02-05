@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DB_FILE="/home/magsud/work/Yonca/yonca.db"
+DB_FILE="/home/magsud/work/Yonca/instance/yonca.db"
 TMP_DIR="/tmp"
 TIMESTAMP=$(date +%F_%H-%M-%S)
 BACKUP_FILE="$TMP_DIR/backup_sqlite_$TIMESTAMP.db"
