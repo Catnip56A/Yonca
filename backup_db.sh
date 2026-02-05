@@ -11,7 +11,7 @@ DATE=$(date +%F_%H-%M-%S)
 DB_FILE="/home/magsud/work/Yonca/yonca.db"        # your SQLite DB file
 BUCKET="gs://yonca-main-site-db-backup"          # GCS bucket
 TMP_FILE="/tmp/backup_sqlite_$DATE.db"
-LOG_FILE="/var/log/db_backup.log"                # log file
+LOG_FILE="/home/magsud/work/Yonca/db_backup.log"                # log file
 
 # Start logging
 echo "[$(date)] Starting SQLite backup..." >> $LOG_FILE
