@@ -2,7 +2,7 @@
 
 # Backup filename (latest by default)
 BUCKET="gs://yonca-main-site-db-backup"
-LOCAL_DB="/home/magsud/work/Yonca/postgres"
+LOCAL_DB="/home/magsud/work/Yonca/yonca.db"
 TMP_FILE="/tmp/restore_db.db.gz"
 
 # 1. Download latest backup
