@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BUCKET="gs://yonca-main-site-db-backup"
-LOCAL_DB="/home/magsud/work/Yonca/yonca.db"
+LOCAL_DB="/home/magsud/work/Yonca/instance/yonca.db"
 TMP_FILE="/tmp/restore_db.db.gz"
 LOG_FILE="/home/magsud/work/Yonca/db_backup.log"
 

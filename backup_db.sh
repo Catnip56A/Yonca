@@ -8,7 +8,7 @@
 DATE=$(date +%F_%H-%M-%S)
 
 # Paths
-DB_FILE="/home/magsud/work/Yonca/yonca.db"        # your SQLite DB file
+DB_FILE="/home/magsud/work/Yonca/instance/yonca.db"        # your SQLite DB file
 BUCKET="gs://yonca-main-site-db-backup"          # GCS bucket
 TMP_FILE="/tmp/backup_sqlite_$DATE.db"
 LOG_FILE="/home/magsud/work/Yonca/db_backup.log"                # log file
