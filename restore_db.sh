@@ -16,6 +16,9 @@ DB_PORT="5432"
 # Use .pgpass for passwordless access
 export PGPASSFILE="$HOME/.pgpass"
 
+# Superuser for dropping/creating database
+SUPERUSER="postgres"
+
 # -----------------------------
 # Logging start
 # -----------------------------
@@ -46,12 +49,12 @@ TMP_FILE="${TMP_FILE%.gz}"
 echo "[$(date)] Backup uncompressed to $TMP_FILE" >> "$LOG_FILE"
 
 # -----------------------------
-# Drop and recreate the database
+# Drop and recreate the database using superuser
 # -----------------------------
-echo "[$(date)] Dropping and recreating database $DB_NAME" >> "$LOG_FILE"
-psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
+echo "[$(date)] Dropping and recreating database $DB_NAME as superuser $SUPERUSER" >> "$LOG_FILE"
+psql -U "$SUPERUSER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
     -c "DROP DATABASE IF EXISTS $DB_NAME;" >> "$LOG_FILE" 2>&1
-psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
+psql -U "$SUPERUSER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
     -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;" >> "$LOG_FILE" 2>&1
 
 # -----------------------------
