@@ -1,43 +1,31 @@
 #!/bin/bash
 
-DB_NAME="yonca_db"
-DB_USER="yonca_user"
-DB_HOST="localhost"
-DB_PORT="5432"
-
+LOG="/home/magsud/work/Yonca/db_backup.log"
 BUCKET="gs://yonca-main-site-db-backup"
-TMP_FILE="/tmp/restore_postgres.sql.gz"
+TMP_GZ="/tmp/restore_postgres.sql.gz"
+TMP_SQL="/tmp/restore_postgres.sql"
 
-LOG_FILE="/home/magsud/work/Yonca/db_backup.log"
+echo "[$(date)] Starting PostgreSQL restore..." >> "$LOG"
 
-export PGPASSWORD="ALHIKO3325Catnip21"
-
-echo "[$(date)] Starting PostgreSQL restore..." >> $LOG_FILE
-
-# 🔴 ONLY pick PostgreSQL backups
-LATEST=$(gsutil ls "$BUCKET/yonca_db_backup_*.sql.gz" | sort | tail -n 1)
+LATEST=$(gsutil ls "$BUCKET"/yonca_db_backup_*.sql.gz | sort | tail -n 1)
 
 if [ -z "$LATEST" ]; then
-    echo "[$(date)] ERROR: No PostgreSQL backup found!" >> $LOG_FILE
+    echo "[$(date)] ERROR: No backup found in bucket" >> "$LOG"
     exit 1
 fi
 
-echo "[$(date)] Latest PostgreSQL backup: $LATEST" >> $LOG_FILE
+echo "[$(date)] Latest backup found: $LATEST" >> "$LOG"
 
-# Download
-gsutil cp "$LATEST" "$TMP_FILE" >> $LOG_FILE 2>&1
+gsutil cp "$LATEST" "$TMP_GZ"
 
-# Recreate DB
-psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -c "DROP DATABASE IF EXISTS $DB_NAME;" >> $LOG_FILE 2>&1
-psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -c "CREATE DATABASE $DB_NAME;" >> $LOG_FILE 2>&1
+gunzip -f "$TMP_GZ"
 
-# Restore
-gunzip -c "$TMP_FILE" | psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d "$DB_NAME" >> $LOG_FILE 2>&1
+psql -U postgres -h localhost -d yonca < "$TMP_SQL"
 
-if [ $? -ne 0 ]; then
-    echo "[$(date)] ERROR: Restore failed!" >> $LOG_FILE
-    exit 1
+if [ $? -eq 0 ]; then
+    echo "[$(date)] PostgreSQL restore completed successfully" >> "$LOG"
+else
+    echo "[$(date)] ERROR: Restore failed" >> "$LOG"
 fi
 
-rm -f "$TMP_FILE"
-echo "[$(date)] PostgreSQL restore completed successfully" >> $LOG_FILE
+rm -f "$TMP_SQL"
