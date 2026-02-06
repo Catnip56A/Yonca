@@ -1,31 +1,70 @@
 #!/bin/bash
+set -e
 
-LOG="/home/magsud/work/Yonca/db_backup.log"
-BUCKET="gs://yonca-main-site-db-backup"
-TMP_GZ="/tmp/restore_postgres.sql.gz"
-TMP_SQL="/tmp/restore_postgres.sql"
+# -----------------------------
+# Config
+# -----------------------------
+LOG_FILE="/home/magsud/work/Yonca/db_backup.log"
+TMP_DIR="/tmp"
+GCS_BUCKET="gs://yonca-main-site-db-backup"
 
-echo "[$(date)] Starting PostgreSQL restore..." >> "$LOG"
+DB_NAME="yonca_db"
+DB_USER="yonca_user"
+DB_HOST="localhost"
+DB_PORT="5432"
 
-LATEST=$(gsutil ls "$BUCKET"/yonca_db_backup_*.sql.gz | sort | tail -n 1)
+# -----------------------------
+# Start logging
+# -----------------------------
+echo "[$(date)] Starting PostgreSQL restore..." >> "$LOG_FILE"
 
-if [ -z "$LATEST" ]; then
-    echo "[$(date)] ERROR: No backup found in bucket" >> "$LOG"
+# -----------------------------
+# Find latest backup in GCS
+# -----------------------------
+LATEST_BACKUP=$(gsutil ls $GCS_BUCKET | sort | tail -n 1)
+if [ -z "$LATEST_BACKUP" ]; then
+    echo "[$(date)] ERROR: No backup found in $GCS_BUCKET" >> "$LOG_FILE"
     exit 1
 fi
+echo "[$(date)] Latest backup found: $LATEST_BACKUP" >> "$LOG_FILE"
 
-echo "[$(date)] Latest backup found: $LATEST" >> "$LOG"
+# -----------------------------
+# Download backup
+# -----------------------------
+TMP_FILE="$TMP_DIR/restore_postgres.sql.gz"
+gsutil cp "$LATEST_BACKUP" "$TMP_FILE" >> "$LOG_FILE" 2>&1
+echo "[$(date)] Backup downloaded: $TMP_FILE" >> "$LOG_FILE"
 
-gsutil cp "$LATEST" "$TMP_GZ"
-
-gunzip -f "$TMP_GZ"
-
-psql -U postgres -h localhost -d yonca_db < "$TMP_SQL"
-
-if [ $? -eq 0 ]; then
-    echo "[$(date)] PostgreSQL restore completed successfully" >> "$LOG"
-else
-    echo "[$(date)] ERROR: Restore failed" >> "$LOG"
+# -----------------------------
+# Uncompress if needed
+# -----------------------------
+if [[ "$TMP_FILE" == *.gz ]]; then
+    gunzip -f "$TMP_FILE"
+    TMP_FILE="${TMP_FILE%.gz}"
+    echo "[$(date)] Backup uncompressed to $TMP_FILE" >> "$LOG_FILE"
 fi
 
-rm -f "$TMP_SQL"
+# -----------------------------
+# Drop and recreate the database
+# -----------------------------
+echo "[$(date)] Dropping and recreating database $DB_NAME" >> "$LOG_FILE"
+psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
+    -c "DROP DATABASE IF EXISTS $DB_NAME;" >> "$LOG_FILE" 2>&1
+psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
+    -c "CREATE DATABASE $DB_NAME;" >> "$LOG_FILE" 2>&1
+
+# -----------------------------
+# Restore the database
+# -----------------------------
+echo "[$(date)] Restoring database $DB_NAME from $TMP_FILE" >> "$LOG_FILE"
+pg_restore -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" \
+    -d "$DB_NAME" --no-owner --role="$DB_USER" \
+    "$TMP_FILE" >> "$LOG_FILE" 2>&1
+
+echo "[$(date)] PostgreSQL restore completed successfully" >> "$LOG_FILE"
+
+# -----------------------------
+# Clean up temp file
+# -----------------------------
+rm -f "$TMP_FILE"
+echo "[$(date)] Temporary files removed" >> "$LOG_FILE"
