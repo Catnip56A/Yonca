@@ -9,7 +9,8 @@ TMP_DIR="/tmp"
 GCS_BUCKET="gs://yonca-main-site-db-backup"
 
 DB_NAME="yonca_db"
-DB_USER="yonca_user"
+DB_USER="yonca_user"        # Normal user for restore
+DB_SUPERUSER="postgres"     # Superuser to drop/create DB
 DB_HOST="localhost"
 DB_PORT="5432"
 
@@ -45,18 +46,19 @@ if [[ "$TMP_FILE" == *.gz ]]; then
 fi
 
 # -----------------------------
-# Drop and recreate the database
+# Drop and recreate the database using superuser
 # -----------------------------
-echo "[$(date)] Dropping and recreating database $DB_NAME" >> "$LOG_FILE"
-psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
+echo "[$(date)] Dropping and recreating database $DB_NAME with superuser $DB_SUPERUSER" >> "$LOG_FILE"
+psql -U "$DB_SUPERUSER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
     -c "DROP DATABASE IF EXISTS $DB_NAME;" >> "$LOG_FILE" 2>&1
-psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
-    -c "CREATE DATABASE $DB_NAME;" >> "$LOG_FILE" 2>&1
+
+psql -U "$DB_SUPERUSER" -h "$DB_HOST" -p "$DB_PORT" -d postgres \
+    -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;" >> "$LOG_FILE" 2>&1
 
 # -----------------------------
-# Restore the database
+# Restore the database as normal user
 # -----------------------------
-echo "[$(date)] Restoring database $DB_NAME from $TMP_FILE" >> "$LOG_FILE"
+echo "[$(date)] Restoring database $DB_NAME from $TMP_FILE as $DB_USER" >> "$LOG_FILE"
 pg_restore -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" \
     -d "$DB_NAME" --no-owner --role="$DB_USER" \
     "$TMP_FILE" >> "$LOG_FILE" 2>&1
