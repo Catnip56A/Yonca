@@ -20,7 +20,7 @@ gsutil cp "$LATEST" "$TMP_GZ"
 
 gunzip -f "$TMP_GZ"
 
-psql -U postgres -h localhost -d yonca < "$TMP_SQL"
+psql -U postgres -h localhost -d yonca_db < "$TMP_SQL"
 
 if [ $? -eq 0 ]; then
     echo "[$(date)] PostgreSQL restore completed successfully" >> "$LOG"
