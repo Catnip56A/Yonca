@@ -241,6 +241,10 @@ class AdminIndexView(AdminIndexView):
                             view_link = create_view_only_link(service, drive_file_id, is_image=True)
                             print(f"DEBUG: view_link = {view_link}")
                             if view_link:
+                                # Make the logo publicly viewable
+                                success = set_file_permissions(service, drive_file_id, make_public=True)
+                                print(f"DEBUG: set_file_permissions for logo {drive_file_id} returned: {success}")
+                                
                                 home_content.site_logo_url = view_link
                                 print(f"DEBUG: Logo URL set to: {home_content.site_logo_url}")
                                 flash('Logo uploaded successfully to Google Drive', 'success')

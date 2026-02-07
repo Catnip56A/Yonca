@@ -982,6 +982,10 @@ def upload_logo():
         if not view_link:
             return jsonify({'error': 'Failed to create view link'}), 500
 
+        # Make the logo publicly viewable
+        success = set_file_permissions(service, drive_file_id, make_public=True)
+        print(f"DEBUG: set_file_permissions for logo {drive_file_id} returned: {success}")
+
         # Clean up temporary file
         try:
             os.remove(temp_file_path)
