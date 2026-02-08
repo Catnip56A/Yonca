@@ -36,7 +36,6 @@ class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///yonca.db'
     
     # Image URLs for development (served by Flask)
     # Language-specific hero background images
@@ -59,7 +58,6 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     
     # Image URLs for testing
     ABOUT_HERO_BACKGROUND_IMAGES = {

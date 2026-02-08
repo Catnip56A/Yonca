@@ -105,6 +105,9 @@ PROTECTED_TERMS = [
     'Yonca',
     'YONCA',
     'yonca',
+    'Tavi',
+    'TAVI',
+    'tavi',
     # Add more brand terms here
 ]
 ```
