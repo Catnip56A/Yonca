@@ -31,11 +31,12 @@ ssh root@your-vps-ip
 sudo apt update && sudo apt upgrade -y
 
 # Install required packages
-sudo apt install -y python3 python3-pip python3-venv postgresql postgresql-contrib nginx certbot python3-certbot-nginx ufw
+sudo apt install -y python3 python3-pip python3-venv postgresql postgresql-contrib caddy ufw
 
 # Configure firewall
 sudo ufw allow ssh
-sudo ufw allow 'Nginx Full'
+sudo ufw allow 80
+sudo ufw allow 443
 sudo ufw --force enable
 ```
 
@@ -110,33 +111,32 @@ sudo systemctl enable yonca
 sudo systemctl start yonca
 ```
 
-### 4.2 Nginx (Reverse Proxy)
+### 4.2 Caddy (Web Server & Reverse Proxy)
 ```bash
-# Copy nginx configuration
-sudo cp deploy/yonca.nginx /etc/nginx/sites-available/yonca
+# Copy Caddyfile configuration
+sudo cp deploy/Caddyfile /etc/caddy/Caddyfile
 
-# Update server_name with your domain
-sudo nano /etc/nginx/sites-available/yonca
-# Change: server_name your-domain.com www.your-domain.com;
+# Update domain name in Caddyfile
+sudo nano /etc/caddy/Caddyfile
+# Change: your-domain.com to your actual domain
 
-# Enable site
-sudo ln -s /etc/nginx/sites-available/yonca /etc/nginx/sites-enabled/
+# Enable and start Caddy
+sudo systemctl enable caddy
+sudo systemctl start caddy
 
-# Test configuration
-sudo nginx -t
-
-# Reload nginx
-sudo systemctl reload nginx
+# Caddy will automatically obtain SSL certificates from Let's Encrypt
 ```
 
 ## Step 5: SSL Certificate (HTTPS)
 
-```bash
-# Get SSL certificate from Let's Encrypt
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+Caddy automatically handles SSL certificate issuance and renewal from Let's Encrypt. No additional configuration is required - SSL certificates will be obtained automatically when you access your domain.
 
-# Test automatic renewal
-sudo certbot renew --dry-run
+```bash
+# Check Caddy status
+sudo systemctl status caddy
+
+# View Caddy logs
+sudo journalctl -u caddy -f
 ```
 
 ## Step 6: Final Checks
@@ -149,7 +149,7 @@ sudo systemctl status yonca
 # Check logs
 sudo journalctl -u yonca -f
 
-# Test nginx
+# Test Caddy
 curl http://localhost
 ```
 
@@ -171,8 +171,9 @@ curl http://localhost
    - Verify PostgreSQL is running: `sudo systemctl status postgresql`
 
 3. **Static files not loading**
-   - Check nginx configuration
+   - Check Caddy configuration in /etc/caddy/Caddyfile
    - Verify static folder permissions
+   - Check Caddy logs: `sudo journalctl -u caddy -f`
 
 4. **Permission issues**
    ```bash

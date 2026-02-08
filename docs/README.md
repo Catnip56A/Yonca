@@ -1,39 +1,48 @@
 # Yonca - Learning Platform
 
-A comprehensive learning management platform built with Python Flask, featuring user authentication, course management, resource sharing, community forums, and administrative tools.
+A comprehensive learning management platform built with Python Flask, featuring user authentication, course management, resource sharing, community forums, Google Drive integration, and administrative tools.
 
 ## 🚀 Features
 
 ### Core Functionality
-- **User Authentication**: Secure login/logout with admin role support
-- **Course Management**: Enroll in and manage learning courses
-- **Resource Library**: Upload and access protected learning materials
+- **User Authentication**: Secure login/logout with admin and teacher roles
+- **Course Management**: Enroll in and manage learning courses with content modules, assignments, and announcements
+- **Resource Library**: Upload and access protected learning materials with Google Drive integration
 - **PDF Document Management**: Secure PDF upload and access with PIN protection
 - **Community Forum**: Interactive discussion forum with threaded replies and channel-based organization
+- **Course Content Management**: Organize course materials in folders with assignments and submissions
+- **Google Drive Integration**: Seamless file storage and sharing via Google Drive
+- **Background Job Processing**: Asynchronous task processing for translations and file operations
 - **Admin Dashboard**: Comprehensive administrative interface for system management
 
 ### Technical Features
-- **Multi-language Support**: English and Russian language options
+- **Multi-language Support**: English, Azerbaijani, and Russian language options
 - **Responsive Design**: Mobile-friendly web interface
 - **RESTful API**: JSON-based API for frontend integration
-- **Secure File Uploads**: Protected resource and PDF management
+- **Secure File Uploads**: Protected resource and PDF management with Google Drive
 - **Session Management**: Secure user sessions with Flask-Login
-- **Database**: SQLite with SQLAlchemy ORM and migration support
+- **Database**: PostgreSQL with SQLAlchemy ORM and migration support
+- **Internationalization**: Dynamic content translation with AI-powered services
 - **Forum Channels**: Multi-channel forum with tiered access control (public/login-required/admin-only)
 
 ## 🛠️ Technology Stack
 
 - **Backend**: Python Flask
-- **Database**: SQLite with SQLAlchemy
-- **Authentication**: Flask-Login
+- **Database**: PostgreSQL with SQLAlchemy
+- **Authentication**: Flask-Login with Google OAuth
 - **Admin Interface**: Flask-Admin
-- **Internationalization**: Flask-Babel
+- **Internationalization**: Flask-Babel with AI translation
+- **File Storage**: Google Drive API integration
+- **Job Processing**: Custom background job system
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Styling**: Custom responsive CSS
+- **Deployment**: Gunicorn + Caddy web server
 
 ## 📋 Prerequisites
 
 - Python 3.8+
+- PostgreSQL database
+- Google Cloud Project with Drive API enabled
 - pip package manager
 
 ## 🚀 Installation & Setup
@@ -55,88 +64,88 @@ A comprehensive learning management platform built with Python Flask, featuring 
    pip install -r requirements.txt
    ```
 
-4. **Initialize the database**:
-   ```bash
-   python Helping Scripts/init_db.py
+4. **Set up environment variables**:
+   Create a `.env` file with:
+   ```env
+   FLASK_ENV=development
+   SECRET_KEY=your-super-secret-key-change-this-make-it-long-and-random
+   DATABASE_URL=postgresql://username:password@localhost:5432/yonca_db
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
    ```
 
-5. **Run database migrations** (if needed):
+5. **Set up Google Drive integration**:
+   - Place your Google service account JSON file in the project root
+   - Update the filename in `config.py` if different
+
+6. **Initialize the database**:
    ```bash
-   # Run any migration scripts in Helping Scripts/ directory
-   python Helping Scripts/migrate_*.py
+   flask db upgrade
    ```
 
-6. **Create admin user** (optional):
+7. **Create admin user** (optional):
    ```bash
-   python Helping Scripts/create_user.py
+   python create_admin.py
    ```
 
-7. **Run the application**:
+8. **Run the application**:
    ```bash
    python app.py
    ```
 
-7. **Access the application**:
+8. **Access the application**:
    - Main site: http://localhost:5000
    - Admin dashboard: http://localhost:5000/admin (admin login required)
-
-## 📖 Usage
-
-### For Students/Learners
-1. Register or login to access the platform
-2. Browse and enroll in available courses
-3. Access learning resources and materials
-4. Participate in community discussions
-5. Upload and share resources (admin approval may be required)
-
-### For Administrators
-1. Login with admin credentials
-2. Access admin dashboard at `/admin`
-3. Manage users, courses, and resources
-4. Moderate forum content
-5. Upload and manage protected documents
-6. Monitor system activity
 
 ## 📁 Project Structure
 
 ```
 yonca/
-├── __init__.py          # Flask application factory
-├── config.py            # Application configuration
-├── models/              # Database models
-│   └── __init__.py
-├── routes/              # API and web routes
-│   ├── api.py          # REST API endpoints
-│   ├── auth.py         # Authentication routes
-│   └── __init__.py
-├── admin/               # Admin interface configuration
-│   └── __init__.py
-├── templates/           # Jinja2 templates
-│   ├── index.html       # Main application page
-│   └── login.html       # Login page
-├── static/              # Static assets
-│   ├── images/          # Image files
-│   └── uploads/         # User uploaded files
-│       ├── pdfs/        # PDF documents
-│       └── resources/   # Learning resources
-└── translations/        # Internationalization files
-    ├── en/
-    └── ru/
-Helping Scripts/         # Database management and utility scripts
-├── init_db.py          # Database initialization
-├── create_user.py      # User creation utilities
-├── migrate_*.py        # Database migration scripts
-└── update_*.py         # Data update scripts
+├── __init__.py              # Flask application factory
+├── config.py                # Application configuration
+├── models/
+│   └── __init__.py          # Database models (User, Course, etc.)
+├── routes/
+│   ├── api.py               # REST API endpoints
+│   ├── auth.py              # Authentication routes
+│   └── __init__.py          # Main web routes
+├── admin/
+│   └── __init__.py          # Admin interface configuration
+├── templates/               # Jinja2 templates
+├── translations/            # Internationalization files
+│   ├── az/                  # Azerbaijani translations
+│   ├── en/                  # English translations
+│   └── ru/                  # Russian translations
+├── content_translator.py    # Dynamic content translation system
+├── google_drive_service.py  # Google Drive API integration
+├── job_manager.py           # Background job processing
+├── translation_service.py   # AI-powered translation services
+└── babel.cfg                # Babel configuration
+
+static/                      # Static assets (CSS, JS, images)
+├── permanent/               # Permanent static files
+└── uploads/                 # User uploaded files (via Google Drive)
+
+Additional_scripts/          # Database management and utility scripts
+├── create_admin.py          # Admin user creation
+├── backup_db.sh             # Database backup script
+├── restore_db.sh            # Database restore script
+└── ...                      # Other utility scripts
+
+migrations/                  # Database migrations
+deploy/                      # Deployment configuration
+└── Caddyfile                # Caddy web server configuration
 ```
 
 ## 🔧 Configuration
 
 Key configuration options in `yonca/config.py`:
-- Database URI
+- Database URI (PostgreSQL)
 - Secret key for sessions
-- Upload folder paths
+- Google OAuth credentials
+- Session settings
 - Language settings
-- Admin credentials
+- File upload limits
 
 ## 🌐 API Endpoints
 
@@ -147,6 +156,9 @@ Key configuration options in `yonca/config.py`:
 
 ### Courses
 - `GET /api/courses` - Get available courses
+- `POST /api/courses/{id}/enroll` - Enroll in course
+- `GET /api/courses/{id}/content` - Get course content
+- `POST /api/courses/{id}/assignments/{aid}/submit` - Submit assignment
 
 ### Resources
 - `GET /api/resources` - Get learning resources
@@ -164,22 +176,29 @@ Key configuration options in `yonca/config.py`:
 - `PUT /api/forum/messages/{id}` - Update message
 - `DELETE /api/forum/messages/{id}` - Delete message
 
+### Translations
+- `POST /api/translate` - Request content translation
+- `GET /api/translation/status/{job_id}` - Check translation status
+
 ## 🔒 Security Features
 
 - Password hashing with Werkzeug
-- Session-based authentication
-- Admin role-based access control
+- Session-based authentication with Google OAuth
+- Admin and teacher role-based access control
 - PIN-protected resource access
-- Secure file upload validation
+- Secure file upload validation with Google Drive
 - CSRF protection
+- Rate limiting and account lockout
+- Input validation and sanitization
 
 ## 🌍 Internationalization
 
 The application supports multiple languages:
 - English (en)
+- Azerbaijani (az)
 - Russian (ru)
 
-Language files are located in `yonca/translations/`.
+Language files are located in `yonca/translations/`. Content translation is handled dynamically using AI services.
 
 ## 🤝 Contributing
 

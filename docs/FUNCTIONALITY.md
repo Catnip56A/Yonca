@@ -29,10 +29,37 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
   - Profile emojis for visual identification
 - **Enrollment System**: Users can enroll in courses they're interested in
 
+#### Course Content Management
+- **Content Modules**: Organize course materials into modules and folders
+- **File Management**: Upload and organize course files (videos, documents, etc.)
+- **Content Folders**: Hierarchical folder structure for course organization
+- **Content Ordering**: Custom ordering of course materials
+- **Access Control**: Control content visibility based on enrollment and progress
+
+#### Assignments & Submissions
+- **Assignment Creation**: Teachers can create assignments with due dates and points
+- **File Submissions**: Students can submit assignments via file upload
+- **Google Drive Integration**: Seamless file storage and sharing
+- **Grading System**: Teachers can grade submissions and provide feedback
+- **Submission Tracking**: Track submission status and deadlines
+
+#### Course Announcements
+- **Announcement System**: Teachers can post course-wide announcements
+- **Threaded Discussions**: Students can reply to announcements
+- **Real-time Updates**: Keep students informed of important updates
+- **Announcement Management**: Edit and manage course communications
+
+#### Course Reviews
+- **Student Feedback**: Enrolled students can leave reviews and ratings
+- **Rating System**: 1-5 star rating system for courses
+- **Review Management**: Teachers and admins can moderate reviews
+- **Analytics**: Track course satisfaction and improvement areas
+
 #### Course Administration (Admin Only)
 - **Create/Edit Courses**: Administrators can add new courses or modify existing ones
 - **User Management**: Assign users to courses and manage enrollments
-- **Course Analytics**: Track enrollment and participation metrics
+- **Content Management**: Full control over course materials and structure
+- **Course Analytics**: Track enrollment, completion, and engagement metrics
 
 ### 3. Resource Library
 
@@ -59,6 +86,34 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
 - **Uploader Visibility**: Uploaders can see their document PINs
 - **Admin Management**: Complete administrative control over PDF documents
 - **File Validation**: Automatic PDF format validation during upload
+
+### 5. Google Drive Integration
+
+#### File Storage
+- **Cloud Storage**: All uploaded files stored securely in Google Drive
+- **Access Control**: Granular permissions for file sharing and access
+- **File Management**: Upload, download, and organize files through Google Drive API
+- **Link Generation**: Automatic generation of view and download links
+
+#### Integration Features
+- **Seamless Uploads**: Direct upload to Google Drive without local storage
+- **File Permissions**: Set appropriate sharing permissions for different user types
+- **Batch Operations**: Handle multiple file operations efficiently
+- **Error Handling**: Robust error recovery for upload and access failures
+
+### 6. Background Job Processing
+
+#### Asynchronous Tasks
+- **Translation Jobs**: AI-powered content translation in the background
+- **File Processing**: Large file uploads and processing without blocking UI
+- **Batch Operations**: Handle bulk operations asynchronously
+- **Job Monitoring**: Track job progress and status in real-time
+
+#### Job Management
+- **Queue System**: Organize and prioritize background tasks
+- **Status Tracking**: Monitor job completion and handle failures
+- **Retry Logic**: Automatic retry for failed operations
+- **Resource Management**: Efficient use of system resources for background processing
 
 ### 5. Community Forum
 
@@ -132,14 +187,17 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
 
 #### Language Support
 - **English**: Complete English language support
+- **Azerbaijani**: Full Azerbaijani language localization
 - **Russian**: Full Russian language localization
 - **Dynamic Switching**: Real-time language switching without page reload
+- **AI-Powered Translation**: Automatic content translation using machine learning
 - **Translation Management**: Centralized translation file management
 
 #### Localization Features
 - **Date Formatting**: Localized date and time display
 - **Number Formatting**: Culture-appropriate number formatting
 - **Text Direction**: Support for right-to-left languages (extensible)
+- **Content Translation**: Dynamic translation of course content, resources, and UI elements
 
 ## 🎨 User Interface Features
 
@@ -184,13 +242,24 @@ Yonca is a comprehensive learning management platform designed to facilitate onl
 ## 📊 Data Management
 
 ### Database Schema
-- **User Model**: User accounts with authentication and profile data
-- **Course Model**: Course information and enrollment relationships
-- **Resource Model**: Learning resources with PIN protection
+- **User Model**: User accounts with authentication, profile data, and role management
+- **Course Model**: Course information, enrollment relationships, and content management
+- **CourseContent Model**: Individual course content items (videos, documents, text)
+- **CourseContentFolder Model**: Hierarchical folder structure for course organization
+- **CourseAssignment Model**: Assignment definitions with due dates and requirements
+- **CourseAssignmentSubmission Model**: Student submissions with grading and feedback
+- **CourseAnnouncement Model**: Course-wide announcements and communications
+- **CourseAnnouncementReply Model**: Threaded discussions on announcements
+- **CourseReview Model**: Student reviews and ratings for courses
+- **Resource Model**: Learning resources with Google Drive integration and PIN protection
 - **PDFDocument Model**: PDF files with secure access controls
 - **ForumChannel Model**: Forum channels with tiered access control (public/login-required/admin-only)
 - **ForumMessage Model**: Discussion forum with threaded replies
-- **TaviTest Model**: Assessment and testing functionality (planned)
+- **HomeContent Model**: Configurable home page content and settings
+- **Translation Model**: AI-powered translation cache for dynamic content
+- **ContentTranslation Model**: Translated content for courses, resources, and UI elements
+- **BackgroundJob Model**: Asynchronous job processing and status tracking
+- **AppSetting Model**: Application configuration and settings storage
 
 ### Data Relationships
 - **Many-to-Many**: Users can enroll in multiple courses
