@@ -1733,14 +1733,6 @@
             <h2 class="section-title">{{ _('Courses') }}</h2>
             <p>{{ _('Explore our available courses and start your learning journey.') }}</p>
 
-            <!-- Enrolled Courses Section (shown only for authenticated users) -->
-            <div id="enrolled-courses-section" style="display: none;">
-                <h3 style="color: #337a2c; margin-top: 2rem; margin-bottom: 1rem;">{{ _('My Enrolled Courses') }}</h3>
-                <div class="courses-grid enrolled-courses-grid">
-                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses...') }}</p>
-                </div>
-            </div>
-
             <!-- Course Filters -->
             <div class="course-filters" style="background: #f5f1ea; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                 <h3 style="margin: 0 0 1rem 0; color: #212121;">📚 {{ _('Filter Courses') }}</h3>
@@ -1751,6 +1743,14 @@
                             <!-- Tag filter buttons will be populated here -->
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Enrolled Courses Section (shown only for authenticated users) -->
+            <div id="enrolled-courses-section" style="display: none;">
+                <h3 style="color: #337a2c; margin-top: 2rem; margin-bottom: 1rem;">{{ _('My Enrolled Courses') }}</h3>
+                <div class="courses-grid enrolled-courses-grid">
+                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses...') }}</p>
                 </div>
             </div>
 

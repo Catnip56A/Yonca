@@ -696,10 +696,10 @@ function addFeatureFromData(containerId, prefix, title, description, buttonText 
     const featureIndex = container.children.length;
 
     // Escape quotes for HTML attributes
-    const escapedTitle = title.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
-    const escapedDescription = description.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
-    const escapedButtonText = buttonText.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
-    const escapedButtonUrl = buttonUrl.replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedTitle = (title || '').replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedDescription = (description || '').replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedButtonText = (buttonText || '').replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
+    const escapedButtonUrl = (buttonUrl || '').replace(/"/g, '&quot;').replace(/&/g, '&amp;').replace(/`/g, '&#96;').replace(/\$\{/g, '\\${');
 
     console.log('addFeatureFromData:', { title, description, buttonText, buttonUrl, escapedTitle, escapedDescription, escapedButtonText, escapedButtonUrl });
 
@@ -1161,13 +1161,13 @@ document.getElementById('translate-all').addEventListener('click', async functio
             // Poll for job status
             await pollJobStatus(jobId, button, originalHtml);
         } else {
-            const escapedError = result.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            const escapedError = (result.error || '').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
             alert(`✗ Failed to queue translation job: ${escapedError}`);
             button.disabled = false;
             button.innerHTML = originalHtml;
         }
     } catch (error) {
-        const escapedMessage = error.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+        const escapedMessage = (error.message || '').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
         alert(`✗ Error: ${escapedMessage}`);
         button.disabled = false;
         button.innerHTML = originalHtml;
@@ -1185,31 +1185,32 @@ async function pollJobStatus(jobId, button, originalHtml) {
 
             if (job.status === 'completed') {
                 // Job completed successfully
-                const stats = job.result;
-                const escapedMessage = job.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-                alert(`✓ Translation completed successfully!\n\n${escapedMessage}\n\nProcessed: ${stats.total_processed} items\n- ${stats.courses} courses\n- ${stats.resources} resources\n- ${stats.home_content} home content\n- ${stats.course_content} course items\n- ${stats.folders} folders\n\nRefresh the page to see translated content when changing languages.`);
+                const stats = job.result || {};
+                const escapedMessage = (job.message || '').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+                alert(`✓ Translation completed successfully!\n\n${escapedMessage}\n\nProcessed: ${stats.total_processed || 0} items\n- ${stats.courses || 0} courses\n- ${stats.resources || 0} resources\n- ${stats.home_content || 0} home content\n\nRefresh the page to see translated content when changing languages.`);
                 button.disabled = false;
                 button.innerHTML = originalHtml;
             } else if (job.status === 'failed') {
                 // Job failed
-                const escapedError = job.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+                const escapedError = (job.error || '').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
                 alert(`✗ Translation failed: ${escapedError}`);
                 button.disabled = false;
                 button.innerHTML = originalHtml;
             } else {
                 // Job still running, update progress and continue polling
-                const escapedMessage = job.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-                button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${job.progress}% - ${escapedMessage}`;
+                const escapedMessage = (job.message || '').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+                button.innerHTML = `<i class="fa fa-spinner fa-spin"></i> ${job.progress || 0}% - ${escapedMessage}`;
                 setTimeout(() => pollJobStatus(jobId, button, originalHtml), 2000); // Poll every 2 seconds
             }
         } else {
-            const escapedError = result.error.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            const escapedError = (result.error || '').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
             alert(`✗ Failed to check job status: ${escapedError}`);
             button.disabled = false;
             button.innerHTML = originalHtml;
         }
     } catch (error) {
-        const escapedMessage = error.message.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+        const errorMessage = error && error.message ? error.message : 'Unknown error occurred';
+        const escapedMessage = errorMessage.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
         alert(`✗ Error checking job status: ${escapedMessage}`);
         button.disabled = false;
         button.innerHTML = originalHtml;

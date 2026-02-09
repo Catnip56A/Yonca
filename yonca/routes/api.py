@@ -6,6 +6,7 @@ import time
 from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from flask_login import current_user, login_required
+from flask_babel import _
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, Translation, db
 from yonca.translation_service import translation_service
 from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
@@ -32,7 +33,7 @@ api_bp.unauthorized = api_unauthorized
 def get_courses():
     """Get all courses with enrollment status for authenticated users"""
     from flask import session
-    from yonca.content_translator import get_translated_content
+    from yonca.content_translator import get_translated_content, get_translated_string_array
     
     # Get user's current locale
     user_locale = session.get('language', 'en')
@@ -50,7 +51,7 @@ def get_courses():
             'time_slot': c.time_slot,
             'profile_emoji': c.profile_emoji,
             'dropdown_menu': c.dropdown_menu,
-            'tags': c.tags or [],
+            'tags': get_translated_string_array('course', c.id, 'tags', c.tags, user_locale),
             'is_enrolled': c.id in enrolled_course_ids
         } for c in all_courses])
     else:
@@ -64,14 +65,14 @@ def get_courses():
             'time_slot': c.time_slot,
             'profile_emoji': c.profile_emoji,
             'dropdown_menu': c.dropdown_menu,
-            'tags': c.tags or []
+            'tags': get_translated_string_array('course', c.id, 'tags', c.tags, user_locale)
         } for c in courses])
 
 @api_bp.route('/user')
 def get_current_user():
     """Get current user information"""
     from flask import session
-    from yonca.content_translator import get_translated_content
+    from yonca.content_translator import get_translated_content, get_translated_string_array
     
     # Get user's current locale
     user_locale = session.get('language', 'en')
@@ -88,7 +89,7 @@ def get_current_user():
                 'time_slot': c.time_slot,
                 'profile_emoji': c.profile_emoji,
                 'dropdown_menu': c.dropdown_menu,
-                'tags': c.tags or []
+                'tags': get_translated_string_array('course', c.id, 'tags', c.tags, user_locale)
             } for c in current_user.courses]
         })
     else:
@@ -462,7 +463,7 @@ def get_resources():
             'id': r.id,
             'title': translated_title,
             'description': translated_description,
-            'tags': r.tags,
+            'tags': ' '.join([_(tag.strip()) for tag in (r.tags or '').split() if tag.strip()]),
             'preview_image': r.preview_image,
             'preview_drive_file_id': r.preview_drive_file_id,
             'preview_drive_view_link': r.preview_drive_view_link,

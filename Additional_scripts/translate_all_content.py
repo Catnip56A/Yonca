@@ -3,13 +3,11 @@ Manual translation utility for dynamic content
 Run this script to translate existing courses, resources, and home content
 """
 from app import app
-from yonca.models import db, Course, Resource, HomeContent, CourseContent, CourseContentFolder
+from yonca.models import db, Course, Resource, HomeContent
 from yonca.content_translator import (
     auto_translate_course,
     auto_translate_resource,
-    auto_translate_home_content,
-    auto_translate_course_content,
-    auto_translate_course_content_folder
+    auto_translate_home_content
 )
 
 def translate_all_courses():
@@ -72,46 +70,6 @@ def translate_all_home_content():
                 print(f"✗ Error translating home content {home.id}: {e}")
 
 
-def translate_all_course_content():
-    """Translate all course content (lessons/materials)"""
-    print("\n" + "="*60)
-    print("Translating All Course Content")
-    print("="*60)
-    
-    with app.app_context():
-        contents = CourseContent.query.all()
-        print(f"\nFound {len(contents)} course content items")
-        
-        for content in contents:
-            try:
-                auto_translate_course_content(content)
-                db.session.commit()
-                print(f"✓ Translated course content: {content.title}")
-            except Exception as e:
-                db.session.rollback()
-                print(f"✗ Error translating course content {content.id}: {e}")
-
-
-def translate_all_course_folders():
-    """Translate all course content folders"""
-    print("\n" + "="*60)
-    print("Translating All Course Content Folders")
-    print("="*60)
-    
-    with app.app_context():
-        folders = CourseContentFolder.query.all()
-        print(f"\nFound {len(folders)} course content folders")
-        
-        for folder in folders:
-            try:
-                auto_translate_course_content_folder(folder)
-                db.session.commit()
-                print(f"✓ Translated folder: {folder.title}")
-            except Exception as e:
-                db.session.rollback()
-                print(f"✗ Error translating folder {folder.id}: {e}")
-
-
 def main():
     """Translate all content"""
     print("\n" + "="*70)
@@ -129,21 +87,15 @@ def main():
             translate_all_resources()
         elif content_type == 'home':
             translate_all_home_content()
-        elif content_type == 'course_content':
-            translate_all_course_content()
-        elif content_type == 'folders':
-            translate_all_course_folders()
         else:
             print(f"\n⚠️  Unknown content type: {content_type}")
-            print("Available options: courses, resources, home, course_content, folders, all")
+            print("Available options: courses, resources, home, all")
             return
     else:
         # Translate everything
         translate_all_courses()
         translate_all_resources()
         translate_all_home_content()
-        translate_all_course_content()
-        translate_all_course_folders()
     
     print("\n" + "="*70)
     print("✓ Translation complete!")

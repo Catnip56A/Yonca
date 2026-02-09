@@ -130,7 +130,9 @@ class JobManager:
         job_model = BackgroundJobModel(
             id=job_id,
             type=job_type,
-            status=JobStatus.QUEUED
+            status=JobStatus.QUEUED,
+            message='',
+            error=''
         )
         db.session.add(job_model)
         db.session.commit()
@@ -215,20 +217,16 @@ class JobManager:
             from yonca.content_translator import (
                 auto_translate_course,
                 auto_translate_resource,
-                auto_translate_home_content,
-                auto_translate_course_content,
-                auto_translate_course_content_folder
+                auto_translate_home_content
             )
-            from yonca.models import Course, Resource, HomeContent, CourseContent, CourseContentFolder
+            from yonca.models import Course, Resource, HomeContent
 
             # Get total counts for progress calculation
             total_courses = Course.query.count()
             total_resources = Resource.query.count()
             total_home_content = HomeContent.query.count()
-            total_course_content = CourseContent.query.count()
-            total_folders = CourseContentFolder.query.count()
             
-            total_items = total_courses + total_resources + total_home_content + total_course_content + total_folders
+            total_items = total_courses + total_resources + total_home_content
             processed_items = 0
 
             # Initialize stats
@@ -236,8 +234,6 @@ class JobManager:
                 'courses': 0,
                 'resources': 0,
                 'home_content': 0,
-                'course_content': 0,
-                'folders': 0,
                 'total_processed': 0
             }
 
@@ -290,38 +286,6 @@ class JobManager:
                     job.save()
                 except Exception as e:
                     print(f"Failed to translate home content {home_content.id}: {e}")
-                    continue
-
-            # Process course content
-            job.message = "Translating course content..."
-            course_contents = CourseContent.query.all()
-            for i, content in enumerate(course_contents):
-                try:
-                    auto_translate_course_content(content)
-                    stats['course_content'] += 1
-                    stats['total_processed'] += 1
-                    processed_items += 1
-                    job.progress = int((processed_items / total_items) * 100)
-                    job.message = f"Translated {stats['course_content']} course content items..."
-                    job.save()
-                except Exception as e:
-                    print(f"Failed to translate course content {content.id}: {e}")
-                    continue
-
-            # Process folders
-            job.message = "Translating folders..."
-            folders = CourseContentFolder.query.all()
-            for i, folder in enumerate(folders):
-                try:
-                    auto_translate_course_content_folder(folder)
-                    stats['folders'] += 1
-                    stats['total_processed'] += 1
-                    processed_items += 1
-                    job.progress = int((processed_items / total_items) * 100)
-                    job.message = f"Translated {stats['folders']} folders..."
-                    job.save()
-                except Exception as e:
-                    print(f"Failed to translate folder {folder.id}: {e}")
                     continue
 
             # Commit all changes

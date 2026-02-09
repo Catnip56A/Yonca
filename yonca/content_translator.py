@@ -17,9 +17,7 @@ TARGET_LANGUAGES = ['az', 'ru']
 
 # Fields to translate for each content type
 TRANSLATABLE_FIELDS = {
-    'course': ['title', 'description', 'page_welcome_title', 'page_subtitle', 'page_description'],
-    'course_content': ['title', 'description'],
-    'course_content_folder': ['title', 'description'],
+    'course': ['title', 'description', 'page_welcome_title', 'page_subtitle', 'page_description', 'tags'],
     'resource': ['title', 'description'],
     'home_content': [
         'welcome_title', 'subtitle', 'get_started_text',
@@ -212,6 +210,37 @@ def translate_json_array(content_type, content_id, field_name, json_array, text_
             translate_content(content_type, content_id, sub_field_name, item['caption'], source_language, session)
 
 
+def translate_string_array(content_type, content_id, field_name, string_array, source_language=None, session=None):
+    """
+    Translate an array of strings, where each string is translated individually.
+    
+    Args:
+        content_type: Type of content
+        content_id: ID of the content item
+        field_name: Name of the field
+        string_array: List of strings to translate
+        source_language: Source language code (if None, auto-detects from first string)
+        session: SQLAlchemy session to use
+    """
+    if not string_array or not isinstance(string_array, list):
+        return
+    
+    # Auto-detect language from first non-empty string if not provided
+    if source_language is None:
+        for item in string_array:
+            if isinstance(item, str) and item.strip():
+                source_language = detect_language(item)
+                print(f"   Detected language for {field_name}: {source_language}")
+                break
+        if source_language is None:
+            source_language = 'en'
+    
+    for index, item in enumerate(string_array):
+        if isinstance(item, str) and item.strip():
+            sub_field_name = f"{field_name}[{index}]"
+            translate_content(content_type, content_id, sub_field_name, item, source_language, session)
+
+
 def auto_translate_course(course, session=None):
     """Automatically translate all translatable fields of a course."""
     fields = TRANSLATABLE_FIELDS.get('course', [])
@@ -219,7 +248,11 @@ def auto_translate_course(course, session=None):
     for field in fields:
         text = getattr(course, field, None)
         if text:
-            translate_content('course', course.id, field, text, session=session)
+            if field == 'tags' and isinstance(text, list):
+                # Handle tags as array of strings
+                translate_string_array('course', course.id, field, text, session=session)
+            else:
+                translate_content('course', course.id, field, text, session=session)
     
     # Translate dropdown menu items
     if course.dropdown_menu:
@@ -380,5 +413,37 @@ def get_translated_json_array(content_type, content_id, field_name, json_array, 
             )
         
         translated_array.append(translated_item)
+    
+    return translated_array
+
+
+def get_translated_string_array(content_type, content_id, field_name, string_array, target_language):
+    """
+    Get translated string array where each string is translated individually.
+    
+    Args:
+        content_type: Type of content
+        content_id: ID of the content item
+        field_name: Name of the field
+        string_array: Original array of strings
+        target_language: Target language code
+    
+    Returns:
+        Array of translated strings
+    """
+    if not target_language or target_language == 'en' or not string_array:
+        return string_array
+    
+    translated_array = []
+    
+    for index, item in enumerate(string_array):
+        if isinstance(item, str) and item.strip():
+            sub_field_name = f"{field_name}[{index}]"
+            translated_item = get_translated_content(
+                content_type, content_id, sub_field_name, item, target_language
+            )
+            translated_array.append(translated_item)
+        else:
+            translated_array.append(item)
     
     return translated_array

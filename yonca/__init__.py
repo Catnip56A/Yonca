@@ -106,6 +106,10 @@ def create_app(config_name='development'):
     # Set locale selector using the correct attribute
     babel.init_app(app, locale_selector=get_locale)
     
+    # Add Babel's _ function to Jinja2 globals for template translations
+    from flask_babel import gettext as _gettext
+    app.jinja_env.globals['_'] = _gettext
+    
     # Enable CORS with credentials support
     CORS(app, supports_credentials=True)
     
