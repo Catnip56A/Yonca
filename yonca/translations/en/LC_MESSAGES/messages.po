@@ -849,7 +849,7 @@ msgid "My Enrolled Courses"
 msgstr ""
 
 #: yonca/templates/index.html:1753
-msgid "Loading enrolled courses..."
+msgid "Loading enrolled courses... (Try switching pages in case of delays)"
 msgstr ""
 
 #: yonca/templates/index.html:1759 yonca/templates/index.html:2131
@@ -858,7 +858,7 @@ msgid "Available Courses"
 msgstr ""
 
 #: yonca/templates/index.html:1761
-msgid "Loading courses..."
+msgid "Loading courses... (Try switching pages in case of delays)"
 msgstr ""
 
 #: yonca/templates/index.html:1768
@@ -976,7 +976,7 @@ msgid "Learning Materials"
 msgstr ""
 
 #: yonca/templates/index.html:1858
-msgid "Loading materials..."
+msgid "Loading materials... (Try switching pages in case of delays)"
 msgstr ""
 
 #: yonca/templates/index.html:1863
@@ -1068,7 +1068,7 @@ msgid "Other Available Courses"
 msgstr ""
 
 #: yonca/templates/index.html:2369
-msgid "Loading..."
+msgid "Loading... (Try switching pages in case of delays)"
 msgstr ""
 
 #: yonca/templates/index.html:2370 yonca/templates/index.html:2382

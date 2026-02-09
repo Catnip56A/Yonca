@@ -213,8 +213,8 @@
 
         @media (min-width: 768px) {
             .white-overlay {
-                margin: 0 15vw;
-                width: 70vw;
+                margin: 0 auto;
+                width: 80vw;
             }
         }
 
@@ -1750,7 +1750,7 @@
             <div id="enrolled-courses-section" style="display: none;">
                 <h3 style="color: #337a2c; margin-top: 2rem; margin-bottom: 1rem;">{{ _('My Enrolled Courses') }}</h3>
                 <div class="courses-grid enrolled-courses-grid">
-                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses...') }}</p>
+                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses... (Try switching pages in case of delays)') }}</p>
                 </div>
             </div>
 
@@ -1758,7 +1758,7 @@
             <div id="available-courses-section">
                 <h3 id="available-courses-title" style="margin-top: 2rem; margin-bottom: 1rem;">{{ _('Available Courses') }}</h3>
                 <div class="courses-grid available-courses-grid">
-                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading courses...') }}</p>
+                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading courses... (Try switching pages in case of delays)') }}</p>
                 </div>
             </div>
         </section>
@@ -1855,7 +1855,7 @@
             <!-- Learning Materials -->
             <h3 style="color: #212121; margin: 2rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📚 {{ _('Learning Materials') }}</h3>
             <div class="resources-grid">
-                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading materials...') }}</p>
+                <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading materials... (Try switching pages in case of delays)') }}</p>
             </div>
 
             <!-- Resource Upload Section (Admin Only) -->
@@ -2099,15 +2099,15 @@
 
             // Load data for specific pages
             if (pageId === 'courses') {
-                console.log('Loading courses...');
+                console.log('Loading courses... (Try switching pages in case of delays)');
                 loadCourses();
                 // Refresh dropdowns in case they were populated before auth check completed
                 setTimeout(() => refreshCourseDropdowns(), 100);
             } else if (pageId === 'forum') {
-                console.log('Loading forum...');
+                console.log('Loading forum... (Try switching pages in case of delays)');
                 loadForumChannels();
             } else if (pageId === 'resources') {
-                console.log('Loading resources...');
+                console.log('Loading resources... (Try switching pages in case of delays)');
                 loadResources();
             }
             
@@ -2366,7 +2366,7 @@
             if (typeof window.currentUser === 'undefined') {
                 // Authentication check still pending - show loading or default state
                 menuItems = [
-                    { text: '{{ _("Loading...") }}', icon: '⏳', url: '#' },
+                    { text: '{{ _("Loading... (Try switching pages in case of delays)") }}', icon: '⏳', url: '#' },
                     { text: '{{ _("View Details") }}', icon: '📖', url: '/courseDescription/' + course.id }
                 ];
             } else if (window.currentUser) {
@@ -2507,6 +2507,8 @@
             
             try {
                 const response = await fetch(`${API_BASE}/api/resources`, {
+                    cache: 'no-store',
+                    credentials: 'include',
                     signal: currentAbortController.signal
                 });
                 const resources = await response.json();
@@ -2693,7 +2695,10 @@
         // Load PDFs
         async function loadPDFs() {
             try {
-                const response = await fetch(`${API_BASE}/api/pdfs`);
+                const response = await fetch(`${API_BASE}/api/pdfs`, {
+                    cache: 'no-store',
+                    credentials: 'include'
+                });
                 const pdfs = await response.json();
                 
                 const pdfsList = document.getElementById('pdfs-list');
@@ -2922,6 +2927,8 @@
             
             try {
                 const response = await fetch(`${API_BASE}/api/forum/channels`, {
+                    cache: 'no-store',
+                    credentials: 'include',
                     signal: currentAbortController.signal
                 });
                 const channels = await response.json();
@@ -3022,6 +3029,8 @@
             
             try {
                 const response = await fetch(`${API_BASE}/api/forum/messages?channel=${channel}`, {
+                    cache: 'no-store',
+                    credentials: 'include',
                     signal: currentAbortController.signal
                 });
                 
@@ -3382,6 +3391,7 @@
             try {
                 console.log('Checking user login status...');
                 const response = await fetch(`${API_BASE}/api/user`, {
+                    cache: 'no-store',
                     credentials: 'include'
                 });
                 console.log('User check response status:', response.status);
