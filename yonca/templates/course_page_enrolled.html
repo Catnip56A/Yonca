@@ -293,6 +293,26 @@
                             <div class="alert alert-warning">{{ _('This folder is locked until you complete the required assignment.') }}</div>
                         {% else %}
 
+                        {# Recursively render subfolders #}
+                        {% set subfolders = folder.subfolders.order_by('order').all() %}
+                        {% if subfolders %}
+                        <ul class="list-group folder-sortable" data-parent-folder-id="{{ folder.id }}">
+                            {% for subfolder in subfolders %}
+                            <li class="list-group-item" data-folder-id="{{ subfolder.id }}">
+                                <span class="drag-handle mr-2" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; margin-right:8px; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto;">☰</span>
+                                {{ render_folder(subfolder, depth + 1) }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% if is_teacher_or_admin %}
+                        <form id="folder-order-form-{{ folder.id }}" method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display:none;">
+                            <input type="hidden" name="action" value="reorder_folders">
+                            <input type="hidden" name="parent_folder_id" value="{{ folder.id }}">
+                            <input type="hidden" name="folder_order" value="">
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                
                         {# Display files in this folder #}
                         {% set folder_items = folder.items.filter_by(is_published=True).order_by('order').all() %}
                         {% if folder_items %}
@@ -347,26 +367,6 @@
                             <input type="hidden" name="file_order" value="">
                         </form>
                         {% endif %}
-                        {% endif %}
-                        {% endif %}
-                
-                        {# Recursively render subfolders #}
-                        {% set subfolders = folder.subfolders.order_by('order').all() %}
-                        {% if subfolders %}
-                        <ul class="list-group folder-sortable" data-parent-folder-id="{{ folder.id }}">
-                            {% for subfolder in subfolders %}
-                            <li class="list-group-item" data-folder-id="{{ subfolder.id }}">
-                                <span class="drag-handle mr-2" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; margin-right:8px; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto;">☰</span>
-                                {{ render_folder(subfolder, depth + 1) }}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% if is_teacher_or_admin %}
-                        <form id="folder-order-form-{{ folder.id }}" method="post" action="{{ url_for('main.course_page_enrolled', course_id=course.id) }}" style="display:none;">
-                            <input type="hidden" name="action" value="reorder_folders">
-                            <input type="hidden" name="parent_folder_id" value="{{ folder.id }}">
-                            <input type="hidden" name="folder_order" value="">
-                        </form>
                         {% endif %}
                         {% endif %}
                     </div>
