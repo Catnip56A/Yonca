@@ -694,6 +694,10 @@ class CourseView(SecureModelView):
             course.description = request.form.get('description', '')
             course.time_slot = request.form.get('time_slot', '')
             course.profile_emoji = request.form.get('profile_emoji', '')
+            
+            # Parse tags from comma-separated input
+            tags_input = request.form.get('tags', '').strip()
+            course.tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()] if tags_input else []
 
             # Course page content
             course.page_welcome_title = request.form.get('page_welcome_title', '')
@@ -775,11 +779,16 @@ class CourseView(SecureModelView):
             return redirect(url_for('auth.login'))
 
         if request.method == 'POST':
+            # Parse tags from comma-separated input
+            tags_input = request.form.get('tags', '').strip()
+            tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()] if tags_input else []
+            
             course = Course(
                 title=request.form.get('title', ''),
                 description=request.form.get('description', ''),
                 time_slot=request.form.get('time_slot', ''),
                 profile_emoji=request.form.get('profile_emoji', ''),
+                tags=tags,
                 page_welcome_title=request.form.get('page_welcome_title', ''),
                 page_subtitle=request.form.get('page_subtitle', ''),
                 page_description=request.form.get('page_description', ''),

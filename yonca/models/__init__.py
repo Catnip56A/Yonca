@@ -90,6 +90,9 @@ class Course(db.Model):
     page_gallery_images = db.Column(db.JSON, default=[])
     page_show_navigation = db.Column(db.Boolean, default=True)
     page_show_footer = db.Column(db.Boolean, default=True)
+    
+    # Tags for course filtering
+    tags = db.Column(db.JSON, default=[])
 
     def __repr__(self):
         return f'<Course {self.title}>'

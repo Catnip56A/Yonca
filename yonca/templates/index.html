@@ -1000,6 +1000,33 @@
             border-color: #337a2c;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
+
+        /* Course tag filter buttons */
+        .tag-filter-btn {
+            background-color: #f9fafb;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-filter-btn:hover {
+            background-color: #e8f5e8;
+            border-color: #2b5a1d;
+            color: #2b5a1d;
+        }
+
+        .tag-filter-btn.active {
+            background-color: #2b5a1d;
+            color: #e8f5e8;
+            border-color: #2b5a1d;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
             background: #f9fafb;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -1714,6 +1741,19 @@
                 </div>
             </div>
 
+            <!-- Course Filters -->
+            <div class="course-filters" style="background: #f5f1ea; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                <h3 style="margin: 0 0 1rem 0; color: #212121;">📚 {{ _('Filter Courses') }}</h3>
+                <div class="filter-section" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <label style="font-weight: 500; color: #353e45; margin-right: 0.5rem;">{{ _("Tags:") }}</label>
+                        <div id="course-tag-filters" style="display: inline-flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <!-- Tag filter buttons will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Available Courses Section -->
             <div id="available-courses-section">
                 <h3 id="available-courses-title" style="margin-top: 2rem; margin-bottom: 1rem;">{{ _('Available Courses') }}</h3>
@@ -1833,7 +1873,7 @@
                     </div>
                     <div class="form-group">
                         <label for="resource-tags">{{ _('Tags:') }}</label>
-                        <input type="text" id="resource-tags" name="tags" placeholder="{{ _('Enter tags separated by spaces, e.g. math science pdf') }}">
+                        <input type="text" id="resource-tags" name="tags" placeholder="{{ _('Enter tags separated by spaces, e.g. Tag1 Tag2 Tag3') }}">
                         <small style="color: #6b7280;">{{ _('Tags will be displayed as hashtags') }}</small>
                     </div>
                     <div class="form-group">
@@ -2155,6 +2195,9 @@
                     availableGrid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">' + enrolledAllCoursesText + '</p>';
                 }
 
+                // Populate tag filters with all courses
+                populateCourseTagFilters(courses);
+
             } catch (error) {
                 if (error.name === 'AbortError') {
                     console.log('Courses loading was cancelled');
@@ -2164,6 +2207,71 @@
                 document.querySelector('.available-courses-grid').innerHTML = '<p style="text-align: center; color: #dc2626;">' + errorLoadingCoursesText + '</p>';
             } finally {
                 currentAbortController = null;
+            }
+        }
+
+        // Populate course tag filters
+        function populateCourseTagFilters(courses) {
+            const tagFilterContainer = document.getElementById('course-tag-filters');
+            if (!tagFilterContainer) return;
+
+            // Collect all unique tags
+            const allTags = new Set();
+            courses.forEach(course => {
+                if (course.tags && Array.isArray(course.tags)) {
+                    course.tags.forEach(tag => allTags.add(tag));
+                }
+            });
+
+            // Clear existing filters
+            tagFilterContainer.innerHTML = '';
+
+            // Add "All" button
+            const allButton = document.createElement('button');
+            allButton.textContent = '{{ _("All") }}';
+            allButton.className = 'tag-filter-btn active';
+            allButton.onclick = () => filterCoursesByTag(null);
+            tagFilterContainer.appendChild(allButton);
+
+            // Add tag buttons
+            Array.from(allTags).sort().forEach(tag => {
+                const tagButton = document.createElement('button');
+                tagButton.textContent = tag;
+                tagButton.className = 'tag-filter-btn';
+                tagButton.onclick = () => filterCoursesByTag(tag);
+                tagFilterContainer.appendChild(tagButton);
+            });
+        }
+
+        // Filter courses by tag
+        function filterCoursesByTag(selectedTag) {
+            const tagButtons = document.querySelectorAll('#course-tag-filters .tag-filter-btn');
+            tagButtons.forEach(btn => btn.classList.remove('active'));
+
+            if (selectedTag === null) {
+                // Show all courses
+                document.querySelectorAll('.course-card').forEach(card => {
+                    card.style.display = 'block';
+                });
+                document.querySelector('#course-tag-filters .tag-filter-btn:first-child').classList.add('active');
+            } else {
+                // Show only courses with the selected tag
+                document.querySelectorAll('.course-card').forEach(card => {
+                    const courseTags = card.querySelector('.course-tags');
+                    if (courseTags) {
+                        const tagSpans = courseTags.querySelectorAll('.tag-badge');
+                        const hasTag = Array.from(tagSpans).some(span => span.textContent === selectedTag);
+                        card.style.display = hasTag ? 'block' : 'none';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                // Find and activate the selected tag button
+                tagButtons.forEach(btn => {
+                    if (btn.textContent === selectedTag) {
+                        btn.classList.add('active');
+                    }
+                });
             }
         }
 
@@ -2187,6 +2295,7 @@
             courseCard.innerHTML = `
                 <h4 style="display: flex; align-items: center;">${course.title} ${enrolledBadge}</h4>
                 <p>${course.description}</p>
+                ${course.tags && course.tags.length > 0 ? '<div class="course-tags" style="margin-top: 0.5rem;">' + course.tags.map(tag => '<span class="tag-badge" style="display: inline-block; background: #e8f5e8; color: #2b5a1d; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-right: 0.3rem; margin-bottom: 0.3rem;">' + tag + '</span>').join('') + '</div>' : ''}
                 ${dropdownElements}
             `;
 

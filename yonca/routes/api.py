@@ -50,6 +50,7 @@ def get_courses():
             'time_slot': c.time_slot,
             'profile_emoji': c.profile_emoji,
             'dropdown_menu': c.dropdown_menu,
+            'tags': c.tags or [],
             'is_enrolled': c.id in enrolled_course_ids
         } for c in all_courses])
     else:
@@ -62,7 +63,8 @@ def get_courses():
             'description': get_translated_content('course', c.id, 'description', c.description, user_locale),
             'time_slot': c.time_slot,
             'profile_emoji': c.profile_emoji,
-            'dropdown_menu': c.dropdown_menu
+            'dropdown_menu': c.dropdown_menu,
+            'tags': c.tags or []
         } for c in courses])
 
 @api_bp.route('/user')
@@ -85,7 +87,8 @@ def get_current_user():
                 'description': get_translated_content('course', c.id, 'description', c.description, user_locale),
                 'time_slot': c.time_slot,
                 'profile_emoji': c.profile_emoji,
-                'dropdown_menu': c.dropdown_menu
+                'dropdown_menu': c.dropdown_menu,
+                'tags': c.tags or []
             } for c in current_user.courses]
         })
     else:
