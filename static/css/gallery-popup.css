@@ -49,8 +49,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  /* subtle dark overlay for legibility */
-  background: linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.26));
+  /* subtle dark overlay for legibility - removed */
+  /* background: linear-gradient(rgba(0,0,0,0.36), rgba(0,0,0,0.26)); */
   pointer-events: none;
 }
 
@@ -63,12 +63,12 @@
 }
 
 #about .about-hero .section-title {
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 0.5rem;
 }
 
 #about .about-hero p {
-  color: rgba(255,255,255,0.92);
+  color: rgba(0,0,0,0.92);
   max-width: 920px;
   margin: 0 auto;
   font-size: 1.05rem;
