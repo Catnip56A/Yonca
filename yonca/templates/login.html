@@ -212,7 +212,7 @@
     </div>
     <div class="login-container">
         <div class="logo">
-            <img src="https://lh3.googleusercontent.com/d/14J5AjDFB4jkBZZRlETtThphQtihmKCfY" alt="Yonca Logo">
+            <img src="{{ home_content.site_logo_url or 'https://lh3.googleusercontent.com/d/1abc123def456ghi789jkl012mno345pqr/view' }}" alt="Yonca Logo">
         </div>
         <h1>{{ _('Login to Your Account') }}</h1>
         {% with messages = get_flashed_messages() %}
