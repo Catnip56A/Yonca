@@ -40,11 +40,11 @@ class DevelopmentConfig(Config):
     # Image URLs for development (served by Flask)
     # Language-specific hero background images
     ABOUT_HERO_BACKGROUND_IMAGES = {
-        'en': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_EN') or '/static/permanent/Bg_aboutCompany.png',
-        'az': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_AZ') or '/static/permanent/Bg_aboutCompany.png',
-        'ru': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_RU') or '/static/permanent/Bg_aboutCompany.png',
+        'en': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_EN') or '/static/permanent/Bg_aboutCompany.jpg',
+        'az': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_AZ') or '/static/permanent/Bg_aboutCompany.jpg',
+        'ru': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_RU') or '/static/permanent/Bg_aboutCompany.jpg',
     }
-    ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.png'
+    ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.jpg'
     
     # Language-specific feature images
     ABOUT_FEATURES_IMAGES = {
@@ -61,11 +61,11 @@ class TestingConfig(Config):
     
     # Image URLs for testing
     ABOUT_HERO_BACKGROUND_IMAGES = {
-        'en': '/static/permanent/Bg_aboutCompany.png',
-        'az': '/static/permanent/Bg_aboutCompany.png',
-        'ru': '/static/permanent/Bg_aboutCompany.png',
+        'en': '/static/permanent/Bg_aboutCompany.jpg',
+        'az': '/static/permanent/Bg_aboutCompany.jpg',
+        'ru': '/static/permanent/Bg_aboutCompany.jpg',
     }
-    ABOUT_HERO_BACKGROUND_IMAGE = '/static/permanent/Bg_aboutCompany.png'
+    ABOUT_HERO_BACKGROUND_IMAGE = '/static/permanent/Bg_aboutCompany.jpg'
     
     # Language-specific feature images
     ABOUT_FEATURES_IMAGES = {
@@ -84,11 +84,11 @@ class ProductionConfig(Config):
     # Image URLs for production (can be set via environment variables)
     # Language-specific hero background images
     ABOUT_HERO_BACKGROUND_IMAGES = {
-        'en': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_EN') or '/static/permanent/Bg_aboutCompany.png',
-        'az': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_AZ') or '/static/permanent/Bg_aboutCompany.png',
-        'ru': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_RU') or '/static/permanent/Bg_aboutCompany.png',
+        'en': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_EN') or '/static/permanent/Bg_aboutCompany.jpg',
+        'az': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_AZ') or '/static/permanent/Bg_aboutCompany.jpg',
+        'ru': os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE_RU') or '/static/permanent/Bg_aboutCompany.jpg',
     }
-    ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.png'
+    ABOUT_HERO_BACKGROUND_IMAGE = os.environ.get('ABOUT_HERO_BACKGROUND_IMAGE') or '/static/permanent/Bg_aboutCompany.jpg'
     
     # Language-specific feature images
     ABOUT_FEATURES_IMAGES = {
