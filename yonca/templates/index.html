@@ -20,12 +20,37 @@
             line-height: 1.8;
             letter-spacing: 0.05em;
             color: #212121;
-            background-color: #262d06;
+            background: rgba(255, 255, 255, 0.55);
             font-size: 18px;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background-image: url('/static/permanent/bg_texture.png');
+            background-repeat: repeat;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            background-image: url('/static/permanent/bg_texture.png');
+            background-repeat: repeat;
+            transform: scaleX(-1);
+            z-index: -1;
+        }
+
         header {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border-bottom: 1px solid #e0e0e0;
             padding: 1rem 0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -203,7 +228,7 @@
         }
 
         .white-overlay {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             min-height: 66vh; /* keep initial visual height but allow expansion */
             height: auto;
             overflow: visible;
@@ -429,7 +454,7 @@
         }
 
         .feature-card {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 2rem;
@@ -464,7 +489,7 @@
         }
 
         .features-section .features {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 0.5rem;
@@ -502,7 +527,7 @@
             overflow: hidden;
             border-radius: 12px;
             margin: 2rem 0;
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             padding: 16px;
         }
 
@@ -589,7 +614,7 @@
         }
 
         .gallery-item {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -658,13 +683,13 @@
             margin-top: 4rem;
             padding-top: 2rem;
             border-top: 2px solid #e5e7eb;
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border-radius: 15px;
             padding: 20px;
         }
 
         #about {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border-radius: 15px;
             padding: 20px;
         }
@@ -857,7 +882,7 @@
         }
 
         .resource-card {
-            background: #f5f1ea;
+            background: rgba(255, 255, 255, 0.55);
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 1.5rem;
@@ -1513,6 +1538,18 @@
         .dropdown-item:hover {
             background-color: #f8f9fa !important;
         }
+
+        .services-button {
+            /* Base styles for the services button */
+        }
+
+        @media (max-width: 768px) {
+            .services-button {
+                width: 25%;
+                padding: 5px 10px !important;
+                font-size: 14px !important;
+            }
+        }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery-popup.css') }}">
 </head>
@@ -1734,7 +1771,7 @@
             <p>{{ _('Explore our available courses and start your learning journey.') }}</p>
 
             <!-- Course Filters -->
-            <div class="course-filters" style="background: #f5f1ea; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+            <div class="course-filters" style="background: rgba(255, 255, 255, 0.55); padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                 <h3 style="margin: 0 0 1rem 0; color: #212121;">📚 {{ _('Filter Courses') }}</h3>
                 <div class="filter-section" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                     <div>
@@ -1782,7 +1819,7 @@
                 </div>
 
                 <!-- Language Selection for Translation -->
-                <div class="language-selector" style="margin-bottom: 2rem; background: #f5f1ea; padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div class="language-selector" style="margin-bottom: 2rem; background: rgba(255, 255, 255, 0.55); padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <h4 style="margin: 0 0 1rem 0; color: #212121;">🌐 {{ _("Translation Settings") }}</h4>
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                         <div>
@@ -1859,7 +1896,7 @@
             </div>
 
             <!-- Resource Upload Section (Admin Only) -->
-            <div id="resource-upload-section" style="display: none; background: #f5f1ea; border-radius: 15px; padding: 20px;">
+            <div id="resource-upload-section" style="display: none; background: rgba(255, 255, 255, 0.55); border-radius: 15px; padding: 20px;">
                 <h3 style="color: #212121; margin: 3rem 0 1rem 0; font-size: 1.4rem; font-weight: 600;">📤 {{ _('Upload Learning Material') }}</h3>
                 <p style="color: #6b7280; margin-bottom: 2rem;">{{ _('Upload documents, presentations, PDFs, or other materials. You can choose to enable PIN protection for security or allow free access.') }}</p>
                 <form id="resource-upload-form" enctype="multipart/form-data">
@@ -1928,7 +1965,7 @@
             <!-- Features Image -->
             <div style="margin: 2rem 0; text-align: center; position: relative;">
                 <img src="{{ get_localized_image(config.ABOUT_FEATURES_IMAGES, config.ABOUT_FEATURES_IMAGE) }}" alt="{{ _('Yonca Features') }}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <button style="position: absolute; left: 45%; top: 80%; transform: translate(-50%, -50%); background-color: #88a660; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">{{ _('Our Services') }}</button>
+                <button class="services-button" style="position: absolute; left: 45%; top: 80%; transform: translate(-50%, -50%); background-color: #88a660; color: white; padding: 1vh 2vw; border: none; border-radius: 5px; cursor: pointer; font-size: 1.2vw;">{{ _('Our Services') }}</button>
             </div>
 
             <!-- Gallery Section -->
