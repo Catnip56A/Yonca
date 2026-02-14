@@ -1,0 +1,85 @@
+# Version Control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environments (NEVER copy these!)
+venv/
+env/
+ENV/
+.venv
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Testing
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker files (not needed inside container)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Environment files (use docker-compose env instead)
+.env
+.env.*
+!.env.example
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation for deployment (not needed in container)
+DEPLOYMENT*.md
+SETUP*.md
+GITHUB_ACTIONS*.md
+
+# Logs (will be volume-mounted)
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database files (if using SQLite locally)
+*.db
+*.sqlite
+*.sqlite3
+instance/*.db
+
+# Node modules (if you have any frontend build)
+node_modules/
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

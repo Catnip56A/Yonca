@@ -1,0 +1,202 @@
+name: Database Operations
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'Database operation to perform'
+        required: true
+        type: choice
+        options:
+          - backup
+          - restore
+          - migrate
+          - info
+      backup_name:
+        description: 'Backup name for restore (YYYYMMDD_HHMMSS) - required for restore'
+        required: false
+        type: string
+
+jobs:
+  database-operation:
+    name: Database ${{ github.event.inputs.operation }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Perform database operation
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          OPERATION: ${{ github.event.inputs.operation }}
+          BACKUP_NAME: ${{ github.event.inputs.backup_name }}
+        run: |
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd ${{ secrets.APP_DIR }}
+            
+            case "${{ github.event.inputs.operation }}" in
+              backup)
+                echo "💾 Creating database backup..."
+                BACKUP_DIR="$HOME/backups/manual_$(date +%Y%m%d_%H%M%S)"
+                mkdir -p "$BACKUP_DIR"
+                
+                # Full backup
+                docker-compose exec -T db pg_dump -U yonca_user yonca > "$BACKUP_DIR/database.sql"
+                
+                # Schema only backup
+                docker-compose exec -T db pg_dump -U yonca_user --schema-only yonca > "$BACKUP_DIR/schema.sql"
+                
+                # Data only backup
+                docker-compose exec -T db pg_dump -U yonca_user --data-only yonca > "$BACKUP_DIR/data.sql"
+                
+                # Save metadata
+                echo "Backup created: $(date)" > "$BACKUP_DIR/metadata.txt"
+                echo "Commit: $(git rev-parse HEAD)" >> "$BACKUP_DIR/metadata.txt"
+                echo "Branch: $(git branch --show-current)" >> "$BACKUP_DIR/metadata.txt"
+                
+                # Show backup info
+                echo "✅ Backup created successfully!"
+                echo ""
+                echo "Backup location: $BACKUP_DIR"
+                echo "Files:"
+                ls -lh "$BACKUP_DIR"
+                echo ""
+                echo "Backup size:"
+                du -sh "$BACKUP_DIR"
+                ;;
+                
+              restore)
+                if [ -z "${{ github.event.inputs.backup_name }}" ]; then
+                  echo "❌ Error: backup_name is required for restore operation"
+                  exit 1
+                fi
+                
+                BACKUP_FILE="$HOME/backups/${{ github.event.inputs.backup_name }}/database.sql"
+                
+                if [ ! -f "$BACKUP_FILE" ]; then
+                  echo "❌ Error: Backup file not found: $BACKUP_FILE"
+                  echo ""
+                  echo "Available backups:"
+                  ls -lh "$HOME/backups/" || echo "No backups found"
+                  exit 1
+                fi
+                
+                echo "⚠️  Creating safety backup before restore..."
+                SAFETY_BACKUP="$HOME/backups/pre_restore_$(date +%Y%m%d_%H%M%S)"
+                mkdir -p "$SAFETY_BACKUP"
+                docker-compose exec -T db pg_dump -U yonca_user yonca > "$SAFETY_BACKUP/database.sql"
+                echo "✅ Safety backup created: $SAFETY_BACKUP"
+                
+                echo ""
+                echo "📊 Restoring database from: ${{ github.event.inputs.backup_name }}"
+                
+                # Stop application
+                docker-compose stop app
+                
+                # Restore database
+                docker-compose exec -T db psql -U yonca_user yonca < "$BACKUP_FILE"
+                
+                # Restart application
+                docker-compose start app
+                
+                echo "✅ Database restored successfully!"
+                echo "Safety backup available at: $SAFETY_BACKUP"
+                ;;
+                
+              migrate)
+                echo "📊 Running database migrations..."
+                
+                # Show current migration status
+                echo "Current migration status:"
+                docker-compose exec -T app flask db current || echo "No migrations yet"
+                
+                echo ""
+                echo "Running upgrade..."
+                docker-compose exec -T app flask db upgrade
+                
+                echo ""
+                echo "New migration status:"
+                docker-compose exec -T app flask db current
+                
+                echo "✅ Migrations completed!"
+                ;;
+                
+              info)
+                echo "📊 Database Information"
+                echo "======================="
+                echo ""
+                
+                # Database size
+                echo "Database Size:"
+                docker-compose exec -T db psql -U yonca_user yonca -c "
+                  SELECT pg_size_pretty(pg_database_size('yonca')) as database_size;
+                "
+                
+                echo ""
+                echo "Table Sizes:"
+                docker-compose exec -T db psql -U yonca_user yonca -c "
+                  SELECT 
+                    schemaname,
+                    tablename,
+                    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
+                  FROM pg_tables 
+                  WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+                  ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC
+                  LIMIT 10;
+                "
+                
+                echo ""
+                echo "Connection Count:"
+                docker-compose exec -T db psql -U yonca_user yonca -c "
+                  SELECT count(*) as active_connections 
+                  FROM pg_stat_activity 
+                  WHERE state = 'active';
+                "
+                
+                echo ""
+                echo "Migration Status:"
+                docker-compose exec -T app flask db current || echo "No migrations found"
+                
+                echo ""
+                echo "Available Backups:"
+                ls -lht "$HOME/backups/" | head -n 10 || echo "No backups found"
+                ;;
+                
+              *)
+                echo "❌ Unknown operation: ${{ github.event.inputs.operation }}"
+                exit 1
+                ;;
+            esac
+          ENDSSH
+
+      - name: Operation summary
+        if: always()
+        run: |
+          echo "## Database Operation Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Operation:** ${{ github.event.inputs.operation }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.inputs.operation }}" == "restore" ]; then
+            echo "**Backup:** ${{ github.event.inputs.backup_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "**Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Failed" >> $GITHUB_STEP_SUMMARY
+          fi
