@@ -37,3 +37,20 @@ h1, h2, h3, h4, h5, h6 {
 strong, b { font-weight: 600; }
 em, i { font-style: italic; }
 
+/* Course gallery square images */
+.course-gallery .circular-image-container {
+    width: 200px !important;
+    height: 200px !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0 1px 4px #ccc !important;
+    flex-shrink: 0 !important;
+}
+
+.course-gallery .circular-image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+

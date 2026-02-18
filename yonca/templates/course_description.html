@@ -5,13 +5,110 @@
 {% block head %}
 {{ super() }}
 <style>
-    body {
-        background-color: #f5f5f5;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
+
+    body {
+        line-height: 1.8;
+        letter-spacing: 0.05em;
+        color: #212121;
+        background: rgba(255, 255, 255, 0.55);
+        font-size: 18px;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-image: url('/static/permanent/bg_texture.png');
+        background-repeat: repeat;
+        z-index: -1;
+    }
+
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100%;
+        background-image: url('/static/permanent/bg_texture.png');
+        background-repeat: repeat;
+        transform: scaleX(-1);
+        z-index: -1;
+    }
+
+    header {
+        background: rgba(254, 251, 250, 0);
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem 0;
+        position: relative;
+        min-height: 80px;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        position: relative;
+    }
+
+    .logo-section {
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .nav-auth-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        gap: 0.5rem;
+    }
+
+    .nav-section {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .auth-section {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+
     .logo img {
         height: 32px;
         width: auto;
     }
+
+    .white-overlay {
+        background: rgba(255, 255, 255, 0.85);
+        min-height: 66vh;
+        height: auto;
+        overflow: visible;
+        border-radius: 20px;
+        padding: 24px;
+        margin: 1rem auto;
+    }
+
+    @media (min-width: 768px) {
+        .white-overlay {
+            margin: 0 auto;
+            width: 80vw;
+        }
+    }
+
     .star-display {
         font-size: 1.2rem;
         color: #ffc107;
@@ -58,22 +155,32 @@
         flex: 1;
         margin-bottom: 0;
     }
+    
+    /* Navbar styling to match main page */
+    .navbar {
+        background: rgba(254, 251, 250, 0.95) !important;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .navbar-light .navbar-nav .nav-link {
+        color: #353e45;
+        font-weight: 500;
+    }
+    
+    .navbar-light .navbar-nav .nav-link:hover {
+        color: #337a2c;
+    }
+    
+    .navbar-light .navbar-brand {
+        color: #337a2c;
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-{% if course.page_show_navigation %}
 {% include 'components/navbar.html' %}
-{% endif %}
-{% if not course.page_show_navigation %}
-<div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-    {% set lang_cycle = {'en': 'az', 'az': 'ru', 'ru': 'en'} %}
-    {% set lang_names = {'en': 'English', 'az': 'Azeri', 'ru': 'Russian'} %}
-    <a href="/set_language/{{ lang_cycle.get(current_locale, 'az') }}" class="btn btn-sm btn-outline-primary">
-        🌐 {{ lang_names.get(current_locale, 'English') }}
-    </a>
-</div>
-{% endif %}
+<div class="white-overlay">
 <section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
     <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ course.page_welcome_title or course.title }}</h1>
     {% if course.page_subtitle %}
@@ -111,10 +218,10 @@
     {% endif %}
     {% if course.page_gallery_images and course.page_gallery_images|length > 0 %}
     <div class="course-gallery" style="margin-top:2rem;">
-        <div class="row">
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
             {% for img in course.page_gallery_images %}
-            <div class="col-md-3 col-6" style="margin-bottom:1rem;">
-                <img src="{{ img }}" alt="Course image" style="width:200px; height:200px; border-radius:50%; object-fit:cover; box-shadow:0 1px 4px #ccc;" />
+            <div class="circular-image-container">
+                <img src="{{ img }}" alt="Course image" />
             </div>
             {% endfor %}
         </div>
@@ -211,6 +318,7 @@
         {% endif %}
     </div>
 </section>
+</div>
 {% if course.page_show_footer %}
 {% include 'components/footer.html' %}
 {% endif %}
