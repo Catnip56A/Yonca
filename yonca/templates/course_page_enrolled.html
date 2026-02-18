@@ -101,14 +101,22 @@
         margin-top: 24px;
     }
     
-    /* Ensure inactive tabs are hidden - align with Bootstrap's fade/show classes */
+    /* Force all inactive tabs to be completely hidden */
     .tab-pane {
         display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        top: -9999px !important;
+        opacity: 0 !important;
     }
     
-    .tab-pane.active,
-    .tab-pane.show {
+    /* Only show the active tab */
+    .tab-pane.active {
         display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        top: auto !important;
+        opacity: 1 !important;
     }
     .folder-item[data-depth="0"] { margin-left: 0px; }
     .folder-item[data-depth="1"] { margin-left: 20px; }
@@ -450,8 +458,30 @@
         {% endmacro %}
         {% if is_teacher_or_admin %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+        {% endif %}
+        
+        <script>
+        // Prevent Bootstrap's tab plugin from auto-initializing
+        // We'll handle tabs completely with our custom code
+        (function() {
+            if (typeof jQuery !== 'undefined' && jQuery.fn.tab) {
+                // Store original tab plugin
+                var originalTab = jQuery.fn.tab;
+                // Override it to do nothing for our tabs
+                jQuery.fn.tab = function(action) {
+                    // Only prevent auto-init, allow explicit calls if needed
+                    return this;
+                };
+            }
+        })();
+        </script>
+        
         <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize robust tab switching that prevents tabs from overlapping
+            initializeTabSwitching();
+            
+            {% if is_teacher_or_admin %}
             // Drag-and-drop for root folders
             var rootUl = document.getElementById('root-folder-sortable');
             if (rootUl) {
@@ -500,9 +530,79 @@
                     }
                 });
             });
+            {% endif %}
         });
+        
+        // Robust tab switching function
+        function initializeTabSwitching() {
+            var tabLinks = document.querySelectorAll('[data-toggle="tab"]');
+            var tabPanes = document.querySelectorAll('.tab-pane');
+            
+            // Ensure only the active tab is visible initially
+            function hideAllTabs() {
+                tabPanes.forEach(function(pane) {
+                    pane.classList.remove('active', 'show');
+                    pane.style.display = 'none';
+                    pane.style.visibility = 'hidden';
+                    pane.setAttribute('aria-hidden', 'true');
+                });
+            }
+            
+            function showTab(tabId) {
+                var tabPane = document.querySelector(tabId);
+                if (tabPane) {
+                    tabPane.classList.add('active');
+                    tabPane.style.display = 'block';
+                    tabPane.style.visibility = 'visible';
+                    tabPane.setAttribute('aria-hidden', 'false');
+                }
+            }
+            
+            // Set up click handlers for ALL tab links (including feature box buttons)
+            tabLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    var targetId = link.getAttribute('href');
+                    if (!targetId || targetId === '#') return;
+                    
+                    // Hide all tabs
+                    hideAllTabs();
+                    
+                    // Remove active class from all nav links
+                    document.querySelectorAll('.nav-tabs .nav-link').forEach(function(navLink) {
+                        navLink.classList.remove('active');
+                    });
+                    
+                    // Show the target tab
+                    showTab(targetId);
+                    
+                    // Activate corresponding nav link if this was clicked from a button
+                    var navLink = document.querySelector('.nav-tabs a[href="' + targetId + '"]');
+                    if (navLink) {
+                        navLink.classList.add('active');
+                    }
+                    
+                    // Scroll to tab content
+                    var tabContent = document.getElementById('courseTabsContent');
+                    if (tabContent) {
+                        setTimeout(function() {
+                            tabContent.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 100);
+                    }
+                });
+            });
+            
+            // Initial state: hide all except active
+            hideAllTabs();
+            var activeLink = document.querySelector('.nav-tabs .nav-link.active');
+            if (activeLink) {
+                var targetId = activeLink.getAttribute('href');
+                showTab(targetId);
+            }
+        }
         </script>
-        {% endif %}
         
         <div class="tab-content" id="courseTabsContent">
         
