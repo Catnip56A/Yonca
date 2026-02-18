@@ -294,25 +294,7 @@
     {% endif %}
 {% endwith %}
 
-<ul class="nav nav-tabs" id="courseTabs" role="tablist" style="margin-top: 0;">
-    <li class="nav-item">
-        <a class="nav-link active" id="content-tab" data-toggle="tab" href="#content" role="tab">{{ _('Content') }}</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab">{{ _('Description') }}</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="assignments-tab" data-toggle="tab" href="#assignments" role="tab">{{ _('Assignments') }}</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="announcements-tab" data-toggle="tab" href="#announcements" role="tab">{{ _('Announcements') }}</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab">{{ _('Reviews') }}</a>
-    </li>
-</ul>
-
-<div class="container" style="margin-top:0;">
+<div class="container" style="margin-top:20px;">
     <script>
     $(document).ready(function() {
         // Ensure Bootstrap tabs work properly
@@ -332,6 +314,23 @@
             <i class="fa fa-arrow-left"></i> {{ _('Back to Courses') }}
         </a>
     </div>
+    <ul class="nav nav-tabs" id="courseTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="content-tab" data-toggle="tab" href="#content" role="tab">{{ _('Content') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab">{{ _('Description') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="assignments-tab" data-toggle="tab" href="#assignments" role="tab">{{ _('Assignments') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="announcements-tab" data-toggle="tab" href="#announcements" role="tab">{{ _('Announcements') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab">{{ _('Reviews') }}</a>
+        </li>
+    </ul>
 
     {% macro render_folder(folder, depth=0) %}
     <div class="folder-item" data-depth="{{ depth }}" data-folder-id="{{ folder.id }}">

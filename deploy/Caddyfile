@@ -9,7 +9,7 @@ magsud.yonca-sdc.com {
 
 	# Serve static files directly
 	handle /static/* {
-		root * /var/www
+		root * /home/magsud/work/Yonca/static
 		file_server
 	}
 

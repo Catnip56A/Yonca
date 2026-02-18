@@ -42,7 +42,7 @@ print("DATABASE_URL:", os.environ.get("DATABASE_URL"))
 from yonca import create_app
 
 # 4️⃣ Create Flask app
-app = create_app()
+app = create_app(os.environ.get('FLASK_ENV', 'production'))
 
 # 5️⃣ Optional: print confirmation
 print("Flask app created successfully")
