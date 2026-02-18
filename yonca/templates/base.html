@@ -117,30 +117,36 @@
             // Also handle URL-based navigation (hash changes)
             function updateNavFromHash() {
                 const hash = window.location.hash.substring(1); // Remove the #
+                const pathname = window.location.pathname;
                 let navKey = 'home'; // Default
                 
-                // Map hash to nav key
-                switch(hash) {
-                    case 'courses':
-                        navKey = 'courses';
-                        break;
-                    case 'forum':
-                        navKey = 'forum';
-                        break;
-                    case 'resources':
-                        navKey = 'resources';
-                        break;
-                    case 'tavi-test':
-                        navKey = 'tavi-test';
-                        break;
-                    case 'contact':
-                        navKey = 'contact';
-                        break;
-                    case 'about':
-                        navKey = 'about';
-                        break;
-                    default:
-                        navKey = 'home';
+                // Check if on course description page
+                if (pathname.startsWith('/courseDescription/')) {
+                    navKey = 'courses';
+                } else {
+                    // Map hash to nav key
+                    switch(hash) {
+                        case 'courses':
+                            navKey = 'courses';
+                            break;
+                        case 'forum':
+                            navKey = 'forum';
+                            break;
+                        case 'resources':
+                            navKey = 'resources';
+                            break;
+                        case 'tavi-test':
+                            navKey = 'tavi-test';
+                            break;
+                        case 'contact':
+                            navKey = 'contact';
+                            break;
+                        case 'about':
+                            navKey = 'about';
+                            break;
+                        default:
+                            navKey = 'home';
+                    }
                 }
                 
                 setActiveNav(navKey);
