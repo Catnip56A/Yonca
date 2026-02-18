@@ -100,6 +100,15 @@
     .tab-content {
         margin-top: 24px;
     }
+    
+    /* Ensure inactive tabs are hidden */
+    .tab-pane {
+        display: none;
+    }
+    
+    .tab-pane.active {
+        display: block;
+    }
     .folder-item[data-depth="0"] { margin-left: 0px; }
     .folder-item[data-depth="1"] { margin-left: 20px; }
     .folder-item[data-depth="2"] { margin-left: 40px; }
