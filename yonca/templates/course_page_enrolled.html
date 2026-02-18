@@ -100,6 +100,16 @@
     .tab-content {
         margin-top: 24px;
     }
+    
+    /* Hide all tab panes by default */
+    #courseTabsContent > .tab-pane {
+        display: none;
+    }
+    
+    /* Only show active tab */
+    #courseTabsContent > .tab-pane.active {
+        display: block;
+    }
     .folder-item[data-depth="0"] { margin-left: 0px; }
     .folder-item[data-depth="1"] { margin-left: 20px; }
     .folder-item[data-depth="2"] { margin-left: 40px; }
@@ -295,6 +305,35 @@
 {% endwith %}
 
 <div class="container" style="margin-top:20px;">
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Manual tab switching to ensure it works properly
+        var tabs = document.querySelectorAll('#courseTabs a[data-toggle="tab"]');
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = this.getAttribute('href');
+                
+                // Hide all tab panes
+                document.querySelectorAll('#courseTabsContent > .tab-pane').forEach(function(pane) {
+                    pane.classList.remove('show', 'active');
+                });
+                
+                // Show target tab pane
+                var targetPane = document.querySelector(target);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+                
+                // Update nav tab active state
+                tabs.forEach(function(t) {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    });
+    </script>
     {% if is_teacher_or_admin %}
     <div class="alert alert-info" style="margin-bottom: 20px;">
         <strong>{{ _('Teacher/Admin Mode:') }}</strong> {{ _('You have editing privileges for this course.') }}
