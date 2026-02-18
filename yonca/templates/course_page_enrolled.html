@@ -100,18 +100,6 @@
     .tab-content {
         margin-top: 24px;
     }
-    
-    .tab-pane {
-        display: none;
-    }
-    
-    .tab-pane.show {
-        display: block;
-    }
-    
-    .tab-pane.show.active {
-        display: block;
-    }
     .folder-item[data-depth="0"] { margin-left: 0px; }
     .folder-item[data-depth="1"] { margin-left: 20px; }
     .folder-item[data-depth="2"] { margin-left: 40px; }
@@ -334,10 +322,9 @@
             <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab">{{ _('Reviews') }}</a>
         </li>
     </ul>
-    <div class="tab-content" id="courseTabsContent">
 
-        {% macro render_folder(folder, depth=0) %}
-        <div class="folder-item" data-depth="{{ depth }}" data-folder-id="{{ folder.id }}">
+    {% macro render_folder(folder, depth=0) %}
+    <div class="folder-item" data-depth="{{ depth }}" data-folder-id="{{ folder.id }}">
             <div class="card mb-2">
                     {% set is_locked = folder.locked_until_assignment_id and (folder.locked_until_assignment_id not in passed_assignment_ids) and not is_teacher_or_admin %}
                     <div class="card-header" style="background: #e3f2fd; cursor: pointer;" {% if not is_locked %}data-toggle="collapse" data-target="#folder-{{ folder.id }}"{% endif %}>
@@ -506,6 +493,8 @@
         });
         </script>
         {% endif %}
+        
+        <div class="tab-content" id="courseTabsContent">
         
         <div class="tab-pane fade" id="features" role="tabpanel">
             <div class="mt-4">
