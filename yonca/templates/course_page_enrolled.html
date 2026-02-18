@@ -295,15 +295,6 @@
 {% endwith %}
 
 <div class="container" style="margin-top:20px;">
-    <script>
-    $(document).ready(function() {
-        // Ensure Bootstrap tabs work properly
-        $('#courseTabs a').on('click', function(e) {
-            e.preventDefault();
-            $(this).tab('show');
-        });
-    });
-    </script>
     {% if is_teacher_or_admin %}
     <div class="alert alert-info" style="margin-bottom: 20px;">
         <strong>{{ _('Teacher/Admin Mode:') }}</strong> {{ _('You have editing privileges for this course.') }}
@@ -1840,6 +1831,12 @@ $(document).ready(function() {
     {% endif %}
     {% endfor %}
     {% endif %}
+
+    // Ensure Bootstrap tabs work properly
+    $('#courseTabs a').on('click', function(e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
 });
 
 // Bulk actions functions for enrolled page
