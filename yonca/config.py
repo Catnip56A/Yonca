@@ -31,6 +31,9 @@ class Config:
     else:
         GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
         GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+    
+    # Google API Key for Picker API (required for file picker functionality)
+    GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY', '')
 
 class DevelopmentConfig(Config):
     """Development configuration"""

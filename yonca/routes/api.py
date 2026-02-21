@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 from flask_babel import _
 from yonca.models import Course, ForumMessage, ForumChannel, Resource, PDFDocument, Translation, db
 from yonca.translation_service import translation_service
-from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions
+from yonca.google_drive_service import authenticate, upload_file, create_view_only_link, set_file_permissions, import_drive_file, import_drive_folder
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -1094,3 +1094,143 @@ def serve_file(file_id):
     
     # If no view link exists, try to construct a direct Google Drive link
     return redirect(f'https://drive.google.com/file/d/{file_id}/view')
+
+@api_bp.route('/import-drive-file', methods=['POST'])
+@login_required
+def import_drive_file_endpoint():
+    """
+    Import a file or folder from Google Drive using drive.file scope.
+    The file must have been selected via Google Picker for access.
+    """
+    from yonca.google_drive_service import (
+        authenticate, import_drive_file, import_drive_folder
+    )
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+    
+    file_id = data.get('file_id')
+    file_name = data.get('file_name')
+    mime_type = data.get('mime_type', '')
+    
+    if not file_id:
+        return jsonify({'error': 'No file ID provided'}), 400
+    
+    # Authenticate with Google Drive
+    service = authenticate(current_user)
+    if not service:
+        return jsonify({
+            'error': 'Google Drive not authenticated',
+            'message': 'Please link your Google account first'
+        }), 401
+    
+    try:
+        # Check if it's a folder (Google Drive folder MIME type)
+        if mime_type == 'application/vnd.google-apps.folder':
+            result = import_drive_folder(service, file_id)
+        else:
+            result = import_drive_file(service, file_id)
+        
+        if isinstance(result, dict) and 'error' in result:
+            return jsonify(result), 400
+        
+        return jsonify({
+            'success': True,
+            'message': 'File successfully imported',
+            'data': result
+        }), 200
+        
+    except Exception as e:
+        import traceback
+        print(f'Error importing file {file_id}: {str(e)}')
+        print(traceback.format_exc())
+        return jsonify({
+            'error': 'Failed to import file',
+            'message': str(e)
+        }), 500
+
+@api_bp.route('/import-drive-file-to-resource', methods=['POST'])
+@login_required
+def import_drive_file_to_resource():
+    """
+    Import a Google Drive file to create or update a Resource.
+    Used when adding files to course resources.
+    """
+    from yonca.google_drive_service import authenticate, import_drive_file
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+    
+    file_id = data.get('file_id')
+    resource_id = data.get('resource_id')  # Optional: if updating existing resource
+    
+    if not file_id:
+        return jsonify({'error': 'No file ID provided'}), 400
+    
+    # Authenticate with Google Drive
+    service = authenticate(current_user)
+    if not service:
+        return jsonify({
+            'error': 'Google Drive not authenticated',
+            'message': 'Please link your Google account first'
+        }), 401
+    
+    try:
+        # Import the file from Google Drive
+        file_data = import_drive_file(service, file_id)
+        
+        if isinstance(file_data, dict) and 'error' in file_data:
+            return jsonify(file_data), 400
+        
+        # If updating existing resource
+        if resource_id:
+            resource = Resource.query.get(resource_id)
+            if not resource:
+                return jsonify({'error': 'Resource not found'}), 404
+            
+            # Update resource with imported file data
+            resource.name = file_data.get('name')
+            resource.drive_file_id = file_data.get('file_id')
+            resource.drive_view_link = file_data.get('view_link')
+            resource.mime_type = file_data.get('mime_type')
+            
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Resource updated with Google Drive file',
+                'resource_id': resource.id,
+                'file_data': file_data
+            }), 200
+        else:
+            # Create new resource with imported file data
+            from yonca.models import Resource
+            
+            resource = Resource(
+                name=file_data.get('name'),
+                drive_file_id=file_data.get('file_id'),
+                drive_view_link=file_data.get('view_link'),
+                mime_type=file_data.get('mime_type'),
+                created_by=current_user.id
+            )
+            
+            db.session.add(resource)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': 'New resource created with Google Drive file',
+                'resource_id': resource.id,
+                'file_data': file_data
+            }), 201
+        
+    except Exception as e:
+        import traceback
+        print(f'Error importing file {file_id} to resource: {str(e)}')
+        print(traceback.format_exc())
+        return jsonify({
+            'error': 'Failed to import file to resource',
+            'message': str(e)
+        }), 500
