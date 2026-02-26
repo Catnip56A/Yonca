@@ -92,22 +92,6 @@
         width: auto;
     }
 
-    .white-overlay {
-        background: rgba(255, 255, 255, 0.85);
-        min-height: 66vh;
-        height: auto;
-        overflow: visible;
-        border-radius: 20px;
-        padding: 24px;
-        margin: 1rem auto;
-    }
-
-    @media (min-width: 768px) {
-        .white-overlay {
-            margin: 0 auto;
-            width: 80vw;
-        }
-    }
 
     .star-display {
         font-size: 1.2rem;
@@ -156,6 +140,28 @@
         margin-bottom: 0;
     }
     
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            width: 100vw;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        footer .container {
+            width: auto;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    }
+    
     /* Navbar styling to match main page */
     .navbar {
         background: rgba(254, 251, 250, 0.95) !important;
@@ -180,7 +186,8 @@
 
 {% block content %}
 {% include 'components/navbar.html' %}
-<div class="white-overlay">
+
+<div class="container" style="margin-top:20px;">
 <section class="course-marketing" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e5e7eb; padding: 2rem; margin-bottom: 2rem;">
     <h1 style="font-size:2.2rem; font-weight:700; color:#337a2c;">{{ course.page_welcome_title or course.title }}</h1>
     {% if course.page_subtitle %}
