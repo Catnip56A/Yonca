@@ -96,6 +96,7 @@
     }
     .list-group-item {
         font-size: 1rem;
+        text-align: left;
     }
     .tab-content {
         margin-top: 24px;
@@ -190,6 +191,7 @@
         .card-header {
             padding: 0.75rem 1rem;
             font-size: 0.9rem;
+            text-align: left;
         }
 
         .card-body {
@@ -367,7 +369,7 @@
     <div class="folder-item" data-depth="{{ depth }}" data-folder-id="{{ folder.id }}">
             <div class="card mb-2">
                     {% set is_locked = folder.locked_until_assignment_id and (folder.locked_until_assignment_id not in passed_assignment_ids) and not is_teacher_or_admin %}
-                    <div class="card-header" style="background: #e3f2fd; cursor: pointer;" {% if not is_locked %}data-toggle="collapse" data-target="#folder-{{ folder.id }}"{% endif %}>
+                    <div class="card-header" style="background: #e3f2fd; cursor: pointer; text-align: left;" {% if not is_locked %}data-toggle="collapse" data-target="#folder-{{ folder.id }}"{% endif %}>
                         <strong>📁 {{ folder.title }} <span class="ml-1" id="icon-{{ folder.id }}">▼</span></strong>
                         {% if is_locked %}
                             <span class="badge badge-danger ml-2">🔒 {{ _('Locked') }}</span>
@@ -423,10 +425,10 @@
                         <ul class="list-group mb-2 file-sortable" data-folder-id="{{ folder.id }}">
                             {% for item in folder_items %}
                             <li class="list-group-item d-flex justify-content-between align-items-center" data-file-id="{{ item.id }}">
-                                <span class="drag-handle mr-2" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; margin-right:8px; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto;">☰</span>
-                                <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                                    <span class="drag-handle" style="cursor:grab; display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; font-size:1.5rem; background:#e0e7ef; border-radius:6px; border:1.5px solid #b6c2d1; user-select:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; pointer-events:auto; flex-shrink: 0;">☰</span>
                                     {% if is_teacher_or_admin %}
-                                    <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()">
+                                    <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()" style="flex-shrink: 0; cursor: pointer;">
                                     {% endif %}
                                     <div>
                                         <strong>{{ item.title }}</strong><br>
@@ -841,9 +843,9 @@
                 <ul class="list-group mb-4">
                     {% for item in unassigned %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
                             {% if is_teacher_or_admin %}
-                            <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()">
+                            <input type="checkbox" class="content-checkbox-enrolled" value="{{ item.id }}" onchange="updateBulkActionsEnrolled()" style="flex-shrink: 0; cursor: pointer;">
                             {% endif %}
                             <div>
                                 <strong>{{ item.title }}</strong><br>
@@ -918,7 +920,7 @@
                 <div class="card">
                     <div class="card-header" id="assignHeading{{ assignment.id }}">
                         <h5 class="mb-0">
-                            <button class="btn btn-link text-left w-100 d-flex justify-content-between align-items-center" type="button" data-toggle="collapse" data-target="#assignCollapse{{ assignment.id }}" aria-expanded="false" aria-controls="assignCollapse{{ assignment.id }}">
+                            <button class="btn btn-link text-left w-100 d-flex justify-content-start align-items-center" type="button" data-toggle="collapse" data-target="#assignCollapse{{ assignment.id }}" aria-expanded="false" aria-controls="assignCollapse{{ assignment.id }}">
                                 <div>
                                     <strong>{{ assignment.title }}</strong>
                                     <br>
