@@ -318,13 +318,9 @@ class AdminIndexView(AdminIndexView):
                 home_content.logged_out_features = logged_out_features
                 
                 # Process What's New media
-                gallery_images = []
-                
-                # Also include existing What's New media that might not have form data
+                # Use a dictionary to collect images by their index to maintain order
+                gallery_images_dict = {}
                 existing_images = home_content.gallery_images or []
-                
-                # Start with all existing images
-                gallery_images = existing_images.copy()
                 
                 # Get all gallery indices from form data (alt, caption, and url fields)
                 gallery_indices = set()
@@ -339,8 +335,8 @@ class AdminIndexView(AdminIndexView):
                         index = key.replace('gallery_url_', '')
                         gallery_indices.add(index)
                 
-                # Process each gallery index
-                for index in sorted(gallery_indices):
+                # Process each gallery index found in the form
+                for index in sorted(gallery_indices, key=lambda x: int(x) if x.isdigit() else 0):
                     file_key = f'gallery_file_{index}'
                     url_key = f'gallery_url_{index}'
                     alt_key = f'gallery_alt_{index}'
@@ -353,11 +349,7 @@ class AdminIndexView(AdminIndexView):
                     url = form_data.get(url_key, '').strip()
                     if url:
                         # Handle direct URL (YouTube, Vimeo, direct video/image links)
-                        try:
-                            index_num = int(index)
-                            gallery_images[index_num] = {'url': url, 'alt': alt, 'caption': caption}
-                        except (ValueError, IndexError):
-                            gallery_images.append({'url': url, 'alt': alt, 'caption': caption})
+                        gallery_images_dict[index] = {'url': url, 'alt': alt, 'caption': caption}
                         continue
                     
                     # Check if a file was uploaded for this index
@@ -368,12 +360,8 @@ class AdminIndexView(AdminIndexView):
                             try:
                                 drive_url = upload_gallery_image_to_drive(file, file.filename)
                                 if drive_url:
-                                    # Replace or add image at this index
-                                    try:
-                                        index_num = int(index)
-                                        gallery_images[index_num] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
-                                    except (ValueError, IndexError):
-                                        gallery_images.append({'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None})
+                                    # Add image with uploaded URL
+                                    gallery_images_dict[index] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
                                 else:
                                     flash(f'Failed to upload gallery image {file.filename} to Google Drive', 'error')
                             except Exception as e:
@@ -383,18 +371,24 @@ class AdminIndexView(AdminIndexView):
                                 else:
                                     flash(f'Failed to upload gallery image {file.filename}: {str(e)}', 'error')
                     else:
-                        # No new file uploaded - update existing image alt/caption if provided
+                        # No new file uploaded - keep existing image but update alt/caption if provided
                         try:
                             index_num = int(index)
-                            if index_num < len(gallery_images):
-                                existing_image = gallery_images[index_num].copy()
+                            if index_num < len(existing_images):
+                                # Get existing image and update only the alt/caption
+                                existing_image = existing_images[index_num].copy()
                                 if alt:
                                     existing_image['alt'] = alt
                                 if caption:
                                     existing_image['caption'] = caption
-                                gallery_images[index_num] = existing_image
+                                gallery_images_dict[index] = existing_image
                         except (ValueError, IndexError):
                             pass  # Skip invalid indices
+                
+                # Convert dictionary to ordered list based on numeric indices
+                gallery_images = []
+                for idx in sorted(gallery_images_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999):
+                    gallery_images.append(gallery_images_dict[idx])
                 
                 home_content.gallery_images = gallery_images
                 
@@ -1084,13 +1078,9 @@ class AboutCompanyView(BaseView):
                 home_content.about_features = about_features
                 
                 # Process About Company gallery
-                about_gallery_images = []
-                
-                # Also include existing About Company gallery that might not have form data
+                # Use a dictionary to collect images by their index to maintain order
+                about_gallery_images_dict = {}
                 existing_about_images = home_content.about_gallery_images or []
-                
-                # Start with all existing images
-                about_gallery_images = existing_about_images.copy()
                 
                 # Get all gallery indices from form data (alt, caption, and url fields)
                 gallery_indices = set()
@@ -1105,8 +1095,8 @@ class AboutCompanyView(BaseView):
                         index = key.replace('about_gallery_url_', '')
                         gallery_indices.add(index)
                 
-                # Process each gallery index
-                for index in sorted(gallery_indices):
+                # Process each gallery index found in the form
+                for index in sorted(gallery_indices, key=lambda x: int(x) if x.isdigit() else 0):
                     file_key = f'about_gallery_file_{index}'
                     url_key = f'about_gallery_url_{index}'
                     alt_key = f'about_gallery_alt_{index}'
@@ -1119,11 +1109,7 @@ class AboutCompanyView(BaseView):
                     url = form_data.get(url_key, '').strip()
                     if url:
                         # Handle direct URL (YouTube, Vimeo, direct video/image links)
-                        try:
-                            index_num = int(index)
-                            about_gallery_images[index_num] = {'url': url, 'alt': alt, 'caption': caption}
-                        except (ValueError, IndexError):
-                            about_gallery_images.append({'url': url, 'alt': alt, 'caption': caption})
+                        about_gallery_images_dict[index] = {'url': url, 'alt': alt, 'caption': caption}
                         continue
                     
                     # Check if a file was uploaded for this index
@@ -1133,28 +1119,29 @@ class AboutCompanyView(BaseView):
                             # Upload to Google Drive instead of local storage
                             drive_url = upload_gallery_image_to_drive(file, file.filename)
                             if drive_url:
-                                # Replace or add image at this index
-                                try:
-                                    index_num = int(index)
-                                    about_gallery_images[index_num] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
-                                except (ValueError, IndexError):
-                                    about_gallery_images.append({'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None})
+                                # Add image with uploaded URL
+                                about_gallery_images_dict[index] = {'url': drive_url, 'alt': alt, 'caption': caption, 'drive_file_id': None}
                             else:
                                 flash(f'Failed to upload about gallery image {file.filename} to Google Drive', 'error')
                     else:
-                        # No new file uploaded - update existing image alt/caption if provided
+                        # No new file uploaded - keep existing image but update alt/caption if provided
                         try:
                             index_num = int(index)
-                            if index_num < len(about_gallery_images):
-                                existing_image = about_gallery_images[index_num].copy()
+                            if index_num < len(existing_about_images):
+                                # Get existing image and update only the alt/caption
+                                existing_image = existing_about_images[index_num].copy()
                                 if alt:
                                     existing_image['alt'] = alt
                                 if caption:
                                     existing_image['caption'] = caption
-                                about_gallery_images[index_num] = existing_image
+                                about_gallery_images_dict[index] = existing_image
                         except (ValueError, IndexError):
                             pass  # Skip invalid indices
-                        continue
+                
+                # Convert dictionary to ordered list based on numeric indices
+                about_gallery_images = []
+                for idx in sorted(about_gallery_images_dict.keys(), key=lambda x: int(x) if x.isdigit() else 999):
+                    about_gallery_images.append(about_gallery_images_dict[idx])
                 
                 home_content.about_gallery_images = about_gallery_images
                 
