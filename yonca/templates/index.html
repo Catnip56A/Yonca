@@ -1751,7 +1751,7 @@
             <!-- Home Features Section (placed after gallery) -->
             <div class="features-section">
                 <h2 class="section-title" style="color: #000000;">{{ translate_field('home_content', home_content.id, 'features_title', home_content.features_title or _('Our Features')) }}</h2>
-                <p>{{ translate_field('home_content', home_content.id, 'features_subtitle', home_content.features_subtitle or _('Discover what makes our platform special.')) }}</p>
+                <p style="text-align: center;">{{ translate_field('home_content', home_content.id, 'features_subtitle', home_content.features_subtitle or _('Discover what makes our platform special.')) }}</p>
 
                 <div class="features">
                 {% if home_content.features %}
@@ -1786,7 +1786,7 @@
         <!-- Courses Page -->
         <section id="courses" class="page">
             <h2 class="section-title">{{ _('Courses') }}</h2>
-            <p>{{ _('Explore our available courses and start your learning journey.') }}</p>
+            <p style="text-align: center;">{{ _('Explore our available courses and start your learning journey.') }}</p>
 
             <!-- Course Filters -->
             <div class="course-filters" style="background: rgba(255, 255, 255, 0.55); padding: 1rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem;">
@@ -1803,7 +1803,7 @@
 
             <!-- Enrolled Courses Section (shown only for authenticated users) -->
             <div id="enrolled-courses-section" style="display: none;">
-                <h3 style="color: #337a2c; margin-top: 2rem; margin-bottom: 1rem; padding: 0 3%;">{{ _('My Enrolled Courses') }}</h3>
+                <h3 style="color: #000000; margin-top: 2rem; margin-bottom: 1rem; padding: 0 3%;">{{ _('My Enrolled Courses') }}</h3>
                 <div class="courses-grid enrolled-courses-grid">
                     <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading enrolled courses... (Try switching pages in case of delays)') }}</p>
                 </div>
@@ -1884,7 +1884,7 @@
         <!-- Resources Page -->
         <section id="resources" class="page">
             <h2 class="section-title">{{ _('Resources') }}</h2>
-            <p>{{ _('Download educational materials, documents, and access protected files.') }}</p>
+            <p style="text-align: center;">{{ _('Download educational materials, documents, and access protected files.') }}</p>
 
             <!-- Resources Filters (on beige background) -->
             <div class="resources-filters-inline">
@@ -1976,7 +1976,7 @@
             {% set gallery_subtitle = translate_field('home_content', home_content.id, 'about_gallery_subtitle', home_content.about_gallery_subtitle or _('Discover the latest updates, new features, and exciting developments in our learning platform.')) %}
             {% for paragraph in gallery_subtitle.split('\n') %}
             {% if paragraph.strip() %}
-            <p>{{ paragraph.strip() }}</p>
+            <p style="text-align: center;">{{ paragraph.strip() }}</p>
             {% endif %}
             {% endfor %}
 
