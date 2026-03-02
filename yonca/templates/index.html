@@ -505,7 +505,10 @@
         }
 
         .features-section .feature-card {
-            background: white;
+            background-image: url('/static/permanent/CourseItemBg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             border: 1px solid rgba(0,0,0,0.04);
             border-radius: 10px;
             padding: 2rem;
@@ -880,11 +883,195 @@
             margin-bottom: 1rem;
         }
 
-        .resources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 0;
+        .resources-grid .resource-card {
+            background: url('/static/permanent/CourseItemBg.png');
+            background-size: cover;
+            background-position: center;
+            background-color: white;
+        }
+            
+
+        /* Courses Hero Section */
+        .courses-hero-container {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+            padding: 3rem 0;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 15px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .courses-left-content {
+            flex: 1;
+            text-align: left;
+            padding-right: 2rem;
+        }
+
+        .courses-header {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #000000;
+            margin: 0 0 0.5rem 0;
+            text-align: left;
+        }
+
+        .courses-subheader {
+            font-size: 1.1rem;
+            color: #353e45;
+            margin: 0 0 2rem 0;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .courses-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .courses-btn {
+            background: #337a2c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .courses-btn:hover {
+            background: #2a5a22;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(51, 122, 44, 0.3);
+        }
+
+        .view-all-btn {
+            background: #337a2c;
+        }
+
+        .view-all-btn:hover {
+            background: #2a5a22;
+        }
+
+        .contact-btn {
+            background: #337a2c;
+        }
+
+        .contact-btn:hover {
+            background: #2a5a22;
+        }
+
+        /* Courses Carousel */
+        .courses-right-carousel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            transition: transform 0.6s ease-in-out;
+            width: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 16 / 10;
+            background: #f5f5f5;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-control:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .carousel-control.prev {
+            left: 12px;
+        }
+
+        .carousel-control.next {
+            right: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .courses-hero-container {
+                flex-direction: column;
+                gap: 2rem;
+                padding: 2rem;
+            }
+
+            .courses-left-content {
+                padding-right: 0;
+                text-align: center;
+            }
+
+            .courses-header {
+                text-align: center;
+            }
+
+            .courses-subheader {
+                text-align: center;
+            }
+
+            .courses-buttons {
+                justify-content: center;
+            }
+
+            .courses-right-carousel {
+                width: 100%;
+            }
+        }
+
+        /* Featured Courses Section */
+        .featured-courses-section {
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
         }
 
         .courses-grid {
@@ -892,6 +1079,14 @@
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 2rem;
             margin: 0 3%;
+            align-items: start;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 0;
             align-items: start;
         }
 
@@ -906,11 +1101,15 @@
 
         .resource-card:hover {
             box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-            transform: translateY(-2px);
         }
 
         .resource-card.course-card {
             cursor: pointer;
+            background: url('/static/permanent/CourseItemBg.png');
+            background-size: cover;
+            background-position: center;
+            background-color: white;
+            background-attachment: fixed;
         }
 
         .resource-card.course-card:hover .dropdown-indicator {
@@ -919,14 +1118,17 @@
         }
 
         .resource-card.course-card.enrolled-course {
-            background: white;
+            background: url('/static/permanent/CourseItemBg.png');
+            background-size: cover;
+            background-position: center;
+            background-color: white;
+            background-attachment: fixed;
             border: 1px solid rgba(0,0,0,0.04);
             border-left: 4px solid #2b5a1d;
         }
 
         .resource-card.course-card.enrolled-course:hover {
             box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-            transform: translateY(-2px);
         }
 
         .dropdown-indicator {
@@ -1068,13 +1270,7 @@
             border-color: #2b5a1d;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-            max-width: 500px;
-        }
+            
 
         .pdf-upload-section {
             background: #f9fafb;
@@ -1559,9 +1755,7 @@
             background-color: #f8f9fa !important;
         }
 
-        .services-button {
-            /* Base styles for the services button */
-        }
+        
 
         @media (max-width: 768px) {
             .services-button {
@@ -1615,7 +1809,7 @@
                             </a>
                             <span style="color: #353e45; margin-right: 0.5rem; white-space: nowrap;">{{ _('Welcome') }}, <span id="user-name"></span>!</span>
                             <button id="admin-btn" onclick="window.location.href='/admin'" style="margin-right: 0.25rem; display: none;">{{ _('Admin') }}</button>
-                            <button onclick="window.location.href='{{ url_for('auth.google_account_info') }}'" style="margin-right: 0.25rem; background: #337A2C; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">{{ _('Link Google') }}</button>
+                            <a href="{{ url_for('auth.google_account_info') }}" style="margin-right: 0.25rem; background: #337A2C; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; display: inline-block;">{{ _('Link Google Account') }}</a>
                             <button onclick="window.location.href='/logout'">{{ _('Logout') }}</button>
                         </div>
                     </div>
@@ -1658,7 +1852,7 @@
             <div id="mobile-user-info" style="margin-top: 2rem; text-align: center; display: none;">
                 <p style="color: #353e45; margin-bottom: 1rem;">{{ _('Welcome') }}, <span id="mobile-user-name"></span>!</p>
                 <button id="mobile-admin-btn" onclick="window.location.href='/admin'" style="width: 100%; margin-bottom: 0.5rem; display: none;">{{ _('Admin') }}</button>
-                <button onclick="window.location.href='{{ url_for('auth.google_account_info') }}'" style="width: 100%; margin-bottom: 0.5rem; background: #337A2C; color: white; border: none; padding: 0.75rem 1rem; border-radius: 4px; cursor: pointer;">{{ _('Link Google Account') }}</button>
+                <a href="{{ url_for('auth.google_account_info') }}" style="display: block; width: 100%; margin-bottom: 0.5rem; background: #337A2C; color: white; text-decoration: none; padding: 0.75rem 1rem; border-radius: 4px; cursor: pointer; text-align: center;">{{ _('Link Google Account') }}</a>
                 <button onclick="window.location.href='/logout'" style="width: 100%;">{{ _('Logout') }}</button>
             </div>
         </div>
@@ -1785,6 +1979,42 @@
 
         <!-- Courses Page -->
         <section id="courses" class="page">
+            <div class="courses-hero-container" id="coursesHeroContainer">
+                <div class="courses-left-content">
+                    <h2 id="courses-title" class="courses-header">{{ _('Professional Education and Training') }}</h2>
+                    <p id="courses-subtitle" class="courses-subheader">{{ _('Evidence-based training for psychologists, therapists, educators, and tutors') }}</p>
+                    <div class="courses-buttons">
+                        <button class="courses-btn view-all-btn" onclick="showPage('coursesAll')">{{ _('View All Courses') }}</button>
+                        <button class="courses-btn contact-btn" onclick="window.open('https://wa.me/+994516237394', '_blank')">{{ _('Contact Us') }}</button>
+                    </div>
+                </div>
+                <div class="courses-right-carousel">
+                    <div class="carousel-container">
+                        <div class="carousel-wrapper" id="coursesCarousel">
+                            <div class="carousel-slide">
+                                <img src="/static/permanent/Professional_Training_pic.jpeg" alt="Professional Training">
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="/static/permanent/SDC_Courses.jpeg" alt="SDC Courses">
+                            </div>
+                        </div>
+                        <button class="carousel-control prev" onclick="prevCourseSlide()">&#10094;</button>
+                        <button class="carousel-control next" onclick="nextCourseSlide()">&#10095;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Courses Section -->
+            <div class="featured-courses-section">
+                <h3 id="featured-courses-title" style="color: #000000; margin-top: 2rem; margin-bottom: 1rem; padding: 0 3%;">{{ _('Featured Courses') }}</h3>
+                <div id="featured-courses-grid" class="courses-grid">
+                    <p style="text-align: center; color: #6b7280; font-style: italic;">{{ _('Loading courses... (Try switching pages in case of delays)') }}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CoursesAll Page -->
+        <section id="coursesAll" class="page">
             <h2 class="section-title">{{ _('Courses') }}</h2>
             <p style="text-align: center;">{{ _('Explore our available courses and start your learning journey.') }}</p>
 
@@ -2058,6 +2288,141 @@
         // API base URL
         const API_BASE = window.location.origin;
 
+        // ===== Courses Carousel Setup =====
+        let courseCurrentSlide = 0;
+        const courseSlides = [
+            {
+                title: '{{ _("Professional Education and Training") }}',
+                subtitle: '{{ _("Evidence-based training for psychologists, therapists, educators, and tutors") }}',
+                tag: 'Professional'
+            },
+            {
+                title: '{{ _("Support and Development Courses") }}',
+                subtitle: '{{ _("Support and Development courses provide guided learning to strengthen core skills, build confidence, and support steady progress.") }}',
+                tag: 'Self-development'
+            }
+        ];
+
+        function updateCourseSlide(index) {
+            const carousel = document.getElementById('coursesCarousel');
+            const title = document.getElementById('courses-title');
+            const subtitle = document.getElementById('courses-subtitle');
+            
+            if (carousel && title && subtitle) {
+                carousel.style.transform = `translateX(-${index * 100}%)`;
+                title.textContent = courseSlides[index].title;
+                subtitle.textContent = courseSlides[index].subtitle;
+            }
+            
+            // Load featured courses for this slide
+            loadFeaturedCourses(courseSlides[index].tag);
+        }
+
+        function loadFeaturedCourses(tag) {
+            const grid = document.getElementById('featured-courses-grid');
+            const titleElement = document.getElementById('featured-courses-title');
+            
+            if (!grid) return;
+            
+            // Show loading message
+            grid.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">{{ _("Loading courses...") }}</p>';
+            
+            // Step 1: Fetch in English to identify matching courses by tag
+            fetch(`${API_BASE}/api/courses?lang=en`, { cache: 'no-store', credentials: 'include' })
+                .then(response => response.json())
+                .then(coursesEnglish => {
+                    // Ensure courses is an array
+                    const coursesArray = Array.isArray(coursesEnglish) ? coursesEnglish : (coursesEnglish.courses || []);
+                    
+                    if (!Array.isArray(coursesArray)) {
+                        grid.innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading courses") }}</p>';
+                        return;
+                    }
+                    
+                    // Filter courses by tag (using English tags for comparison)
+                    const matchingCourseIds = coursesArray
+                        .filter(course => {
+                            if (!course.tags) return false;
+                            const tags = typeof course.tags === 'string' ? course.tags.split(',') : course.tags;
+                            return tags.map(t => t.trim().toLowerCase()).includes(tag.toLowerCase());
+                        })
+                        .map(course => course.id);
+                    
+                    if (matchingCourseIds.length === 0) {
+                        grid.innerHTML = '<p style="text-align: center; color: #6b7280;">{{ _("No courses available for this category.") }}</p>';
+                        return;
+                    }
+                    
+                    // Step 2: Fetch in current language to display localized content
+                    fetch(`${API_BASE}/api/courses`, { cache: 'no-store', credentials: 'include' })
+                        .then(response => response.json())
+                        .then(coursesLocalized => {
+                            const localizedArray = Array.isArray(coursesLocalized) ? coursesLocalized : (coursesLocalized.courses || []);
+                            
+                            // Filter localized courses to only show the ones matching the tag
+                            const filteredCourses = localizedArray.filter(course => matchingCourseIds.includes(course.id));
+                            
+                            // Clear the grid and populate with localized course cards
+                            grid.innerHTML = '';
+                            filteredCourses.forEach(course => {
+                                const courseCard = createCourseCard(course, false); // false = not enrolled
+                                grid.appendChild(courseCard);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading localized courses:', error);
+                            grid.innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading courses") }}</p>';
+                        });
+                })
+                .catch(error => {
+                    console.error('Error loading courses:', error);
+                    grid.innerHTML = '<p style="text-align: center; color: #dc2626;">{{ _("Error loading courses") }}</p>';
+                });
+        }
+
+        function isHeroContainerScrolledOff() {
+            const heroContainer = document.getElementById('coursesHeroContainer');
+            if (!heroContainer) return false;
+            
+            const rect = heroContainer.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            // Return true if the bottom of the container has scrolled above 33% of screen height
+            // (meaning it's scrolled far off-screen and we should stop rotation)
+            return rect.bottom < (windowHeight * 0.33);
+        }
+
+        function nextCourseSlide() {
+            if (isHeroContainerScrolledOff()) {
+                return; // Stop auto-rotation once hero scrolls below 33% marker
+            }
+            
+            courseCurrentSlide = (courseCurrentSlide + 1) % courseSlides.length;
+            updateCourseSlide(courseCurrentSlide);
+            resetCourseCarouselTimer();
+        }
+
+        function prevCourseSlide() {
+            courseCurrentSlide = (courseCurrentSlide - 1 + courseSlides.length) % courseSlides.length;
+            updateCourseSlide(courseCurrentSlide);
+            resetCourseCarouselTimer();
+        }
+
+        let courseCarouselTimer;
+        function startCourseCarousel() {
+            courseCarouselTimer = setInterval(() => {
+                if (!isHeroContainerScrolledOff()) {
+                    nextCourseSlide();
+                }
+            }, 20000); // 20 seconds
+        }
+
+        function resetCourseCarouselTimer() {
+            clearInterval(courseCarouselTimer);
+            startCourseCarousel();
+        }
+        // ===== End Courses Carousel Setup =====
+
         // Current page management
         function showPage(pageId, event) {
             console.log('showPage called with pageId:', pageId, 'event:', event);
@@ -2133,11 +2498,12 @@
                     }
                 }
             } else {
-                console.error('Link element not found:', pageId + '-link');
+                // Link element may not exist for all pages (e.g., coursesAll)
+                console.log('Link element not found for page:', pageId + '-link', '(this is normal for some pages)');
             }
 
             // Load data for specific pages
-            if (pageId === 'courses') {
+            if (pageId === 'courses' || pageId === 'coursesAll') {
                 console.log('Loading courses... (Try switching pages in case of delays)');
                 loadCourses();
                 // Refresh dropdowns in case they were populated before auth check completed
@@ -3822,7 +4188,7 @@
             const hash = window.location.hash.substring(1); // Remove the '#'
             if (hash && hash !== 'home') {
                 // Valid page hashes - must match section IDs in HTML
-                const validPages = ['courses', 'forum', 'resources', 'tavi-test', 'about'];
+                const validPages = ['courses', 'coursesAll', 'forum', 'resources', 'tavi-test', 'about'];
                 if (validPages.includes(hash)) {
                     console.log('Loading page from URL hash:', hash);
                     // Map hash to actual page ID
@@ -3847,7 +4213,7 @@
                 const hash = window.location.hash.substring(1); // Remove the '#'
                 if (hash) {
                     // Valid page hashes - must match navbar hrefs
-                    const validPages = ['courses', 'forum', 'resources', 'tavi-test', 'contact', 'about'];
+                    const validPages = ['courses', 'coursesAll', 'forum', 'resources', 'tavi-test', 'contact', 'about'];
                     if (validPages.includes(hash)) {
                         console.log('Hash changed to:', hash, '- showing page');
                         // Map hash to actual page ID
@@ -4074,6 +4440,17 @@
                     }
                 });
             }
+
+            // Start carousel when page loads
+            startCourseCarousel();
+            
+            // Load initial featured courses
+            loadFeaturedCourses(courseSlides[0].tag);
+            
+            // Add scroll listener to check hero container visibility
+            window.addEventListener('scroll', function() {
+                // This will be checked in the carousel interval
+            });
         });
     </script>
     <script src="{{ url_for('static', filename='js/gallery-popup.js') }}"></script>

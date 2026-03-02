@@ -32,11 +32,11 @@ api_bp.unauthorized = api_unauthorized
 @api_bp.route('/courses')
 def get_courses():
     """Get all courses with enrollment status for authenticated users"""
-    from flask import session
+    from flask import session, request
     from yonca.content_translator import get_translated_content, get_translated_string_array
     
-    # Get user's current locale
-    user_locale = session.get('language', 'en')
+    # Get language from query parameter, or fall back to session language
+    user_locale = request.args.get('lang', session.get('language', 'en'))
     
     if current_user.is_authenticated:
         # Get all courses

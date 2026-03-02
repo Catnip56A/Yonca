@@ -43,8 +43,7 @@ with app.app_context():
         print(f"  Russian:  {ru_trans.translated_text if ru_trans else 'NOT FOUND'}")
     
     # Check about_features JSON array
-    print("
-about_features JSON array:")
+    print("about_features JSON array:")
     about_features = getattr(home_content, 'about_features', [])
     if about_features:
         for i, feature in enumerate(about_features):
