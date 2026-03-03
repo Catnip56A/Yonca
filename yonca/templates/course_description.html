@@ -209,7 +209,9 @@
         <div class="col-md-4" style="margin-bottom:1.5rem;">
             <div style="background:#f3f4f6; border-radius:8px; padding:1rem; height:100%;">
                 {% if feature.image %}
-                <img src="{{ feature.image }}" alt="{{ feature.title }}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:1rem;" />
+                <div style="width:150px; height:150px; margin:0 auto 1rem; border-radius:50%; overflow:hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <img src="{{ feature.image }}" alt="{{ feature.title }}" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
                 {% endif %}
                 <h4 style="color:#337a2c; font-size:1.1rem; font-weight:600;">{{ feature.title | parse_buttons | safe }}</h4>
                 <div style="color:#555;">
@@ -227,8 +229,8 @@
     <div class="course-gallery" style="margin-top:2rem;">
         <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
             {% for img in course.page_gallery_images %}
-            <div class="circular-image-container">
-                <img src="{{ img }}" alt="Course image" />
+            <div style="width: 200px !important; height: 200px !important; border-radius: 50% !important; overflow: hidden !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; flex-shrink: 0 !important; background: #f0f0f0 !important;">
+                <img src="{{ img }}" alt="Course image" style="width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important;" />
             </div>
             {% endfor %}
         </div>

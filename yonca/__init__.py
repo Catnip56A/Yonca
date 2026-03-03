@@ -79,7 +79,7 @@ def create_app(config_name='development'):
     
     # Initialize Babel for internationalization
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(package_dir, 'translations')
-    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+    app.config['BABEL_DEFAULT_LOCALE'] = 'az'
     
     babel = Babel(app)
     
@@ -99,9 +99,9 @@ def create_app(config_name='development'):
             print(f"DEBUG: Babel get_locale from session: {lang}")
             return lang
         
-        # Default to English
-        print("DEBUG: Babel get_locale defaulting to English")
-        return 'en'
+        # Default to Azerbaijani
+        print("DEBUG: Babel get_locale defaulting to Azerbaijani")
+        return 'az'
     
     # Set locale selector using the correct attribute
     babel.init_app(app, locale_selector=get_locale)

@@ -43,7 +43,7 @@ class TranslationService:
     """Service for handling AI-powered translations with caching and protected terms"""
 
     # Supported languages for automatic translation
-    SUPPORTED_LANGUAGES = ['en', 'az', 'ru']
+    SUPPORTED_LANGUAGES = ['az', 'ru', 'en']
 
     def __init__(self):
         if DEEP_TRANS_AVAILABLE:

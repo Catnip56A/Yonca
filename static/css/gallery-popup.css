@@ -131,6 +131,41 @@
 #about .gallery-grid .gallery-item {
   flex: 0 0 320px;
   scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#about .gallery-grid .gallery-item .gallery-media-viewport {
+  width: 288px !important;
+  height: 288px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background: #f0f0f0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 1rem auto !important;
+}
+
+#about .gallery-grid .gallery-item img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+#about .gallery-grid .gallery-item iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+}
+
+#about .gallery-grid .gallery-item video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
 /* hide scrollbar but keep accessible */
