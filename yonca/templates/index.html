@@ -1918,7 +1918,7 @@
                     <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
                     {% endif %}
                     {% if image.caption %}
-                    <div class="gallery-caption">{{ image.caption }}</div>
+                    <div class="gallery-caption">{{ image.caption | safe }}</div>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -2261,7 +2261,7 @@
                     <img src="{{ image.url }}" alt="{{ image.alt }}" loading="lazy">
                     {% endif %}
                     {% if image.caption %}
-                    <div class="gallery-caption">{{ image.caption }}</div>
+                    <div class="gallery-caption">{{ image.caption | safe }}</div>
                     {% endif %}
                 </div>
                 {% endfor %}
