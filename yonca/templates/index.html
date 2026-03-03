@@ -305,7 +305,7 @@
 
         .dropdown-toggle::after {
             content: " ▼";
-            font-size: 0.8em;
+            font-size: 1.04em;
             margin-left: 0.25rem;
         }
 
@@ -668,7 +668,7 @@
             padding: 0.5rem;
             background: rgba(249, 250, 251, 0.9);
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 1.04rem;
             color: #000000;
             backdrop-filter: blur(4px);
             border-radius: 8px;
@@ -815,7 +815,7 @@
 
         .forum-message .timestamp {
             color: #000000;
-            font-size: 0.875rem;
+            font-size: 1.1375rem;
         }
 
         .message-actions {
@@ -832,7 +832,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 1.04rem;
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
             transition: background-color 0.3s ease;
@@ -1251,7 +1251,7 @@
             border: 1px solid #d1d5db;
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 1.17rem;
             cursor: pointer;
             transition: all 0.2s ease;
             margin-right: 0.5rem;
@@ -2080,7 +2080,7 @@
                             </select>
                         </div>
                     </div>
-                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem; color: #6b7280;">{{ _("Select a language to translate messages, or choose 'Don't translate' to view messages in their original language. Click individual messages to toggle translation.") }}</p>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.1375rem; color: #6b7280;">{{ _("Select a language to translate messages, or choose 'Don't translate' to view messages in their original language. Click individual messages to toggle translation.") }}</p>
                 </div>
 
                 <div class="message-form">
@@ -2182,7 +2182,7 @@
                         </div>
                     </div>
                     <div class="form-group" id="pin-info-group">
-                        <p style="font-size: 0.9em; color: #6b7280; margin: 0;">{{ _('Access PIN will be auto-generated (6 characters, expires in 10 minutes)') }}</p>
+                        <p style="font-size: 1.17em; color: #6b7280; margin: 0;">{{ _('Access PIN will be auto-generated (6 characters, expires in 10 minutes)') }}</p>
                     </div>
                     <button type="submit" id="resource-upload-btn">{{ _('Upload Material') }}</button>
                 </form>
@@ -2700,7 +2700,7 @@
             courseCard.innerHTML = `
                 <h4 style="display: flex; align-items: center;">${course.title} ${enrolledBadge}</h4>
                 <p>${course.description}</p>
-                ${course.tags && course.tags.length > 0 ? '<div class="course-tags" style="margin-top: 0.5rem;">' + course.tags.map(tag => '<span class="tag-badge" style="display: inline-block; background: #e8f5e8; color: #2b5a1d; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-right: 0.3rem; margin-bottom: 0.3rem;">' + tag + '</span>').join('') + '</div>' : ''}
+                ${course.tags && course.tags.length > 0 ? '<div class="course-tags" style="margin-top: 0.5rem;">' + course.tags.map(tag => '<span class="tag-badge" style="display: inline-block; background: #e8f5e8; color: #2b5a1d; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 1.04rem; margin-right: 0.3rem; margin-bottom: 0.3rem;">' + tag + '</span>').join('') + '</div>' : ''}
                 ${dropdownElements}
             `;
 
@@ -3027,8 +3027,8 @@
                             ${resource.preview_image ? `<img src="${previewSrc}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title} 🔒</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
-                            ${resource.tags ? `<p style="font-size: 0.9rem; color: #337a2c; margin: 0.5rem 0;">${resource.tags.split(' ').map(tag => tag.trim() ? `#${tag.trim()}` : '').join(' ')}</p>` : ''}
-                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
+                            ${resource.tags ? `<p style="font-size: 1.17rem; color: #337a2c; margin: 0.5rem 0;">${resource.tags.split(' ').map(tag => tag.trim() ? `#${tag.trim()}` : '').join(' ')}</p>` : ''}
+                            <p style="font-size: 1.17rem; color: #6b7280; margin: 0.5rem 0;">
                                 {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
                             </p>
                             ${accessButton}
@@ -3050,8 +3050,8 @@
                             ${resource.preview_image ? `<img src="${previewSrc}" alt="${resource.title}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
                             <h4>${resource.title}</h4>
                             <p>${resource.description || '{{ _("No description available") }}'}</p>
-                            ${resource.tags ? `<p style="font-size: 0.9rem; color: #337a2c; margin: 0.5rem 0;">${resource.tags.split(' ').map(tag => tag.trim() ? `#${tag.trim()}` : '').join(' ')}</p>` : ''}
-                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
+                            ${resource.tags ? `<p style="font-size: 1.17rem; color: #337a2c; margin: 0.5rem 0;">${resource.tags.split(' ').map(tag => tag.trim() ? `#${tag.trim()}` : '').join(' ')}</p>` : ''}
+                            <p style="font-size: 1.17rem; color: #6b7280; margin: 0.5rem 0;">
                                 {{ _('Uploaded:') }} ${new Date(resource.upload_date).toLocaleDateString()}
                             </p>
                             <a href="${resource.drive_view_link}" target="_blank" style="background: #337a2c; color: white; text-decoration: none; border: 1px solid #337a2c; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition: all 0.3s ease; display: inline-block;">{{ _('View Resource') }}</a>
@@ -3139,7 +3139,7 @@
                     pdfCard.innerHTML = `
                         <h4>${pdf.title}</h4>
                         <p>${pdf.description || '{{ _("No description available") }}'}</p>
-                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0.5rem 0;">
+                        <p style="font-size: 1.17rem; color: #6b7280; margin: 0.5rem 0;">
                             {{ _('Uploaded:') }} ${new Date(pdf.upload_date).toLocaleDateString()}
                         </p>
                         ${accessButton}
