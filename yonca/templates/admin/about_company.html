@@ -129,7 +129,7 @@
     <div class="row">
         <div class="col-md-12">
             <h1 class="mt-4 mb-4">
-                <i class="fa fa-info-circle"></i> About Company Configuration
+                <i class="fa fa-info-circle"></i> {{ _('About Company Configuration') }}
             </h1>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -148,49 +148,49 @@
                 <!-- About Company Section -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-info-circle"></i> About Company</h4>
+                        <h4 class="section-title"><i class="fa fa-info-circle"></i> {{ _('About Company') }}</h4>
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="about_welcome_title">Welcome Title:</label>
+                        <label for="about_welcome_title">{{ _('Welcome Title:') }}</label>
                         <input type="text" id="about_welcome_title" name="about_welcome_title" class="form-control"
-                               value="{{ form.about_welcome_title.data or 'Welcome to Yonca' }}">
-                        <small class="text-muted">The main welcome title displayed on the About page</small>
+                               value="{{ form.about_welcome_title.data or _('Welcome to Yonca') }}">
+                        <small class="text-muted">{{ _('The main welcome title displayed on the About page') }}</small>
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="about_subtitle">Subtitle:</label>
-                        <textarea id="about_subtitle" name="about_subtitle" class="form-control" rows="3">{{ form.about_subtitle.data or 'Join our learning community and discover amazing features designed to enhance your educational experience.' }}</textarea>
-                        <small class="text-muted">A brief description that appears below the welcome title</small>
+                        <label for="about_subtitle">{{ _('Subtitle:') }}</label>
+                        <textarea id="about_subtitle" name="about_subtitle" class="form-control" rows="3">{{ form.about_subtitle.data or _('Join our learning community and discover amazing features designed to enhance your educational experience.') }}</textarea>
+                        <small class="text-muted">{{ _('A brief description that appears below the welcome title') }}</small>
                     </div>
                 </div>
 
                 <!-- About Features Section Heading -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-star"></i> About Features Section</h4>
+                        <h4 class="section-title"><i class="fa fa-star"></i> {{ _('About Features Section') }}</h4>
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="about_features_title">Features Title:</label>
+                        <label for="about_features_title">{{ _('Features Title:') }}</label>
                         <input type="text" id="about_features_title" name="about_features_title" class="form-control"
-                               value="{{ form.about_features_title.data or 'Our Features' }}">
-                        <small class="text-muted">The heading that appears above the features</small>
+                               value="{{ form.about_features_title.data or _('Our Features') }}">
+                        <small class="text-muted">{{ _('The heading that appears above the features') }}</small>
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="about_features_subtitle">Features Subtitle:</label>
-                        <textarea id="about_features_subtitle" name="about_features_subtitle" class="form-control" rows="2">{{ form.about_features_subtitle.data or 'Discover what makes our platform special.' }}</textarea>
-                        <small class="text-muted">The subtitle that appears below the features title</small>
+                        <label for="about_features_subtitle">{{ _('Features Subtitle:') }}</label>
+                        <textarea id="about_features_subtitle" name="about_features_subtitle" class="form-control" rows="2">{{ form.about_features_subtitle.data or _('Discover what makes our platform special.') }}</textarea>
+                        <small class="text-muted">{{ _('The subtitle that appears below the features title') }}</small>
                     </div>
                 </div>
 
                 <!-- About Features Section -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-star"></i> About Features</h4>
+                        <h4 class="section-title"><i class="fa fa-star"></i> {{ _('About Features') }}</h4>
                         <button type="button" class="btn btn-sm btn-outline-primary" id="add-about-feature">
-                            <i class="fa fa-plus"></i> Add Feature
+                            <i class="fa fa-plus"></i> {{ _('Add Feature') }}
                         </button>
                     </div>
 
@@ -202,29 +202,29 @@
                 <!-- About Gallery Section Heading -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-heading"></i> About Gallery Section</h4>
+                        <h4 class="section-title"><i class="fa fa-heading"></i> {{ _('About Gallery Section') }}</h4>
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="about_gallery_title">Gallery Title:</label>
+                        <label for="about_gallery_title">{{ _('Gallery Title:') }}</label>
                         <input type="text" id="about_gallery_title" name="about_gallery_title" class="form-control"
-                               value="{{ form.about_gallery_title.data or 'What\'s New' }}">
-                        <small class="text-muted">The heading that appears above the gallery</small>
+                               value="{{ form.about_gallery_title.data or _('What\'s New') }}">
+                        <small class="text-muted">{{ _('The heading that appears above the gallery') }}</small>
                     </div>
 
                     <div class="form-group-inline">
-                        <label for="about_gallery_subtitle">Gallery Subtitle:</label>
-                        <textarea id="about_gallery_subtitle" name="about_gallery_subtitle" class="form-control" rows="2">{{ form.about_gallery_subtitle.data or 'Discover the latest updates, new features, and exciting developments in our learning platform.' }}</textarea>
-                        <small class="text-muted">The subtitle that appears below the gallery title</small>
+                        <label for="about_gallery_subtitle">{{ _('Gallery Subtitle:') }}</label>
+                        <textarea id="about_gallery_subtitle" name="about_gallery_subtitle" class="form-control" rows="2">{{ form.about_gallery_subtitle.data or _('Discover the latest updates, new features, and exciting developments in our learning platform.') }}</textarea>
+                        <small class="text-muted">{{ _('The subtitle that appears below the gallery title') }}</small>
                     </div>
                 </div>
 
                 <!-- About Gallery Section -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h4 class="section-title"><i class="fa fa-image"></i> About Gallery (Images, Videos, YouTube, Vimeo)</h4>
+                        <h4 class="section-title"><i class="fa fa-image"></i> {{ _('About Gallery (Images, Videos, YouTube, Vimeo)') }}</h4>
                         <button type="button" class="btn btn-sm btn-outline-primary" id="add-about-gallery-image">
-                            <i class="fa fa-plus"></i> Add Media
+                            <i class="fa fa-plus"></i> {{ _('Add Media') }}
                         </button>
                     </div>
 
@@ -236,10 +236,10 @@
                 <!-- Submit Button -->
                 <div class="content-section">
                     <button type="submit" class="btn btn-success">
-                        <i class="fa fa-save"></i> Save Changes
+                        <i class="fa fa-save"></i> {{ _('Save Changes') }}
                     </button>
                     <a href="{{ url_for('admin.index') }}" class="btn btn-primary ml-2">
-                        <i class="fa fa-arrow-left"></i> Back to Home
+                        <i class="fa fa-arrow-left"></i> {{ _('Back to Home') }}
                     </a>
                 </div>
             </form>
@@ -248,6 +248,31 @@
 </div>
 
 <script>
+// Translation strings for JavaScript
+const TRANSLATIONS = {
+    feature_title: '{{ _("Title:") }}',
+    feature_description: '{{ _("Description:") }}',
+    feature_placeholder_title: '{{ _("Feature title") }}',
+    feature_placeholder_desc: '{{ _("Feature description") }}',
+    choose_input_type: '{{ _("Choose input type:") }}',
+    upload_file: '{{ _("Upload File") }}',
+    enter_url: '{{ _("Enter URL") }}',
+    media_file: '{{ _("Media File:") }}',
+    media_url: '{{ _("Media URL:") }}',
+    url_placeholder: '{{ _("https://youtube.com/watch?v=... or https://drive.google.com/file/d/... or direct video URL") }}',
+    alt_text: '{{ _("Alt Text:") }}',
+    alt_placeholder: '{{ _("Image description") }}',
+    caption: '{{ _("Caption:") }}',
+    caption_placeholder: '{{ _("Image caption") }}',
+    translate_caption: '{{ _("Translate Caption") }}',
+    enter_caption: '{{ _("Please enter some text in the caption field before translating.") }}',
+    translation_completed: '{{ _("Translation completed and cached:") }}',
+    original: '{{ _("Original") }}',
+    translation_failed: '{{ _("Translation failed:") }}',
+    translation_error: '{{ _("Translation error:") }}',
+    unknown_error: '{{ _("Unknown error") }}'
+};
+
 // Add any client-side validation or enhancements here
 document.addEventListener('DOMContentLoaded', function() {
     // Basic JSON validation for features field (removed since we now use dynamic features)
@@ -304,14 +329,14 @@ function addAboutFeature(containerId, prefix) {
             </button>
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_title_${featureIndex}">Title:</label>
+            <label for="${prefix}_title_${featureIndex}">${TRANSLATIONS.feature_title}</label>
             <input type="text" id="${prefix}_title_${featureIndex}" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
-                   placeholder="Feature title" value="">
+                   placeholder="${TRANSLATIONS.feature_placeholder_title}" value="">
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_desc_${featureIndex}">Description:</label>
+            <label for="${prefix}_desc_${featureIndex}">${TRANSLATIONS.feature_description}</label>
             <textarea id="${prefix}_desc_${featureIndex}" name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
-                      placeholder="Feature description"></textarea>
+                      placeholder="${TRANSLATIONS.feature_placeholder_desc}"></textarea>
         </div>
     `;
 
@@ -342,14 +367,14 @@ function addAboutFeatureFromData(containerId, prefix, title, description) {
             </button>
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_title_${featureIndex}">Title:</label>
+            <label for="${prefix}_title_${featureIndex}">${TRANSLATIONS.feature_title}</label>
             <input type="text" id="${prefix}_title_${featureIndex}" name="${prefix}_title_${featureIndex}" class="form-control feature-title"
-                   placeholder="Feature title" value="${escapedTitle}">
+                   placeholder="${TRANSLATIONS.feature_placeholder_title}" value="${escapedTitle}">
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_desc_${featureIndex}">Description:</label>
+            <label for="${prefix}_desc_${featureIndex}">${TRANSLATIONS.feature_description}</label>
             <textarea id="${prefix}_desc_${featureIndex}" name="${prefix}_desc_${featureIndex}" class="form-control feature-desc" rows="2"
-                      placeholder="Feature description">${escapedDescription}</textarea>
+                      placeholder="${TRANSLATIONS.feature_placeholder_desc}">${escapedDescription}</textarea>
         </div>
     `;
 
@@ -377,38 +402,38 @@ function addAboutGalleryImage(containerId, prefix) {
             </button>
         </div>
         <div style="margin-bottom: 10px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Choose input type:</label>
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">${TRANSLATIONS.choose_input_type}</label>
             <div style="display: flex; gap: 10px;">
-                <label><input type="radio" name="about_input_type_${imageIndex}" value="file" checked> Upload File</label>
-                <label><input type="radio" name="about_input_type_${imageIndex}" value="url"> Enter URL</label>
+                <label><input type="radio" name="about_input_type_${imageIndex}" value="file" checked> ${TRANSLATIONS.upload_file}</label>
+                <label><input type="radio" name="about_input_type_${imageIndex}" value="url"> ${TRANSLATIONS.enter_url}</label>
             </div>
         </div>
         <div class="file-input-group">
             <div class="form-group-inline">
-                <label for="${prefix}_file_${imageIndex}">Media File:</label>
+                <label for="${prefix}_file_${imageIndex}">${TRANSLATIONS.media_file}</label>
                 <input type="file" id="${prefix}_file_${imageIndex}" name="${prefix}_file_${imageIndex}" class="form-control gallery-file"
                        accept="image/*,video/*" required>
             </div>
         </div>
         <div class="url-input-group" style="display: none;">
             <div class="form-group-inline">
-                <label for="${prefix}_url_${imageIndex}">Media URL:</label>
+                <label for="${prefix}_url_${imageIndex}">${TRANSLATIONS.media_url}</label>
                 <input type="url" id="${prefix}_url_${imageIndex}" name="${prefix}_url_${imageIndex}" class="form-control gallery-url"
-                       placeholder="https://youtube.com/watch?v=... or https://drive.google.com/file/d/... or direct video URL" value="">
+                       placeholder="${TRANSLATIONS.url_placeholder}" value="">
             </div>
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_alt_${imageIndex}">Alt Text:</label>
+            <label for="${prefix}_alt_${imageIndex}">${TRANSLATIONS.alt_text}</label>
             <input type="text" id="${prefix}_alt_${imageIndex}" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
-                   placeholder="Image description" value="">
+                   placeholder="${TRANSLATIONS.alt_placeholder}" value="">
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_caption_${imageIndex}">Caption:</label>
+            <label for="${prefix}_caption_${imageIndex}">${TRANSLATIONS.caption}</label>
             <div style="display: flex; gap: 5px; flex: 1;">
                 <input type="text" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
-                       placeholder="Image caption" value="">
+                       placeholder="${TRANSLATIONS.caption_placeholder}" value="">
                 <button type="button" class="btn btn-sm btn-outline-info translate-caption-btn" 
-                        title="Translate Caption" data-index="${imageIndex}">
+                        title="${TRANSLATIONS.translate_caption}" data-index="${imageIndex}">
                     <i class="fa fa-language"></i>
                 </button>
             </div>
@@ -468,38 +493,38 @@ function addAboutGalleryImageFromData(containerId, prefix, url, alt, caption) {
             </button>
         </div>
         <div style="margin-bottom: 10px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Choose input type:</label>
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">${TRANSLATIONS.choose_input_type}</label>
             <div style="display: flex; gap: 10px;">
-                <label><input type="radio" name="about_input_type_${imageIndex}" value="file" ${!hasUrl ? 'checked' : ''}> Upload File</label>
-                <label><input type="radio" name="about_input_type_${imageIndex}" value="url" ${hasUrl ? 'checked' : ''}> Enter URL</label>
+                <label><input type="radio" name="about_input_type_${imageIndex}" value="file" ${!hasUrl ? 'checked' : ''}> ${TRANSLATIONS.upload_file}</label>
+                <label><input type="radio" name="about_input_type_${imageIndex}" value="url" ${hasUrl ? 'checked' : ''}> ${TRANSLATIONS.enter_url}</label>
             </div>
         </div>
         <div class="file-input-group" style="${hasUrl ? 'display: none;' : 'display: block;'}">
             <div class="form-group-inline">
-                <label for="${prefix}_file_${imageIndex}">Media File:</label>
+                <label for="${prefix}_file_${imageIndex}">${TRANSLATIONS.media_file}</label>
                 <input type="file" id="${prefix}_file_${imageIndex}" name="${prefix}_file_${imageIndex}" class="form-control gallery-file"
                        accept="image/*,video/*" ${!hasUrl ? 'required' : ''}>
             </div>
         </div>
         <div class="url-input-group" style="${hasUrl ? 'display: block;' : 'display: none;'}">
             <div class="form-group-inline">
-                <label for="${prefix}_url_${imageIndex}">Media URL:</label>
+                <label for="${prefix}_url_${imageIndex}">${TRANSLATIONS.media_url}</label>
                 <input type="url" id="${prefix}_url_${imageIndex}" name="${prefix}_url_${imageIndex}" class="form-control gallery-url"
-                       placeholder="https://youtube.com/watch?v=... or https://drive.google.com/file/d/... or direct video URL" value="${escapedUrl}" ${hasUrl ? 'required' : ''}>
+                       placeholder="${TRANSLATIONS.url_placeholder}" value="${escapedUrl}" ${hasUrl ? 'required' : ''}>
             </div>
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_alt_${imageIndex}">Alt Text:</label>
+            <label for="${prefix}_alt_${imageIndex}">${TRANSLATIONS.alt_text}</label>
             <input type="text" id="${prefix}_alt_${imageIndex}" name="${prefix}_alt_${imageIndex}" class="form-control gallery-alt"
-                   placeholder="Image description" value="${escapedAlt}">
+                   placeholder="${TRANSLATIONS.alt_placeholder}" value="${escapedAlt}">
         </div>
         <div class="form-group-inline">
-            <label for="${prefix}_caption_${imageIndex}">Caption:</label>
+            <label for="${prefix}_caption_${imageIndex}">${TRANSLATIONS.caption}</label>
             <div style="display: flex; gap: 5px; flex: 1;">
                 <input type="text" name="${prefix}_caption_${imageIndex}" class="form-control gallery-caption"
-                       placeholder="Image caption" value="${escapedCaption}">
+                       placeholder="${TRANSLATIONS.caption_placeholder}" value="${escapedCaption}">
                 <button type="button" class="btn btn-sm btn-outline-info translate-caption-btn" 
-                        title="Translate Caption" data-index="${imageIndex}">
+                        title="${TRANSLATIONS.translate_caption}" data-index="${imageIndex}">
                     <i class="fa fa-language"></i>
                 </button>
             </div>
